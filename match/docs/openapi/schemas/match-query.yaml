@@ -272,3 +272,5 @@ components:
               $ref: '../schemas/match-query.yaml#/MatchResponseExamples/TopLevelError'
     '400':
       description: "Bad request. Request body does not match the required format."
+    '429':
+      description: "Too Many Requests. The status code indicates the user has sent too many requests in a given amount of time 'rate limiting'."
