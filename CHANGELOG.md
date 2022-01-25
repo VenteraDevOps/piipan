@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0] - 2022-01-25
+
+### Changed
+- Documentation to keep up to date with current practices
+### Added
+- ADR on approach to time storage (i.e., `timestamptz`) in our PostgreSQL databases
+
 ## [0.97] - 2022-01-13
 
 ### Changed
@@ -208,6 +215,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[1.0]: https://github.com/18F/piipan/releases/tag/v1.0
+[0.97]: https://github.com/18F/piipan/releases/tag/v0.97
+[0.96]: https://github.com/18F/piipan/releases/tag/v0.96
+[0.95]: https://github.com/18F/piipan/releases/tag/v0.95
+[0.94]: https://github.com/18F/piipan/releases/tag/v0.94
+[0.93]: https://github.com/18F/piipan/releases/tag/v0.93
 [0.92]: https://github.com/18F/piipan/releases/tag/v0.92
 [0.91]: https://github.com/18F/piipan/releases/tag/v0.91
 [0.9]: https://github.com/18F/piipan/releases/tag/v0.9

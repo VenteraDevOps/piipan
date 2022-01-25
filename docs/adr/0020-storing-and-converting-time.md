@@ -4,7 +4,7 @@ Date: 2021-09-16
 
 ## Status
 
-Accepted
+Superceded by [26. Use Timestamptz (with time zone) for PostgreSQL DateTime storage](0026-use-timestamptz.md)
 
 ## Context
 

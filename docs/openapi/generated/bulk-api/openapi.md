@@ -28,7 +28,7 @@ Base URLs:
 # You can also use wget
 curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
   -H 'Content-Type: text/plain' \
-  -H 'Content-Length: 0' \
+  -H 'Content-Length: 6413' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
