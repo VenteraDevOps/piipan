@@ -1,6 +1,7 @@
 # Piipan documentation
 
 System-wide:
+* [Quick Start Guide for Engineers](./quick-start-guide-dev.md)
 * [Architectural Decision Records](./adr)
 * [High-level Architecture](./architecture.md)
 * [Infrastructure-as-Code](./iac.md)
