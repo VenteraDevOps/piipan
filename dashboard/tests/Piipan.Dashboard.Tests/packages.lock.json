@@ -872,8 +872,8 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "6.0.2",
-        "contentHash": "j/BJY/1lqtu5ssfGEi9D+qJ/3OMrK8ZdicsW4SldV49CahRVXVHldj636ucVcEqJPNDI0h+/PWJD7oHsQ/cFAQ==",
+        "resolved": "6.0.3",
+        "contentHash": "yt/3XFRhHsJ01a4+qHM9+0mtitQ3DY2wJLyGP9vtvZa1cB1nSAw762GJGdSX3Bbc7wZKzeo4dc4drD3yvQe7gA==",
         "dependencies": {
           "System.Diagnostics.DiagnosticSource": "6.0.0",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
@@ -2143,7 +2143,7 @@
           "Azure.Identity": "1.5.0",
           "Azure.Security.KeyVault.Secrets": "4.2.0",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
-          "Npgsql": "6.0.2",
+          "Npgsql": "6.0.3",
           "Piipan.Shared": "1.0.0"
         }
       },
@@ -2171,7 +2171,7 @@
           "Microsoft.Extensions.Logging": "3.1.22",
           "Microsoft.Extensions.Options": "3.1.22",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.2"
+          "Npgsql": "6.0.3"
         }
       }
     }
