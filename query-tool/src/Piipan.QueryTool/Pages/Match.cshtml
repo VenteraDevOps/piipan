@@ -1,0 +1,298 @@
+﻿@page
+@model MatchModel
+@{
+}
+
+@{
+    ViewData["Title"] = "NAC Participant Search";
+}
+
+<div class="grid-container">
+
+    <!-- Match header -->
+    <div class="grid-row">
+        <h3><span class="usa-tag bg-mint">Open</span> Match ID: @Model.Match.MatchId</h3>
+    </div>
+    <!-- \match header -->
+
+    <!-- Alert banner -->
+    <div class="grid-row">
+        <div class="tablet:grid-col-12">
+            <div class="usa-alert usa-alert--warning">
+                <div class="usa-alert__body">
+                    <h4 class="usa-alert__heading">This match involves a vulnerable individual</h4>
+                    <p class="usa-alert__text">
+                        To protect this individual, do not use their location on notices or in communications with other members of the household.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- \alert banner -->
+
+    <!-- Match content -->
+    <div class="grid-row margin-top-2">
+
+        <!-- Left panel -->
+        <div class="tablet:grid-col-4 margin-bottom-2">
+            
+            <div class="usa-card__container">
+
+                <!-- Header left panel -->
+                <header class="usa-card__header">
+                    <h3>Record information about this match for Iowa</h3>
+                </header>
+                <!-- \header left panel -->
+                
+                <!-- Body left panel -->
+                <div class="usa-card__body">
+                    <div>
+                        <button class="usa-button">Edit information</button>
+
+                        <!-- Section 1 -->
+                        <h3 class="margin-bottom-1">Does this match involve a vulnerable individual?</h3>
+                        <form class="usa-form">
+                            <fieldset class="usa-fieldset">
+                                <legend class="usa-legend usa-legend">Select Yes if you have reason to believe this individual should have their location protected. This will signal to the other state involved in the match not to reveal the participant’s location in any communications.</legend>
+                                <div class="usa-radio">
+                                    <input
+                                        class="usa-radio__input"
+                                        id="historical-truth"
+                                        type="radio"
+                                        name="historical-figures"
+                                        value="sojourner-truth"
+                                        checked
+                                    />
+                                    <label class="usa-radio__label" for="historical-truth">
+                                        Yes, involves a vulnerable individual
+                                    </label>
+                                </div>
+                                <div class="usa-radio">
+                                    <input
+                                        class="usa-radio__input"
+                                        id="historical-douglass"
+                                        type="radio"
+                                        name="historical-figures"
+                                        value="frederick-douglass"
+                                    />
+                                    <label class="usa-radio__label" for="historical-douglass">
+                                        No, does not involve a vulnerable individual
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </form>
+                        <!-- /section1 -->
+
+                        <!-- Section 2 -->
+                        <h3 class="margin-bottom-1">Should this match be flagged as invalid?</h3>
+                        <form class="usa-form">
+                            <fieldset class="usa-fieldset">
+                                <legend class="usa-legend usa-legend">Matches are invalid if the participant was not receiving or applying for benefits in more than one state. This may occur if there has been a typo in the information submitted to the NAC or in cases of identity theft. If you select Yes, you will be required to provide an explanation.</legend>
+                                <div class="usa-radio">
+                                    <input
+                                        class="usa-radio__input"
+                                        id="historical-truth"
+                                        type="radio"
+                                        name="historical-figures"
+                                        value="sojourner-truth"
+                                        checked
+                                    />
+                                    <label class="usa-radio__label" for="historical-truth">
+                                        Yes, flag this match as invalid
+                                    </label>
+                                </div>
+                                <div class="usa-radio">
+                                    <input
+                                        class="usa-radio__input"
+                                        id="historical-douglass"
+                                        type="radio"
+                                        name="historical-figures"
+                                        value="frederick-douglass"
+                                    />
+                                    <label class="usa-radio__label" for="historical-douglass">
+                                        No, do not flag this match as invalid
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </form>
+                        <!-- /section 2 -->
+
+                        <!-- Section 3 -->
+                        <h3 class="margin-bottom-0">Record initial action taken to resolve the match.</h3>                    
+                        <label>Initial action is defined as TBD.</label>
+                        <label class="usa-label" for="options">Select the initial action taken</label>
+                        <select class="usa-select" name="options" id="options">
+                            <option value="">- Select -</option>
+                            <option value="value2">Date of initial action</option>
+                            <option value="value3">mm/dd/yyyy</option>
+                        </select>
+                        <div class="usa-form-group">
+                            <label class="usa-label" id="appointment-date-label" for="appointment-date">
+                                Date of initial action
+                            </label>
+                            <div class="usa-hint" id="appointment-date-hint">mm/dd/yyyy</div>
+                            <div class="usa-date-picker">
+                                <input
+                                class="usa-input"
+                                id="appointment-date"
+                                name="appointment-date"
+                                type="text"
+                                aria-labelledby="appointment-date-label"
+                                aria-describedby="appointment-date-hint"
+                                />
+                            </div>
+                        </div>
+                        <!-- /section 3 -->
+
+                        <!-- Section 4 -->
+                        <h3 class="margin-bottom-0">Record the final disposition for the participant.</h3>                    
+                        <label>Final disposition is defined as TBD.</label>
+                        <label class="usa-label" for="options">Select the final disposition</label>
+                        <select class="usa-select" name="options" id="options">
+                            <option value="">- Select -</option>
+                        </select>
+                        <div class="usa-form-group">
+                            <label class="usa-label" id="appointment-date-label" for="appointment-date">
+                                Date of final disposition
+                            </label>
+                            <div class="usa-hint" id="appointment-date-hint">mm/dd/yyyy</div>
+                            <div class="usa-date-picker">
+                                <input
+                                class="usa-input"
+                                id="appointment-date"
+                                name="appointment-date"
+                                type="text"
+                                aria-labelledby="appointment-date-label"
+                                aria-describedby="appointment-date-hint"
+                                />
+                            </div>
+                        </div> 
+                        <!-- /section 4 -->               
+
+                    </div>
+                </div>
+                <!-- \body left panel -->
+                
+            </div>
+
+        </div>
+        <!-- \left panel -->
+
+        <!-- Right panel -->
+        <div class="tablet:grid-col-8">
+            <div class="usa-accordion" aria-multiselectable="true">
+                
+                <!-- Accordion 1 -->
+                <h4 class="usa-accordion__heading">
+                    <button class="usa-accordion__button" aria-expanded="true" aria-controls="a1">
+                    Match information
+                    </button>
+                </h4>
+                <div id="a1" class="usa-accordion__content usa-prose">
+                    <p>
+                        All NAC matches are based on an exact match of Last name, Date of birth, and Social Security Number, as provided by each of the States.
+                    </p>
+                    <p>
+                        <label><strong>Match recorded on:</strong> mm/dd/yyyy (0 days since match)</label><br/>
+                        <label><strong>Match query by:</strong> [State]</label>
+                    </p>
+                    <p>
+                        The information below will be updated as each state records responses.
+
+                        <div class="grid-container">
+                            <div class="grid-row">
+                                <div class="tablet:grid-col-6">
+                                    <h4 class="text-primary margin-bottom-1">State A</h4>
+                                    <label><strong>Vulnerable individual:</strong> No entry</label><br/>
+                                    <label><strong>Invalid match:</strong> No entry</label><br/>
+                                    <label><strong>Initial action:</strong> No entry</label><br/>
+                                    <label><strong>Date of initial action:</strong> No entry</label><br/>
+                                    <label><strong>Final disposition:</strong> No entry</label><br/>
+                                    <label><strong>Date of final disposition::</strong> No entry</label><br/>
+                                </div>
+                                <div class="tablet:grid-col-6">
+                                    <h4 class="text-primary margin-bottom-1">State B</h4>
+                                    <label><strong>Vulnerable individual:</strong> No entry</label><br/>
+                                    <label><strong>Invalid match:</strong> No entry</label><br/>
+                                    <label><strong>Initial action:</strong> No entry</label><br/>
+                                    <label><strong>Date of initial action:</strong> No entry</label><br/>
+                                    <label><strong>Final disposition:</strong> No entry</label><br/>
+                                    <label><strong>Date of final disposition::</strong> No entry</label><br/>
+                                </div>
+                            </div>
+                        </div>
+                    </p>
+                </div>
+                <!-- Accordion 1 -->
+
+                <!-- Accordion 2 -->
+                <h4 class="usa-accordion__heading">
+                    <button class="usa-accordion__button" aria-expanded="true" aria-controls="a2">
+                    SNAP participant information
+                    </button>
+                </h4>
+                <div id="a2" class="usa-accordion__content usa-prose">
+                    <ul>
+                        <li>Use your state’s Case and Participant ID to identify the individual involved.</li>
+                        <li>Use the other state’s Case and Participant ID to communicate about the individual without exposing more sensitive PII, such as Name, Date of Birth, or Social Security Number.</li>
+                    </ul>
+                    <div class="grid-container">
+                        <div class="grid-row">
+                            <div class="tablet:grid-col-6">
+                                <h4 class="text-primary margin-bottom-1">State A</h4>
+                                <label><strong>Case ID:</strong> No entry</label><br/>
+                                <label><strong>Participant ID:</strong> No entry</label><br/>
+                                <label><strong>Benefits end:</strong> No entry</label><br/>
+                                <label><strong>Recent benefit months:</strong> No entry</label><br/>
+                            </div>
+                            <div class="tablet:grid-col-6">
+                                <h4 class="text-primary margin-bottom-1">State B</h4>
+                                <label><strong>Case ID:</strong> No entry</label><br/>
+                                <label><strong>Participant ID:</strong> No entry</label><br/>
+                                <label><strong>Benefits end:</strong> No entry</label><br/>
+                                <label><strong>Recent benefit months:</strong> No entry</label><br/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- accordion 2 -->
+
+                <!-- Accordion 3 -->
+                <h4 class="usa-accordion__heading">
+                    <button class="usa-accordion__button" aria-expanded="true" aria-controls="a3">
+                    State agency contact information
+                    </button>
+                </h4>
+                <div id="a3" class="usa-accordion__content usa-prose">
+                    <ul>
+                        <li>Use this information if you need to contact the other state in regards to this match.</li>
+                        <li>Do not exchange PII about the participant by email; use their state participant IDs.</li>
+                    </ul>
+                    <div class="grid-container">
+                        <div class="grid-row">
+                            <div class="tablet:grid-col-6">
+                                <h4 class="text-primary margin-bottom-1">State A</h4>
+                                <label><strong>Email address:</strong> No entry</label><br/>
+                                <label><strong>Phone number:</strong> No entry</label><br/>
+                            </div>
+                            <div class="tablet:grid-col-6">
+                                <h4 class="text-primary margin-bottom-1">State B</h4>
+                                <label><strong>Email address:</strong> No entry</label><br/>
+                                <label><strong>Phone number:</strong> No entry</label><br/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- \accordion 3 -->
+
+
+
+    
+                </div>
+        </div>
+         <!-- \right panel -->
+
+    </div>
+    <!-- \match content -->
+
+</div>
