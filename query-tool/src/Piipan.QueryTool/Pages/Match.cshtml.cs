@@ -60,7 +60,7 @@ namespace Piipan.QueryTool.Pages
                 ParticipantId = "1",
                 BenefitsEndDate = null,
                 RecentBenefitMonths = null,
-                ProtectLocation = null
+                ProtectLocation = true
             };
 
             Participants[1] = new ParticipantMatch()
@@ -72,12 +72,23 @@ namespace Piipan.QueryTool.Pages
                 ParticipantId = "1",
                 BenefitsEndDate = null,
                 RecentBenefitMonths = null,
-                ProtectLocation = null
+                ProtectLocation = false
             };
 
             Participants[2] = new ParticipantMatch()
             {
-                MatchId = "1",
+                MatchId = "2",
+                LdsHash = null,
+                State = "VI",
+                CaseId = "1",
+                ParticipantId = "1",
+                BenefitsEndDate = null,
+                RecentBenefitMonths = null,
+                ProtectLocation = true
+            };
+            Participants[3] = new ParticipantMatch()
+            {
+                MatchId = "3",
                 LdsHash = null,
                 State = "VI",
                 CaseId = "1",

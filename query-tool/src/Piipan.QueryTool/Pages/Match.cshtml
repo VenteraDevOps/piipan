@@ -16,22 +16,89 @@
     <!-- \match header -->
 
     <!-- Alert banner -->
-    <div class="grid-row">
+    @if (Model.Match.ProtectLocation == true)
+    {
+        <script type="text/javascript">
+            
+            document.addEventListener("DOMContentLoaded", function() {
+                const banner = document.getElementById('banner-protect-location');
+                const warning = document.getElementById('warning-protect-location');
+                const content = document.getElementById('match-content');
+
+                banner.style.display = 'none';
+                content.style.display = 'none';
+
+                document.getElementById('warning-btn').onclick = function() {
+                    warning.style.display = 'none';
+                    banner.style.display = '';
+                    content.style.display = '';
+
+                };
+            });
+
+        </script>
+
+        <!-- Protect location warning -->
+        <div id="warning-protect-location" class="grid-row">
+            <div class="tablet:grid-col-12">
+                <div class="usa-alert usa-alert--warning">
+                    <div class="usa-alert__body">
+                        <h4 class="usa-alert__heading">This match involves a vulnerable individual</h4>
+                        <p class="usa-alert__text">
+                            One or both states has indicated that the individual involved in this match is considered vulnerable individual. This means that the individual's location should not be shared. For example, this individual may ne freeing domestic violence.
+                        </p>
+                        <strong>To protect this individual, do not use their location on notices or in communications with other members of the household.</strong>
+
+                        <ul class="usa-button-group">
+                            <li class="usa-button-group__item">
+                                <button id="warning-btn" class="usa-button usa-button--accent-warm">I wish to proceed and agree to protect this individual's location</button>
+                            </li>
+                            <li class="usa-button-group__item">
+                                <a href="javascript:void(0);" class="usa-button usa-button--outline usa-button--active">Back</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /protect location warning -->
+
+        <!-- Protect location warning banner -->
+        <div id="banner-protect-location" class="grid-row">
+            <div class="tablet:grid-col-12">
+                <div class="usa-alert usa-alert--warning">
+                    <div class="usa-alert__body">
+                        <h4 class="usa-alert__heading">This match involves a vulnerable individual</h4>
+                        <p class="usa-alert__text">
+                            To protect this individual, do not use their location on notices or in communications with other members of the household.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /protect location warning banner -->
+        <br />
+    }
+
+    <!-- Flagged as invalid banner -->
+    <div id="banner-protect-location" class="grid-row">
         <div class="tablet:grid-col-12">
             <div class="usa-alert usa-alert--warning">
                 <div class="usa-alert__body">
-                    <h4 class="usa-alert__heading">This match involves a vulnerable individual</h4>
+                    <h4 class="usa-alert__heading">This match has been flagged as invalid.</h4>
                     <p class="usa-alert__text">
-                        To protect this individual, do not use their location on notices or in communications with other members of the household.
+                        Helpful message about what to do this instance.
                     </p>
                 </div>
             </div>
         </div>
     </div>
+    <!-- \flagged as invalid banner -->
+ 
     <!-- \alert banner -->
 
     <!-- Match content -->
-    <div class="grid-row margin-top-2">
+    <div id="match-content" class="grid-row margin-top-2">
 
         <!-- Left panel -->
         <div class="tablet:grid-col-4 margin-bottom-2">
@@ -122,9 +189,10 @@
                         <label>Initial action is defined as TBD.</label>
                         <label class="usa-label" for="options">Select the initial action taken</label>
                         <select class="usa-select" name="options" id="options">
-                            <option value="">- Select -</option>
-                            <option value="value2">Date of initial action</option>
-                            <option value="value3">mm/dd/yyyy</option>
+                            <option value="">-- Select --</option>
+                            <option value="">Attempted to contact individual</option>
+                            <option value="value2">Conversation with individual</option>
+                            <option value="value3">Sent notice to individual</option>
                         </select>
                         <div class="usa-form-group">
                             <label class="usa-label" id="appointment-date-label" for="appointment-date">
@@ -149,7 +217,11 @@
                         <label>Final disposition is defined as TBD.</label>
                         <label class="usa-label" for="options">Select the final disposition</label>
                         <select class="usa-select" name="options" id="options">
-                            <option value="">- Select -</option>
+                            <option value="">-- Select --</option>
+                            <option value="">Benefits approved</option>
+                            <option value="">Benefits denied</option>
+                            <option value="">Benefits continued</option>
+                            <option value="">Benefits terminated</option>
                         </select>
                         <div class="usa-form-group">
                             <label class="usa-label" id="appointment-date-label" for="appointment-date">
