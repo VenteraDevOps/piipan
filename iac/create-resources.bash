@@ -99,7 +99,8 @@ main () {
         funcAppServicePlanSubnetName="$FUNC_SUBNET_NAME" \
         funcAppServicePlanNsgName="$FUNC_NSG_NAME" \
         webAppServicePlanSubnetName="$WEBAPP_SUBNET_NAME" \
-        webAppServicePlanNsgName="$WEBAPP_NSG_NAME"
+        webAppServicePlanNsgName="$WEBAPP_NSG_NAME" \
+        idpOidcIpRanges="$IDP_OIDC_IP_RANGES"
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
