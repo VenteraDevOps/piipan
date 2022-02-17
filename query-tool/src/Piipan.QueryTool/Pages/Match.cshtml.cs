@@ -21,10 +21,10 @@ namespace Piipan.QueryTool.Pages
         private readonly ILdsDeidentifier _ldsDeidentifier;
         private readonly IMatchApi _matchApi;
 
-        public ParticipantMatch Match = new ParticipantMatch();
+        public MatchData Match = new MatchData();
 
-        private ParticipantMatch[] Participants = Enumerable.Range(0, 10)
-                                                            .Select(x => new ParticipantMatch())
+        private MatchData[] Participants = Enumerable.Range(0, 10)
+                                                            .Select(x => new MatchData())
                                                             .ToArray();
 
         public MatchModel(ILogger<IndexModel> logger
@@ -51,50 +51,91 @@ namespace Piipan.QueryTool.Pages
 
         private void GetFakeData()
         {
-            Participants[0] = new ParticipantMatch()
+            Participants[0] = new MatchData()
             {
                 MatchId = "0",
-                LdsHash = null,
-                State = "VI",
-                CaseId = "1",
-                ParticipantId = "1",
-                BenefitsEndDate = null,
-                RecentBenefitMonths = null,
+                LdsHash = "",
+                Status = "Open",
+                MatchCreationDate = "",
+                QueryingState = "Montana (MT)",
+                QueryingStateVulnerableStatus = false,
+                QueryingStateMatchValidity = true,
+                QueryingStateInitialAction = "",
+                QueryingStateDateInitialAction = null,
+                QueryingStateFinalDisposition = "",
+                QueryingStateDateFinalDisposition = null,
+                QueryingStateCaseId = "MT-1234",
+                QueryingStateParticipantId = "JKL1234",
+                MatchState = "Iowa (IA)",
+                MatchStateVulnerableStatus = false,
+                MatchStateMatchValidity = true,
+                MatchStateInitialAction = "",
+                MatchStateDateInitialAction = null,
+                MatchStateFinalDisposition = "",
+                MatchStateDateFinalDisposition = null,
+                MatchStateCaseId = "IA-5678",
+                MatchStateParticipantId = "LMN5678",
                 ProtectLocation = true
             };
 
-            Participants[1] = new ParticipantMatch()
+            Participants[1] = new MatchData()
             {
                 MatchId = "1",
-                LdsHash = null,
-                State = "VI",
-                CaseId = "1",
-                ParticipantId = "1",
-                BenefitsEndDate = null,
-                RecentBenefitMonths = null,
-                ProtectLocation = false
-            };
-
-            Participants[2] = new ParticipantMatch()
-            {
-                MatchId = "2",
-                LdsHash = null,
-                State = "VI",
-                CaseId = "1",
-                ParticipantId = "1",
-                BenefitsEndDate = null,
-                RecentBenefitMonths = null,
+                LdsHash = "",
+                Status = "Open",
+                MatchCreationDate = "",
+                QueryingState = "Montana (MT)",
+                QueryingStateVulnerableStatus = true,
+                QueryingStateMatchValidity = true,
+                QueryingStateInitialAction = "",
+                QueryingStateDateInitialAction = null,
+                QueryingStateFinalDisposition = "",
+                QueryingStateDateFinalDisposition = null,
+                QueryingStateCaseId = "MT-1234",
+                QueryingStateParticipantId = "JKL1234",
+                MatchState = "Iowa (IA)",
+                MatchStateVulnerableStatus = false,
+                MatchStateMatchValidity = true,
+                MatchStateInitialAction = "",
+                MatchStateDateInitialAction = null,
+                MatchStateFinalDisposition = "",
+                MatchStateDateFinalDisposition = null,
+                MatchStateCaseId = "IA-5678",
+                MatchStateParticipantId = "LMN5678",
                 ProtectLocation = true
             };
-            Participants[3] = new ParticipantMatch()
+
+            Participants[2] = new MatchData()
+            {
+                MatchId = "1",
+                LdsHash = "",
+                Status = "Open",
+                MatchCreationDate = "",
+                QueryingState = "Montana (MT)",
+                QueryingStateVulnerableStatus = false,
+                QueryingStateMatchValidity = true,
+                QueryingStateInitialAction = "",
+                QueryingStateDateInitialAction = null,
+                QueryingStateFinalDisposition = "",
+                QueryingStateDateFinalDisposition = null,
+                QueryingStateCaseId = "MT-1234",
+                QueryingStateParticipantId = "JKL1234",
+                MatchState = "Iowa (IA)",
+                MatchStateVulnerableStatus = false,
+                MatchStateMatchValidity = false,
+                MatchStateInitialAction = "",
+                MatchStateDateInitialAction = null,
+                MatchStateFinalDisposition = "",
+                MatchStateDateFinalDisposition = null,
+                MatchStateCaseId = "IA-5678",
+                MatchStateParticipantId = "LMN5678",
+                ProtectLocation = true
+            };
+            Participants[3] = new MatchData()
             {
                 MatchId = "3",
                 LdsHash = null,
-                State = "VI",
-                CaseId = "1",
-                ParticipantId = "1",
-                BenefitsEndDate = null,
-                RecentBenefitMonths = null,
+        
                 ProtectLocation = null
             };
         }

@@ -7,33 +7,118 @@
     ViewData["Title"] = "NAC Participant Search";
 }
 
+<script type="text/javascript">
+
+            //For the mockup version the script was maintined on the razor page.
+            //TODO: Move this script to its own file. 
+            //TOD: Decide if we want to have server page action or we want to jus JS to edit the information (without refresh the page)
+
+            //Element IDs of all form fields
+            const fieldElementIds = [
+                     'protect-location-yes'
+                    ,'protect-location-no'
+                    ,'invalid-yes'
+                    ,'invalid-no'
+                    ,'action-taken'
+                    ,'date-initial-action'
+                    ,'final-disposition'
+            ];
+            
+            //On DOM content loaded
+            document.addEventListener("DOMContentLoaded", function() {
+
+                toggleDisplayElement('save-information');
+                toggleDisplayElement('cancel-information');
+
+                toggleAllElements();
+
+                document.getElementById('warning-btn').onclick = function() {
+
+                    toggleDisplayElement('banner-protect-location','');
+                    toggleDisplayElement('match-content','');
+                    toggleDisplayElement('warning-protect-location');
+
+                };
+            });
+
+            //Toggle the element disable status of all form fields
+            const toggleAllElements = () => {
+                fieldElementIds.map((elem) => toggleElement(elem));
+            }
+
+            //Simulate the action of edit information button 
+            const editInformation = () => {
+
+                toggleAllElements();
+
+                toggleButtons();
+            }
+
+            //Simulate the action of save information button 
+            const saveInformation = () => {
+
+                toggleAllElements();
+
+                toggleButtons();
+
+            }
+
+            //Simulate the action of cancel information button 
+            //For the mockup just calling save information
+            const cancelInformation = () => {
+
+                saveInformation();
+
+            }
+
+            //Toggle element disable status
+            const toggleElement = (elemId) => {
+                const elem = document.getElementById(elemId)
+                if(elem.disabled)
+                    elem.disabled = false;
+                else 
+                    elem.disabled = true;
+            }
+
+            //Toggle element display status
+            const toggleDisplayElement = (elemId, value) => {
+                const elem = document.getElementById(elemId)
+                if(elem.style.display === "none")
+                    if(value == null) 
+                        elem.style.display  = "inline-block";
+                    else 
+                        elem.style.display  = value;
+                else 
+                    elem.style.display = "none";
+            }
+
+            //Toggle the buttons display status
+            const toggleButtons = () => {
+                toggleDisplayElement('edit-information');
+                toggleDisplayElement('save-information');
+                toggleDisplayElement('cancel-information');
+            }
+
+</script>
+
 <div class="grid-container">
 
     <!-- Match header -->
     <div class="grid-row">
-        <h3><span class="usa-tag bg-mint">Open</span> Match ID: @Model.Match.MatchId</h3>
+        <h3><span class="usa-tag bg-mint">@Model.Match.Status</span> Match ID: @Model.Match.MatchId</h3>
     </div>
     <!-- \match header -->
 
-    <!-- Alert banner -->
-    @if (Model.Match.ProtectLocation == true)
+    <!-- Alert banners -->
+    @if ( Model.Match.MatchStateVulnerableStatus == true || Model.Match.QueryingStateVulnerableStatus == true)
     {
         <script type="text/javascript">
-            
+
             document.addEventListener("DOMContentLoaded", function() {
-                const banner = document.getElementById('banner-protect-location');
-                const warning = document.getElementById('warning-protect-location');
-                const content = document.getElementById('match-content');
 
-                banner.style.display = 'none';
-                content.style.display = 'none';
+                toggleDisplayElement('banner-protect-location');
+                toggleDisplayElement('match-content');
 
-                document.getElementById('warning-btn').onclick = function() {
-                    warning.style.display = 'none';
-                    banner.style.display = '';
-                    content.style.display = '';
-
-                };
             });
 
         </script>
@@ -80,20 +165,23 @@
         <br />
     }
 
-    <!-- Flagged as invalid banner -->
-    <div id="banner-protect-location" class="grid-row">
-        <div class="tablet:grid-col-12">
-            <div class="usa-alert usa-alert--warning">
-                <div class="usa-alert__body">
-                    <h4 class="usa-alert__heading">This match has been flagged as invalid.</h4>
-                    <p class="usa-alert__text">
-                        Helpful message about what to do this instance.
-                    </p>
+    @if (Model.Match.MatchStateMatchValidity == false || Model.Match.QueryingStateMatchValidity == false)
+    {
+        <!-- Flagged as invalid banner -->
+        <div id="banner-invalid-match" class="grid-row">
+            <div class="tablet:grid-col-12">
+                <div class="usa-alert usa-alert--warning">
+                    <div class="usa-alert__body">
+                        <h4 class="usa-alert__heading">This match has been flagged as invalid.</h4>
+                        <p class="usa-alert__text">
+                            Helpful message about what to do this instance.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- \flagged as invalid banner -->
+        <!-- \flagged as invalid banner -->
+    }
  
     <!-- \alert banner -->
 
@@ -114,8 +202,9 @@
                 <!-- Body left panel -->
                 <div class="usa-card__body">
                     <div>
-                        <button class="usa-button">Edit information</button>
-
+                        <button id="edit-information" class="usa-button" onclick="editInformation()">Edit information</button>
+                        <button id="save-information" class="usa-button" onclick="saveInformation()">Save</button>
+                        <button id="cancel-information" class="usa-button" onclick="cancelInformation()">Cancel</button>
                         <!-- Section 1 -->
                         <h3 class="margin-bottom-1">Does this match involve a vulnerable individual?</h3>
                         <form class="usa-form">
@@ -124,25 +213,25 @@
                                 <div class="usa-radio">
                                     <input
                                         class="usa-radio__input"
-                                        id="historical-truth"
+                                        id="protect-location-yes"
                                         type="radio"
                                         name="historical-figures"
                                         value="sojourner-truth"
                                         checked
                                     />
-                                    <label class="usa-radio__label" for="historical-truth">
+                                    <label class="usa-radio__label" for="protect-location-yes">
                                         Yes, involves a vulnerable individual
                                     </label>
                                 </div>
                                 <div class="usa-radio">
                                     <input
                                         class="usa-radio__input"
-                                        id="historical-douglass"
+                                        id="protect-location-no"
                                         type="radio"
                                         name="historical-figures"
                                         value="frederick-douglass"
                                     />
-                                    <label class="usa-radio__label" for="historical-douglass">
+                                    <label class="usa-radio__label" for="protect-location-no">
                                         No, does not involve a vulnerable individual
                                     </label>
                                 </div>
@@ -158,25 +247,25 @@
                                 <div class="usa-radio">
                                     <input
                                         class="usa-radio__input"
-                                        id="historical-truth"
+                                        id="invalid-yes"
                                         type="radio"
                                         name="historical-figures"
                                         value="sojourner-truth"
                                         checked
                                     />
-                                    <label class="usa-radio__label" for="historical-truth">
+                                    <label class="usa-radio__label" for="invalid-yes">
                                         Yes, flag this match as invalid
                                     </label>
                                 </div>
                                 <div class="usa-radio">
                                     <input
                                         class="usa-radio__input"
-                                        id="historical-douglass"
+                                        id="invalid-no"
                                         type="radio"
                                         name="historical-figures"
                                         value="frederick-douglass"
                                     />
-                                    <label class="usa-radio__label" for="historical-douglass">
+                                    <label class="usa-radio__label" for="invalid-no">
                                         No, do not flag this match as invalid
                                     </label>
                                 </div>
@@ -187,23 +276,23 @@
                         <!-- Section 3 -->
                         <h3 class="margin-bottom-0">Record initial action taken to resolve the match.</h3>                    
                         <label>Initial action is defined as TBD.</label>
-                        <label class="usa-label" for="options">Select the initial action taken</label>
-                        <select class="usa-select" name="options" id="options">
+                        <label class="usa-label" for="action-taken">Select the initial action taken</label>
+                        <select id="action-taken" class="usa-select" name="options">
                             <option value="">-- Select --</option>
                             <option value="">Attempted to contact individual</option>
                             <option value="value2">Conversation with individual</option>
                             <option value="value3">Sent notice to individual</option>
                         </select>
                         <div class="usa-form-group">
-                            <label class="usa-label" id="appointment-date-label" for="appointment-date">
+                            <label class="usa-label" id="date-initial-action" for="appointment-date">
                                 Date of initial action
                             </label>
                             <div class="usa-hint" id="appointment-date-hint">mm/dd/yyyy</div>
                             <div class="usa-date-picker">
                                 <input
                                 class="usa-input"
-                                id="appointment-date"
-                                name="appointment-date"
+                                id="date-initial-action"
+                                name="date-initial-action"
                                 type="text"
                                 aria-labelledby="appointment-date-label"
                                 aria-describedby="appointment-date-hint"
@@ -215,8 +304,8 @@
                         <!-- Section 4 -->
                         <h3 class="margin-bottom-0">Record the final disposition for the participant.</h3>                    
                         <label>Final disposition is defined as TBD.</label>
-                        <label class="usa-label" for="options">Select the final disposition</label>
-                        <select class="usa-select" name="options" id="options">
+                        <label class="usa-label" for="final-disposition">Select the final disposition</label>
+                        <select class="usa-select" name="final-disposition" id="final-disposition">
                             <option value="">-- Select --</option>
                             <option value="">Benefits approved</option>
                             <option value="">Benefits denied</option>
@@ -224,10 +313,10 @@
                             <option value="">Benefits terminated</option>
                         </select>
                         <div class="usa-form-group">
-                            <label class="usa-label" id="appointment-date-label" for="appointment-date">
+                            <label class="usa-label" id="date-final-disposition" for="appointment-date">
                                 Date of final disposition
                             </label>
-                            <div class="usa-hint" id="appointment-date-hint">mm/dd/yyyy</div>
+                            <div class="usa-hint" id="date-final-disposition">mm/dd/yyyy</div>
                             <div class="usa-date-picker">
                                 <input
                                 class="usa-input"
@@ -274,22 +363,48 @@
                         <div class="grid-container">
                             <div class="grid-row">
                                 <div class="tablet:grid-col-6">
-                                    <h4 class="text-primary margin-bottom-1">State A</h4>
-                                    <label><strong>Vulnerable individual:</strong> No entry</label><br/>
-                                    <label><strong>Invalid match:</strong> No entry</label><br/>
-                                    <label><strong>Initial action:</strong> No entry</label><br/>
-                                    <label><strong>Date of initial action:</strong> No entry</label><br/>
-                                    <label><strong>Final disposition:</strong> No entry</label><br/>
-                                    <label><strong>Date of final disposition::</strong> No entry</label><br/>
+                                    <h4 class="text-primary margin-bottom-1">
+                                        @(@String.IsNullOrEmpty(@Model.Match.QueryingState) ? "No entry" : @Model.Match.QueryingState)
+                                    </h4>
+                                    <label><strong>Vulnerable individual:</strong> 
+                                        @(!@Model.Match.QueryingStateVulnerableStatus.HasValue ? "No entry" : @Model.Match.QueryingStateVulnerableStatus.ToString())
+                                    </label><br/>
+                                    <label><strong>Invalid match:</strong> 
+                                        @(!@Model.Match.QueryingStateMatchValidity.HasValue ? "No entry" : @Model.Match.QueryingStateMatchValidity.ToString())
+                                    </label><br/>
+                                    <label><strong>Initial action:</strong>
+                                        @(@String.IsNullOrEmpty(@Model.Match.QueryingStateInitialAction) ? "No entry" : @Model.Match.QueryingStateInitialAction)
+                                    </label><br/>
+                                    <label><strong>Date of initial action:</strong>
+                                        @(!@Model.Match.QueryingStateDateInitialAction.HasValue ? "No entry" : @Model.Match.QueryingStateDateInitialAction.ToString())
+                                    </label><br/>
+                                    <label><strong>Final disposition:</strong>
+                                        @(@String.IsNullOrEmpty(@Model.Match.QueryingStateFinalDisposition) ? "No entry" : @Model.Match.QueryingStateFinalDisposition)
+                                    </label><br/>
+                                    <label><strong>Date of final disposition:</strong>
+                                        @(!@Model.Match.QueryingStateDateFinalDisposition.HasValue ? "No entry" : @Model.Match.QueryingStateDateFinalDisposition.ToString())
+                                    </label><br/>
                                 </div>
                                 <div class="tablet:grid-col-6">
-                                    <h4 class="text-primary margin-bottom-1">State B</h4>
-                                    <label><strong>Vulnerable individual:</strong> No entry</label><br/>
-                                    <label><strong>Invalid match:</strong> No entry</label><br/>
-                                    <label><strong>Initial action:</strong> No entry</label><br/>
-                                    <label><strong>Date of initial action:</strong> No entry</label><br/>
-                                    <label><strong>Final disposition:</strong> No entry</label><br/>
-                                    <label><strong>Date of final disposition::</strong> No entry</label><br/>
+                                    <h4 class="text-primary margin-bottom-1">@Model.Match.MatchState</h4>
+                                    <label><strong>Vulnerable individual:</strong> 
+                                        @(!@Model.Match.MatchStateVulnerableStatus.HasValue ? "No entry" : @Model.Match.MatchStateVulnerableStatus.ToString())
+                                    </label><br/>
+                                    <label><strong>Invalid match:</strong> 
+                                        @(!@Model.Match.MatchStateMatchValidity.HasValue ? "No entry" : @Model.Match.MatchStateMatchValidity.ToString())
+                                    </label><br/>
+                                    <label><strong>Initial action:</strong>
+                                        @(@String.IsNullOrEmpty(@Model.Match.MatchStateInitialAction) ? "No entry" : @Model.Match.MatchStateInitialAction)
+                                    </label><br/>
+                                    <label><strong>Date of initial action:</strong>
+                                        @(!@Model.Match.MatchStateDateInitialAction.HasValue ? "No entry" : @Model.Match.MatchStateDateInitialAction.ToString())
+                                    </label><br/>
+                                    <label><strong>Final disposition:</strong>
+                                        @(@String.IsNullOrEmpty(@Model.Match.MatchStateFinalDisposition) ? "No entry" : @Model.Match.MatchStateFinalDisposition)
+                                    </label><br/>
+                                    <label><strong>Date of final disposition:</strong>
+                                        @(!@Model.Match.MatchStateDateFinalDisposition.HasValue ? "No entry" : @Model.Match.MatchStateDateFinalDisposition.ToString())
+                                    </label><br/>
                                 </div>
                             </div>
                         </div>
@@ -312,17 +427,33 @@
                         <div class="grid-row">
                             <div class="tablet:grid-col-6">
                                 <h4 class="text-primary margin-bottom-1">State A</h4>
-                                <label><strong>Case ID:</strong> No entry</label><br/>
-                                <label><strong>Participant ID:</strong> No entry</label><br/>
-                                <label><strong>Benefits end:</strong> No entry</label><br/>
-                                <label><strong>Recent benefit months:</strong> No entry</label><br/>
+                                <label><strong>Case ID:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.QueryingStateCaseId) ? "No entry" : @Model.Match.QueryingStateCaseId)
+                                </label><br/>
+                                <label><strong>Participant ID:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.QueryingStateParticipantId) ? "No entry" : @Model.Match.QueryingStateParticipantId)            
+                                </label><br/>
+                                <label><strong>Benefits end:</strong>
+                                    @(!@Model.Match.QueryingStateBenefitsEndDate.HasValue ? "No entry" : @Model.Match.QueryingStateBenefitsEndDate.ToString())                        
+                                </label><br/>
+                                <label><strong>Recent benefit months:</strong>
+                                @(!@Model.Match.QueryingStateRecentBenefitMonths.HasValue ? "No entry" : @Model.Match.QueryingStateRecentBenefitMonths.ToString())
+                                </label><br/>
                             </div>
                             <div class="tablet:grid-col-6">
                                 <h4 class="text-primary margin-bottom-1">State B</h4>
-                                <label><strong>Case ID:</strong> No entry</label><br/>
-                                <label><strong>Participant ID:</strong> No entry</label><br/>
-                                <label><strong>Benefits end:</strong> No entry</label><br/>
-                                <label><strong>Recent benefit months:</strong> No entry</label><br/>
+                                <label><strong>Case ID:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.MatchStateCaseId) ? "No entry" : @Model.Match.MatchStateCaseId)
+                                </label><br/>
+                                <label><strong>Participant ID:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.MatchStateParticipantId) ? "No entry" : @Model.Match.MatchStateParticipantId)            
+                                </label><br/>
+                                <label><strong>Benefits end:</strong>
+                                    @(!@Model.Match.MatchStateBenefitsEndDate.HasValue ? "No entry" : @Model.Match.MatchStateBenefitsEndDate.ToString())
+                                </label><br/>
+                                <label><strong>Recent benefit months:</strong>
+                                    @(!@Model.Match.MatchStateRecentBenefitMonths.HasValue ? "No entry" : @Model.Match.MatchStateRecentBenefitMonths.ToString())
+                                </label><br/>
                             </div>
                         </div>
                     </div>
@@ -344,13 +475,21 @@
                         <div class="grid-row">
                             <div class="tablet:grid-col-6">
                                 <h4 class="text-primary margin-bottom-1">State A</h4>
-                                <label><strong>Email address:</strong> No entry</label><br/>
-                                <label><strong>Phone number:</strong> No entry</label><br/>
+                                <label><strong>Email address:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.QueryingStateEmailAddress) ? "No entry" : @Model.Match.QueryingStateEmailAddress) 
+                                </label><br/>
+                                <label><strong>Phone number:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.QueryingStatePhoneAddress) ? "No entry" : @Model.Match.QueryingStatePhoneAddress) 
+                                </label><br/>
                             </div>
                             <div class="tablet:grid-col-6">
                                 <h4 class="text-primary margin-bottom-1">State B</h4>
-                                <label><strong>Email address:</strong> No entry</label><br/>
-                                <label><strong>Phone number:</strong> No entry</label><br/>
+                                <label><strong>Email address:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.MatchStateEmailAddress) ? "No entry" : @Model.Match.MatchStateEmailAddress) 
+                                </label><br/>
+                                <label><strong>Phone number:</strong>
+                                    @(@String.IsNullOrEmpty(@Model.Match.MatchStatePhoneAddress) ? "No entry" : @Model.Match.MatchStatePhoneAddress) 
+                                </label><br/>
                             </div>
                         </div>
                     </div>
