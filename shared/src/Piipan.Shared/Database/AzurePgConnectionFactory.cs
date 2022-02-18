@@ -79,7 +79,6 @@ namespace Piipan.Shared.Database
             var connection = _dbProviderFactory.CreateConnection();
 
             connection.ConnectionString = builder.ConnectionString;
-            await connection.OpenAsync();
 
             return connection;
         }

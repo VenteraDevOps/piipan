@@ -31,10 +31,9 @@ namespace Piipan.Shared.Database
                 builder.Database = database;
             }
 
-            var connection = _dbProviderFactory.CreateConnection();
+            var connection = await Task.FromResult(_dbProviderFactory.CreateConnection());
 
             connection.ConnectionString = builder.ConnectionString;
-            await connection.OpenAsync();
 
             return connection;
         }

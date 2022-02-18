@@ -16,6 +16,12 @@
         },
         "subnet": {
             "type": "string"
+        },
+        "sku": {
+            "type": "string"
+        },
+        "eventHubNamespace": {
+            "type": "String"
         }
     },
     "variables": {
@@ -33,7 +39,7 @@
             "location": "[parameters('location')]",
             "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "sku": {
-                "name": "Standard_LRS"
+                "name": "[parameters('sku')]"
             },
             "kind": "StorageV2",
             "properties": {
@@ -61,6 +67,33 @@
                     ]
                 }
             ]
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings#diagnostic-setting-for-azure-storage */
+            "apiVersion": "2017-05-01-preview",
+            "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticSettings",
+            "name": "[concat(variables('uniqueStorageName'), '/default/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('uniqueStorageName'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubNamespace'), '/authorizationrules/RootManageSharedAccessKey')]",
+                "eventHubName": "logs",
+                "logs": [
+                    {
+                        "category": "StorageRead",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageWrite",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageDelete",
+                        "enabled": true
+                    }
+                ]
+            }
         }
     ],
     "outputs": {

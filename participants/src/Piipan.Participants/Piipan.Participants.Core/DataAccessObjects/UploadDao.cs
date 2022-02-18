@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
 using Piipan.Participants.Api.Models;
@@ -17,33 +18,38 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
         public async Task<IUpload> GetLatestUpload(string state = null)
         {
-            var connection = await _dbConnectionFactory.Build(state);
-            return await connection
-                .QuerySingleAsync<UploadDbo>(@"
+            using (var connection = await _dbConnectionFactory.Build(state))
+            {
+                return await connection
+                    .QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
                     FROM uploads
                     ORDER BY id DESC
                     LIMIT 1");
+            }
         }
 
         public async Task<IUpload> AddUpload()
         {
-            var connection = await _dbConnectionFactory.Build();
-            var tx = connection.BeginTransaction();
+            using (var connection = await _dbConnectionFactory.Build() as DbConnection)
+            {
+                await connection.OpenAsync();
+                var tx = connection.BeginTransaction();
 
-            await connection.ExecuteAsync(@"
+                await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher)
                 VALUES (now() at time zone 'utc', current_user)");
 
-            var upload = await connection.QuerySingleAsync<UploadDbo>(@"
+                var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
                     FROM uploads
                     ORDER BY id DESC
                     LIMIT 1");
 
-            tx.Commit();
+                tx.Commit();
 
-            return upload;
+                return upload;
+            }
         }
     }
 }

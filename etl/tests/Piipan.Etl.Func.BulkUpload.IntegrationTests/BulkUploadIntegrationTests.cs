@@ -34,7 +34,6 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                     {
                         var connection = Factory.CreateConnection();
                         connection.ConnectionString = ConnectionString;
-                        connection.Open();
                         return connection;
                     });
                 return factory.Object;

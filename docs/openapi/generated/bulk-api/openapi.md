@@ -1,4 +1,3 @@
-<!-- Generator: Widdershins v4.0.1 -->
 
 <h1 id="bulk-api">Bulk API v2.0.0</h1>
 
@@ -29,7 +28,7 @@ Base URLs:
 # You can also use wget
 curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
   -H 'Content-Type: text/plain' \
-  -H 'Content-Length: 0' \
+  -H 'Content-Length: 6413' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```

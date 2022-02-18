@@ -7,7 +7,7 @@
 - [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
 - `psql` client for PostgreSQL – included in Azure Cloud Shell
-- [Node.js](https://nodejs.org/en/) and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during the build of ASP.NET Core web applications
+- [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during the build of ASP.NET Core web applications
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:
@@ -47,31 +47,12 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./configure-oidc-apps.bash tts/dev
 ```
 
-7. Create a subscription in the API Management service. At least for now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
+7. Create a subscription in the API Management service. For now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
 
-    1. Go to the Azure Portal
-    2. Go to Resource Groups
-    3. Look for `rg-match-dev` resource group
-    4. Go to `tts-apim-duppartapi-dev`, an API Management service 
-    5. Go to `Subscriptions`, on the left menu
-    6. Click on `Add Subscription`
-        1. Name: `EA-DupPart`
-        2. Display Name: `EA-DupPart`
-        3. Allow tracing: `uncheck`
-        4. Scope: `API`
-        5. API: `Duplicate participation API`
-        6. Product: `blank`
-        7. User: `blank`
-        8. Click `Create`
-    7. Click on `Add Subscription`
-        1. Name: `EA-BulkUpload`
-        2. Display Name: `EA-BulkUpload`
-        3. Allow tracing: `uncheck`
-        4. Scope: `API`
-        5. API: `EA Bulk upload API`
-        6. Product: `blank`
-        7. User: `blank`
-        8. Click `Create` 
+```
+    ./match/tools/create-apim-match-subscription.bash tts/dev ea
+    ./etl/tools/create-apim-bulk-subscription.bash tts/dev ea
+```
 
 8. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
 
@@ -127,8 +108,10 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Collect, Piipan.Metrics.Func.Api |
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
+| `OrchApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Orchestrator API's Azure Active Directory application object | Piipan.QueryTool |
 | `States` | Comma-separated list of the lower-case two letter abbreviations for each participating state. | Piipan.Match.Orchestrator |
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
+| `MetricsApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Metrics API's Azure Active Directory application object | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 

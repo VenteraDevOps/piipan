@@ -39,3 +39,12 @@ Meta:
     offset:
       type: integer
       description: "offset from first page"
+components:
+  parameters:
+    State:
+      name: state
+      in: query
+      description: abbreviation of state to filter responses for
+      required: false
+      schema:
+        type: string

@@ -2,9 +2,9 @@
 
 *As a user, I want to [X] so that I can [Y].*
 
-### Relates to Milestone
+### Relates to Epic
 
-*Link to Milestone*
+*Link to Epic*
 
 ### Acceptance Criteria
 

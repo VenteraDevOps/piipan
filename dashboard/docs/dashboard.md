@@ -2,6 +2,7 @@
 
 ## Prerequisites
 - [.NET Core SDK 3.1](https://dotnet.microsoft.com/download)
+- [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during build
 
 ## Local development
 To run the app locally:
@@ -12,12 +13,17 @@ To run the app locally:
 
 2. Set the `MetricsApiUri` environment variable to a local or remote instance of `Piipan.Metrics.Api`:
 ```
-export MetricsApiUri=https://tts-func-metricsapi-dev.azurewebsites.net/api/getparticipantuploads
+export MetricsApiUri=https://tts-func-metricsapi-dev.azurewebsites.net/api/
 ```
 
-3. If using a remote metrics API URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `Metrics.Read` role for the remote metrics API Function App and authorize the Azure CLI.
+3. Set the `MetricsApiAppId` environment variable to the [application ID](../../docs/securing-internal-apis.md#application-id-uri) associated with the API in the previous step:
+```
+export MetricsApiAppId=<application-id>
+```
 
-4. Run the app using the `dotnet run` CLI command:
+4. If using a remote metrics API URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `Metrics.Read` role for the remote metrics API Function App and authorize the Azure CLI.
+
+5. Run the app using the `dotnet run` CLI command:
 ```
     cd dashboard/src/Piipan.Dashboard
     dotnet run
@@ -28,7 +34,7 @@ Alternatively, use the `watch` command to update the app upon file changes:
     dotnet watch run
 ```
 
-5. Visit https://localhost:5001
+6. Visit https://localhost:5001
 
 ## Building Assets
 

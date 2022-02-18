@@ -48,13 +48,72 @@ To achieve this product vision, Piipan incorporates a Privacy-Preserving Record 
 
 ## Development
 
-Piipan is implemented with .NET and Microsoft Azure, using a Platform as a Service (PaaS) and Function as a Service (FaaS) approach. Once Piipan's [prerequisites](./docs/iac.md#prerequisites) are installed in a development environment, its subsystems can be built and tested by navigating to the top of its project tree and running:
+Piipan is implemented with .NET and Microsoft Azure, using a Platform as a Service (PaaS) and Function as a Service (FaaS) approach.
+
+Piipan is organized into [subsystems](./docs/adr/0018-standardize-subsystem-software-architecture.md). A subsystem can contain one or more .NET projects. Each subsystem has a top-level `build.bash` script that can run builds, unit tests, and deployments for all projects in its subsystem.
+
+Piipan also has a top-level `build.bash` script that can perform these operations for all subsystems.
+
+### Dependencies
+
+Install Piipan's list of [prerequisites](./docs/iac.md#prerequisites) before starting development.
+
+### How to Build
+
+Once the prerequisites are installed in a development environment, you can locally build all projects in a particular subsystem by navigating to it's top-level directory and executing `build.bash`.
+
+Example:
+
+```bash
+$ cd match
+$ ./build.bash
+```
+
+To build all subsystems at once, navigate to Piipan's top-level directory and execute `./build.bash`
+
+### How to Test
+
+#### Unit Tests
+
+Run all unit tests for a particular subsystem by navigating to it's top-level directory and executing `build.bash test`.
+
+Example:
 
 ```
-./build.bash test
+$ cd match
+$ ./build.bash test
 ```
 
-For more details, see Piipan's [architecture and implementation notes](./docs/architecture.md), our [team practices](./docs/engineering-team-practices.md), and our [other technical documentation](./docs/README.md).
+When testing, an optional flag [-c] can be passed to run in Continuous Integration mode:
+
+Example:
+
+```
+$ ./build.bash test -c
+```
+
+To run all subsystem unit tests at once, navigate to Piipan's top-level directory and run `./build.bash test`.
+
+#### Integration Tests
+
+A subsystem may have one or more integration test suites. Because they require containerized environments, each integration test suite must be run individually. Consult each subsystem documentation for integration testing instructions.
+
+### How to Deploy
+
+Deploy all projects for a particular subsystem by navigating to it's top-level directory and executing `build.bash deploy -e [env]`.
+
+Example:
+
+```
+$ cd match
+$ ./build.bash deploy -e tts/dev
+```
+
+To deploy all Piipan subsystems, navigate to Piipan's top-level directory and execute `build.bash deploy -e [env]`.
+
+These scripts rely on a top-level [solutions (sln) file](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-sln) for each subsystem. See [tools/build-common.bash](./tools/build-common.bash) for more details.
+
+For more information for developers, see Piipan's [architecture and implementation notes](./docs/architecture.md), our [team practices](./docs/engineering-team-practices.md), and our [other technical documentation](./docs/README.md).
 
 ## Public domain
 

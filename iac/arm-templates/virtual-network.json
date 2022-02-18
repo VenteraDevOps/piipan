@@ -50,6 +50,12 @@
             "metadata": {
                 "description": "The name of the network security group associated with the web apps subnet."
             }
+        },
+        "idpOidcIpRanges": {
+            "type": "string",
+            "metadata": {
+                "description": "Comma-separated list of IP addresses / CIDR ranges to be allowed for OIDC egress traffic."
+            }
         }
     },
     "variables": {},
@@ -128,6 +134,9 @@
                             "type": "string"
                         },
                         "webAppServicePlanNsgName": {
+                            "type": "string"
+                        },
+                        "idpOidcIpRanges": {
                             "type": "string"
                         }
                     },
@@ -340,7 +349,7 @@
                                             "sourceAddressPrefix": "*",
                                             "destinationAddressPrefix": "Internet",
                                             "access": "Deny",
-                                            "priority": 120,
+                                            "priority": 130,
                                             "direction": "Outbound",
                                             "sourcePortRanges": [],
                                             "destinationPortRanges": [],
@@ -349,6 +358,31 @@
                                         }
                                     }
                                 ]
+                            }
+                        },
+                        // Conditionally deploy a discrete security rule to support
+                        // environments without OIDC-specific egress requirements
+                        {
+                            "condition": "[not(empty(parameters('idpOidcIpRanges')))]",
+
+                            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                            "apiVersion": "2020-11-01",
+                            "name": "[concat(parameters('webAppServicePlanNsgName'), '/AllowOIDC')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('webAppServicePlanNsgName'))]"
+                            ],
+                            "properties": {
+                                "protocol": "*",
+                                "sourcePortRange": "*",
+                                "destinationPortRange": "*",
+                                "sourceAddressPrefix": "*",
+                                "access": "Allow",
+                                "priority": 120,
+                                "direction": "Outbound",
+                                "sourcePortRanges": [],
+                                "destinationPortRanges": [],
+                                "sourceAddressPrefixes": [],
+                                "destinationAddressPrefixes": "[split(parameters('idpOidcIpRanges'), ',')]"
                             }
                         }
                     ]
@@ -380,6 +414,9 @@
                     },
                     "webAppServicePlanNsgName": {
                         "value": "[parameters('webAppServicePlanNsgName')]"
+                    },
+                    "idpOidcIpRanges": {
+                        "value": "[trim(parameters('idpOidcIpRanges'))]"
                     }
                 }
             }

@@ -5,7 +5,8 @@
         "type": "string",
         "description": "SHA-512 digest of participant's last name, DoB, and SSN. See pprl.md for details",
         "constraints": {
-          "pattern": "^[0-9a-f]{128}$"
+          "pattern": "^[0-9a-f]{128}$",
+          "required": true
         }
       },
       {

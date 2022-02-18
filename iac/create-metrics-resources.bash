@@ -48,7 +48,7 @@ main () {
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
     --default-action "Deny" \
-    --sku Standard_LRS \
+    --sku "$STORAGE_SKU" \
     --tags Project=$PROJECT_TAG
 
   echo "Allowing $VNET_NAME to access $COLLECT_STORAGE_NAME"
@@ -174,7 +174,7 @@ main () {
     --location "$LOCATION" \
     --resource-group "$RESOURCE_GROUP" \
     --default-action "Deny" \
-    --sku Standard_LRS \
+    --sku "$STORAGE_SKU" \
     --tags Project=$PROJECT_TAG
 
   echo "Allowing $VNET_NAME to access $API_APP_STORAGE_NAME"

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - [.NET Core SDK](https://dotnet.microsoft.com/download)
-- [npm](https://npmjs.com)
+- [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during build
 
 ## Local development
 To run the app locally:
@@ -16,9 +16,14 @@ To run the app locally:
 export OrchApiUri=https://tts-func-orchestrator-dev.azurewebsites.net/api/v1/
 ```
 
-3. If using a remote orchestrator URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `OrchestratorApi.Query` role for the remote orchestrator Function App and authorize the Azure CLI.
+3. Set the `OrchApiAppId` environment variable to the [application ID](../../docs/securing-internal-apis.md#application-id-uri) associated with the API in the previous step:
+```
+export OrchApiAppId=<application-id>
+```
 
-4. Run the app using the `dotnet run` CLI command:
+4. If using a remote orchestrator URI, follow the [instructions](../../docs/securing-internal-apis.md) to assign your Azure user account the `OrchestratorApi.Query` role for the remote orchestrator Function App and authorize the Azure CLI.
+
+5. Run the app using the `dotnet run` CLI command:
 ```
     cd query-tool/src/Piipan.QueryTool
     dotnet run
@@ -29,7 +34,7 @@ Alternatively, use the `watch` command to update the app upon file changes:
     dotnet watch run
 ```
 
-5. Visit https://localhost:5001
+6. Visit https://localhost:5001
 
 
 ### Building Assets

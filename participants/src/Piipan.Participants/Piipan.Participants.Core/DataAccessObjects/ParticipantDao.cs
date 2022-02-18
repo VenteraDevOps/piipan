@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
@@ -23,9 +24,10 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
         public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId)
         {
-            var connection = await _dbConnectionFactory.Build(state);
-            return await connection
-                .QueryAsync<ParticipantDbo>(@"
+            using (var connection = await _dbConnectionFactory.Build(state))
+            {
+                return await connection
+                    .QueryAsync<ParticipantDbo>(@"
                     SELECT
                         lds_hash LdsHash,
                         participant_id ParticipantId,
@@ -37,12 +39,13 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     FROM participants
                     WHERE lds_hash=@ldsHash
                         AND upload_id=@uploadId",
-                    new
-                    {
-                        ldsHash = ldsHash,
-                        uploadId = uploadId
-                    }
-                );
+                        new
+                        {
+                            ldsHash = ldsHash,
+                            uploadId = uploadId
+                        }
+                    );
+            }
         }
 
         public async Task AddParticipants(IEnumerable<ParticipantDbo> participants)
@@ -70,13 +73,18 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 )
             ";
 
-            var connection = await _dbConnectionFactory.Build();
-            foreach (var participant in participants)
+            using (var connection = await _dbConnectionFactory.Build() as DbConnection)
             {
-                _logger.LogDebug(
-                    $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
+                // A performance optimization. Dapper will open/close around invidual
+                // calls if it is passed a closed connection. 
+                await connection.OpenAsync();
+                foreach (var participant in participants)
+                {
+                    _logger.LogDebug(
+                        $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
 
-                await connection.ExecuteAsync(sql, participant);
+                    await connection.ExecuteAsync(sql, participant);
+                }
             }
         }
     }

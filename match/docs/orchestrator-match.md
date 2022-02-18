@@ -13,7 +13,7 @@ The orchestrator matching API is implemented in the `Piipan.Match.Orchestrator` 
 
 To query the API:
 1. A JSON `POST` request that conforms to the [OpenApi spec](openapi.md) is sent to the orchestrator API endpoint.
-1. The `POST` event triggers a function named `Query` in the orchestrator Function App.
+1. The `POST` event triggers a function named `Find` in the orchestrator Function App.
 1. The orchestrator Function App looks for matches across each per-state participant database
 
 ## Environment variables

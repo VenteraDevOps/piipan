@@ -67,13 +67,14 @@ namespace Piipan.Match.Core.DataAccessObjects
                 RETURNING match_id;
             ";
 
-            var connection = await _dbConnectionFactory.Build();
-
             // Match IDs are randomly generated at the service level and may result
             // in unique constraint violations in the rare case of a collision.
             try
             {
-                return await connection.ExecuteScalarAsync<string>(sql, record);
+                using (var connection = await _dbConnectionFactory.Build())
+                {
+                    return await connection.ExecuteScalarAsync<string>(sql, record);
+                }
             }
             catch (PostgresException ex)
             {
@@ -108,9 +109,10 @@ namespace Piipan.Match.Core.DataAccessObjects
                     states @> @States AND
                     states <@ @States;";
 
-            var connection = await _dbConnectionFactory.Build();
-
-            return await connection.QueryAsync<MatchRecordDbo>(sql, record);
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection.QueryAsync<MatchRecordDbo>(sql, record);
+            }
         }
     }
 }

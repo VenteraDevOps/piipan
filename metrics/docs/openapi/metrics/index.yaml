@@ -15,6 +15,8 @@ paths:
         - "Participant Uploads"
       summary: "participant uploads index"
       description: "Queries metrics database to show which states are uploading participants and when"
+      parameters:
+        - $ref: '../schemas/participant-uploads.yaml#/components/parameters/State'
       responses:
         '200':
           description: "List of participant upload events"
@@ -35,8 +37,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ParticipantUploadsResponse'
+security:
+  - BearerAuth: []
 components:
   schemas:
     ParticipantUploadsResponse:
       $ref: '../schemas/participant-uploads.yaml#/ParticipantUploadsResponse'
-
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

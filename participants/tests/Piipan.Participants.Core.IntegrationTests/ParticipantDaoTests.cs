@@ -62,7 +62,6 @@ namespace Piipan.Participants.Core.IntegrationTests
                 {
                     var conn = Factory.CreateConnection();
                     conn.ConnectionString = ConnectionString;
-                    conn.Open();
                     return conn;
                 });
 

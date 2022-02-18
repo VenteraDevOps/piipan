@@ -32,9 +32,10 @@ namespace Piipan.Metrics.Core.DataAccessObjects
                 sql += $" WHERE lower(state) LIKE @state";
             }
 
-            var connection = await _dbConnectionFactory.Build();
-
-            return await connection.ExecuteScalarAsync<Int64>(sql, new { state = state });
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection.ExecuteScalarAsync<Int64>(sql, new { state = state });
+            }
         }
 
         public async Task<IEnumerable<ParticipantUpload>> GetUploads(string? state, int limit, int offset = 0)
@@ -54,50 +55,53 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             sql += $" LIMIT @limit";
             sql += $" OFFSET @offset";
 
-            var connection = await _dbConnectionFactory.Build();
-
-            return await connection
-                .QueryAsync<ParticipantUpload>(sql, new { state = state, limit = limit, offset = offset });
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection
+                    .QueryAsync<ParticipantUpload>(sql, new { state = state, limit = limit, offset = offset });
+            }
         }
 
         public async Task<IEnumerable<ParticipantUpload>> GetLatestUploadsByState()
         {
-            var connection = await _dbConnectionFactory.Build();
-
-            return (await connection.QueryAsync(@"
-                SELECT 
-                    state, 
-                    max(uploaded_at) as uploaded_at
-                FROM participant_uploads
-                GROUP BY state
-                ORDER BY uploaded_at ASC
-            ;")).Select(o => new ParticipantUpload
+            using (var connection = await _dbConnectionFactory.Build())
             {
-                State = o.state,
-                UploadedAt = o.uploaded_at
-            });
+                return (await connection.QueryAsync(@"
+                    SELECT 
+                        state, 
+                        max(uploaded_at) as uploaded_at
+                    FROM participant_uploads
+                    GROUP BY state
+                    ORDER BY uploaded_at ASC
+                ;")).Select(o => new ParticipantUpload
+                {
+                    State = o.state,
+                    UploadedAt = o.uploaded_at
+                });
+            }
         }
 
         public async Task<int> AddUpload(string state, DateTime uploadedAt)
         {
-            var connection = await _dbConnectionFactory.Build();
-
-            return await connection.ExecuteAsync(@"
-                INSERT INTO participant_uploads 
-                (
-                    state, 
-                    uploaded_at
-                ) 
-                VALUES
-                (
-                    @state, 
-                    @uploaded_at
-                );",
-                new
-                {
-                    state = state,
-                    uploaded_at = uploadedAt
-                });
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection.ExecuteAsync(@"
+                    INSERT INTO participant_uploads 
+                    (
+                        state, 
+                        uploaded_at
+                    ) 
+                    VALUES
+                    (
+                        @state, 
+                        @uploaded_at
+                    );",
+                    new
+                    {
+                        state = state,
+                        uploaded_at = uploadedAt
+                    });
+            }
         }
     }
 }
