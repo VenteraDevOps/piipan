@@ -14,6 +14,7 @@ When new source trees (e.g., a new component or test suite) are added to this re
 1. For new components, update [.circleci/config.yml](/.circleci/config.yml) to build and deploy it to Azure. Any infrastructure should be pre-existing and established separately via [create-resources.bash](/iac/create-resources.bash).
 1. For any `dotnet` command in CircleCI that calls MSBuild under the hood (e.g., `build`, `test`, `publish`), ensure that the `ContinuousIntegrationBuild=true` property is set. See the job-level `$MSBUILD_PROPS` variable in [.circleci/config.yml](/.circleci/config.yml).
 1. Add project to the subsystem solutions (sln) file
+1. Add project to the top-level system solutions file (system.sln) at the root of the repo
 
 ## Source code conventions
 

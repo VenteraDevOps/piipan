@@ -3,71 +3,71 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Dashboard", "..\dashboard\src\Piipan.Dashboard\Piipan.Dashboard.csproj", "{B571316B-CDD8-42D3-BD0C-E67878EB2A17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Dashboard", "dashboard\src\Piipan.Dashboard\Piipan.Dashboard.csproj", "{B571316B-CDD8-42D3-BD0C-E67878EB2A17}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Etl.Func.BulkUpload", "..\etl\src\Piipan.Etl\Piipan.Etl.Func.BulkUpload\Piipan.Etl.Func.BulkUpload.csproj", "{D1576A59-E40B-42DF-878A-C33D63FC2C19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Etl.Func.BulkUpload", "etl\src\Piipan.Etl\Piipan.Etl.Func.BulkUpload\Piipan.Etl.Func.BulkUpload.csproj", "{D1576A59-E40B-42DF-878A-C33D63FC2C19}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Etl.Func.BulkUpload.IntegrationTests", "..\etl\tests\Piipan.Etl.Func.BulkUpload.IntegrationTests\Piipan.Etl.Func.BulkUpload.IntegrationTests.csproj", "{8D18AD5F-0E7A-4656-B814-EC194C8F3999}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Etl.Func.BulkUpload.IntegrationTests", "etl\tests\Piipan.Etl.Func.BulkUpload.IntegrationTests\Piipan.Etl.Func.BulkUpload.IntegrationTests.csproj", "{8D18AD5F-0E7A-4656-B814-EC194C8F3999}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Etl.Func.BulkUpload.Tests", "..\etl\tests\Piipan.Etl.Func.BulkUpload.Tests\Piipan.Etl.Func.BulkUpload.Tests.csproj", "{07DA04EE-1BCE-4171-A9F1-B202617ADFBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Etl.Func.BulkUpload.Tests", "etl\tests\Piipan.Etl.Func.BulkUpload.Tests\Piipan.Etl.Func.BulkUpload.Tests.csproj", "{07DA04EE-1BCE-4171-A9F1-B202617ADFBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Dashboard.Tests", "..\dashboard\tests\Piipan.Dashboard.Tests\Piipan.Dashboard.Tests.csproj", "{04A4D6BA-28FB-4C92-A33F-A906667E665B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Dashboard.Tests", "dashboard\tests\Piipan.Dashboard.Tests\Piipan.Dashboard.Tests.csproj", "{04A4D6BA-28FB-4C92-A33F-A906667E665B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Api", "..\match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj", "{7A9433FC-399A-4B48-ABD1-7A39430BD2FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Api", "match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj", "{7A9433FC-399A-4B48-ABD1-7A39430BD2FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Client", "..\match\src\Piipan.Match\Piipan.Match.Client\Piipan.Match.Client.csproj", "{99C258C1-0DF7-4B7B-B53A-750BD4547076}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Client", "match\src\Piipan.Match\Piipan.Match.Client\Piipan.Match.Client.csproj", "{99C258C1-0DF7-4B7B-B53A-750BD4547076}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Core", "..\match\src\Piipan.Match\Piipan.Match.Core\Piipan.Match.Core.csproj", "{89F9AD7B-21AB-4B75-A7B9-3D5CC823BD23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Core", "match\src\Piipan.Match\Piipan.Match.Core\Piipan.Match.Core.csproj", "{89F9AD7B-21AB-4B75-A7B9-3D5CC823BD23}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.Api", "..\match\src\Piipan.Match\Piipan.Match.Func.Api\Piipan.Match.Func.Api.csproj", "{F339FA80-3D8E-484C-BBD5-59F628614EE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.Api", "match\src\Piipan.Match\Piipan.Match.Func.Api\Piipan.Match.Func.Api.csproj", "{F339FA80-3D8E-484C-BBD5-59F628614EE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Api.Tests", "..\match\tests\Piipan.Match.Api.Tests\Piipan.Match.Api.Tests.csproj", "{A6A9838B-88B2-4952-8169-DFCE7555268E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Api.Tests", "match\tests\Piipan.Match.Api.Tests\Piipan.Match.Api.Tests.csproj", "{A6A9838B-88B2-4952-8169-DFCE7555268E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Client.Tests", "..\match\tests\Piipan.Match.Client.Tests\Piipan.Match.Client.Tests.csproj", "{F6F5E827-B968-443C-82F0-1DD304510F38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Client.Tests", "match\tests\Piipan.Match.Client.Tests\Piipan.Match.Client.Tests.csproj", "{F6F5E827-B968-443C-82F0-1DD304510F38}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Core.IntegrationTests", "..\match\tests\Piipan.Match.Core.IntegrationTests\Piipan.Match.Core.IntegrationTests.csproj", "{1306C950-9CF9-458E-94A7-4029A356FC76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Core.IntegrationTests", "match\tests\Piipan.Match.Core.IntegrationTests\Piipan.Match.Core.IntegrationTests.csproj", "{1306C950-9CF9-458E-94A7-4029A356FC76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.Api.Tests", "..\match\tests\Piipan.Match.Func.Api.Tests\Piipan.Match.Func.Api.Tests.csproj", "{15C59964-23BD-49FE-A6D6-35E1CCCABA59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.Api.Tests", "match\tests\Piipan.Match.Func.Api.Tests\Piipan.Match.Func.Api.Tests.csproj", "{15C59964-23BD-49FE-A6D6-35E1CCCABA59}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Core.Tests", "..\match\tests\Piipan.Match.Core.Tests\Piipan.Match.Core.Tests.csproj", "{76AD4921-6978-481C-A78A-A2C2E0BBB90E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Core.Tests", "match\tests\Piipan.Match.Core.Tests\Piipan.Match.Core.Tests.csproj", "{76AD4921-6978-481C-A78A-A2C2E0BBB90E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.Api.IntegrationTests", "..\match\tests\Piipan.Match.Func.Api.IntegrationTests\Piipan.Match.Func.Api.IntegrationTests.csproj", "{306EE899-42DF-423B-90FD-FF4EA4850FFD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.Api.IntegrationTests", "match\tests\Piipan.Match.Func.Api.IntegrationTests\Piipan.Match.Func.Api.IntegrationTests.csproj", "{306EE899-42DF-423B-90FD-FF4EA4850FFD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Api", "..\metrics\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj", "{987ECD0E-6E2D-4749-B837-196804C03545}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Api", "metrics\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj", "{987ECD0E-6E2D-4749-B837-196804C03545}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Client", "..\metrics\src\Piipan.Metrics\Piipan.Metrics.Client\Piipan.Metrics.Client.csproj", "{2EFA82A1-FE7A-4424-83B8-E87C0D750E1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Client", "metrics\src\Piipan.Metrics\Piipan.Metrics.Client\Piipan.Metrics.Client.csproj", "{2EFA82A1-FE7A-4424-83B8-E87C0D750E1A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Core", "..\metrics\src\Piipan.Metrics\Piipan.Metrics.Core\Piipan.Metrics.Core.csproj", "{CD73403A-1E64-4C54-92E3-394320A3A332}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Core", "metrics\src\Piipan.Metrics\Piipan.Metrics.Core\Piipan.Metrics.Core.csproj", "{CD73403A-1E64-4C54-92E3-394320A3A332}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Api", "..\metrics\src\Piipan.Metrics\Piipan.Metrics.Func.Api\Piipan.Metrics.Func.Api.csproj", "{30E9D159-91A8-4DEF-B18F-CE9C7FC0B931}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Api", "metrics\src\Piipan.Metrics\Piipan.Metrics.Func.Api\Piipan.Metrics.Func.Api.csproj", "{30E9D159-91A8-4DEF-B18F-CE9C7FC0B931}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Collect", "..\metrics\src\Piipan.Metrics\Piipan.Metrics.Func.Collect\Piipan.Metrics.Func.Collect.csproj", "{4ECD1F2A-B912-4540-9693-F8DB713B7F6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Collect", "metrics\src\Piipan.Metrics\Piipan.Metrics.Func.Collect\Piipan.Metrics.Func.Collect.csproj", "{4ECD1F2A-B912-4540-9693-F8DB713B7F6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Client.Tests", "..\metrics\tests\Piipan.Metrics.Client.Tests\Piipan.Metrics.Client.Tests.csproj", "{171855F1-55AC-457C-9B4B-5FD62050C4EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Client.Tests", "metrics\tests\Piipan.Metrics.Client.Tests\Piipan.Metrics.Client.Tests.csproj", "{171855F1-55AC-457C-9B4B-5FD62050C4EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Core.IntegrationTests", "..\metrics\tests\Piipan.Metrics.Core.IntegrationTests\Piipan.Metrics.Core.IntegrationTests.csproj", "{C6AF8602-F7D0-401A-8D54-D85243066224}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Core.IntegrationTests", "metrics\tests\Piipan.Metrics.Core.IntegrationTests\Piipan.Metrics.Core.IntegrationTests.csproj", "{C6AF8602-F7D0-401A-8D54-D85243066224}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Core.Tests", "..\metrics\tests\Piipan.Metrics.Core.Tests\Piipan.Metrics.Core.Tests.csproj", "{A65D9A1D-13C0-4F8D-9F3E-41490A43F769}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Core.Tests", "metrics\tests\Piipan.Metrics.Core.Tests\Piipan.Metrics.Core.Tests.csproj", "{A65D9A1D-13C0-4F8D-9F3E-41490A43F769}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Api.Tests", "..\metrics\tests\Piipan.Metrics.Func.Api.Tests\Piipan.Metrics.Func.Api.Tests.csproj", "{16278D3E-97B5-4ABA-B8DB-7AC5A82942F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Api.Tests", "metrics\tests\Piipan.Metrics.Func.Api.Tests\Piipan.Metrics.Func.Api.Tests.csproj", "{16278D3E-97B5-4ABA-B8DB-7AC5A82942F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Collect.Tests", "..\metrics\tests\Piipan.Metrics.Func.Collect.Tests\Piipan.Metrics.Func.Collect.Tests.csproj", "{41D1C282-2E56-4695-868E-543DFABB56A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Metrics.Func.Collect.Tests", "metrics\tests\Piipan.Metrics.Func.Collect.Tests\Piipan.Metrics.Func.Collect.Tests.csproj", "{41D1C282-2E56-4695-868E-543DFABB56A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Api", "..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj", "{7828EA7C-30D7-4B48-A539-A577BF1EB6CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Api", "participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj", "{7828EA7C-30D7-4B48-A539-A577BF1EB6CE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Core", "..\participants\src\Piipan.Participants\Piipan.Participants.Core\Piipan.Participants.Core.csproj", "{333F8286-C578-4463-ADC7-817DC77A5195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Core", "participants\src\Piipan.Participants\Piipan.Participants.Core\Piipan.Participants.Core.csproj", "{333F8286-C578-4463-ADC7-817DC77A5195}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Core.IntegrationTests", "..\participants\tests\Piipan.Participants.Core.IntegrationTests\Piipan.Participants.Core.IntegrationTests.csproj", "{E6917F8B-7FB9-476C-A2D0-79B9D9806A16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Core.IntegrationTests", "participants\tests\Piipan.Participants.Core.IntegrationTests\Piipan.Participants.Core.IntegrationTests.csproj", "{E6917F8B-7FB9-476C-A2D0-79B9D9806A16}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Core.Tests", "..\participants\tests\Piipan.Participants.Core.Tests\Piipan.Participants.Core.Tests.csproj", "{9C9D1FC6-ED6A-46FC-BAFD-492569CFE2A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Participants.Core.Tests", "participants\tests\Piipan.Participants.Core.Tests\Piipan.Participants.Core.Tests.csproj", "{9C9D1FC6-ED6A-46FC-BAFD-492569CFE2A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.QueryTool", "..\query-tool\src\Piipan.QueryTool\Piipan.QueryTool.csproj", "{3D4BB26B-33B9-4F97-A742-FB640157D07F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.QueryTool", "query-tool\src\Piipan.QueryTool\Piipan.QueryTool.csproj", "{3D4BB26B-33B9-4F97-A742-FB640157D07F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.QueryTool.Tests", "..\query-tool\tests\Piipan.QueryTool.Tests\Piipan.QueryTool.Tests.csproj", "{FF9992ED-13DE-4F16-B2A3-E6234857C3C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.QueryTool.Tests", "query-tool\tests\Piipan.QueryTool.Tests\Piipan.QueryTool.Tests.csproj", "{FF9992ED-13DE-4F16-B2A3-E6234857C3C7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared", "..\shared\src\Piipan.Shared\Piipan.Shared.csproj", "{BF34BB0B-13E9-431E-A39D-953DA177DC8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared", "shared\src\Piipan.Shared\Piipan.Shared.csproj", "{BF34BB0B-13E9-431E-A39D-953DA177DC8A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Tests", "..\shared\tests\Piipan.Shared.Tests\Piipan.Shared.Tests.csproj", "{803D0B10-0ED3-46A5-B4DC-C04800E2F111}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Tests", "shared\tests\Piipan.Shared.Tests\Piipan.Shared.Tests.csproj", "{803D0B10-0ED3-46A5-B4DC-C04800E2F111}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ETL", "ETL", "{C6B8F36A-B448-4F97-9DA0-C611B2CDAA27}"
 EndProject
