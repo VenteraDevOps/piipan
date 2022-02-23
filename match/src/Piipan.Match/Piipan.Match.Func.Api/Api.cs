@@ -60,9 +60,13 @@ namespace Piipan.Match.Func.Api
                 LogRequest(logger, req);
 
                 var initiatingState = InitiatingState(req);
+                //var initiatingParticipantId = InitiatingParticipantId(req);
+                //var initiatingCaseId = InitiatingCaseId(req);
                 var request = await _requestParser.Parse(req.Body);
                 var response = await _matchApi.FindMatches(request, initiatingState);
-                response = await _matchEventService.ResolveMatches(request, response, initiatingState);
+                response = await _matchEventService.ResolveMatches(request, response, initiatingState, "partid3636", "case3636");
+                //TODO
+
 
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
@@ -112,6 +116,23 @@ namespace Piipan.Match.Func.Api
 
             return state;
         }
+
+        //private string InitiatingParticipantId(HttpRequest request)
+        //{
+        //    string state = request.Headers["X-Initiating-Participant-Id"];
+
+        //    if (String.IsNullOrEmpty(state))
+        //    {
+        //        throw new HttpRequestException("Request is missing required header: X-Participant-Id");
+        //    }
+
+        //    return state;
+        //}
+
+        //private string InitiatingCaseId(HttpRequest request)
+        //{
+        //    return request.Headers["X-Case-id"];
+        //}
 
         private ActionResult ValidationErrorResponse(ValidationException exception)
         {
