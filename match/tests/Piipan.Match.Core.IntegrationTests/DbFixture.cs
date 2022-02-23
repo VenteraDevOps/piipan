@@ -63,6 +63,8 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
                 conn.Execute("DROP TYPE IF EXISTS status");
@@ -81,6 +83,8 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
                 conn.Execute("DROP TYPE IF EXISTS status");
