@@ -33,7 +33,7 @@ namespace Piipan.Match.Core.Services
         /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
         /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
         /// <returns>The updated `matchResponse` object with `match_id`s</returns>
-        public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState, string initiatingParticipantId, string initiatingCaseId)
+        public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
         {
             matchResponse.Data.Results = (await Task.WhenAll(matchResponse.Data.Results.Select(result =>
                 ResolvePersonMatches(
