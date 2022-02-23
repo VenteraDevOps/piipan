@@ -1,3 +1,5 @@
+using System;
+using System.Net;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +43,21 @@ namespace Piipan.Dashboard
             {
                 options.Conventions.AuthorizeFolder("/");
                 options.Conventions.AllowAnonymousToPage("/SignedOut");
+            });
+
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromSeconds(31536000);
+                // options.ExcludedHosts.Add("example.com");
+                // options.ExcludedHosts.Add("www.example.com");
+            });
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = (int) HttpStatusCode.TemporaryRedirect;
+                options.HttpsPort = 5001;
             });
 
             services.AddHttpContextAccessor();

@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -51,6 +52,21 @@ namespace Piipan.QueryTool
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
 
+            services.AddHsts(options =>
+            {
+                options.Preload = true;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromSeconds(31536000);
+                // options.ExcludedHosts.Add("example.com");
+                // options.ExcludedHosts.Add("www.example.com");
+            });
+
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = (int) HttpStatusCode.TemporaryRedirect;
+                options.HttpsPort = 5001;
+            });
+
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
             
             services.AddSingleton<INameNormalizer, NameNormalizer>();
@@ -70,6 +86,8 @@ namespace Piipan.QueryTool
                     .GetSection(AuthorizationPolicyOptions.SectionName)
                     .Get<AuthorizationPolicyOptions>());
             });
+
+            
 
             services.RegisterMatchClientServices(_env);
 
