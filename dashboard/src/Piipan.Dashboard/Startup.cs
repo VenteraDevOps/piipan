@@ -1,5 +1,3 @@
-using System;
-using System.Net;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
