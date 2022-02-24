@@ -38,7 +38,7 @@ We use this commit message template:
 
 - The PR submitter closes the PR after getting 1 approval. This more directly assigns the responsibility of any failed CircleCI builds to the PR submitter, as others may not get the build failure notifications.
 
-- If possible, judiciously select a single reviewer for a PR, based on their area of speciality, or if they had previously worked on the portion of the code base. For API specification work or changes concerning the entire development team, add the entire team as reviewers (but feel free to merge with 1 approval).
+- Now that there are multiple teams making changes to the code base, judiciously select a single member from each team to review a PR. Select reviewers, based on their area of speciality, or if they had previously worked on the portion of the code base. For API specification work or changes concerning the entire development team, add the entire team as reviewers (but feel free to merge with 1 approval).
 
 ## Definition of Done
 

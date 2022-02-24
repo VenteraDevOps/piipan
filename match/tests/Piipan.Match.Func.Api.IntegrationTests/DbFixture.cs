@@ -74,6 +74,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             {
                 conn.ConnectionString = CollabConnectionString;
                 conn.Open();
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Close();
             }
@@ -105,6 +107,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute(matchesSql);
 

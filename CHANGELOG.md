@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0.34] - 2022-02-22
+
+### Added
+- Added reference to error 429 in find & duplicate-participation-api
+- ADR for using Event Sourcing for Match Resolution
+- Allow egress traffic from web apps to OIDC provider
+
+## [1.0.0.33] - 2022-02-08
+
+### Changed
+- Updated Engineering Practices doc to specify approach to cross-team review
+### Added
+- Engineering quick start guide
+
 ## [1.0] - 2022-01-25
 
 ### Changed
@@ -215,6 +229,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[1.0.0.33]: https://github.com/18F/piipan/releases/tag/v1.0.0.33
 [1.0]: https://github.com/18F/piipan/releases/tag/v1.0
 [0.97]: https://github.com/18F/piipan/releases/tag/v0.97
 [0.96]: https://github.com/18F/piipan/releases/tag/v0.96

@@ -271,6 +271,7 @@ Searches all state databases for any participant records that are an exact match
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Successful response. Returns match response items.|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Bad request. Request body does not match the required format.|None|
+|429|[Too Many Requests](https://tools.ietf.org/html/rfc6585#section-4)|Too Many Requests. The status code indicates the user has sent too many requests in a given amount of time 'rate limiting'.|None|
 
 <h3 id="find-matches-responseschema">Response Schema</h3>
 
