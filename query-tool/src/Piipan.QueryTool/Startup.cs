@@ -54,17 +54,9 @@ namespace Piipan.QueryTool
 
             services.AddHsts(options =>
             {
-                options.Preload = true;
-                options.IncludeSubDomains = true;
-                options.MaxAge = TimeSpan.FromSeconds(31536000);
-                // options.ExcludedHosts.Add("example.com");
-                // options.ExcludedHosts.Add("www.example.com");
-            });
-
-            services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = (int) HttpStatusCode.TemporaryRedirect;
-                options.HttpsPort = 5001;
+                options.Preload = true; //Sets the preload parameter of the Strict-Transport-Security header. Preload isn't part of the RFC HSTS specification, but is supported by web browsers to preload HSTS sites on fresh install. For more information, see https://hstspreload.org
+                options.IncludeSubDomains = true; //Enables includeSubDomain, which applies the HSTS policy to Host subdomains.
+                options.MaxAge = TimeSpan.FromSeconds(31536000); //Explicitly sets the max-age parameter of the Strict-Transport-Security header to 365 days. If not set, defaults to 30 days.
             });
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
@@ -86,8 +78,6 @@ namespace Piipan.QueryTool
                     .GetSection(AuthorizationPolicyOptions.SectionName)
                     .Get<AuthorizationPolicyOptions>());
             });
-
-            
 
             services.RegisterMatchClientServices(_env);
 
