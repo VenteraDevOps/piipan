@@ -98,6 +98,40 @@ namespace Piipan.Participants.Core.IntegrationTests
         }
 
         [Theory]
+        [InlineData(5)]
+        public async void AfterException_AddParticipantsRollsTranactionBack(int nParticipants)
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                ClearParticipants();
+
+                var logger = Mock.Of<ILogger<ParticipantDao>>();
+                var dao = new ParticipantDao(DbConnFactory(), logger);
+                var participants = RandomParticipants(nParticipants);
+                participants.Last().LdsHash = null;
+                try
+                {
+                    // Act
+                    await dao.AddParticipants(participants);
+                    throw new Exception("Test should have failed because of participant with null ldsHash value");
+                }
+                catch (Exception)
+                {
+                    // Assert
+                    participants.ToList().ForEach(p =>
+                    {
+                        Assert.False(HasParticipant(p));
+                    });
+                }
+                
+                
+            }
+        }
+
+        [Theory]
         [InlineData(1)]
         [InlineData(20)]
         public async void GetParticipants(int nMatches)

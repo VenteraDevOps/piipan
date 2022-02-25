@@ -78,12 +78,25 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 // A performance optimization. Dapper will open/close around invidual
                 // calls if it is passed a closed connection. 
                 await connection.OpenAsync();
-                foreach (var participant in participants)
-                {
-                    _logger.LogDebug(
-                        $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
+                var tx = connection.BeginTransaction();
 
-                    await connection.ExecuteAsync(sql, participant);
+                try
+                {
+                    foreach (var participant in participants)
+                    {
+                        _logger.LogDebug(
+                            $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
+
+                        await connection.ExecuteAsync(sql, participant);
+                    }
+
+                    await tx.CommitAsync();
+                }
+                catch(Exception ex)
+                {
+                    await tx.RollbackAsync();
+                    _logger.LogError(ex, ex.Message);
+                    throw;
                 }
             }
         }
