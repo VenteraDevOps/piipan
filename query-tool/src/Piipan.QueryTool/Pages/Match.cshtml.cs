@@ -8,9 +8,6 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
-// using Piipan.Match.Core.DataAccessObjects;
-// using Piipan.Match.Core.Exceptions;
-using Piipan.Match.Api.Models;
 
 namespace Piipan.QueryTool.Pages
 {
