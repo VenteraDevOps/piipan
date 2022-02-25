@@ -30,9 +30,9 @@
       },
       "TimeZoneConverter": {
         "type": "Direct",
-        "requested": "[3.5.0, )",
-        "resolved": "3.5.0",
-        "contentHash": "ziTcQ5rVxRdtWJEnEqhKBukZGuUQregbf5G7QRrFKj6CwBLss5tSz0dlSHy9gzi5M5ES0PNQ0K2ACP/0XVT5Ow=="
+        "requested": "[5.0.0, )",
+        "resolved": "5.0.0",
+        "contentHash": "U7Oilf3Ya6Rmu6gOaBfWyT3q0kwy2av6a5PfTn05CF54C+7DvuLsE3ljASvYmCpsSQeJvpnqU5Uzag6+ysWUeA=="
       },
       "Azure.Core": {
         "type": "Transitive",

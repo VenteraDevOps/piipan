@@ -2068,8 +2068,8 @@
       },
       "TimeZoneConverter": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "ziTcQ5rVxRdtWJEnEqhKBukZGuUQregbf5G7QRrFKj6CwBLss5tSz0dlSHy9gzi5M5ES0PNQ0K2ACP/0XVT5Ow=="
+        "resolved": "5.0.0",
+        "contentHash": "U7Oilf3Ya6Rmu6gOaBfWyT3q0kwy2av6a5PfTn05CF54C+7DvuLsE3ljASvYmCpsSQeJvpnqU5Uzag6+ysWUeA=="
       },
       "WindowsAzure.Storage": {
         "type": "Transitive",
@@ -2134,7 +2134,7 @@
           "Piipan.Metrics.Api": "1.0.0",
           "Piipan.Metrics.Client": "1.0.0",
           "Piipan.Shared": "1.0.0",
-          "TimeZoneConverter": "3.5.0"
+          "TimeZoneConverter": "5.0.0"
         }
       },
       "piipan.metrics.api": {
