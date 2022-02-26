@@ -78,7 +78,6 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 // A performance optimization. Dapper will open/close around invidual
                 // calls if it is passed a closed connection. 
                 await connection.OpenAsync();
-                var tx = connection.BeginTransaction();
 
                 try
                 {
@@ -89,12 +88,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
                         await connection.ExecuteAsync(sql, participant);
                     }
-
-                    await tx.CommitAsync();
                 }
                 catch(Exception ex)
                 {
-                    await tx.RollbackAsync();
                     _logger.LogError(ex, ex.Message);
                     throw;
                 }
