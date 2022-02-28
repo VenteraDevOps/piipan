@@ -114,5 +114,39 @@ namespace Piipan.Match.Core.DataAccessObjects
                 return await connection.QueryAsync<MatchRecordDbo>(sql, record);
             }
         }
+
+        /// <summary>
+        /// Finds a Match Record by Match ID
+        /// </summary>
+        /// <remarks>
+        /// Throws InvalidOperationException if 0 or more than 1 record is found.
+        /// </remarks>
+        /// <param name="matchId">The Match ID for the specified match record.</param>
+        /// <returns>Enumerable of Match Records with length 1</returns>
+        public async Task<IMatchRecord> GetRecordByMatchId(string matchId)
+        {
+            const string sql = @"
+                SELECT
+                    match_id,
+                    created_at,
+                    initiator,
+                    states,
+                    hash,
+                    hash_type::text,
+                    input::jsonb,
+                    data::jsonb,
+                    status::text
+                FROM matches
+                WHERE
+                    match_id = @MatchId
+                ;";
+
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection.QuerySingleAsync<MatchRecordDbo>(sql, new MatchRecordDbo {
+                    MatchId = matchId
+                });
+            }
+        }
     }
 }

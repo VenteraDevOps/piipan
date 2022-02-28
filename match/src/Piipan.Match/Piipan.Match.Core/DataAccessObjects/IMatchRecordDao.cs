@@ -9,5 +9,6 @@ namespace Piipan.Match.Core.DataAccessObjects
     {
         Task<string> AddRecord(MatchRecordDbo record);
         Task<IEnumerable<IMatchRecord>> GetRecords(MatchRecordDbo record);
+        Task<IMatchRecord> GetRecordByMatchId(string matchId);
     }
 }
