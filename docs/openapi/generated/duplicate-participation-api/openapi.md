@@ -59,6 +59,8 @@ Searches all state databases for any participant records that are an exact match
 |From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
 |data|body|[object]|true|none|
 |» lds_hash|body|string|true|SHA-512 digest of participant's last name, DoB, and SSN. See docs/pprl.md for details|
+|» case_id|body|string|false|Participants Case Number within a State|
+|» participant_id|body|string|false|Participants Participant ID within a state|
 
 > Example responses
 
