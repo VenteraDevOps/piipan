@@ -52,7 +52,7 @@ namespace Piipan.QueryTool.Pages
                     {
                         Data = new List<RequestPerson>
                         {
-                            new RequestPerson { LdsHash = digest }
+                            new RequestPerson { LdsHash = digest, CaseId = "Temp_CaseId", ParticipantId = "Temp_ParticipantId" }
                         }
                     };
 
