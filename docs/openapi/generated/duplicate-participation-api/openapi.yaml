@@ -41,12 +41,12 @@ paths:
                         type: string
                         description: 'SHA-512 digest of participant''s last name, DoB, and SSN. See docs/pprl.md for details'
                         pattern: '^[0-9a-f]{128}$'
-                      case_id:
-                        type: string
-                        description: Participants Case Number within a State
                       participant_id:
                         type: string
-                        description: Participants Participant ID within a state
+                        description: Participant's state-specific identifier. Must not be social security number or any personal identifiable information.
+                      case_id:
+                        type: string
+                        description: Participant's state-specific case number
             examples:
               Single person:
                 description: 'An example request to query a single person, with values for all fields'
