@@ -8,6 +8,7 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
+using System.Text.RegularExpressions;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -20,9 +21,7 @@ namespace Piipan.QueryTool.Pages
 
         public MatchData Match = new MatchData();
 
-        private MatchData[] Participants = Enumerable.Range(0, 10)
-                                                            .Select(x => new MatchData())
-                                                            .ToArray();
+        List<MatchData> Matches = new List<MatchData>();
 
         public MatchModel(ILogger<IndexModel> logger
                            , IClaimsProvider claimsProvider
@@ -39,16 +38,28 @@ namespace Piipan.QueryTool.Pages
         }
 
         // [HttpGet("{id}")]
-        public void OnGet(string id)
+        public IActionResult OnGet(string id)
         {   
-            int selectedId = 0;
-            Int32.TryParse(id, out selectedId);
-            Match = Participants[selectedId];
+            Regex r = new Regex("^[a-zA-Z0-9]*$");
+            if (r.IsMatch(id)) {
+
+                Match = Matches.Find(x => x.MatchId == id);
+
+                if(Match == null) {
+                    return RedirectToPage("/NotFound");
+                }
+                
+                return Page();
+            }
+            else {
+                return RedirectToPage("/NotFound");
+            }
+
         }
 
         private void GetFakeData()
         {
-            Participants[0] = new MatchData()
+            Matches.Add(new MatchData()
             {
                 MatchId = "0",
                 LdsHash = "",
@@ -73,9 +84,9 @@ namespace Piipan.QueryTool.Pages
                 MatchStateCaseId = "IA-5678",
                 MatchStateParticipantId = "LMN5678",
                 ProtectLocation = true
-            };
+            });
 
-            Participants[1] = new MatchData()
+            Matches.Add(new MatchData()
             {
                 MatchId = "1",
                 LdsHash = "",
@@ -100,9 +111,9 @@ namespace Piipan.QueryTool.Pages
                 MatchStateCaseId = "IA-5678",
                 MatchStateParticipantId = "LMN5678",
                 ProtectLocation = true
-            };
+            });
 
-            Participants[2] = new MatchData()
+            Matches.Add(new MatchData()
             {
                 MatchId = "1",
                 LdsHash = "",
@@ -127,14 +138,97 @@ namespace Piipan.QueryTool.Pages
                 MatchStateCaseId = "IA-5678",
                 MatchStateParticipantId = "LMN5678",
                 ProtectLocation = true
-            };
-            Participants[3] = new MatchData()
+            });
+
+            Matches.Add(new MatchData()
             {
                 MatchId = "3",
                 LdsHash = null,
         
                 ProtectLocation = null
-            };
+            });
+
+            Matches.Add(new MatchData()
+            {
+                MatchId = "m1",
+                LdsHash = "",
+                Status = "Open",
+                MatchCreationDate = "",
+                QueryingState = "Montana (MT)",
+                QueryingStateVulnerableStatus = false,
+                QueryingStateMatchValidity = true,
+                QueryingStateInitialAction = "",
+                QueryingStateDateInitialAction = null,
+                QueryingStateFinalDisposition = "",
+                QueryingStateDateFinalDisposition = null,
+                QueryingStateCaseId = "MT-1234",
+                QueryingStateParticipantId = "JKL1234",
+                MatchState = "Iowa (IA)",
+                MatchStateVulnerableStatus = false,
+                MatchStateMatchValidity = false,
+                MatchStateInitialAction = "",
+                MatchStateDateInitialAction = null,
+                MatchStateFinalDisposition = "",
+                MatchStateDateFinalDisposition = null,
+                MatchStateCaseId = "IA-5678",
+                MatchStateParticipantId = "LMN5678",
+                ProtectLocation = true
+            });
+
+            Matches.Add(new MatchData()
+            {
+                MatchId = "m2",
+                LdsHash = "",
+                Status = "Open",
+                MatchCreationDate = "",
+                QueryingState = "Montana (MT)",
+                QueryingStateVulnerableStatus = false,
+                QueryingStateMatchValidity = true,
+                QueryingStateInitialAction = "",
+                QueryingStateDateInitialAction = null,
+                QueryingStateFinalDisposition = "",
+                QueryingStateDateFinalDisposition = null,
+                QueryingStateCaseId = "MT-1234",
+                QueryingStateParticipantId = "JKL1234",
+                MatchState = "Iowa (IA)",
+                MatchStateVulnerableStatus = false,
+                MatchStateMatchValidity = false,
+                MatchStateInitialAction = "",
+                MatchStateDateInitialAction = null,
+                MatchStateFinalDisposition = "",
+                MatchStateDateFinalDisposition = null,
+                MatchStateCaseId = "IA-5678",
+                MatchStateParticipantId = "LMN5678",
+                ProtectLocation = true
+            });
+
+            Matches.Add(new MatchData()
+            {
+                MatchId = "m3",
+                LdsHash = "",
+                Status = "Open",
+                MatchCreationDate = "",
+                QueryingState = "Montana (MT)",
+                QueryingStateVulnerableStatus = false,
+                QueryingStateMatchValidity = true,
+                QueryingStateInitialAction = "",
+                QueryingStateDateInitialAction = null,
+                QueryingStateFinalDisposition = "",
+                QueryingStateDateFinalDisposition = null,
+                QueryingStateCaseId = "MT-1234",
+                QueryingStateParticipantId = "JKL1234",
+                MatchState = "Iowa (IA)",
+                MatchStateVulnerableStatus = false,
+                MatchStateMatchValidity = false,
+                MatchStateInitialAction = "",
+                MatchStateDateInitialAction = null,
+                MatchStateFinalDisposition = "",
+                MatchStateDateFinalDisposition = null,
+                MatchStateCaseId = "IA-5678",
+                MatchStateParticipantId = "LMN5678",
+                ProtectLocation = true
+            });
+
         }
 
     }
