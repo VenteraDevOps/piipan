@@ -63,6 +63,8 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
                 conn.Execute("DROP TYPE IF EXISTS status");
@@ -81,6 +83,8 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
                 conn.Execute("DROP TYPE IF EXISTS status");
@@ -98,6 +102,19 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.Open();
 
                 conn.Execute("DELETE FROM matches");
+
+                conn.Close();
+            }
+        }
+
+        public void ClearMatchResEvents()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute("DELETE FROM match_res_events");
 
                 conn.Close();
             }
@@ -142,6 +159,37 @@ namespace Piipan.Match.Core.IntegrationTests
             }
         }
 
+        public void InsertMatchResEvent(MatchResEventDbo record)
+        {
+            var factory = NpgsqlFactory.Instance;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute(@"
+                    INSERT INTO match_res_events
+                    (
+                        inserted_at,
+                        match_id,
+                        actor,
+                        actor_state,
+                        delta
+                    )
+                    VALUES
+                    (
+                        now() at time zone 'utc',
+                        @MatchId,
+                        @Actor,
+                        @ActorState,
+                        @Delta::jsonb
+                    )", record);
+
+                conn.Close();
+            }
+        }
+
         public bool HasRecord(MatchRecordDbo record)
         {
             var result = false;
@@ -167,6 +215,36 @@ namespace Piipan.Match.Core.IntegrationTests
                     WHERE match_id=@MatchId", record);
 
                 result = row.Equals(record);
+
+                conn.Close();
+            }
+
+            return result;
+        }
+
+        public bool HasMatchResEvent(MatchResEventDbo record)
+        {
+            var result = false;
+            var factory = NpgsqlFactory.Instance;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var row = conn.QuerySingle<MatchResEventDbo>(@"
+                    SELECT
+                        id,
+                        inserted_at,
+                        match_id,
+                        actor,
+                        actor_state,
+                        delta
+                    FROM match_res_events
+                    WHERE id=@Id
+                    ", record);
+
+                result = row.Id.Equals(record.Id);
 
                 conn.Close();
             }

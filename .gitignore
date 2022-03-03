@@ -6,6 +6,10 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+**/local.settings.json
+
+# Visual Studio Ignores
+**/.vs/*
 
 .vs/*
 
