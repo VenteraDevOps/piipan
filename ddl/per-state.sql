@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS participants(
 	upload_id integer REFERENCES uploads (id),
     	case_id text NOT NULL,
     	participant_id text NOT NULL,
-	benefits_end_date date,
+	participant_closing_date   date,
     	recent_benefit_months date[],
     	protect_location boolean
 );
