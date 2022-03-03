@@ -24,7 +24,7 @@ namespace Piipan.Participants.Core.Tests.Services
                     LdsHash = Guid.NewGuid().ToString(),
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
-                    BenefitsEndDate = DateTime.UtcNow.Date,
+                    ParticipantClosingDate = DateTime.UtcNow.Date,
                     RecentBenefitMonths = new List<DateTime>(),
                     ProtectLocation = (new Random()).Next(2) == 0,
                     UploadId = (new Random()).Next()

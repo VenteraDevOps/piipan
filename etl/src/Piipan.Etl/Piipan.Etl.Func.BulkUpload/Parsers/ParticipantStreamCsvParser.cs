@@ -37,12 +37,12 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 return !string.IsNullOrEmpty(field.Field);
             });
 
-            Map(m => m.BenefitsEndDate)
-                .Name("benefits_end_month")
+            Map(m => m.ParticipantClosingDate)
+                .Name("participant_closing_date")  
                 .Validate(field => {
                     if (String.IsNullOrEmpty(field.Field)) return true;
 
-                    string[] formats={"yyyy-MM", "yyyy-M"};
+                    string[] formats= { "M-dd-yyyy", "M-d-yyyy", "MM-dd-yyyy", "MM-d-yyyy", "M/dd/yyyy", "M/d/yyyy", "MM/dd/yyyy", "MM/d/yyyy" };
                     DateTime dateValue;
                     var result = DateTime.TryParseExact(
                         field.Field,
@@ -53,7 +53,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                     if (!result) return false;
                     return true;
                 })
-                .TypeConverter<ToMonthEndConverter>().Optional();
+                .TypeConverter<ToDateConverter>().Optional();
 
             Map(m => m.RecentBenefitMonths)
                 .Name("recent_benefit_months")
@@ -80,6 +80,17 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             Map(m => m.ProtectLocation).Name("protect_location")
                 .TypeConverterOption.NullValues(string.Empty).Optional();
 
+        }
+    }
+    /// <summary>
+    /// Converts to ISO 8601 year-months-date when as a string
+    /// </summary>
+    public class ToDateConverter : DefaultTypeConverter
+    {
+        public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+        {
+            if (String.IsNullOrEmpty(text)) return null;
+            return DateTime.Parse(text);
         }
     }
 

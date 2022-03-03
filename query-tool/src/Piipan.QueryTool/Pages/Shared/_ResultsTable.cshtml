@@ -15,7 +15,7 @@
                         <th scope="col">State</th>
                         <th scope="col">Case ID</th>
                         <th scope="col">Participant ID</th>
-                        <th scope="col">Benefits end month</th>
+                        <th scope="col">Participant closing date</th>
                         <th scope="col">Recent benefits months</th>
                         <th scope="col">Protect location?</th>
                     </tr>
@@ -27,7 +27,7 @@
                                 <td class="text-uppercase">@record.State</td>
                                 <td>@record.CaseId</td>
                                 <td>@record.ParticipantId</td>
-                                <td>@record.BenefitsEndDateDisplay()</td>
+                                <td>@record.ParticipantClosingDateDisplay()</td>
                                 <td>@record.RecentBenefitMonthsDisplay()</td>
                                 <td>@record.ProtectLocationDisplay()</td>
                             </tr>

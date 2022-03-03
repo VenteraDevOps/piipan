@@ -11,7 +11,7 @@ namespace Piipan.Participants.Core.Models
         public string State { get; set; }
         public string CaseId { get; set; }
         public string ParticipantId { get; set; }
-        public DateTime? BenefitsEndDate { get; set; }
+        public DateTime? ParticipantClosingDate { get; set; }
         public IEnumerable<DateTime> RecentBenefitMonths { get; set; }
         public bool? ProtectLocation { get; set; }
         public Int64 UploadId { get; set; }
@@ -27,7 +27,7 @@ namespace Piipan.Participants.Core.Models
             State = participant.State;
             CaseId = participant.CaseId;
             ParticipantId = participant.ParticipantId;
-            BenefitsEndDate = participant.BenefitsEndDate;
+            ParticipantClosingDate = participant.ParticipantClosingDate;
             RecentBenefitMonths = participant.RecentBenefitMonths;
             ProtectLocation = participant.ProtectLocation;
         }
@@ -50,7 +50,7 @@ namespace Piipan.Participants.Core.Models
                 State == p.State &&
                 CaseId == p.CaseId &&
                 ParticipantId == p.ParticipantId &&
-                BenefitsEndDate.Value.Date == p.BenefitsEndDate.Value.Date &&
+                ParticipantClosingDate.Value.Date == p.ParticipantClosingDate.Value.Date &&
                 RecentBenefitMonths.SequenceEqual(p.RecentBenefitMonths) &&
                 ProtectLocation == p.ProtectLocation &&
                 UploadId == p.UploadId;
@@ -63,7 +63,7 @@ namespace Piipan.Participants.Core.Models
                 State,
                 CaseId,
                 ParticipantId,
-                BenefitsEndDate,
+                ParticipantClosingDate,
                 RecentBenefitMonths,
                 ProtectLocation,
                 UploadId
