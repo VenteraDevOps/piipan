@@ -31,7 +31,7 @@ COMMENT ON TABLE participants IS 'Program participant';
 COMMENT ON COLUMN participants.lds_hash IS 'Participant''s deidentified data as hex value';
 COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
 COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
-COMMENT ON COLUMN participants.benefits_end_date IS 'Participant''s ending benefits date';
+COMMENT ON COLUMN participants.participant_closing_date IS 'Participant''s ending benefits date';
 COMMENT ON COLUMN participants.recent_benefit_months IS 'Participant''s recent benefit months';
 COMMENT ON COLUMN participants.protect_location IS 'Participant''s vulnerability status';
 
