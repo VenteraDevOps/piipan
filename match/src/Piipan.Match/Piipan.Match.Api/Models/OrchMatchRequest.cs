@@ -21,5 +21,13 @@ namespace Piipan.Match.Api.Models
             Required = Required.Always,
             NullValueHandling = NullValueHandling.Ignore)]
         public string LdsHash { get; set; }
+
+        [JsonProperty("participant_id",
+            NullValueHandling = NullValueHandling.Ignore)]
+        public string ParticipantId { get; set; }
+
+        [JsonProperty("case_id",
+            NullValueHandling = NullValueHandling.Ignore)]
+        public string CaseId { get; set; }
     }
 }
