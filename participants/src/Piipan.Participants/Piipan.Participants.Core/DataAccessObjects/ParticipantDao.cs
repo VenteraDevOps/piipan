@@ -57,7 +57,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     upload_id,
                     case_id,
                     participant_id,
-                    participant_closing_Date,
+                    participant_closing_date,
                     recent_benefit_months,
                     protect_location
                 )

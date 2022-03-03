@@ -40,7 +40,7 @@ namespace Piipan.QueryTool.Tests.Extensions
             var result = participant.Object.ParticipantClosingDateDisplay();
 
             // Assert
-            Assert.Equal("2021-05", result);
+            Assert.Equal("2021-05-31", result);
         }
 
         [Fact]

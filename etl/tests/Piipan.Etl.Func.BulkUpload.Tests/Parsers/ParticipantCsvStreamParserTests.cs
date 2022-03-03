@@ -13,19 +13,26 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
     {
         private const string LDS_HASH = "04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef";
 
-        private Stream CsvFixture(string[] records, bool includeHeader = true, bool requiredOnly = false)
+        private Stream CsvFixture(string[] records, bool includeHeader = true, bool requiredOnly = false, bool isLegacy = false)
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
-            if (includeHeader)
+            if (isLegacy)
             {
-                if (requiredOnly)
+                writer.WriteLine("lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location");
+            }
+            else
+            {
+                if (includeHeader)
                 {
-                    writer.WriteLine("lds_hash,case_id,participant_id");
-                }
-                else
-                {
-                    writer.WriteLine("lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_months,protect_location,participant_closing_date");
+                    if (requiredOnly)
+                    {
+                        writer.WriteLine("lds_hash,case_id,participant_id");
+                    }
+                    else
+                    {
+                        writer.WriteLine("lds_hash,case_id,participant_id,participant_closing_date,recent_benefit_months,protect_location");
+                    }
                 }
             }
             foreach (var record in records)
@@ -43,7 +50,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         {
             // Arrange
             var stream = CsvFixture(new string[] {
-                $"{LDS_HASH},CaseId,ParticipantId,,2021-05 2021-04 2021-03,true,10-10-2020"
+                $"{LDS_HASH},CaseId,ParticipantId,2020-10-10,2021-05 2021-04 2021-03,true"
             });
 
             var parser = new ParticipantCsvStreamParser();
@@ -81,10 +88,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Theory]
-        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,,ParticipantId,,,,")] // Missing CaseId
-        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,,,,,")] // Missing ParticipantId
-        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,,,foobar")] // Malformed Participant closing date
-        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,foo2bar,,")] // Malformed Recent Benefit Months
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,,ParticipantId,,,")] // Missing CaseId
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,,,")] // Missing ParticipantId
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,foobar,,")] // Malformed Participant closing date
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,foo2bar,")] // Malformed Recent Benefit Months
         public void ExpectFieldValidationError(String inline)
         {
             // Arrange
@@ -126,7 +133,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Theory]
-        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,,")] // Missing last column
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,,")] // Missing last column
         public void ExpectMissingFieldError(String inline)
         {
             // Arrange
@@ -191,5 +198,27 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             // Assert
             Assert.Empty(records);
         }
+        [Theory]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,2020-10,,")]
+        public void ExpectLegacyColumns(String inline)
+        {
+            // Arrange
+            var stream = CsvFixture(new string[] { inline }, isLegacy: true);
+            var parser = new ParticipantCsvStreamParser();
+
+            // Act
+            var records = parser.Parse(stream).ToList();
+
+            // Assert
+            Assert.Single(records);
+            Assert.Equal(LDS_HASH, records.First().LdsHash);
+            Assert.Equal("CaseId", records.First().CaseId);
+            Assert.Equal("ParticipantId", records.First().ParticipantId);
+            Assert.Null(records.First().ParticipantClosingDate);
+            Assert.Null(records.First().ProtectLocation);
+            Assert.Empty(records.First().RecentBenefitMonths);
+        }
+        
+
     }
 }

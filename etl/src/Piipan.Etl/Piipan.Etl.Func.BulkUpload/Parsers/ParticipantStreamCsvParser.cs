@@ -42,7 +42,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 .Validate(field => {
                     if (String.IsNullOrEmpty(field.Field)) return true;
 
-                    string[] formats= { "M-dd-yyyy", "M-d-yyyy", "MM-dd-yyyy", "MM-d-yyyy", "M/dd/yyyy", "M/d/yyyy", "MM/dd/yyyy", "MM/d/yyyy" };
+                    string[] formats= { "yyyy-MM-dd", "yyyy-M-d", "yyyy-M-dd", "yyyy-MM-d" };
                     DateTime dateValue;
                     var result = DateTime.TryParseExact(
                         field.Field,
