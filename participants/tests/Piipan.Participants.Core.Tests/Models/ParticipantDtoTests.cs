@@ -135,7 +135,7 @@ namespace Piipan.Participants.Core.Tests.Models
         }
 
         [Fact]
-        public void Equals_BenefitsEndDateMismatch()
+        public void Equals_ParticipantClosingDateMismatch()
         {
             // Arrange
             var lhs = new ParticipantDto
