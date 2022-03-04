@@ -64,7 +64,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                         State = randoms.First().State,
                         CaseId = p.CaseId,
                         ParticipantId = p.ParticipantId,
-                        BenefitsEndDate = p.BenefitsEndDate,
+                        ParticipantClosingDate = p.ParticipantClosingDate,
                         RecentBenefitMonths = p.RecentBenefitMonths,
                         ProtectLocation = p.ProtectLocation,
                         UploadId = randoms.First().UploadId

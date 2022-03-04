@@ -24,9 +24,9 @@ namespace Piipan.Match.Api.Models
         [JsonProperty("participant_id")]
         public string ParticipantId { get; set; }
 
-        [JsonProperty("benefits_end_month")]
-        [JsonConverter(typeof(JsonConverters.MonthEndConverter))]
-        public DateTime? BenefitsEndDate { get; set; }
+        [JsonProperty("participant_closing_date")]
+        [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
+        public DateTime? ParticipantClosingDate { get; set; }
 
         [JsonProperty("recent_benefit_months")]
         [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
@@ -43,7 +43,7 @@ namespace Piipan.Match.Api.Models
             State = p.State;
             CaseId = p.CaseId;
             ParticipantId = p.ParticipantId;
-            BenefitsEndDate = p.BenefitsEndDate;
+            ParticipantClosingDate = p.ParticipantClosingDate;
             RecentBenefitMonths = p.RecentBenefitMonths;
             ProtectLocation = p.ProtectLocation;
         }

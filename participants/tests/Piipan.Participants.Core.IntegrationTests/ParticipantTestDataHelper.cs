@@ -51,7 +51,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                     LdsHash = RandomHashString(),
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
-                    BenefitsEndDate = DateTime.UtcNow.Date,
+                    ParticipantClosingDate = DateTime.UtcNow.Date,
                     RecentBenefitMonths = new List<DateTime>
                     {
                         new DateTime(2021, 4, 1),

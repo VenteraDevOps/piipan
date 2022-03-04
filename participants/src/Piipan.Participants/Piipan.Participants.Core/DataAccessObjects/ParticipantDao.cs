@@ -32,7 +32,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                         lds_hash LdsHash,
                         participant_id ParticipantId,
                         case_id CaseId,
-                        benefits_end_date BenefitsEndDate,
+                        participant_closing_date ParticipantClosingDate,
                         recent_benefit_months RecentBenefitMonths,
                         protect_location ProtectLocation,
                         upload_id UploadId
@@ -57,7 +57,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     upload_id,
                     case_id,
                     participant_id,
-                    benefits_end_date,
+                    participant_closing_date,
                     recent_benefit_months,
                     protect_location
                 )
@@ -67,7 +67,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     @UploadId,
                     @CaseId,
                     @ParticipantId,
-                    @BenefitsEndDate,
+                    @ParticipantClosingDate,
                     @RecentBenefitMonths::date[],
                     @ProtectLocation
                 )

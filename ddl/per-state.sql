@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS participants(
 	upload_id integer REFERENCES uploads (id),
     	case_id text NOT NULL,
     	participant_id text NOT NULL,
-	benefits_end_date date,
+	participant_closing_date   date,
     	recent_benefit_months date[],
     	protect_location boolean
 );
@@ -31,7 +31,7 @@ COMMENT ON TABLE participants IS 'Program participant';
 COMMENT ON COLUMN participants.lds_hash IS 'Participant''s deidentified data as hex value';
 COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
 COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
-COMMENT ON COLUMN participants.benefits_end_date IS 'Participant''s ending benefits date';
+COMMENT ON COLUMN participants.participant_closing_date   IS 'Date when the Participant''s case will close. This will be the last date the participate is eligible to receive benefits.';
 COMMENT ON COLUMN participants.recent_benefit_months IS 'Participant''s recent benefit months';
 COMMENT ON COLUMN participants.protect_location IS 'Participant''s vulnerability status';
 

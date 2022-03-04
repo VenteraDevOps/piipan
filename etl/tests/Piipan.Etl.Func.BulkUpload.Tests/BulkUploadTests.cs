@@ -110,7 +110,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                     State = Guid.NewGuid().ToString(),
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
-                    BenefitsEndDate = DateTime.UtcNow,
+                    ParticipantClosingDate = DateTime.UtcNow,
                     RecentBenefitMonths = new List<DateTime>(),
                     ProtectLocation = (new Random()).Next(2) == 1
                 }

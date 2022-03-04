@@ -39,7 +39,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
-                BenefitsEndDate = new DateTime(1970, 1, 31),
+                ParticipantClosingDate = new DateTime(1970, 1, 15),
                 RecentBenefitMonths = new List<DateTime>() {
                   new DateTime(2021, 5, 31),
                   new DateTime(2021, 4, 30),
@@ -149,7 +149,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Assert.Equal(record.CaseId, person.Matches.First().CaseId);
             Assert.Equal(record.ParticipantId, person.Matches.First().ParticipantId);
             Assert.Equal(state[0], person.Matches.First().State);
-            Assert.Equal(record.BenefitsEndDate, person.Matches.First().BenefitsEndDate);
+            Assert.Equal(record.ParticipantClosingDate, person.Matches.First().ParticipantClosingDate);
             Assert.Equal(record.RecentBenefitMonths, person.Matches.First().RecentBenefitMonths);
             Assert.Equal(record.ProtectLocation, person.Matches.First().ProtectLocation);
             // serialization

@@ -144,7 +144,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                             LdsHash = reader[1].ToString(),
                             CaseId = reader[3].ToString(),
                             ParticipantId = reader[4].ToString(),
-                            BenefitsEndDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
+                            ParticipantClosingDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
                             RecentBenefitMonths = reader[6] is DBNull ? new List<DateTime>() : new List<DateTime>((DateTime[])reader[6]),
                             ProtectLocation = reader[7] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[7])
                         };
