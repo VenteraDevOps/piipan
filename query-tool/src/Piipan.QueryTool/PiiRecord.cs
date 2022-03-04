@@ -38,7 +38,7 @@ namespace Piipan.QueryTool
         [JsonPropertyName("ssn")]
         public string SocialSecurityNum { get; set; }
 
-        [Display(Name = "Partcipant Id")]
+        [Display(Name = "Participant ID")]
         [JsonPropertyName("participant_id")]
         public string ParticipantId { get; set; }
 
