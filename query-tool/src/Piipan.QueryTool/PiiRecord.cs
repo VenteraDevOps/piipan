@@ -42,7 +42,7 @@ namespace Piipan.QueryTool
         [JsonPropertyName("participant_id")]
         public string ParticipantId { get; set; }
 
-        [Display(Name = "Case Number")]
+        [Display(Name = "Case number")]
         [JsonPropertyName("case_id")]
         public string CaseId { get; set; }
     }
