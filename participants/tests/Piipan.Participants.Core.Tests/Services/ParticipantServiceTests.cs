@@ -197,7 +197,7 @@ namespace Piipan.Participants.Core.Tests.Services
 
         }
 
-                [Fact]
+        [Fact]
         public async void GetStates_ReturnsDaoResult()
         {
             // Arrange

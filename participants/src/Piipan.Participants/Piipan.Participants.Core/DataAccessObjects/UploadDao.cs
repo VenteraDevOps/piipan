@@ -34,7 +34,6 @@ namespace Piipan.Participants.Core.DataAccessObjects
             using (var connection = await _dbConnectionFactory.Build() as DbConnection)
             {
                 await connection.OpenAsync();
-                var tx = connection.BeginTransaction();
 
                 await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher)
@@ -45,8 +44,6 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     FROM uploads
                     ORDER BY id DESC
                     LIMIT 1");
-
-                tx.Commit();
 
                 return upload;
             }
