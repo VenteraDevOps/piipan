@@ -15,7 +15,7 @@ namespace Piipan.QueryTool.Pages
     public class MatchModel : BasePageModel
     {
 
-        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<MatchModel> _logger;
         private readonly ILdsDeidentifier _ldsDeidentifier;
         private readonly IMatchApi _matchApi;
 
@@ -23,7 +23,7 @@ namespace Piipan.QueryTool.Pages
 
         List<MatchData> Matches = new List<MatchData>();
 
-        public MatchModel(ILogger<IndexModel> logger
+        public MatchModel(ILogger<MatchModel> logger
                            , IClaimsProvider claimsProvider
                            , ILdsDeidentifier ldsDeidentifier
                            , IMatchApi matchApi)
@@ -40,12 +40,16 @@ namespace Piipan.QueryTool.Pages
         // [HttpGet("{id}")]
         public IActionResult OnGet(string id)
         {   
+            //Prevents malicious user input
+            //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
             Regex r = new Regex("^[a-zA-Z0-9]*$");
             if (r.IsMatch(id)) {
 
-                Match = Matches.Find(x => x.MatchId == id);
+                Match = Matches.Find(item => item.MatchId == id);
 
-                if(Match == null) {
+                //Match ID length = 7 characters
+                //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
+                if(Match == null || id.Length != 7) {
                     return RedirectToPage("/NotFound");
                 }
                 
@@ -61,7 +65,7 @@ namespace Piipan.QueryTool.Pages
         {
             Matches.Add(new MatchData()
             {
-                MatchId = "0",
+                MatchId = "m123456",
                 LdsHash = "",
                 Status = "Open",
                 MatchCreationDate = "",

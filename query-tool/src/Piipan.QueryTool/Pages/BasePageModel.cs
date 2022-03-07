@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Piipan.Shared.Claims;
 
@@ -19,6 +20,11 @@ namespace Piipan.QueryTool.Pages
         public string BaseUrl
         {
             get { return $"{Request.Scheme}://{Request.Host}"; }
+        }
+
+        public string Path
+        {
+            get { return $"{Request.Path}"; }
         }
     }
 } 

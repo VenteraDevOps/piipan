@@ -5,6 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    },
+    {
       "type": "pwa-chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
@@ -16,6 +21,11 @@
       "type": "coreclr",
       "request": "attach",
       "processId": "${command:azureFunctions.pickProcess}"
-    }
+    },
+    {
+      "name": "Test Query-Tool",
+      "type": "coreclr",
+      "request": "attach"
+    }    
   ]
 }

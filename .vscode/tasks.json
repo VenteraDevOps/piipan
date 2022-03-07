@@ -76,6 +76,41 @@
 			"command": "host start",
 			"isBackground": true,
 			"problemMatcher": "$func-dotnet-watch"
-		}
+		},
+		{
+            "label": "build query-tool",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/query-tool/query-tool.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+		{ 
+            "label": "test-query-tool", 
+            "type": "process", 
+            "isBackground": true, 
+            "command": "dotnet", 
+            "args": [ "test" ], 
+            "options": 
+                { 
+                    "cwd": "${workspaceFolder}/query-tool/tests/Piipan.QueryTool.Tests", 
+                    "env": 
+                    { 
+                        "VSTEST_HOST_DEBUG": "1" 
+                    }, 
+                }, 
+            "group": "test", "presentation": 
+                { 
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+            "problemMatcher": [] 
+        }
 	]
 }
