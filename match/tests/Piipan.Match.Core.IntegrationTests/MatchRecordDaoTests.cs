@@ -54,8 +54,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{}"
                 };
 
@@ -87,8 +85,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{}"
                 };
 
@@ -124,8 +120,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{{"
                 };
 
@@ -154,8 +148,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{}"
                 };
 
@@ -187,8 +179,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Open,
-                        Invalid = false,
                         Data = "{}"
                     },
                     new MatchRecordDbo
@@ -198,8 +188,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Closed,
-                        Invalid = false,
                         Data = "{}"
                     }
                 };
@@ -211,7 +199,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 var results = (await dao.GetRecords(records.First())).ToList();
 
                 // Assert
-                Assert.True(results.OrderBy(r => r.Status).SequenceEqual(records.OrderBy(r => r.Status)));
+                Assert.True(results.SequenceEqual(records));
             }
         }
 
@@ -237,8 +225,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Open,
-                        Invalid = false,
                         Data = "{}"
                     },
                     new MatchRecordDbo
@@ -248,8 +234,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Closed,
-                        Invalid = false,
                         Data = "{}"
                     }
                 };
@@ -266,7 +250,7 @@ namespace Piipan.Match.Core.IntegrationTests
         }
 
         [Fact]
-        public async Task GetRecordByMatchId_ThrowsExceptionIfNotFound()
+        public void GetRecordByMatchId_ThrowsExceptionIfNotFound()
         {
             using (var conn = Factory.CreateConnection())
             {
@@ -287,8 +271,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Open,
-                        Invalid = false,
                         Data = "{}"
                     },
                     new MatchRecordDbo
@@ -298,8 +280,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Closed,
-                        Invalid = false,
                         Data = "{}"
                     }
                 };

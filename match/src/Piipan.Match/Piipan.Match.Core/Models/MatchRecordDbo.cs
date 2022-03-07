@@ -20,8 +20,6 @@ namespace Piipan.Match.Core.Models
         public string Input { get; set; }
         [Column(TypeName = "jsonb")]
         public string Data { get; set; }
-        public Boolean Invalid { get; set; } = false;
-        public string Status { get; set; } = MatchRecordStatus.Open;
 
         public override bool Equals(Object obj)
         {
@@ -41,9 +39,7 @@ namespace Piipan.Match.Core.Models
                 Initiator == m.Initiator &&
                 States.SequenceEqual(m.States) &&
                 Hash == m.Hash &&
-                HashType == m.HashType &&
-                Status == m.Status &&
-                Invalid == m.Invalid;
+                HashType == m.HashType;
         }
 
         public override int GetHashCode()
@@ -56,9 +52,7 @@ namespace Piipan.Match.Core.Models
                 Initiator,
                 String.Join(",", sortedStates),
                 Hash,
-                HashType,
-                Status,
-                Invalid
+                HashType
             );
         }
     }

@@ -67,7 +67,6 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
-                conn.Execute("DROP TYPE IF EXISTS status");
 
                 conn.Close();
             }
@@ -87,7 +86,6 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
-                conn.Execute("DROP TYPE IF EXISTS status");
                 conn.Execute(sqltext);
 
                 conn.Close();
@@ -136,7 +134,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         match_id,
                         initiator,
                         states,
-                        status,
                         hash,
                         hash_type,
                         input,
@@ -148,7 +145,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         @MatchId,
                         @Initiator,
                         @States,
-                        @Status::status,
                         @Hash,
                         @HashType::hash_type,
                         @Input::jsonb,
@@ -208,9 +204,7 @@ namespace Piipan.Match.Core.IntegrationTests
                         hash_type::text,
                         states,
                         input,
-                        data,
-                        invalid,
-                        status::text
+                        data
                     FROM matches
                     WHERE match_id=@MatchId", record);
 

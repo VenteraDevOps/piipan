@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Npgsql;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Parsers;
@@ -95,6 +96,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             services.AddTransient<IValidator<RequestPerson>, RequestPersonValidator>();
 
             services.AddTransient<IStreamParser<OrchMatchRequest>, OrchMatchRequestParser>();
+
+            services.AddTransient<IMatchResEventDao, MatchResEventDao>();
+            services.AddTransient<IMatchResAggregator, MatchResAggregator>();
 
             services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(s =>
             {

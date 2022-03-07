@@ -12,7 +12,6 @@ namespace Piipan.Match.Core.Models
     {
         public Disposition[] Dispositions { get; set; } = Array.Empty<Disposition>();
         public Participant[] Participants { get; set; } = Array.Empty<Participant>();
-        public string Status { get; set; } = "open";
-
+        public string Status { get; set; } = MatchRecordStatus.Open;
     }
 }

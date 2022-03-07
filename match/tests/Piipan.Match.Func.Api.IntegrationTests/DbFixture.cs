@@ -173,7 +173,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                         match_id,
                         initiator,
                         states,
-                        status::text,
                         hash,
                         hash_type::text,
                         input::jsonb,

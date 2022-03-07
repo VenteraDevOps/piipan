@@ -46,7 +46,6 @@ namespace Piipan.Match.Core.DataAccessObjects
                     match_id,
                     initiator,
                     states,
-                    status,
                     hash,
                     hash_type,
                     input,
@@ -58,7 +57,6 @@ namespace Piipan.Match.Core.DataAccessObjects
                     @MatchId,
                     @Initiator,
                     @States,
-                    @Status::status,
                     @Hash,
                     @HashType::hash_type,
                     @Input::jsonb,
@@ -100,8 +98,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                     hash,
                     hash_type::text,
                     input::jsonb,
-                    data::jsonb,
-                    status::text
+                    data::jsonb
                 FROM matches
                 WHERE
                     hash=@Hash AND
@@ -134,8 +131,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                     hash,
                     hash_type::text,
                     input::jsonb,
-                    data::jsonb,
-                    status::text
+                    data::jsonb
                 FROM matches
                 WHERE
                     match_id = @MatchId

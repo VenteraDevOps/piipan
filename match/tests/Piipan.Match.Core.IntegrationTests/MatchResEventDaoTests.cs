@@ -215,7 +215,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 result = result.ToList();
 
                 // Assert
-                Assert.Equal(0, result.Count());
+                Assert.Empty(result);
             }
         }
     }

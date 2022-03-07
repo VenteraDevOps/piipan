@@ -12,7 +12,5 @@ namespace Piipan.Match.Api.Models
         string HashType { get; set; }
         string Input { get; set; }
         string Data { get; set; }
-        Boolean Invalid { get; set; }
-        string Status { get; set; }
     }
 }
