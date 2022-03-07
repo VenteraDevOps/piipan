@@ -21,10 +21,5 @@ namespace Piipan.QueryTool.Pages
         {
             get { return $"{Request.Scheme}://{Request.Host}"; }
         }
-
-        public string Path
-        {
-            get { return $"{Request.Path}"; }
-        }
     }
 } 
