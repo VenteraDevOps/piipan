@@ -78,7 +78,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ea",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": "2021-01",
+            "participant_closing_date": "2021-10-13",
             "recent_benefit_months": [
               "2021-05",
               "2021-04",
@@ -124,7 +124,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "eb",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": "2021-01",
+            "participant_closing_date": "2021-10-13",
             "recent_benefit_months": [
               "2021-05",
               "2021-04",
@@ -137,7 +137,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": null,
+            "participant_closing_date": null,
             "protect_location": null
           }
         ]
@@ -162,7 +162,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": null,
+            "participant_closing_date": null,
             "protect_location": null
           }
         ]
@@ -175,7 +175,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ea",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": "2021-01",
+            "participant_closing_date": "2021-10-13",
             "recent_benefit_months": [
               "2021-05",
               "2021-04",
@@ -209,7 +209,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": null,
+            "participant_closing_date": null,
             "protect_location": null
           }
         ]
@@ -234,7 +234,7 @@ Searches all state databases for any participant records that are an exact match
             "state": "ec",
             "case_id": "string",
             "participant_id": "string",
-            "benefits_end_month": null,
+            "participant_closing_date": null,
             "protect_location": null
           }
         ]
@@ -291,7 +291,7 @@ Status Code **200**
 |»»»» state|string|true|none|State/territory two-letter postal abbreviation|
 |»»»» case_id|string|true|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
 |»»»» participant_id|string|true|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
-|»»»» benefits_end_month|string|false|none|Participant's ending benefits month|
+|»»»» participant_closing_date|string|false|none|Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits.|
 |»»»» recent_benefit_months|array|false|none|List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month.|
 |»»»» protect_location|boolean|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
 |»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
