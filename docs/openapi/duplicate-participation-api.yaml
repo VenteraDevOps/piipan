@@ -22,6 +22,8 @@ paths:
           $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/200'
         '400':
           $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/400'
+        '429':
+          $ref: '../../match/docs/openapi/schemas/match-query.yaml#/components/responses/429'
 
 security:
   - ApiKeyAuth: []

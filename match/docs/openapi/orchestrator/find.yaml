@@ -14,3 +14,5 @@ post:
       $ref: '../schemas/match-query.yaml#/components/responses/200'
     '400':
       $ref: '../schemas/match-query.yaml#/components/responses/400'
+    '429':
+      $ref: '../schemas/match-query.yaml#/components/responses/429'
