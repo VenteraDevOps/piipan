@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Piipan.Shared.Claims;
 
