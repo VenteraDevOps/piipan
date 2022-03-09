@@ -14,7 +14,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Func.Api.DataTypeHandlers;
-using Piipan.Match.Func.Api.Models;
+using Piipan.Shared.Http;
 
 namespace Piipan.Match.Func.Api
 {
@@ -68,19 +68,19 @@ namespace Piipan.Match.Func.Api
             }
             catch (StreamParserException ex)
             {
-                return DeserializationErrorResponse(ex);
+                return ApiErrors.DeserializationErrorResponse(ex);
             }
             catch (ValidationException ex)
             {
-                return ValidationErrorResponse(ex);
+                return ApiErrors.ValidationErrorResponse(ex);
             }
             catch (HttpRequestException ex)
             {
-                return BadRequestErrorresponse(ex);
+                return ApiErrors.BadRequestErrorResponse(ex);
             }
             catch (Exception ex)
             {
-                return InternalServerErrorResponse(ex);
+                return ApiErrors.InternalServerErrorResponse(ex);
             }
         }
 
@@ -111,60 +111,6 @@ namespace Piipan.Match.Func.Api
             }
 
             return state;
-        }
-
-        private ActionResult ValidationErrorResponse(ValidationException exception)
-        {
-            var errResponse = new ApiErrorResponse();
-            foreach (var failure in exception.Errors)
-            {
-                errResponse.Errors.Add(new ApiHttpError()
-                {
-                    Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                    Title = failure.ErrorCode,
-                    Detail = failure.ErrorMessage
-                });
-            }
-            return (ActionResult)new BadRequestObjectResult(errResponse);
-        }
-
-        private ActionResult DeserializationErrorResponse(Exception ex)
-        {
-            var errResponse = new ApiErrorResponse();
-            errResponse.Errors.Add(new ApiHttpError()
-            {
-                Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                Title = Convert.ToString(ex.GetType()),
-                Detail = ex.Message
-            });
-            return (ActionResult)new BadRequestObjectResult(errResponse);
-        }
-
-        private ActionResult InternalServerErrorResponse(Exception ex)
-        {
-            var errResponse = new ApiErrorResponse();
-            errResponse.Errors.Add(new ApiHttpError()
-            {
-                Status = Convert.ToString((int)HttpStatusCode.InternalServerError),
-                Title = ex.GetType().Name,
-                Detail = ex.Message
-            });
-            return (ActionResult)new JsonResult(errResponse)
-            {
-                StatusCode = (int)HttpStatusCode.InternalServerError
-            };
-        }
-
-        private ActionResult BadRequestErrorresponse(Exception ex)
-        {
-            var errResponse = new ApiErrorResponse();
-            errResponse.Errors.Add(new ApiHttpError()
-            {
-                Status = Convert.ToString((int)HttpStatusCode.BadRequest),
-                Title = "Bad request",
-                Detail = ex.Message
-            });
-            return (ActionResult)new BadRequestObjectResult(errResponse);
         }
     }
 }
