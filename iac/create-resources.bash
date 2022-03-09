@@ -376,6 +376,31 @@ main () {
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
+  # Create Match Resolution API Function App
+  echo "Create Match Resolution API Function App"
+  collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME")
+  az deployment group create \
+    --name match-res-api \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --template-file  ./arm-templates/function-match-res.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      functionAppName="$MATCH_RES_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+      storageAccountName="$MATCH_RES_FUNC_APP_STORAGE_NAME" \
+      collabDatabaseConnectionString="$collab_db_conn_str" \
+      cloudName="$CLOUD_NAME" \
+      states="$state_abbrs" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
+
+  echo "Publish Match Resolution API Function App"
+  try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Res.Func.Api"
+
+  # TODO: integrate Match Resolution API with VNet
+  # TODO: Config managed role for Match Resolution API
+
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
   else

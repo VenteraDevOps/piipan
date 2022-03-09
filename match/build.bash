@@ -26,6 +26,16 @@ run_deploy () {
       func azure functionapp publish "$app" --dotnet
     popd
   done
+
+  match_res_function_apps=($(get_resources $MATCH_RES_API_TAG "$MATCH_RESOURCE_GROUP"))
+
+  for app in "${match_res_function_apps[@]}"
+  do
+    echo "Publish ${app} to Azure Environment ${azure_env}"
+    pushd ./src/Piipan.Match/Piipan.Match.Res.Func.Api
+      func azure functionapp publish "$app" --dotnet
+    popd
+  done
 }
 
 main "$@"
