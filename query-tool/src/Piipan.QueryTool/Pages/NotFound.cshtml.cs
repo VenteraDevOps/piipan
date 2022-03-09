@@ -28,8 +28,9 @@ namespace Piipan.QueryTool.Pages
             _matchApi = matchApi;
         }
 
-        public void OnGet()
+        public void OnGet(string message)
         {
+            ViewData["Message"] = message;
         }
     }
 }

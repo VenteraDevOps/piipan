@@ -39,24 +39,32 @@ namespace Piipan.QueryTool.Pages
         // [HttpGet("{id}")]
         public IActionResult OnGet(string id)
         {   
-            //Prevents malicious user input
-            //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
-            Regex r = new Regex("^[a-zA-Z0-9]*$");
-            if (r.IsMatch(id)) {
-
-                Match = Matches.Find(item => item.MatchId == id);
-
-                //Match ID length = 7 characters
+            
+            if(id != null) {
+                //Prevents malicious user input
                 //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
-                if(Match == null || id.Length != 7) {
-                    return RedirectToPage("/NotFound");
-                }
+                Regex r = new Regex("^[a-zA-Z0-9]*$");
+                if (r.IsMatch(id)) {
 
-                return Page();
+                    Match = Matches.Find(item => item.MatchId == id);
+
+                    //Match ID length = 7 characters
+                    //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
+                    if(Match == null || id.Length != 7) {
+                        return RedirectToPage("Error", new { message = "MatchId not found" });
+                    }
+
+                    return Page();
+                }
+                else {
+                    return RedirectToPage("Error", new { message = "MatchId not valid" });
+                }
             }
             else {
-                return RedirectToPage("/NotFound");
+                //TODO: Once we have the Match search, this should point to that page
+                return RedirectToPage("Error", new { message = "MatchId not valid" });
             }
+
 
         }
 

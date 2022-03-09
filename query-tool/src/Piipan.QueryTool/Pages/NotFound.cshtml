@@ -5,5 +5,18 @@
 }
 
 <div class="grid-container">
-<h1>Not found</h1>
-</div>
+
+    @if (@ViewData["Message"] != null)
+    {
+        <div id="banner-invalid-match" class="grid-row margin-top-1">
+            <div class="tablet:grid-col-12">
+                <div class="usa-alert usa-alert--warning">
+                    <div class="usa-alert__body">
+                        <h4 class="usa-alert__heading">@ViewData["Message"]</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div> 

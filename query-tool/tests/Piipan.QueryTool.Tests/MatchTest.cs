@@ -83,7 +83,7 @@ namespace Piipan.QueryTool.Tests
             var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m12345")).PageName;
 
             // assert
-            Assert.Equal("/NotFound", result);
+            Assert.Equal("Error", result);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Piipan.QueryTool.Tests
             var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m123456789")).PageName;
 
             // assert
-            Assert.Equal("/NotFound", result);
+            Assert.Equal("Error", result);
         }
 
 
@@ -128,7 +128,7 @@ namespace Piipan.QueryTool.Tests
             var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m1$23^45")).PageName;
 
             // assert
-            Assert.Equal("/NotFound", result);
+            Assert.Equal("Error", result);
         }
 
         [Fact]
