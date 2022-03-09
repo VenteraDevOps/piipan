@@ -106,6 +106,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | Name | Value | Used by |
 |---|---|---|
 | `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Collect, Piipan.Metrics.Func.Api |
+| `CollaborationDatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Match.Orchestrator, Piipan.Match.Res.Func.Api |
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
 | `OrchApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Orchestrator API's Azure Active Directory application object | Piipan.QueryTool |
