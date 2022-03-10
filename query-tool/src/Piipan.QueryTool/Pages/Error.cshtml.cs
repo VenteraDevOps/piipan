@@ -17,6 +17,8 @@ namespace Piipan.QueryTool.Pages
         private readonly ILdsDeidentifier _ldsDeidentifier;
         private readonly IMatchApi _matchApi;
 
+        public string Message = "";
+
         public ErrorModel(ILogger<ErrorModel> logger,
                           IClaimsProvider claimsProvider,
                           ILdsDeidentifier ldsDeidentifier,
@@ -30,7 +32,9 @@ namespace Piipan.QueryTool.Pages
 
         public void OnGet(string message)
         {
-            ViewData["Message"] = message;
+            if(message != null) {
+                Message = message;
+            }
         }
     }
 }

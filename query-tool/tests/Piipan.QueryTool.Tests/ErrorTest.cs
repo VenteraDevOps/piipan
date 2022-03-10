@@ -64,6 +64,27 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal("noreply@tts.test", pageModel.Email);
         }
 
+        [Fact]
+        public void TestMessageOnGet()
+        {
+            // arrange
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var mockMatchApi = Mock.Of<IMatchApi>();
+            var pageModel = new ErrorModel(
+                new NullLogger<ErrorModel>(),
+                mockClaimsProvider,
+                mockLdsDeidentifier,
+                mockMatchApi
+            );
+
+            // act
+            string message = "test message";
+            pageModel.OnGet(message);
+            // assert
+            Assert.Equal(message, pageModel.Message);
+        }
+
         
     }
 }
