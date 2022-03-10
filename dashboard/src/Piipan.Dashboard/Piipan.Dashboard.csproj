@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.22" />
     <PackageReference Include="NEasyAuthMiddleware" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="TimeZoneConverter" Version="3.5.0" />
+    <PackageReference Include="TimeZoneConverter" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

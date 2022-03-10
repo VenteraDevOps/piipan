@@ -20,65 +20,6 @@ namespace Piipan.Match.Api.Tests.Serializers
         }
 
         [Fact]
-        public void MonthEndConverter_CanConvertChecksType()
-        {
-            // Arrange
-            var converter = new JsonConverters.MonthEndConverter();
-
-            // Assert
-            Assert.True(converter.CanConvert(typeof(DateTime)));
-            Assert.False(converter.CanConvert(typeof(int)));
-            Assert.False(converter.CanConvert(typeof(string)));
-            Assert.False(converter.CanConvert(typeof(object)));
-            Assert.False(converter.CanConvert(typeof(bool)));
-        }
-
-        [Fact]
-        public void MonthEndConverter_ReadJsonReturnsNullForEmptyInput()
-        {
-            // Arrange
-            var converter = new JsonConverters.MonthEndConverter();
-            var reader = new Mock<JsonReader>();
-            reader
-                .Setup(m => m.Value)
-                .Returns((object)null);
-
-            // Act
-            var result = converter.ReadJson(reader.Object,
-                default(Type),
-                default(object),
-                default(JsonSerializer));
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Theory]
-        [InlineData("2020-02-01", "2020-02-29")]
-        [InlineData("2020-05-01", "2020-05-31")]
-        [InlineData("2020-06-10", "2020-06-30")]
-        [InlineData("2020-11-30", "2020-11-30")]
-        public void MonthEndConverter_ReadJsonReturnsMonthEnd(string input, string expected)
-        {
-            // Arrange
-            var converter = new JsonConverters.MonthEndConverter();
-            var reader = new Mock<JsonReader>();
-            reader
-                .Setup(m => m.Value)
-                .Returns((object)input);
-
-            // Act
-            var result = converter.ReadJson(reader.Object,
-                default(Type),
-                default(object),
-                default(JsonSerializer));
-
-            // Assert
-            var dt = (DateTime)result;
-            Assert.Equal(expected, dt.ToString("yyyy-MM-dd"));
-        }
-
-        [Fact]
         public void NullConverter_CanReadIsTrue()
         {
             // Arrange

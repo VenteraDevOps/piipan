@@ -54,8 +54,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{}"
                 };
 
@@ -87,8 +85,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{}"
                 };
 
@@ -124,8 +120,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{{"
                 };
 
@@ -154,8 +148,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     HashType = "ldshash",
                     Initiator = "ea",
                     States = new string[] { "ea", "eb" },
-                    Status = MatchRecordStatus.Open,
-                    Invalid = false,
                     Data = "{}"
                 };
 
@@ -168,7 +160,7 @@ namespace Piipan.Match.Core.IntegrationTests
         }
 
         [Fact]
-        public async Task GetRecord_ReturnsMatchingRecords()
+        public async Task GetRecords_ReturnsMatchingRecords()
         {
             using (var conn = Factory.CreateConnection())
             {
@@ -187,8 +179,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Open,
-                        Invalid = false,
                         Data = "{}"
                     },
                     new MatchRecordDbo
@@ -198,8 +188,6 @@ namespace Piipan.Match.Core.IntegrationTests
                         HashType = "ldshash",
                         Initiator = "ea",
                         States = new string[] { "ea", "eb" },
-                        Status = MatchRecordStatus.Closed,
-                        Invalid = false,
                         Data = "{}"
                     }
                 };
@@ -211,7 +199,97 @@ namespace Piipan.Match.Core.IntegrationTests
                 var results = (await dao.GetRecords(records.First())).ToList();
 
                 // Assert
-                Assert.True(results.OrderBy(r => r.Status).SequenceEqual(records.OrderBy(r => r.Status)));
+                Assert.True(results.SequenceEqual(records));
+            }
+        }
+
+        [Fact]
+        public async Task GetRecordByMatchId_ReturnsRecordIfFound()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchRecordDao>>();
+                var dao = new MatchRecordDao(DbConnFactory(), logger);
+                var idService = new MatchIdService();
+                var id = idService.GenerateId();
+
+                var records = new List<MatchRecordDbo>() {
+                    new MatchRecordDbo
+                    {
+                        MatchId = id,
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Data = "{}"
+                    },
+                    new MatchRecordDbo
+                    {
+                        MatchId = idService.GenerateId(),
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Data = "{}"
+                    }
+                };
+
+                ClearMatchRecords();
+                records.ForEach(r => Insert(r));
+
+                // Act
+                var result = await dao.GetRecordByMatchId(id);
+
+                // Assert
+                Assert.Equal(result.MatchId, id);
+            }
+        }
+
+        [Fact]
+        public void GetRecordByMatchId_ThrowsExceptionIfNotFound()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchRecordDao>>();
+                var dao = new MatchRecordDao(DbConnFactory(), logger);
+                var idService = new MatchIdService();
+                var id = idService.GenerateId();
+
+                var records = new List<MatchRecordDbo>() {
+                    new MatchRecordDbo
+                    {
+                        MatchId = idService.GenerateId(),
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Data = "{}"
+                    },
+                    new MatchRecordDbo
+                    {
+                        MatchId = idService.GenerateId(),
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Data = "{}"
+                    }
+                };
+
+                ClearMatchRecords();
+                records.ForEach(r => Insert(r));
+
+                // Act
+                // Assert
+                Assert.ThrowsAsync<System.InvalidOperationException>(() => dao.GetRecordByMatchId(id));
             }
         }
     }

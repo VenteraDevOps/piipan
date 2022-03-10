@@ -49,6 +49,8 @@ namespace Piipan.Match.Func.Api.Tests
             Assert.NotNull(provider.GetService<IMatchRecordDao>());
             Assert.NotNull(provider.GetService<IMatchEventService>());
             Assert.NotNull(provider.GetService<IActiveMatchRecordBuilder>());
+            Assert.NotNull(provider.GetService<IMatchResEventDao>());
+            Assert.NotNull(provider.GetService<IMatchResAggregator>());
         }
     }
 }

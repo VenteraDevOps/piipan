@@ -52,6 +52,10 @@
             <input class="usa-input" type="date" asp-for="Query.DateOfBirth">
             <label class="usa-label" for="Query_SocialSecurityNum">@Html.DisplayNameFor(m => m.Query.SocialSecurityNum) <span class="text-gray-50">(xxx-xx-xxxx)</span></label>
             <input class="usa-input" type="text" asp-for="Query.SocialSecurityNum">
+            <label class="usa-label" asp-for="Query.ParticipantId">@Html.DisplayNameFor(m => m.Query.ParticipantId) <span class="text-gray-50">(optional)</span></label>
+            <input class="usa-input" type="text" asp-for="Query.ParticipantId" />
+            <label class="usa-label" for="Query_CaseId">@Html.DisplayNameFor(m => m.Query.CaseId) <span class="text-gray-50">(optional)</span></label>
+            <input class="usa-input" type="text" asp-for="Query.CaseId" />
             <input class="usa-button" type="submit" value="Search" />
         </fieldset>
     </form>

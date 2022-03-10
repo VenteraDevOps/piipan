@@ -16,7 +16,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -34,7 +34,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -56,7 +56,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -65,7 +65,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash + "2",
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
-                BenefitsEndDate = lhs.BenefitsEndDate,
+                ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
                 ProtectLocation = lhs.ProtectLocation
             };
@@ -85,7 +85,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -94,7 +94,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash,
                 CaseId = lhs.CaseId + "2",
                 ParticipantId = lhs.ParticipantId,
-                BenefitsEndDate = lhs.BenefitsEndDate,
+                ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
                 ProtectLocation = lhs.ProtectLocation
             };
@@ -114,7 +114,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -123,7 +123,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash,
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId + "2",
-                BenefitsEndDate = lhs.BenefitsEndDate,
+                ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
                 ProtectLocation = lhs.ProtectLocation
             };
@@ -135,7 +135,7 @@ namespace Piipan.Participants.Core.Tests.Models
         }
 
         [Fact]
-        public void Equals_BenefitsEndDateMismatch()
+        public void Equals_ParticipantClosingDateMismatch()
         {
             // Arrange
             var lhs = new ParticipantDto
@@ -143,7 +143,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -152,7 +152,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash,
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
-                BenefitsEndDate = lhs.BenefitsEndDate + TimeSpan.FromDays(1),
+                ParticipantClosingDate = lhs.ParticipantClosingDate + TimeSpan.FromDays(1),
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
                 ProtectLocation = lhs.ProtectLocation
             };
@@ -172,7 +172,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -181,7 +181,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash,
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
-                BenefitsEndDate = lhs.BenefitsEndDate,
+                ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = new List<DateTime> { DateTime.UtcNow },
                 ProtectLocation = lhs.ProtectLocation
             };
@@ -201,7 +201,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -210,7 +210,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash,
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
-                BenefitsEndDate = lhs.BenefitsEndDate,
+                ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
                 ProtectLocation = !lhs.ProtectLocation
             };
@@ -230,7 +230,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = "l",
                 CaseId = "c",
                 ParticipantId = "p",
-                BenefitsEndDate = DateTime.UtcNow.Date,
+                ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
                 ProtectLocation = false
             };
@@ -239,7 +239,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 LdsHash = lhs.LdsHash,
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
-                BenefitsEndDate = lhs.BenefitsEndDate,
+                ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
                 ProtectLocation = lhs.ProtectLocation
             };

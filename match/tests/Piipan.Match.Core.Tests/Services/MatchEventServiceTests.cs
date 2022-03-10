@@ -5,6 +5,7 @@ using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
+using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Participants.Api.Models;
@@ -39,6 +40,34 @@ namespace Piipan.Match.Core.Tests.Services
             return api;
         }
 
+        private Mock<IMatchResEventDao> MatchResEventDaoMock(
+            IEnumerable<IMatchResEvent> events
+        )
+        {
+            var mock = new Mock<IMatchResEventDao>();
+            mock.Setup(r => r.GetEvents(
+                    It.IsAny<string>(),
+                    It.IsAny<bool>()
+                ))
+                .ReturnsAsync(events);
+
+            return mock;
+        }
+
+        private Mock<IMatchResAggregator> MatchResAggregatorMock(
+            MatchResRecord result
+        )
+        {
+            var mock = new Mock<IMatchResAggregator>();
+            mock.Setup(r => r.Build(
+                It.IsAny<IMatchRecord>(),
+                It.IsAny<IEnumerable<IMatchResEvent>>()
+            ))
+            .Returns(result);
+
+            return mock;
+        }
+
         [Fact]
         public async void Resolve_AddsSingleRecord()
         {
@@ -66,7 +95,15 @@ namespace Piipan.Match.Core.Tests.Services
             };
             response.Data.Results.Add(result);
 
-            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+            var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
+            var aggDao = MatchResAggregatorMock(new MatchResRecord());
+
+            var service = new MatchEventService(
+                recordBuilder.Object,
+                recordApi.Object,
+                mreDao.Object,
+                aggDao.Object
+            );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
@@ -110,7 +147,15 @@ namespace Piipan.Match.Core.Tests.Services
             };
             response.Data.Results.Add(result);
 
-            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+            var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
+            var aggDao = MatchResAggregatorMock(new MatchResRecord());
+
+            var service = new MatchEventService(
+                recordBuilder.Object,
+                recordApi.Object,
+                mreDao.Object,
+                aggDao.Object
+            );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
@@ -153,7 +198,15 @@ namespace Piipan.Match.Core.Tests.Services
             };
             response.Data.Results.Add(result);
 
-            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+            var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
+            var aggDao = MatchResAggregatorMock(new MatchResRecord());
+
+            var service = new MatchEventService(
+                recordBuilder.Object,
+                recordApi.Object,
+                mreDao.Object,
+                aggDao.Object
+            );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
@@ -181,12 +234,10 @@ namespace Piipan.Match.Core.Tests.Services
                 .ReturnsAsync(new List<MatchRecordDbo> {
                     new MatchRecordDbo {
                         MatchId = openMatchId,
-                        Status = MatchRecordStatus.Open,
                         CreatedAt = new DateTime(2020,01,02)
                     },
                     new MatchRecordDbo {
                         MatchId = closedMatchId,
-                        Status = MatchRecordStatus.Open,
                         CreatedAt = new DateTime(2020,01,01)
                     }
                 });
@@ -204,7 +255,15 @@ namespace Piipan.Match.Core.Tests.Services
             };
             response.Data.Results.Add(result);
 
-            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+            var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
+            var aggDao = MatchResAggregatorMock(new MatchResRecord());
+
+            var service = new MatchEventService(
+                recordBuilder.Object,
+                recordApi.Object,
+                mreDao.Object,
+                aggDao.Object
+            );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
@@ -230,8 +289,7 @@ namespace Piipan.Match.Core.Tests.Services
             recordApi.Setup(r => r.GetRecords(It.IsAny<IMatchRecord>()))
                 .ReturnsAsync(new List<MatchRecordDbo> {
                     new MatchRecordDbo {
-                        MatchId = openMatchId,
-                        Status = MatchRecordStatus.Open
+                        MatchId = openMatchId
                     }
                 });
 
@@ -248,7 +306,15 @@ namespace Piipan.Match.Core.Tests.Services
             };
             response.Data.Results.Add(result);
 
-            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+            var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
+            var aggDao = MatchResAggregatorMock(new MatchResRecord());
+
+            var service = new MatchEventService(
+                recordBuilder.Object,
+                recordApi.Object,
+                mreDao.Object,
+                aggDao.Object
+            );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
@@ -275,7 +341,6 @@ namespace Piipan.Match.Core.Tests.Services
                 .ReturnsAsync(new List<MatchRecordDbo> {
                     new MatchRecordDbo {
                         MatchId = "closedId",
-                        Status = MatchRecordStatus.Closed,
                         CreatedAt = new DateTime(2020,01,02)
                     }
                 });
@@ -293,7 +358,17 @@ namespace Piipan.Match.Core.Tests.Services
             };
             response.Data.Results.Add(result);
 
-            var service = new MatchEventService(recordBuilder.Object, recordApi.Object);
+            var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
+            var aggDao = MatchResAggregatorMock(new MatchResRecord(){
+                Status = MatchRecordStatus.Closed
+            });
+
+            var service = new MatchEventService(
+                recordBuilder.Object,
+                recordApi.Object,
+                mreDao.Object,
+                aggDao.Object
+            );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
