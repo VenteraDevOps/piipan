@@ -40,7 +40,6 @@ namespace Piipan.Match.Core.DataAccessObjects
             const string sql = @"
                 INSERT INTO match_res_events
                 (
-                    inserted_at,
                     match_id,
                     actor,
                     actor_state,
@@ -48,7 +47,6 @@ namespace Piipan.Match.Core.DataAccessObjects
                 )
                 VALUES
                 (
-                    now() at time zone 'utc',
                     @MatchId,
                     @Actor,
                     @ActorState,

@@ -167,7 +167,6 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.Execute(@"
                     INSERT INTO match_res_events
                     (
-                        inserted_at,
                         match_id,
                         actor,
                         actor_state,
@@ -175,7 +174,6 @@ namespace Piipan.Match.Core.IntegrationTests
                     )
                     VALUES
                     (
-                        now() at time zone 'utc',
                         @MatchId,
                         @Actor,
                         @ActorState,
