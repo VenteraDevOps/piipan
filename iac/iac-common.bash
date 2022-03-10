@@ -9,6 +9,7 @@ RESOURCE_TAGS="{ \"Project\": \"${PROJECT_TAG}\" }"
 PER_STATE_ETL_TAG="SysType=PerStateEtl"
 PER_STATE_STORAGE_TAG="SysType=PerStateStorage"
 ORCHESTRATOR_API_TAG="SysType=OrchestratorApi"
+MATCH_RES_API_TAG="SysType=MatchResApi"
 DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
@@ -85,6 +86,10 @@ QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
 DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV
 DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
 DASHBOARD_WAF_NAME=wafdashboard${ENV}
+
+# Match Resolution Function App Info
+MATCH_RES_FUNC_APP_NAME=$PREFIX-func-matchres-$ENV
+MATCH_RES_FUNC_APP_STORAGE_NAME=${PREFIX}stmatchres${ENV}
 
 # Names of apps authenticated by OIDC
 OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
