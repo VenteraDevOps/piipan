@@ -148,12 +148,32 @@ namespace Piipan.QueryTool.Tests
 
             // act
             var caseid = "m123456";
-            // var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m123456")).PageName;
             pageModel.OnGet(caseid);
             var result = pageModel.Match.MatchId;
 
             // assert
             Assert.Equal(caseid, result);
+        }
+
+        public void TestValidMatchIdNotFound()
+        {
+            // arrange
+            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var mockMatchApi = Mock.Of<IMatchApi>();
+            var pageModel = new MatchModel(
+                new NullLogger<MatchModel>(),
+                mockClaimsProvider,
+                mockLdsDeidentifier,
+                mockMatchApi
+            );
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m123457")).PageName;
+
+            // assert
+            Assert.Equal("Error", result);
         }
     }
 }
