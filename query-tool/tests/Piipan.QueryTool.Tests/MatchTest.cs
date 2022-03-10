@@ -155,7 +155,7 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal(caseid, result);
         }
 
-        public void TestValidMatchIdNotFound()
+        public void TestValidMatchIdThatDoesNotExist()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
