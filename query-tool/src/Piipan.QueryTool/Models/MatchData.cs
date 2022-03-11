@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
-using Piipan.Match.Api.Serializers;
-using Piipan.Participants.Api.Models;
 
 namespace Piipan.QueryTool.Pages
 {

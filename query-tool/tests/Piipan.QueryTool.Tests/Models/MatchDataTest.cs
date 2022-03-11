@@ -22,8 +22,6 @@ namespace Piipan.QueryTool.Tests
             // Then
             Assert.Equal("m123456", Match.MatchId);
             Assert.Equal("Open", Match.Status);
-    
-
         }
 
 
@@ -41,7 +39,9 @@ namespace Piipan.QueryTool.Tests
             MatchData Match2 = Match;
             // Then
             Assert.Equal("m123456", Match2.MatchId);
-            Assert.Equal("Close", Match.Status);
+            Assert.Equal("Close", Match2.Status);
+            Assert.Equal(Match.MatchId, Match2.MatchId);
+            Assert.Equal(Match.Status, Match2.Status);
         }
 
         [Fact]
