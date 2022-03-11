@@ -398,8 +398,18 @@ main () {
   echo "Publish Match Resolution API Function App"
   try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
 
-  # TODO: integrate Match Resolution API with VNet
-  # TODO: Config managed role for Match Resolution API
+  echo "Integrating ${MATCH_RES_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$MATCH_RES_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$VNET_ID"
+  az functionapp config appsettings set \
+    --name "$MATCH_RES_FUNC_APP_NAME" \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --settings \
+      WEBSITE_CONTENTOVERVNET=1 \
+      WEBSITE_VNET_ROUTE_ALL=1
 
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
