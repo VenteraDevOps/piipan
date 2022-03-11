@@ -155,6 +155,7 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal(caseid, result);
         }
 
+        [Fact]
         public void TestValidMatchIdThatDoesNotExist()
         {
             // arrange
