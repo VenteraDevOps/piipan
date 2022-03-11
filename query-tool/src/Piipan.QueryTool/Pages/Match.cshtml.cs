@@ -73,28 +73,7 @@ namespace Piipan.QueryTool.Pages
             Matches.Add(new MatchData()
             {
                 MatchId = "m123456",
-                LdsHash = "",
-                Status = "Open",
-                MatchCreationDate = "",
-                QueryingState = "Montana (MT)",
-                QueryingStateVulnerableStatus = false,
-                QueryingStateMatchValidity = true,
-                QueryingStateInitialAction = "",
-                QueryingStateDateInitialAction = null,
-                QueryingStateFinalDisposition = "",
-                QueryingStateDateFinalDisposition = null,
-                QueryingStateCaseId = "MT-1234",
-                QueryingStateParticipantId = "JKL1234",
-                MatchState = "Iowa (IA)",
-                MatchStateVulnerableStatus = false,
-                MatchStateMatchValidity = true,
-                MatchStateInitialAction = "",
-                MatchStateDateInitialAction = null,
-                MatchStateFinalDisposition = "",
-                MatchStateDateFinalDisposition = null,
-                MatchStateCaseId = "IA-5678",
-                MatchStateParticipantId = "LMN5678",
-                ProtectLocation = true
+                Status = "Open"
             });
         }
 
