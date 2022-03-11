@@ -22,7 +22,7 @@ ParticipantRecord:
     participant_closing_date:
       type: string
       pattern: '^\d{4}-\d{2}-\d{2}$'
-      example: "2021-01"
+      example: "2021-01-31"
       description: "Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits."
     recent_benefit_months:
       type: array
