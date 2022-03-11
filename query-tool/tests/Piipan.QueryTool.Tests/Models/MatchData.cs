@@ -52,5 +52,24 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal("m123456", Match2.MatchId);
             Assert.Equal("Close", Match.Status);
         }
+
+        [Fact]
+        public void TestMatchDataToJson()
+        {
+            // Given
+            var Match = new MatchData()
+            {
+                MatchId = "m123456",
+                Status = "Close"
+
+            };
+
+            // When
+        
+            // Then
+            Assert.Equal("{\n  \"match_id\": \"m123456\",\n  \"match_status\": \"Close\"\n}", Match.ToJson());
+        }
     }
 }
+
+
