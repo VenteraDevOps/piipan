@@ -66,7 +66,7 @@ namespace Piipan.Match.Core.DataAccessObjects
         /// </summary>
         /// <param name="matchId">The given match ID</param>
         /// <param name="sortByAsc">Boolean indicating ascending sort order, defaults to true. Argument of false is descending order</param>
-        /// <returns>IEnumerable of IMatchResEvents</returns>
+        /// <returns>Task of IEnumerable of IMatchResEvents</returns>
         public async Task<IEnumerable<IMatchResEvent>> GetEvents(
             string matchId,
             bool sortByAsc = true

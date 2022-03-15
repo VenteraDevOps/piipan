@@ -33,8 +33,19 @@ Forthcoming
 
 ## Unit / integration tests
 
-Forthcoming
+Unit tests for API are included in the match SLN, so they are included in our [unit test build scripts](../../README.md#unit-tests).
 
+To run Unit tests in isolation, from root:
+```bash
+$ cd match/tests/Piipan.Match.Func.ResolutionApi.Tests/
+$ dotnet test
+```
+
+Integration tests are run by connecting to a PostgreSQL Docker container. With Docker installed on your machine, run the integration tests using Docker Compose:
+```bash
+$ cd match/tests/
+$ docker-compose run --rm app dotnet test /code/match/tests/Piipan.Match.Func.ResolutionApi.IntegrationTests/Piipan.Match.Func.ResolutionApi.IntegrationTests.csproj
+```
 
 ## App deployment
 
