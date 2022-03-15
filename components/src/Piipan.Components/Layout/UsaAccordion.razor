@@ -1,0 +1,23 @@
+﻿@using static LayoutConstants
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public bool Multiselectable { get; set; } = false;
+
+    public List<UsaAccordionItem> Items { get; set; } = new();
+    public void Expand(UsaAccordionItem item)
+    {
+        if (!Multiselectable)
+        {
+            foreach (var unselectedItem in Items.Where(n => n != item && n.Expanded))
+            {
+                unselectedItem.Toggle();
+            }
+        }
+    }
+}
+
+<div class="@AccordionClass" aria-multiselectable="@(Multiselectable ? "true" : "false")">
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>

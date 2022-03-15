@@ -1,0 +1,17 @@
+﻿.usa-card-group {
+    display: grid;
+    --coln: 3;
+    grid-template-columns: repeat(var(--coln), 1fr);
+}
+
+@media (max-width: 991px) {
+    .usa-card-group {
+        --coln: 2;
+    }
+}
+
+@media (max-width: 676px) {
+    .usa-card-group {
+        --coln: 1;
+    }
+}

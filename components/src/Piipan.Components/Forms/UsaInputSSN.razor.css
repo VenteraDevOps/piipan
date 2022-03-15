@@ -1,0 +1,18 @@
+﻿.usa-ssn-group {
+    display: grid;
+    grid-template-columns: 108px 1.5em;
+    grid-gap: .5rem;
+    gap: .5rem;
+    align-items: center;
+}
+
+.usa-ssn-group .usa-button--unstyled {
+    margin-top: .5rem;
+    height: 1.5em;
+}
+
+.usa-ssn-group .usa-button--unstyled .usa-icon {
+    width: 1.5em;
+    height: 1.5em;
+    color: black;
+}

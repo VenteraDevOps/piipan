@@ -1,0 +1,365 @@
+﻿@using Piipan.Components.Forms
+@using static Piipan.Components.Forms.FormConstants
+@inherits BaseTest<UsaInputSSN>
+@code {
+    public class TestModel {
+        [UsaSSN]
+        [Display(Name = "Optional Field")]
+        public string? NotRequiredField { get; set; }
+
+        [UsaRequired]
+        [UsaSSN]
+        [Display(Name = "Required Field")]
+        public string? RequiredField { get; set; }
+    }
+    private IRenderedComponent<UsaForm>? form = null;
+    private IElement? inputElement = null;
+    private TestModel model = new();
+    private RenderFragment? renderFragment = null;
+    private BunitJSModuleInterop moduleInterop;
+
+    public UsaInputSSNTests()
+    {
+        moduleInterop = JSInterop.SetupModule("./_content/Piipan.Components/Forms/UsaInputSSN.razor.js");
+    }
+
+    #region Tests
+
+    [Fact]
+    public void Input_Should_Exist_With_USA_Input_Class()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.NotNull(inputElement);
+    }
+
+    [Fact]
+    public void Input_Should_Bind_Value_On_Change()
+    {
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+        inputElement!.Input("123-12-1234");
+
+        // Assert
+        Assert.Equal("123-12-1234", model.NotRequiredField);
+    }
+
+    [Fact]
+    public void Input_Should_Have_An_Accessible_Label()
+    {
+        // Arrange
+        CreateTestComponent();
+        var labelElement = form!.Find("label");
+
+        // Assert
+        Assert.Equal(labelElement.GetAttribute("for"), inputElement!.Id);
+    }
+
+    [Fact]
+    public void Input_Should_Have_Required_Attribute_When_Field_Is_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Assert
+        Assert.True(inputElement!.HasAttribute("required"));
+    }
+
+    [Fact]
+    public void Input_Should_Not_Have_Required_Attribute_When_Field_Is_Not_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.False(inputElement!.HasAttribute("required"));
+    }
+
+    [Fact]
+    public void Input_Should_Be_Able_To_Take_Extra_Parameters()
+    {
+        // Arrange
+        renderFragment = 
+            @<UsaInputSSN @bind-Value=model.RequiredField data-extra-param="test" />;
+        CreateTestComponent();
+
+        // Assert
+        Assert.Equal("test", inputElement!.GetAttribute("data-extra-param"));
+    }
+
+    [Fact]
+    public void Input_Should_Not_Have_Errors_When_Empty_And_Not_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+    }
+
+    [Fact]
+    public void Input_Should_Have_Errors_When_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasRequiredErrors();
+    }
+
+    [Fact]
+    public void Input_Should_Not_Have_Errors_When_Not_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("123-12-1234");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+    }
+
+    [Fact]
+    public void Input_Should_Have_Errors_When_Not_Empty_And_Invalid()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(4);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("tes-t");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasErrors("Optional Field must have the form ###-##-####");
+    }
+
+    [Fact]
+    public void Input_Should_Put_In_Hyphens_Automatically()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(9);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("123121234");
+
+        // Assert
+        Assert.Equal("123-12-1234", model.NotRequiredField);
+        // Verify cursor position
+        foreach (var invocation in moduleInterop.Invocations.Where(n => n.Identifier == "setCursorPosition"))
+        {
+            // the second argument in this call is the new cursor position. After adding in the hyphens, it should be 11
+            Assert.Equal(11, invocation.Arguments[1]);
+        }
+    }
+
+    [Fact]
+    public void Input_Should_Put_In_One_Hyphen_Automatically_With_3_Characters()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(3);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("123");
+
+        // Assert
+        Assert.Equal("123-", model.NotRequiredField);
+        // Verify cursor position
+        foreach (var invocation in moduleInterop.Invocations.Where(n => n.Identifier == "setCursorPosition"))
+        {
+            // the second argument in this call is the new cursor position. After adding in the hyphen, it should be 4
+            Assert.Equal(4, invocation.Arguments[1]);
+        }
+    }
+
+    [Fact]
+    public void Input_Should_Put_In_Two_Hyphen_Automatically_With_6_Characters()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(6);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("123-12");
+
+        // Assert
+        Assert.Equal("123-12-", model.NotRequiredField);
+        // Verify cursor position
+        foreach (var invocation in moduleInterop.Invocations.Where(n => n.Identifier == "setCursorPosition"))
+        {
+            // the second argument in this call is the new cursor position. After adding in the hyphen, it should be 7
+            Assert.Equal(7, invocation.Arguments[1]);
+        }
+    }
+
+    [Fact]
+    public void Input_Should_Allow_Hyphen_Deletion_If_Last_Character()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(6);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+        
+        // Act
+        inputElement!.Input("123-12-");
+
+        // Assert it gets set to all 6 characters
+        Assert.Equal("123-12-", model.NotRequiredField);
+
+        // Act (remove last hyphen)
+        inputElement!.Input("123-12");
+
+        // Assert the last hyphen got deleted and not added back in
+        Assert.Equal("123-12", model.NotRequiredField);
+    }
+
+    [Fact]
+    public void Input_Should_Appear_Invisible_If_Protected()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("123-12-1234");
+
+        // Assert
+        Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
+    }
+
+    [Fact]
+    public void Input_Should_Appear_Normal_If_Not_Protected()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        form!.Find($".usa-button").Click(); // Click the view/hide button to view
+        inputElement!.Input("123-12-1234");
+
+        // Assert
+        Assert.Equal("123-12-1234", inputElement!.GetAttribute("value"));
+    }
+
+    [Fact]
+    public void Input_Should_Appear_Invisible_If_After_Protecting()
+    {
+        // Arrange
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        form!.Find($".usa-button").Click(); // Click the view/hide button to view
+        inputElement!.Input("123-12-1234");
+        form!.Find($".usa-button").Click(); // Click the view/hide button again to hide
+
+        // Assert
+        Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
+    }
+
+    [Fact]
+    public void Input_Should_Have_Errors_When_Changed_Back_To_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.SetupVoid("setCursorPosition", _ => true);
+
+        // Act
+        inputElement!.Input("123-12-1234");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+
+        // Act
+        moduleInterop.Setup<int>("getCursorPosition", _ => true).SetResult(0);
+        inputElement!.Input("");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasRequiredErrors();
+    }
+
+    #endregion Tests
+
+    #region Helper Function
+
+    private RenderFragment RequiredFieldRenderFragment() => 
+        @<UsaInputSSN @bind-Value="model.RequiredField" />;
+
+    protected override void CreateTestComponent()
+    {
+        EditContext editContext = new EditContext(model);
+        editContext.EnableDataAnnotationsValidation();
+        var componentFragment = Render<UsaForm>(
+            @<UsaForm Model="model">
+                <UsaFormGroup>
+                    @if (renderFragment == null)
+                    {
+                        <UsaInputSSN @bind-Value="model.NotRequiredField" />
+                    }
+                    else
+                    {
+                        @renderFragment
+                    }
+                </UsaFormGroup>
+            </UsaForm>
+        );
+        form = componentFragment;
+        Component = componentFragment.FindComponent<UsaInputSSN>();
+        inputElement = componentFragment.Find($".{InputClass}");
+    }
+
+    private void AssertHasNoErrors()
+    {
+        Assert.False(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorSpans = form!.FindAll($".{InputErrorMessageClass}");
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        Assert.Equal(0, errorForms.Count);
+        Assert.Equal(0, errorSpans.Count);
+    }
+
+    private void AssertHasRequiredErrors()
+    {
+        AssertHasErrors("Required Field is required");
+    }
+
+    private void AssertHasErrors(string error)
+    {
+        Assert.True(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        var errorSpan = form!.Find($".{InputErrorMessageClass}");
+        Assert.Equal(error, errorSpan.TextContent);
+        Assert.Equal(1, errorForms.Count);
+    }
+
+    #endregion Helper Functions
+}

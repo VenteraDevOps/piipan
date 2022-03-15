@@ -1,0 +1,262 @@
+﻿@using Microsoft.JSInterop
+@using Piipan.Components.Forms
+@using static Piipan.Components.Forms.FormConstants
+@inherits BaseTest<UsaInputDate>
+@code {
+    public class TestModel {
+        [Display(Name = "Not Required Field")]
+        public DateTime? NotRequiredField { get; set; }
+
+        [UsaRequired]
+        [Display(Name = "Required Field")]
+        public DateTime? RequiredField { get; set; }
+    }
+    private IRenderedComponent<UsaForm>? form = null;
+    private IElement? inputElement = null;
+    private TestModel model = new();
+    private RenderFragment? renderFragment = null;
+    private string validDate = "01/01/1990";
+    private string invalidDate = "test";
+    private bool badInput = false;
+
+    #region Tests
+
+    [Fact]
+    public void Input_Should_Exist_With_USA_Input_Class()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.NotNull(inputElement);
+    }
+
+    [Fact]
+    public void Input_Should_Bind_Value_On_Change()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Change<string>(validDate);
+
+        // Assert
+        Assert.Equal(DateTime.Parse(validDate), model.NotRequiredField);
+    }
+
+    [Fact]
+    public void Input_Should__Not_Bind_Value_On_Invalid_Change()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Change<string>(invalidDate);
+
+        // Assert
+        Assert.Null(model.NotRequiredField);
+    }
+
+    [Fact]
+    public void Input_Should_Have_An_Accessible_Label()
+    {
+        // Arrange
+        CreateTestComponent();
+        var labelElement = form!.Find("label");
+
+        // Assert
+        Assert.Equal(labelElement.GetAttribute("for"), inputElement!.Id);
+    }
+
+    [Fact]
+    public void Input_Should_Have_Required_Attribute_When_Field_Is_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Assert
+        Assert.True(inputElement!.HasAttribute("required"));
+    }
+
+    [Fact]
+    public void Input_Should_Not_Have_Required_Attribute_When_Field_Is_Not_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.False(inputElement!.HasAttribute("required"));
+    }
+
+    [Fact]
+    public void Input_Should_Be_Able_To_Take_Extra_Parameters()
+    {
+        // Arrange
+        renderFragment = 
+            @<UsaInputDate @bind-Value=model.RequiredField data-extra-param="test" />;
+        CreateTestComponent();
+
+        // Assert
+        Assert.Equal("test", inputElement!.GetAttribute("data-extra-param"));
+    }
+
+    [Fact]
+    public void Input_Should_Not_Have_Errors_When_Empty_And_Not_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        //Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+    }
+
+    [Fact]
+    public void Input_Should_Have_Errors_When_Invalid_And_Not_Required()
+    {
+        // Arrange
+        badInput = true;
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Change(invalidDate);
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasInvalidErrors("Not Required Field is invalid");
+    }
+
+    [Fact]
+    public void Input_Should_Have_Errors_When_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasRequiredErrors();
+    }
+
+    [Fact]
+    public void Input_Should_Not_Have_Errors_When_Not_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Change(validDate);
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+    }
+
+    [Fact]
+    public void Input_Should_Have_Invalid_Error_When_Invalid_And_Required()
+    {
+        // Arrange
+        badInput = true;
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Change(invalidDate);
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasInvalidErrors("Required Field is invalid");
+    }
+
+    [Fact]
+    public void Input_Should_Have_Errors_When_Changed_Back_To_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Change(validDate);
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+
+        // Act
+        inputElement!.Change("");
+        inputElement!.Blur();
+
+         // Assert
+        AssertHasRequiredErrors();
+    }
+
+    #endregion Tests
+
+    #region Helper Function
+
+    private RenderFragment RequiredFieldRenderFragment() => 
+        @<UsaInputDate @bind-Value="model.RequiredField" />;
+
+    /// <summary>
+    /// Setup the component and register Javascript mocks
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        var moduleInterop = JSInterop.SetupModule("./_content/Piipan.Components/Forms/UsaInputDate.razor.js");
+        EditContext editContext = new EditContext(model);
+        editContext.EnableDataAnnotationsValidation();
+        var componentFragment = Render<UsaForm>(
+            @<UsaForm Model="model">
+                <UsaFormGroup>
+                    @if (renderFragment == null)
+                    {
+                        <UsaInputDate @bind-Value="model.NotRequiredField" />
+                    }
+                    else
+                    {
+                        @renderFragment
+                    }
+                </UsaFormGroup>
+            </UsaForm>
+        );
+        form = componentFragment;
+        Component = componentFragment.FindComponent<UsaInputDate>();
+        inputElement = componentFragment.Find($".{InputClass}");
+        moduleInterop.Setup<bool>("doesDateHaveBadInput", _ => true).SetResult(badInput);
+    }
+
+    private void AssertHasNoErrors()
+    {
+        Assert.False(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorSpans = form!.FindAll($".{InputErrorMessageClass}");
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        Assert.Equal(0, errorForms.Count);
+        Assert.Equal(0, errorSpans.Count);
+    }
+
+    private void AssertHasRequiredErrors()
+    {
+        Assert.True(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        var errorSpan = form!.Find($".{InputErrorMessageClass}");
+        Assert.Equal("Required Field is required", errorSpan.TextContent);
+        Assert.Equal(1, errorForms.Count);
+    }
+
+    private void AssertHasInvalidErrors(string expectedErrorText)
+    {
+        Assert.True(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        var errorSpan = form!.Find($".{InputErrorMessageClass}");
+        Assert.Equal(expectedErrorText, errorSpan.TextContent);
+        Assert.Equal(1, errorForms.Count);
+    }
+
+    #endregion Helper Functions
+}

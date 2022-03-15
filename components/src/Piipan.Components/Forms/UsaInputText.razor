@@ -1,0 +1,9 @@
+﻿@using static FormConstants
+@inherits UsaInputBase<string>
+
+<input class="@InputClass @(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")"
+    @ref="ElementReference"
+    @bind="CurrentValue" @onblur="BlurField"
+    required="@FormGroup.Required" 
+    id="@FormGroup?.GroupId-input"
+    @attributes="AdditionalAttributes" style="@(Width != null ? $"width: {Width}px;" : "")" />

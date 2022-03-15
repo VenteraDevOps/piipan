@@ -1,0 +1,12 @@
+﻿@inject HttpClient httpClient
+@code {
+    protected virtual string[] Files { get; set; }
+    protected Dictionary<string, string> fileContents = new();
+    protected override async Task OnInitializedAsync()
+    {
+        foreach (string file in Files)
+        {
+            fileContents.Add(file, await httpClient.GetStringAsync("/" + file));
+        }
+    }
+}
