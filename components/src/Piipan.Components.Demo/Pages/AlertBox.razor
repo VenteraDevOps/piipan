@@ -6,7 +6,7 @@
 @code {
     protected override string[] Files { get; set; } = { "components/AlertBoxComponent.razor" };
 
-    AlertSeverity AlertSeverity { get; set; } = AlertSeverity.Error;
+    private AlertSeverity AlertSeverity { get; set; } = AlertSeverity.Error;
 }
 
 <h1>Alert Box</h1>

@@ -7,11 +7,18 @@
 
     public bool Expanded { get; set; } = false;
     private string contentId = Guid.NewGuid().ToString();
+
     protected override void OnInitialized()
     {
         Expanded = StartsExpanded;
         AccordionGroup?.Items.Add(this);
+        base.OnInitialized();
     }
+
+    /// <summary>
+    /// Called by the parent Accordion to close when single-select and another item was opened.
+    /// Also called by itself when the accordion item is clicked
+    /// </summary>
     public void Toggle()
     {
         Expanded = !Expanded;

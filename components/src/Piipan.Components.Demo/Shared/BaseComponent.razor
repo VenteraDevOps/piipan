@@ -1,6 +1,6 @@
 ﻿@inject HttpClient httpClient
 @code {
-    protected virtual string[] Files { get; set; }
+    protected virtual string[] Files { get; set; } = new string[0];
     protected Dictionary<string, string> fileContents = new();
     protected override async Task OnInitializedAsync()
     {

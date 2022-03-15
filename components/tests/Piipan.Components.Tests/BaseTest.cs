@@ -1,14 +1,15 @@
 ﻿using Bunit;
 using Microsoft.AspNetCore.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Piipan.Components.Tests
 {
+    /// <summary>
+    /// The Base Test for all components, which allows you to set initial values for the component, as well as
+    /// perform operations such as creating and updating the component
+    /// </summary>
+    /// <typeparam name="T">The type of the component we are testing</typeparam>
     public abstract class BaseTest<T> : TestContext where T : IComponent, new()
     {
         protected T InitialValues { get; set; } = new T();

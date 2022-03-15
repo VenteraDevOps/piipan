@@ -1,5 +1,8 @@
 ﻿namespace Piipan.Components.Forms
 {
+    /// <summary>
+    /// Constants associated with forms
+    /// </summary>
     public static class FormConstants
     {
         public const string FormClass = "usa-form";

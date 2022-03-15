@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Piipan.Components.Demo.Models
 {
+    /// <summary>
+    /// A model that simulates an object that has a required date, and not required date.
+    /// </summary>
     public class InputDateModel
     {
         [Display(Name = "Optional Date")]

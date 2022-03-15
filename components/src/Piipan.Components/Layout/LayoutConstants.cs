@@ -1,5 +1,8 @@
 ﻿namespace Piipan.Components.Layout
 {
+    /// <summary>
+    /// Constants associated with layout components
+    /// </summary>
     public static class LayoutConstants
     {
         public const string AccordionClass = "usa-accordion";

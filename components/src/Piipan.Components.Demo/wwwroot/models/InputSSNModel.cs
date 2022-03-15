@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Piipan.Components.Demo.Models
 {
+    /// <summary>
+    /// A model that simulates an object that has a required ssn, and not required ssn.
+    /// </summary>
     public class InputSSNModel
     {
         [UsaSSN]

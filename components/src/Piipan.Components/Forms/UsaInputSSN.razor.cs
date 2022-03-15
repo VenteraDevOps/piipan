@@ -5,10 +5,20 @@ using System.Threading.Tasks;
 
 namespace Piipan.Components.Forms
 {
+    /// <summary>
+    /// The Social Security Number component
+    /// </summary>
     public partial class UsaInputSSN
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
+
         private IJSObjectReference module;
+
+        /// <summary>
+        /// After this component is rendered the first time, import the social security number javascript module, which helps
+        /// perform cursor placement when hyphens are added/removed.
+        /// </summary>
+        /// <param name="firstRender">Whether or not this component is rendering for the first time</param>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -19,7 +29,10 @@ namespace Piipan.Components.Forms
             await base.OnAfterRenderAsync(firstRender);
         }
 
-        public async Task Input(ChangeEventArgs e)
+        /// <summary>
+        /// On input, we need to do add/remove hyphens, as well as potentially protect the value from prying eyes.
+        /// </summary>
+        private async Task Input(ChangeEventArgs e)
         {
             CurrentValue ??= "";
             string value = e.Value as string;

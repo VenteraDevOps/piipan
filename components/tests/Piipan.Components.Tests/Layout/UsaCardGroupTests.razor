@@ -6,6 +6,9 @@
 
 @code {
     private IElement? element;
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
     public UsaCardGroupTests() : base()
     {
         InitialValues = new()
@@ -19,7 +22,7 @@
     }
 
     /// <summary>
-    /// Create abstract card group component
+    /// Create a card group component
     /// </summary>
     protected override void CreateTestComponent()
     {
@@ -33,6 +36,9 @@
 
     #region Tests
 
+    /// <summary>
+    /// Verify the default markup of a card group
+    /// </summary>
     [Fact]
     public void Card_Group_Should_Exist_And_Have_Correct_Markup()
     {
@@ -47,6 +53,9 @@
         );
     }
 
+    /// <summary>
+    /// Verify the card group can change its body content after being created
+    /// </summary>
     [Fact]
     public void Card_Group_Should_Be_Able_To_Change_Content_After_Created()
     {

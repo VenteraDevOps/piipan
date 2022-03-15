@@ -5,6 +5,9 @@
 @inherits BaseTest<UsaAccordionItem>
 
 @code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
     public UsaAccordionItemTests() : base()
     {
         InitialValues = new()
@@ -25,6 +28,9 @@
     }
     #region Tests
 
+    /// <summary>
+    /// Verify that the markup that is generated for this accordion item is what we expect
+    /// </summary>
     [Fact]
     public void Accordion_Should_Exist_And_Have_Correct_Markup()
     {
@@ -35,6 +41,9 @@
         VerifyOpen();
     }
 
+    /// <summary>
+    /// Verify that the markup that is generated for this accordion item is what we expect when it starts collapsed
+    /// </summary>
     [Fact]
     public void Accordion_Should_Be_Able_To_Start_Collapsed()
     {
@@ -46,6 +55,9 @@
         VerifyClosed();
     }
 
+    /// <summary>
+    /// Verify that the markup that is generated for this accordion item is what we expect after we close it
+    /// </summary>
     [Fact]
     public void Accordion_Should_Close_When_Clicked()
     {
@@ -59,6 +71,9 @@
         VerifyClosed();
     }
 
+    /// <summary>
+    /// Verify that the markup that is generated for this accordion item is what we expect after we close it and reopen it
+    /// </summary>
     [Fact]
     public void Accordion_Should_Close_And_Reopen_When_Clicked_Twice()
     {

@@ -10,6 +10,13 @@ namespace Piipan.Components.Forms
         private bool HasErrors => currentErrors?.Count() > 0;
         private EditContext editContext;
         private bool ShowAlertBox { get; set; } = false;
+
+        public List<UsaFormGroup> FormGroups { get; set; } = new();
+        private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors = new();
+
+        /// <summary>
+        /// Set the edit context of this form when it's initialized
+        /// </summary>
         protected override void OnInitialized()
         {
             editContext = new EditContext(Model);
@@ -17,10 +24,9 @@ namespace Piipan.Components.Forms
             editContext.EnableDataAnnotationsValidation();
         }
 
-        public List<UsaFormGroup> FormGroups { get; set; } = new();
-
-        private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors = new();
-
+        /// <summary>
+        /// Update the state of the form, such as after a field changes its value
+        /// </summary>
         public void UpdateState()
         {
             currentErrors.Clear();
@@ -33,7 +39,8 @@ namespace Piipan.Components.Forms
             }
             StateHasChanged();
         }
-        async Task SubmitForm()
+        
+        private async Task SubmitForm()
         {
             currentErrors.Clear();
             foreach (var formGroup in FormGroups)

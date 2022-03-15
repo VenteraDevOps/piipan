@@ -6,6 +6,9 @@
 
 @code {
     private IElement? element;
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
     public UsaCardTests() : base()
     {
         InitialValues = new()
@@ -32,6 +35,9 @@
 
     #region Tests
 
+    /// <summary>
+    /// Verify the default markup of an card component
+    /// </summary>
     [Fact]
     public void Card_Should_Exist_And_Have_Correct_Markup()
     {
@@ -52,6 +58,9 @@
         );
     }
 
+    /// <summary>
+    /// Verify the card can change its heading after being created
+    /// </summary>
     [Fact]
     public void Card_Should_Be_Able_To_Change_Header_Before_And_After_Created()
     {
@@ -72,6 +81,9 @@
         header!.MarkupMatches(@<header class="@CardHeaderClass"><h2 class="@CardHeadingClass">@afterValue</h2></header>);
     }
 
+    /// <summary>
+    /// Verify the card can change its footer content after being created
+    /// </summary>
     [Fact]
     public void Card_Should_Be_Able_To_Change_Footer_Before_And_After_Created()
     {
@@ -92,6 +104,9 @@
         header!.MarkupMatches(@<div class="@CardFooterClass">@afterValue</div>);
     }
 
+    /// <summary>
+    /// Verify the card can change its body content after being created
+    /// </summary>
     [Fact]
     public void Card_Should_Be_Able_To_Change_Body_Before_And_After_Created()
     {

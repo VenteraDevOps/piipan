@@ -3,8 +3,16 @@ using Xunit;
 
 namespace Piipan.Components.Tests.Validation
 {
+    /// <summary>
+    /// Tests associated with the UsaSSN attribute
+    /// </summary>
     public class UsaSSNAttributeTests
     {
+        /// <summary>
+        /// Verify it is either valid or not given multiple inputs
+        /// </summary>
+        /// <param name="ssn">The value of the associated field</param>
+        /// <param name="isValidExpected">Whether or not we expect this field to have an error after the value is entered</param>
         [Theory]
         [InlineData("123-12-1234", true)]
         [InlineData("12-123-1234", false)]
@@ -24,6 +32,9 @@ namespace Piipan.Components.Tests.Validation
             Assert.Equal(isValidExpected, result);
         }
 
+        /// <summary>
+        /// Validate that if an error occurs that the correct error message is returned
+        /// </summary>
         [Fact]
         public void CorrectErrorMessageIsUsed()
         {

@@ -1,5 +1,8 @@
 ﻿namespace Piipan.Components.Shared
 {
+    /// <summary>
+    /// Common constants associated with many different components
+    /// </summary>
     public static class CommonConstants
     {
         public const string ButtonClass = "usa-button";

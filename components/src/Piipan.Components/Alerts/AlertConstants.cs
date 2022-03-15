@@ -1,5 +1,8 @@
 ﻿namespace Piipan.Components.Alerts
 {
+    /// <summary>
+    /// Constants associated with the alert box
+    /// </summary>
     public static class AlertConstants
     {
         public const string AlertClass = "usa-alert";

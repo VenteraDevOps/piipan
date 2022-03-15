@@ -4,6 +4,11 @@
     [Parameter] public bool Multiselectable { get; set; } = false;
 
     public List<UsaAccordionItem> Items { get; set; } = new();
+
+    /// <summary>
+    /// Called after the accordion item is expanded. Used to close the other accordion items if the accordion list single-select
+    /// </summary>
+    /// <param name="item"></param>
     public void Expand(UsaAccordionItem item)
     {
         if (!Multiselectable)

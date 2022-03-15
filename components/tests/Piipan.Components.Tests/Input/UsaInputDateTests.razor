@@ -21,16 +21,24 @@
 
     #region Tests
 
+    /// <summary>
+    /// Verify the default markup of an input date
+    /// </summary>
     [Fact]
-    public void Input_Should_Exist_With_USA_Input_Class()
+    public void Input_Should_Exist_And_Have_Correct_Markup()
     {
         // Arrange
         CreateTestComponent();
 
         // Assert
-        Assert.NotNull(inputElement);
+        Component!.MarkupMatches(
+            @<input type="date" class="@InputClass valid" value="" style="width: 180px;" id:ignore />
+        );
     }
 
+    /// <summary>
+    /// Verify that when the value changes, the backend model is updated
+    /// </summary>
     [Fact]
     public void Input_Should_Bind_Value_On_Change()
     {
@@ -44,6 +52,9 @@
         Assert.Equal(DateTime.Parse(validDate), model.NotRequiredField);
     }
 
+    /// <summary>
+    /// Verify that when the value changes to an invalid value, the backend model is NOT updated
+    /// </summary>
     [Fact]
     public void Input_Should__Not_Bind_Value_On_Invalid_Change()
     {
@@ -57,6 +68,9 @@
         Assert.Null(model.NotRequiredField);
     }
 
+    /// <summary>
+    /// Verify the label "for" attribute matches the input's ID
+    /// </summary>
     [Fact]
     public void Input_Should_Have_An_Accessible_Label()
     {
@@ -68,6 +82,9 @@
         Assert.Equal(labelElement.GetAttribute("for"), inputElement!.Id);
     }
 
+    /// <summary>
+    /// Verify the required attribute is present when the field has the UsaRequired data annotation
+    /// </summary>
     [Fact]
     public void Input_Should_Have_Required_Attribute_When_Field_Is_Required()
     {
@@ -79,6 +96,9 @@
         Assert.True(inputElement!.HasAttribute("required"));
     }
 
+    /// <summary>
+    /// Verify the required attribute is NOT present when the field does NOT have the UsaRequired data annotation
+    /// </summary>
     [Fact]
     public void Input_Should_Not_Have_Required_Attribute_When_Field_Is_Not_Required()
     {
@@ -89,6 +109,9 @@
         Assert.False(inputElement!.HasAttribute("required"));
     }
 
+    /// <summary>
+    /// Verify that any additional html attributes are added to the input field
+    /// </summary>
     [Fact]
     public void Input_Should_Be_Able_To_Take_Extra_Parameters()
     {
@@ -101,6 +124,9 @@
         Assert.Equal("test", inputElement!.GetAttribute("data-extra-param"));
     }
 
+    /// <summary>
+    /// Verify that if the value isn't set that we don't get errors if field is not required
+    /// </summary>
     [Fact]
     public void Input_Should_Not_Have_Errors_When_Empty_And_Not_Required()
     {
@@ -114,6 +140,9 @@
         AssertHasNoErrors();
     }
 
+    /// <summary>
+    /// Verify that if the value is invalid and if field is not required, that we get an invalid error
+    /// </summary>
     [Fact]
     public void Input_Should_Have_Errors_When_Invalid_And_Not_Required()
     {
@@ -129,6 +158,9 @@
         AssertHasInvalidErrors("Not Required Field is invalid");
     }
 
+    /// <summary>
+    /// Verify that if the value isn't set that we get errors if field is required
+    /// </summary>
     [Fact]
     public void Input_Should_Have_Errors_When_Empty_And_Required()
     {
@@ -143,6 +175,9 @@
         AssertHasRequiredErrors();
     }
 
+    /// <summary>
+    /// Verify that if the value is set that we do NOT get errors if field is required
+    /// </summary>
     [Fact]
     public void Input_Should_Not_Have_Errors_When_Not_Empty_And_Required()
     {
@@ -158,6 +193,9 @@
         AssertHasNoErrors();
     }
 
+    /// <summary>
+    /// Verify that if the value is set to an invalid value that we get Invalid errors if field is required, instead of the required error
+    /// </summary>
     [Fact]
     public void Input_Should_Have_Invalid_Error_When_Invalid_And_Required()
     {
@@ -174,6 +212,9 @@
         AssertHasInvalidErrors("Required Field is invalid");
     }
 
+    /// <summary>
+    /// Verify that we get errors when the value is set and then cleared if field is required
+    /// </summary>
     [Fact]
     public void Input_Should_Have_Errors_When_Changed_Back_To_Empty_And_Required()
     {

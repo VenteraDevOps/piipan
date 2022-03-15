@@ -6,6 +6,9 @@
 
 @code {
     private IElement? element;
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
     public UsaAccordionTests() : base()
     {
         InitialValues = new()
@@ -40,6 +43,9 @@
 
     #region Tests
 
+    /// <summary>
+    /// Verify that the markup that is generated for this accordion is what we expect
+    /// </summary>
     [Fact]
     public void Accordion_Should_Exist_And_Have_Correct_Markup()
     {
@@ -65,6 +71,9 @@
         );
     }
 
+    /// <summary>
+    /// Verify that if the group allows only one accordion open at a time, we can't have multiple open
+    /// </summary>
     [Fact]
     public void Accordion_Verify_Single_Select()
     {
@@ -76,6 +85,9 @@
         VerifySingleSelect();
     }
 
+    /// <summary>
+    /// Verify that if the group allows multiple accordions open at a time, we can have multiple open
+    /// </summary>
     [Fact]
     public void Accordion_Verify_Multi_Select()
     {
@@ -87,6 +99,9 @@
         VerifyMultiSelect();
     }
 
+    /// <summary>
+    /// Verify that the group can switch from single select to multiselect on the fly
+    /// </summary>
     [Fact]
     public void Accordion_Should_Be_Able_To_Change_Multiselect_Before_And_After_Created()
     {

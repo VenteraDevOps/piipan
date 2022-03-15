@@ -1,7 +1,7 @@
 ﻿@page "/input-date"
 @inherits BaseComponent
 @code {
-    public InputDateModel DateModel { get; set; } = new();
+    private InputDateModel DateModel { get; set; } = new();
     protected override string[] Files { get; set; } = { "components/InputDateComponent.razor", "models/InputDateModel.cs" };
 }
 

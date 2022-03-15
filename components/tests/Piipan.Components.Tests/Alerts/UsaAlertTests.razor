@@ -6,6 +6,10 @@
 
 @code {
     private IElement? element;
+
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
     public UsaAlertTests() : base()
     {
         InitialValues = new()
@@ -43,6 +47,9 @@
 
     #region Tests
 
+    /// <summary>
+    /// Verify the default markup of an alert box
+    /// </summary>
     [Fact]
     public void Alert_Box_Should_Exist_And_Have_Correct_Markup()
     {
@@ -62,6 +69,9 @@
         );
     }
 
+    /// <summary>
+    /// Verify the markup of an alert box when the alert box list dismissable
+    /// </summary>
     [Fact]
     public void Alert_Box_Should_Have_Correct_Markup_When_Dismissable()
     {
@@ -87,6 +97,9 @@
         );
     }
 
+    /// <summary>
+    /// Verify the alert box can change severity on the fly
+    /// </summary>
     [Theory]
     [InlineData(AlertSeverity.Error, AlertSeverity.Warning)]
     [InlineData(AlertSeverity.Warning, AlertSeverity.Info)]
@@ -110,6 +123,9 @@
         Assert.True(element.ClassList.Contains(AlertSeverityClasses[endingSeverity]));
     }
 
+    /// <summary>
+    /// Verify the alert box can change its header on the fly
+    /// </summary>
     [Fact]
     public void Alert_Box_Should_Be_Able_To_Change_Header_Before_And_After_Created()
     {
@@ -131,6 +147,9 @@
         headerElement!.MarkupMatches(@<h4 class="@AlertHeadingClass">@testAfterValue</h4>);
     }
 
+    /// <summary>
+    /// Verify the alert box can change its slim style on the fly
+    /// </summary>
     [Fact]
     public void Alert_Box_Should_Be_Able_To_Change_Slim_Style_Before_And_After_Created()
     {
@@ -148,6 +167,9 @@
         Component!.MarkupMatches(@<div class="@AlertClass @AlertErrorClass @AlertSlimClass" role="alert" diff:ignoreChildren></div>);
     }
 
+    /// <summary>
+    /// Verify the alert box can change its body content on the fly
+    /// </summary>
     [Fact]
     public void Alert_Box_Should_Be_Able_To_Change_Child_Content_Before_And_After_Created()
     {
@@ -166,10 +188,12 @@
 
         // Assert Updated Values
         textElement = element.QuerySelector($".{AlertTextClass}")!;
-        textElement.MarkupMatches(@<div class="@AlertTextClass">@testAfterValue</div>
-    );
+        textElement.MarkupMatches(@<div class="@AlertTextClass">@testAfterValue</div>);
     }
 
+    /// <summary>
+    /// Verify the alert box can fire an action when it is dismissed
+    /// </summary>
     [Fact]
     public void Alert_Box_Should_Be_Able_To_Be_Dismissed()
     {
