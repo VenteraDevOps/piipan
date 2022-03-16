@@ -6,8 +6,6 @@
     [CascadingParameter] public UsaFormGroup FormGroup { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public InputStatus Status { get; set; }
-
-    private bool required = false;
 }
 
 <label class="usa-label" for="@(FormGroup?.GroupId)-input">

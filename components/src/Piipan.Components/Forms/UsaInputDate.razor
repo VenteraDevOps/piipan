@@ -4,7 +4,7 @@
 @code {
     InputDate<DateTime?> InputDateReference { get; set; }
     public override int? Width { get; set; } = 180;
-    private IJSObjectReference? module;
+    private IJSObjectReference module;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
