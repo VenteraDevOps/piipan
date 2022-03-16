@@ -107,15 +107,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components", "compon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components.Demo", "components\src\Piipan.Components.Demo\Piipan.Components.Demo.csproj", "{0E78EBA0-0A80-4FDD-8470-513910F02F3C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{60FB6685-3CF9-4469-B38F-ECABF457BCD1}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{28EA778D-49E0-49F6-92E7-56391E11D0E3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Piipan.Match", "Piipan.Match", "{207255D2-37B1-410D-91BC-8EBE735088CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Match.Func.ResolutionApi", "match\src\Piipan.Match\Piipan.Match.Func.ResolutionApi\Piipan.Match.Func.ResolutionApi.csproj", "{FC81EDEF-C422-433E-9F41-E2BCB7A09847}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.ResolutionApi", "match\src\Piipan.Match\Piipan.Match.Func.ResolutionApi\Piipan.Match.Func.ResolutionApi.csproj", "{FC81EDEF-C422-433E-9F41-E2BCB7A09847}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
