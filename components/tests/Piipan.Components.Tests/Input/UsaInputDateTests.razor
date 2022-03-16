@@ -13,9 +13,9 @@
     }
     private IRenderedComponent<UsaForm>? form = null;
     private IElement? inputElement = null;
-    private TestModel model = new();
+    private TestModel model = new TestModel();
     private RenderFragment? renderFragment = null;
-    private string validDate = "01/01/1990";
+    private string validDate = "1990-01-01";
     private string invalidDate = "test";
     private bool badInput = false;
 
@@ -249,9 +249,6 @@
     /// </summary>
     protected override void CreateTestComponent()
     {
-        var moduleInterop = JSInterop.SetupModule("./_content/Piipan.Components/Forms/UsaInputDate.razor.js");
-        EditContext editContext = new EditContext(model);
-        editContext.EnableDataAnnotationsValidation();
         var componentFragment = Render<UsaForm>(
             @<UsaForm Model="model">
                 <UsaFormGroup>
@@ -269,7 +266,7 @@
         form = componentFragment;
         Component = componentFragment.FindComponent<UsaInputDate>();
         inputElement = componentFragment.Find($".{InputClass}");
-        moduleInterop.Setup<bool>("doesDateHaveBadInput", _ => true).SetResult(badInput);
+        JSInterop.Setup<bool>("piipan.utilities.doesElementHaveInvalidInput", _ => true).SetResult(badInput);
     }
 
     private void AssertHasNoErrors()

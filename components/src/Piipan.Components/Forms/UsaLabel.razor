@@ -8,7 +8,7 @@
     [Parameter] public InputStatus Status { get; set; }
 }
 
-<label class="usa-label" for="@(FormGroup?.GroupId)-input">
+<label class="usa-label" for="@FormGroup?.InputElementId">
     @ChildContent
     @if (FormGroup?.Required ?? false)
     {

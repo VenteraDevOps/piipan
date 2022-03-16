@@ -1,7 +1,7 @@
 ﻿@page "/input-ssn"
 @inherits BaseComponent
 @code {
-    private InputSSNModel SSNModel { get; set; } = new();
+    private InputSSNModel SSNModel { get; set; } = new InputSSNModel();
     protected override string[] Files { get; set; } = { "components/InputSSNComponent.razor", "models/InputSSNModel.cs" };
 }
 

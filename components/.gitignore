@@ -5,7 +5,8 @@
 
 # Certain static assets compiled in build process
 **/wwwroot/css/
-**/wwwroot/js/
+**/wwwroot/js/uswds.js
+**/wwwroot/js/uswds-init.js
 
 # User-specific files
 *.rsuser

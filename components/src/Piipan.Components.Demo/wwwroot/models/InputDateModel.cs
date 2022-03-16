@@ -1,4 +1,5 @@
 ﻿using Piipan.Components.Validation;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Piipan.Components.Demo.Models

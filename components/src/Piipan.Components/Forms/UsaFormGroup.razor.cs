@@ -16,7 +16,7 @@ namespace Piipan.Components.Forms
         public string Label { get; set; }
         public FieldIdentifier FieldIdentifier { get; set; }
         public InputStatus Status { get; private set; } = InputStatus.None;
-        public ElementReference? InputElement { get; set; }
+        public string InputElementId { get; set; }
 
         public List<string> ValidationMessages { get; set; } = new List<string>();
         public Func<Task<List<string>>> PreverificationChecks { get; set; } = null;

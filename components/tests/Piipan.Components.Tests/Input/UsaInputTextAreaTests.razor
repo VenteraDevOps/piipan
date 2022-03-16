@@ -11,7 +11,7 @@
     }
     private IRenderedComponent<UsaForm>? form = null;
     private IElement? inputElement = null;
-    private TestModel model = new();
+    private TestModel model = new TestModel();
     private RenderFragment? renderFragment = null;
 
     #region Tests
@@ -187,8 +187,6 @@
 
     protected override void CreateTestComponent()
     {
-        EditContext editContext = new EditContext(model);
-        editContext.EnableDataAnnotationsValidation();
         var componentFragment = Render<UsaForm>(
             @<UsaForm Model="model">
                 <UsaFormGroup>

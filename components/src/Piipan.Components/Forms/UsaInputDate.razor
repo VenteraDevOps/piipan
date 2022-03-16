@@ -4,23 +4,13 @@
 @code {
     InputDate<DateTime?> InputDateReference { get; set; }
     public override int? Width { get; set; } = 180;
-    private IJSObjectReference module;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            this.ElementReference = InputDateReference.Element;
-            module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Piipan.Components/Forms/UsaInputDate.razor.js");
-        }
 
-        await base.OnAfterRenderAsync(firstRender);
-    }
     protected override async Task<List<string>> PreverificationChecks()
     {
-        bool hasBadInput = await module.InvokeAsync<bool>("doesDateHaveBadInput", ElementReference);
+        bool hasBadInput = await JSRuntime.InvokeAsync<bool>("piipan.utilities.doesElementHaveInvalidInput", $"{FormGroup?.GroupId}-input");
         if (hasBadInput)
         {
-            return new() { ValidationConstants.InvalidMessage };
+            return new List<string>() { ValidationConstants.InvalidMessage };
         }
         else
         {
@@ -33,7 +23,7 @@
            class="@($"{InputClass} {(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")}")"
            @bind-Value="CurrentValue" @onblur="BlurField"
            required="@FormGroup.Required"
-           id="@($"{FormGroup?.GroupId}-input")"
+           id="@Id"
            @attributes="AdditionalAttributes"
            style="@(Width != null ? $"width: {Width}px;" : "")">
 </InputDate>

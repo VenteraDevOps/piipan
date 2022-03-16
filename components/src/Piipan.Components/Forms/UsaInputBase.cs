@@ -26,6 +26,8 @@ namespace Piipan.Components.Forms
 
         protected ElementReference? ElementReference { get; set; }
 
+        protected string Id { get => $"{FormGroup?.GroupId}-input"; }
+
         /// <summary>
         /// When this input is created, update the form group's properties that are dependant on field
         /// </summary>
@@ -34,23 +36,9 @@ namespace Piipan.Components.Forms
             base.OnInitialized();
             FormGroup.PreverificationChecks = PreverificationChecks;
             FormGroup.FieldIdentifier = this.FieldIdentifier;
-            
+            FormGroup.InputElementId = Id;
             FormGroup.Label = ValueExpression.GetAttribute<T, DisplayAttribute>()?.Name ?? ValueExpression.Name;
             FormGroup.Required = ValueExpression.HasAttribute<T, RequiredAttribute>();
-        }
-
-        /// <summary>
-        /// After this renders the first time, set the FormGroup's input element to this so that it can be focused if an error occurs.
-        /// You cannot do this in the OnInitialized, since the ElementReference doesn't exist yet.
-        /// </summary>
-        /// <param name="firstRender">Whether or not this component is rendering for the first time</param>
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-            if (firstRender)
-            {
-                FormGroup.InputElement = ElementReference;
-            }
         }
 
         /// <summary>

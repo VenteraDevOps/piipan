@@ -1,7 +1,7 @@
 ﻿@page "/input-text"
 @inherits BaseComponent
 @code {
-    private InputTextModel TextModel { get; set; } = new();
+    private InputTextModel TextModel { get; set; } = new InputTextModel();
     protected override string[] Files { get; set; } = { "components/InputTextComponent.razor", "models/InputTextModel.cs" };
 }
 

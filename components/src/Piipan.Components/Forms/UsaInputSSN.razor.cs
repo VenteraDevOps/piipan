@@ -12,23 +12,6 @@ namespace Piipan.Components.Forms
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
 
-        private IJSObjectReference module;
-
-        /// <summary>
-        /// After this component is rendered the first time, import the social security number javascript module, which helps
-        /// perform cursor placement when hyphens are added/removed.
-        /// </summary>
-        /// <param name="firstRender">Whether or not this component is rendering for the first time</param>
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Piipan.Components/Forms/UsaInputSSN.razor.js");
-            }
-
-            await base.OnAfterRenderAsync(firstRender);
-        }
-
         /// <summary>
         /// On input, we need to do add/remove hyphens, as well as potentially protect the value from prying eyes.
         /// </summary>
@@ -36,7 +19,7 @@ namespace Piipan.Components.Forms
         {
             CurrentValue ??= "";
             string value = e.Value as string;
-            var cursorPosition = await module.InvokeAsync<int>("getCursorPosition", ElementReference);
+            var cursorPosition = await JSRuntime.InvokeAsync<int>("piipan.utilities.getCursorPosition", ElementReference);
             if (!visible)
             {
                 var beginningStr = "";
@@ -116,13 +99,13 @@ namespace Piipan.Components.Forms
             if (CurrentValue == tempValue)
             {
                 // Reset the value. Blazor won't rebind, but we need to refresh it anyway
-                await module.InvokeVoidAsync("setValue", ElementReference, visible ? tempValue : invisibleValue);
+                await JSRuntime.InvokeVoidAsync("piipan.utilities.setValue", ElementReference, visible ? tempValue : invisibleValue);
             }
             CurrentValue = tempValue;
             InvisibleValue = invisibleValue;
             StateHasChanged();
             await ValueChanged.InvokeAsync(tempValue);
-            await module.InvokeVoidAsync("setCursorPosition", ElementReference, cursorPosition);
+            await JSRuntime.InvokeVoidAsync("piipan.utilities.setCursorPosition", ElementReference, cursorPosition);
         }
     }
 }
