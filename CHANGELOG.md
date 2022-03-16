@@ -3,6 +3,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2022-03-08
+
+### Changed
+- Enabled soft blob delete with retention period set to 1 day
+- Participant table "benefits_end_date" column replaced with "participant_closing_date"
+  - Updated database schema with new name and changed column type
+  - Updated IaC code with new column name
+  - Updated example csv files with new column name
+  - Updated Bulk Upload API to support changed field
+  - Updated Duplicate Participation API to support changed field
+  - Updated Query Tool with field changes
+- Removed "invalid" and "status" columns from "matches" table
+- Disabled weak ciphers flagged by security scans
+### Added
+- Added HSTS support for Dashboard and Query Tool applications
+- Incorporated Case Number and Participant ID fields in Query Tool 
+  - Added these fields to Duplicate Participation API
+  - Documenation updated to reflect these changes
+- Visual Studio top-level solution file
+- Added Match Resolution Events table (match_res_events)
+- Match Resolution Aggregator
+- Logging for Event Hub
+### Fixed
+- Bulk Upload commits entire upload as single transaction rather than one transaction per uploaded participant
+
 ## [1.0.0.34] - 2022-02-22
 
 ### Added

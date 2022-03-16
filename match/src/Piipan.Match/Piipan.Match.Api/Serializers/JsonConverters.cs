@@ -25,43 +25,6 @@ namespace Piipan.Match.Api.Serializers
         }
 
         /// <summary>
-        /// JSON.NET converter for deserializing month-only string to a DateTime
-        /// to last day of the month
-        /// and serializing a DateTime into a year-month string
-        /// using our desired ISO 8601 YYYY-MM format.
-        /// </summary>
-        /// <remarks>
-        /// Applied to model properties as `[JsonConverter(typeof(MonthEndConverter))]`
-        /// </remarks>
-        public class MonthEndConverter : JsonConverter
-        {
-            public override bool CanRead => true;
-            public override bool CanWrite => true;
-
-            public override bool CanConvert(Type objectType) => objectType == typeof(DateTime);
-
-            public override object ReadJson(
-                JsonReader reader,
-                Type objectType,
-                object existingValue,
-                JsonSerializer serializer
-            )
-            {
-                if (String.IsNullOrEmpty((string)reader.Value)) return null;
-                return MonthEndDateTime.Parse((string)reader.Value);
-            }
-
-            public override void WriteJson(
-                JsonWriter writer,
-                object value,
-                JsonSerializer serializer
-            )
-            {
-                writer.WriteValue(((DateTime)value).ToString("yyyy-MM"));
-            }
-        }
-
-        /// <summary>
         /// JSON.NET converter used for converting null, missing, or empty
         /// properties to a `null` value when deserializing JSON.
         /// </summary>

@@ -27,8 +27,8 @@
         }
       },
       {
-        "name": "benefits_end_month",
-        "type": "yearmonth",
+        "name": "participant_closing_date",
+        "type": "date",
         "description": "The final month when a participant will receive benefits. Leave this field blank if the participant will continue receiving benefits until the next recertification period."
       },
       {

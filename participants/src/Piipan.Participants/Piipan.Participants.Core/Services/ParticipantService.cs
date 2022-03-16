@@ -7,6 +7,7 @@ using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using System;
+using System.Transactions;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -47,14 +48,18 @@ namespace Piipan.Participants.Core.Services
 
         public async Task AddParticipants(IEnumerable<IParticipant> participants)
         {
-            var upload = await _uploadDao.AddUpload();
-
-            var participantDbos = participants.Select(p => new ParticipantDbo(p)
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
-                UploadId = upload.Id
-            });
+                var upload = await _uploadDao.AddUpload();
 
-            await _participantDao.AddParticipants(participantDbos);
+                var participantDbos = participants.Select(p => new ParticipantDbo(p)
+                {
+                    UploadId = upload.Id
+                });
+
+                await _participantDao.AddParticipants(participantDbos);
+                scope.Complete();
+            }
         }
 
         public async Task<IEnumerable<string>> GetStates()

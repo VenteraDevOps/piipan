@@ -41,6 +41,12 @@ paths:
                         type: string
                         description: 'SHA-512 digest of participant''s last name, DoB, and SSN. See docs/pprl.md for details'
                         pattern: '^[0-9a-f]{128}$'
+                      participant_id:
+                        type: string
+                        description: Participant's state-specific identifier. Must not be social security number or any personal identifiable information.
+                      case_id:
+                        type: string
+                        description: Participant's state-specific case number
             examples:
               Single person:
                 description: 'An example request to query a single person, with values for all fields'
@@ -104,11 +110,11 @@ paths:
                                   participant_id:
                                     type: string
                                     description: Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.
-                                  benefits_end_month:
+                                  participant_closing_date:
                                     type: string
-                                    pattern: '^\d{4}-\d{2}$'
+                                    pattern: '^\d{4}-\d{2}-\d{2}$'
                                     example: 2021-01
-                                    description: Participant's ending benefits month
+                                    description: Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits.
                                   recent_benefit_months:
                                     type: array
                                     items:
@@ -176,7 +182,7 @@ paths:
                               state: ea
                               case_id: string
                               participant_id: string
-                              benefits_end_month: 2021-01
+                              participant_closing_date: '2021-10-13'
                               recent_benefit_months:
                                 - 2021-05
                                 - 2021-04
@@ -202,7 +208,7 @@ paths:
                               state: eb
                               case_id: string
                               participant_id: string
-                              benefits_end_month: 2021-01
+                              participant_closing_date: '2021-10-13'
                               recent_benefit_months:
                                 - 2021-05
                                 - 2021-04
@@ -212,7 +218,7 @@ paths:
                               state: ec
                               case_id: string
                               participant_id: string
-                              benefits_end_month: null
+                              participant_closing_date: null
                               protect_location: null
                       errors: []
                 Multiple persons with matches:

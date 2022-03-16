@@ -19,11 +19,11 @@ ParticipantRecord:
     participant_id:
       type: string
       description: "Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII."
-    benefits_end_month:
+    participant_closing_date:
       type: string
-      pattern: '^\d{4}-\d{2}$'
+      pattern: '^\d{4}-\d{2}-\d{2}$'
       example: "2021-01"
-      description: "Participant's ending benefits month"
+      description: "Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits."
     recent_benefit_months:
       type: array
       items:
@@ -45,7 +45,7 @@ ParticipantRecordExamples:
     state: "ea"
     case_id: "string"
     participant_id: "string"
-    benefits_end_month: "2021-01"
+    participant_closing_date: "2021-10-13"
     recent_benefit_months:
       - "2021-05"
       - "2021-04"
@@ -56,7 +56,7 @@ ParticipantRecordExamples:
     state: "eb"
     case_id: "string"
     participant_id: "string"
-    benefits_end_month: "2021-01"
+    participant_closing_date: "2021-10-13"
     recent_benefit_months:
       - "2021-05"
       - "2021-04"
@@ -67,5 +67,5 @@ ParticipantRecordExamples:
     state: "ec"
     case_id: "string"
     participant_id: "string"
-    benefits_end_month: null
+    participant_closing_date: null
     protect_location: null

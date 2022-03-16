@@ -51,6 +51,13 @@ namespace Piipan.QueryTool
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
 
+            services.AddHsts(options =>
+            {
+                options.Preload = true; //Sets the preload parameter of the Strict-Transport-Security header. Preload isn't part of the RFC HSTS specification, but is supported by web browsers to preload HSTS sites on fresh install. For more information, see https://hstspreload.org
+                options.IncludeSubDomains = true; //Enables includeSubDomain, which applies the HSTS policy to Host subdomains.
+                options.MaxAge = TimeSpan.FromSeconds(31536000); //Explicitly sets the max-age parameter of the Strict-Transport-Security header to 365 days. If not set, defaults to 30 days.
+            });
+
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
             
             services.AddSingleton<INameNormalizer, NameNormalizer>();

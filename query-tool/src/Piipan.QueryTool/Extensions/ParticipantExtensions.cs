@@ -6,9 +6,9 @@ namespace Piipan.QueryTool.Extensions
 {
     public static class ParticipantExtensions
     {
-        public static string BenefitsEndDateDisplay(this IParticipant participant)
+        public static string ParticipantClosingDateDisplay(this IParticipant participant)
         {
-            return participant.BenefitsEndDate?.ToString("yyyy-MM");
+            return participant.ParticipantClosingDate?.ToString("yyyy-MM-dd");
         }
 
         public static string RecentBenefitMonthsDisplay(this IParticipant participant)

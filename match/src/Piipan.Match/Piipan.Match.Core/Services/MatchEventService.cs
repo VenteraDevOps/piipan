@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
+using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Participants.Api.Models;
 
 namespace Piipan.Match.Core.Services
@@ -15,13 +16,19 @@ namespace Piipan.Match.Core.Services
     {
         private readonly IActiveMatchRecordBuilder _recordBuilder;
         private readonly IMatchRecordApi _recordApi;
+        private readonly IMatchResEventDao _matchResEventDao;
+        private readonly IMatchResAggregator _matchResAggregator;
 
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
-            IMatchRecordApi recordApi)
+            IMatchRecordApi recordApi,
+            IMatchResEventDao matchResEventDao,
+            IMatchResAggregator matchResAggregator)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
+            _matchResEventDao = matchResEventDao;
+            _matchResAggregator = matchResAggregator;
         }
 
         /// <summary>
@@ -85,7 +92,10 @@ namespace Piipan.Match.Core.Services
         {
             var latest = existingRecords.OrderBy(r => r.CreatedAt).Last();
 
-            if (latest.Status == MatchRecordStatus.Closed)
+            var events = await _matchResEventDao.GetEvents(latest.MatchId);
+            var matchResRecord = _matchResAggregator.Build(latest, events);
+
+            if (matchResRecord.Status == MatchRecordStatus.Closed)
             {
                 return new ParticipantMatch(match)
                 {

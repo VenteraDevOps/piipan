@@ -125,6 +125,13 @@ jobs:
             DatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
+          working_directory: match/tests/Piipan.Match.Func.ResolutionApi.IntegrationTests
+          name: Test Match Resolution Api integration
+          environment:
+            CollaborationDatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
+            States: ea
+          command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      - run:
           name: Upload Code Climate coverage report
           command: |
             ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json
@@ -133,6 +140,8 @@ jobs:
             ./cc-test-reporter -d format-coverage ./query-tool/tests/Piipan.QueryTool.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.query-tool.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Func.Api.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.func.api.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Func.Api.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.func.api.integration.json
+            ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Func.ResolutionApi.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.func.resolutionapi.integration.json
+            ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Func.ResolutionApi.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.func.resolutionapi.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Api.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.api.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.core.json
             ./cc-test-reporter -d format-coverage ./match/tests/Piipan.Match.Core.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.match.core.integration.json

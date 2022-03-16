@@ -1,0 +1,22 @@
+﻿@page
+@model Piipan.QueryTool.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="grid-container">
+
+    @if (@Model.Message != null)
+    {
+        <div id="error-message" class="grid-row margin-top-1">
+            <div class="tablet:grid-col-12">
+                <div class="usa-alert usa-alert--warning">
+                    <div class="usa-alert__body">
+                        <h4 class="usa-alert__heading">@Model.Message</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div> 

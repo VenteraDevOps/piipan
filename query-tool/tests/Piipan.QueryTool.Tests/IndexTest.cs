@@ -112,7 +112,7 @@ namespace Piipan.QueryTool.Tests
                                         State = "ea",
                                         CaseId = "caseId",
                                         ParticipantId = "pId",
-                                        BenefitsEndDate = new DateTime(2021, 05, 31),
+                                        ParticipantClosingDate = new DateTime(2021, 05, 31),
                                         RecentBenefitMonths = new List<DateTime>
                                         {
                                             new DateTime(2021, 04, 30),

@@ -11,6 +11,8 @@
 # Visual Studio Ignores
 **/.vs/*
 
+.vs/*
+
 # Local History for Visual Studio Code
 .history/
 iac/env/tts/eth.bash

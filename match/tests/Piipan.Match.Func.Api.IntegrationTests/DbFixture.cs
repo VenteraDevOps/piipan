@@ -74,6 +74,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             {
                 conn.ConnectionString = CollabConnectionString;
                 conn.Open();
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Close();
             }
@@ -105,6 +107,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
+                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
+                conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute(matchesSql);
 
@@ -169,7 +173,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                         match_id,
                         initiator,
                         states,
-                        status::text,
                         hash,
                         hash_type::text,
                         input::jsonb,
@@ -198,8 +201,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 parameters.Add("UploadId", lastval);
 
                 conn.Execute(@"
-                    INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location)
-                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @BenefitsEndDate, @RecentBenefitMonths::date[], @ProtectLocation)",
+                    INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, participant_closing_date, recent_benefit_months, protect_location)
+                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @ParticipantClosingDate, @RecentBenefitMonths::date[], @ProtectLocation)",
                     parameters);
 
                 conn.Close();

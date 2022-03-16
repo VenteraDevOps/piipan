@@ -16,9 +16,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
 
             // Act / Assert
@@ -35,9 +33,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var nRecord = new
             {
@@ -58,9 +54,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var recordMismatch = new MatchRecordDbo
             {
@@ -68,9 +62,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = record.Initiator,
                 States = record.States,
                 Hash = record.Hash,
-                HashType = record.HashType,
-                Status = record.Status,
-                Invalid = record.Invalid
+                HashType = record.HashType
             };
 
             // Act / Assert
@@ -88,9 +80,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var recordMismatch = new MatchRecordDbo
             {
@@ -98,9 +88,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = record.Initiator + "b",
                 States = record.States,
                 Hash = record.Hash,
-                HashType = record.HashType,
-                Status = record.Status,
-                Invalid = record.Invalid
+                HashType = record.HashType
             };
 
             // Act / Assert
@@ -118,9 +106,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var recordMismatch = new MatchRecordDbo
             {
@@ -128,9 +114,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = record.Initiator,
                 States = new string[] { "a", "c" },
                 Hash = record.Hash,
-                HashType = record.HashType,
-                Status = record.Status,
-                Invalid = record.Invalid
+                HashType = record.HashType
             };
 
             // Act / Assert
@@ -148,9 +132,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var recordMismatch = new MatchRecordDbo
             {
@@ -158,9 +140,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = record.Initiator,
                 States = record.States,
                 Hash = record.Hash + "a",
-                HashType = record.HashType,
-                Status = record.Status,
-                Invalid = record.Invalid
+                HashType = record.HashType
             };
 
             // Act / Assert
@@ -178,9 +158,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var recordMismatch = new MatchRecordDbo
             {
@@ -188,69 +166,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = record.Initiator,
                 States = record.States,
                 Hash = record.Hash,
-                HashType = record.HashType + "y",
-                Status = record.Status,
-                Invalid = record.Invalid
-            };
-
-            // Act / Assert
-            Assert.False(record.Equals(recordMismatch));
-            Assert.NotEqual(record.GetHashCode(), recordMismatch.GetHashCode());
-        }
-
-        [Fact]
-        public void Equals_HashCode_StatusMismatch()
-        {
-            // Arrange
-            var record = new MatchRecordDbo
-            {
-                MatchId = "m",
-                Initiator = "i",
-                States = new string[] { "a", "b" },
-                Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
-            };
-            var recordMismatch = new MatchRecordDbo
-            {
-                MatchId = record.MatchId,
-                Initiator = record.Initiator,
-                States = record.States,
-                Hash = record.Hash,
-                HashType = record.HashType,
-                Status = record.Status + "t",
-                Invalid = record.Invalid
-            };
-
-            // Act / Assert
-            Assert.False(record.Equals(recordMismatch));
-            Assert.NotEqual(record.GetHashCode(), recordMismatch.GetHashCode());
-        }
-
-        [Fact]
-        public void Equals_HashCode_InvalidMismatch()
-        {
-            // Arrange
-            var record = new MatchRecordDbo
-            {
-                MatchId = "m",
-                Initiator = "i",
-                States = new string[] { "a", "b" },
-                Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
-            };
-            var recordMismatch = new MatchRecordDbo
-            {
-                MatchId = record.MatchId,
-                Initiator = record.Initiator,
-                States = record.States,
-                Hash = record.Hash,
-                HashType = record.HashType,
-                Status = record.Status,
-                Invalid = !record.Invalid
+                HashType = record.HashType + "y"
             };
 
             // Act / Assert
@@ -269,9 +185,7 @@ namespace Piipan.Match.Core.Tests.Models
                 States = new string[] { "a", "b" },
                 Hash = "h",
                 HashType = "t",
-                Input = "{}",
-                Status = "s",
-                Invalid = false
+                Input = "{}"
             };
             var recordMatch = new MatchRecordDbo
             {
@@ -280,9 +194,7 @@ namespace Piipan.Match.Core.Tests.Models
                 States = record.States,
                 Hash = record.Hash,
                 HashType = record.HashType,
-                Input = "{[]}",
-                Status = record.Status,
-                Invalid = record.Invalid
+                Input = "{[]}"
             };
 
             // Act / Assert
@@ -301,9 +213,7 @@ namespace Piipan.Match.Core.Tests.Models
                 States = new string[] { "a", "b" },
                 Hash = "h",
                 HashType = "t",
-                Data = "{}",
-                Status = "s",
-                Invalid = false
+                Data = "{}"
             };
             var recordMatch = new MatchRecordDbo
             {
@@ -312,9 +222,7 @@ namespace Piipan.Match.Core.Tests.Models
                 States = record.States,
                 Hash = record.Hash,
                 HashType = record.HashType,
-                Data = "{[]}",
-                Status = record.Status,
-                Invalid = record.Invalid
+                Data = "{[]}"
             };
 
             // Act / Assert
@@ -333,9 +241,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var a = DateTime.Now.AddDays(1);
             var recordMatch = new MatchRecordDbo
@@ -345,9 +251,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = record.Initiator,
                 States = record.States,
                 Hash = record.Hash,
-                HashType = record.HashType,
-                Status = record.Status,
-                Invalid = record.Invalid
+                HashType = record.HashType
             };
 
             // Act / Assert
@@ -365,9 +269,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
             var recordMatch = new MatchRecordDbo
             {
@@ -375,9 +277,7 @@ namespace Piipan.Match.Core.Tests.Models
                 Initiator = "i",
                 States = new string[] { "a", "b" },
                 Hash = "h",
-                HashType = "t",
-                Status = "s",
-                Invalid = false
+                HashType = "t"
             };
 
             // Act / Assert

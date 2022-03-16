@@ -12,35 +12,35 @@ namespace Piipan.QueryTool.Tests.Extensions
     public class ParticipantExtensionsTests
     {
         [Fact]
-        public void BenefitsEndDateDisplay_Null()
+        public void ParticipantClosingDateDisplay_Null()
         {
             // Arrange
             var participant = new Mock<IParticipant>();
             participant
-                .Setup(m => m.BenefitsEndDate)
+                .Setup(m => m.ParticipantClosingDate)
                 .Returns<DateTime?>(null);
 
             // Act
-            var result = participant.Object.BenefitsEndDateDisplay();
+            var result = participant.Object.ParticipantClosingDateDisplay();
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public void BenefitsEndDateDisplay()
+        public void ParticipantClosingDateDisplay()
         {
             // Arrange
             var participant = new Mock<IParticipant>();
             participant
-                .Setup(m => m.BenefitsEndDate)
+                .Setup(m => m.ParticipantClosingDate)
                 .Returns(new DateTime(2021, 5, 31));
 
             // Act
-            var result = participant.Object.BenefitsEndDateDisplay();
+            var result = participant.Object.ParticipantClosingDateDisplay();
 
             // Assert
-            Assert.Equal("2021-05", result);
+            Assert.Equal("2021-05-31", result);
         }
 
         [Fact]

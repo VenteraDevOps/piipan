@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Dapper;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Piipan.Participants.Core.Models;
 
@@ -19,10 +21,24 @@ namespace Piipan.Participants.Core.IntegrationTests
         public DbFixture()
         {
             ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            if(string.IsNullOrEmpty(ConnectionString))
+            {
+                IConfiguration config = InitConfiguration();
+                ConnectionString = config.GetConnectionString("DatabaseConnectionString");
+            }
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
             ApplySchema();
+        }
+
+        public static IConfiguration InitConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+               .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+            return config;
         }
 
         /// <summary>
@@ -143,8 +159,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 parameters.Add("UploadId", lastval);
 
                 conn.Execute(@"
-                    INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, benefits_end_date, recent_benefit_months, protect_location)
-                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @BenefitsEndDate, @RecentBenefitMonths::date[], @ProtectLocation)",
+                    INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, participant_closing_date, recent_benefit_months, protect_location)
+                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @ParticipantClosingDate, @RecentBenefitMonths::date[], @ProtectLocation)",
                     parameters);
 
                 conn.Close();
@@ -174,18 +190,25 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
-                var record = conn.QuerySingle<ParticipantDbo>(@"
+                var record = conn.Query<ParticipantDbo>(@"
                     SELECT lds_hash LdsHash,
                         participant_id ParticipantId,
                         case_id CaseId,
-                        benefits_end_date BenefitsEndDate,
+                        participant_closing_date ParticipantClosingDate,
                         recent_benefit_months RecentBenefitMonths,
                         protect_location ProtectLocation,
                         upload_id UploadId
                     FROM participants
-                    WHERE lds_hash=@LdsHash", participant);
-                    
-                result = record.Equals(participant);
+                    WHERE lds_hash=@LdsHash", participant).FirstOrDefault();
+
+                if (record == null)
+                {
+                    result = false;
+                }
+                else
+                {
+                    result = record.Equals(participant);
+                }
 
                 conn.Close();
             }
