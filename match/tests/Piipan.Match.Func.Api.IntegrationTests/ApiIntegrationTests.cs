@@ -30,7 +30,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {
-        private const string InitiatingState = "ea";
+        private const string InitiatingState = "eb";
 
         static ParticipantDbo FullRecord()
         {

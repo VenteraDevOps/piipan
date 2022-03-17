@@ -36,7 +36,7 @@ curl -X POST /match/v2/find_matches \
 
 *Search for all matching participant records using de-identified data*
 
-Searches all state databases for any participant records that are an exact match to the `lds_hash` of persons provided in the request.
+Searches all state databases for any participant records that are an exact match to the `lds_hash` of persons provided in the request. Does not search the database for the state initiating the request.
 
 > Body parameter
 

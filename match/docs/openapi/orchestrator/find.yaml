@@ -3,8 +3,7 @@ post:
   tags:
     - "Match"
   summary: "Search for all matching participant records using de-identified data"
-  description: "Searches all state databases for any participant records that are an exact match to the `lds_hash` of persons provided in the request."
-  parameters:
+  description: "Searches all state databases for any participant records that are an exact match to the `lds_hash` of persons provided in the request. Does not search the database for the state initiating the request."  parameters:
     - $ref: '../schemas/match-query.yaml#/components/parameters/From'
     - $ref: '../schemas/match-query.yaml#/components/parameters/InitiatingState'
   requestBody:

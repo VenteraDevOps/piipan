@@ -142,9 +142,9 @@ namespace Piipan.Match.Core.Tests.Services
             Assert.Single(response.Data.Results, r => r.Index == 0);
 
             var matches = response.Data.Results.First().Matches;
-            Assert.Equal(4, matches.Count());
-            Assert.Equal(2, matches.Count(m => m.ParticipantId == "p1"));
-            Assert.Equal(2, matches.Count(m => m.ParticipantId == "p2"));
+            Assert.Equal(2, matches.Count());
+            Assert.Equal(1, matches.Count(m => m.ParticipantId == "p1"));
+            Assert.Equal(1, matches.Count(m => m.ParticipantId == "p2"));
         }
 
         [Fact]
@@ -201,6 +201,89 @@ namespace Piipan.Match.Core.Tests.Services
 
             // Act / Assert
             await Assert.ThrowsAsync<Exception>(() => service.FindMatches(request, "ea"));
+        }
+        [Fact]
+        public async Task ReturnsAggregatedMatchesFromSameState()
+        {
+            // Arrange
+            var participantApi = new Mock<IParticipantApi>();
+            participantApi
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string> { "ea" });
+
+            participantApi
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new List<ParticipantMatch>
+                {
+                    new ParticipantMatch { ParticipantId = "p1" },
+                    new ParticipantMatch { ParticipantId = "p2" }
+                });
+
+            var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
+            requestPersonValidator
+                .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
+
+            var request = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>
+                {
+                    new RequestPerson { LdsHash = "" }
+                }
+            };
+
+            // Act
+            var response = await service.FindMatches(request, "ea");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Empty(response.Data.Errors);
+            Assert.Single(response.Data.Results);
+            Assert.Single(response.Data.Results, r => r.Index == 0);
+
+            var matches = response.Data.Results.First().Matches;
+            Assert.Equal(0, matches.Count());
+            Assert.Equal(0, matches.Count(m => m.ParticipantId == "p1"));
+            Assert.Equal(0, matches.Count(m => m.ParticipantId == "p2"));
+        }
+        [Fact]
+        public async Task ReturnsEmptyMatchesFromSameState()
+        {
+            // Arrange
+            var participantApi = new Mock<IParticipantApi>();
+            participantApi
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string> { "ea" });
+
+            participantApi
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new List<ParticipantMatch>
+                {
+                    new ParticipantMatch { ParticipantId = "p1" },
+                });
+
+            var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
+            requestPersonValidator
+                .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
+
+            var request = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>
+                {
+                    new RequestPerson { LdsHash = "" }
+                }
+            };
+
+            // Act
+            var response = await service.FindMatches(request, "ea");
+
+            participantApi.Verify(r => r.GetParticipants("ea", request.Data[0].LdsHash), Times.Never);
+            
         }
     }
 }
