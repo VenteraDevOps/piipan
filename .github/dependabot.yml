@@ -5,20 +5,6 @@ updates:
   schedule:
     interval: daily
     time: "09:00"
-  ignore:
-    # We’ve been staying with the 3.1.x versions of the .NET libraries in accordance with our decision to stay with .NET Core 3.1:
-    # https://github.com/18F/piipan/blob/dev/docs/adr/0019-continue-to-use-net-core-3-1.md
-    # We’ve been holding off on updating the Microsoft.NET.Sdk.Functions library to 4.x until MS updates their guidance on which version to use:
-    # https://github.com/18F/piipan/pull/1951#issuecomment-947665260
-    # These configs should be replicated on every nuget project
-    - dependency-name: "Microsoft.AspNetCore.Authorization"
-      versions: ["4.x", "5.x", "6.x", "7.x"]
-    - dependency-name: "Microsoft.Azure.WebJobs.Extensions.EventGrid"
-      versions: ["3.x"]
-    - dependency-name: "Microsoft.Extensions.*"
-      versions: ["4.x", "5.x", "6.x"]
-    - dependency-name: "Microsoft.NET.Sdk.Functions"
-      versions: ["4.x"]
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/dashboard/src/Piipan.Dashboard"
@@ -398,3 +384,8 @@ updates:
       versions: ["4.x", "5.x", "6.x"]
     - dependency-name: "Microsoft.NET.Sdk.Functions"
       versions: ["4.x"]
+- package-ecosystem: nuget
+  directory: "/perf-tests/src/Etl.BulkUpload.Performance.TestRunner/Etl.BulkUpload.Performance.TestRunner"
+  schedule:
+    interval: daily
+    time: "09:00"
