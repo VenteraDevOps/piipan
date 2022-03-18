@@ -6,6 +6,8 @@ Date: 2022-03-16
 
 Proposed
 
+Supercedes [11. Use Razor pages for web-apps](0011-use-razor-pages-for-web-apps.md)
+
 ## Context
 
 While we have been able to have a pretty low complexity application until now, new screens and functionality are being designed that require a little more client-side interactivity.
