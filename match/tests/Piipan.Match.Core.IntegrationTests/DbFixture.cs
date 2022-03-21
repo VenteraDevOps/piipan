@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Dapper;
 using Npgsql;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
+using Piipan.Match.Core.DataAccessObjects;
 
 namespace Piipan.Match.Core.IntegrationTests
 {
@@ -241,6 +245,37 @@ namespace Piipan.Match.Core.IntegrationTests
                 conn.Close();
             }
 
+            return result;
+        }
+
+        public async Task<IEnumerable<IMatchResEvent>> GetEvents(string matchId)
+        {
+            const string sql = @"
+                SELECT
+                    id,
+                    match_id,
+                    inserted_at,
+                    actor,
+                    actor_state,
+                    delta::jsonb
+                FROM match_res_events
+                WHERE
+                    match_id=@MatchId
+                ORDER BY inserted_at asc
+                ;";
+            var parameters = new {
+                MatchId = matchId,
+            };
+            var factory = NpgsqlFactory.Instance;
+            IEnumerable<MatchResEventDbo> result;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                result = await conn.QueryAsync<MatchResEventDbo>(sql, parameters);
+                conn.Close();
+            }
             return result;
         }
     }

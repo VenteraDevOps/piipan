@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,10 @@ using Piipan.Match.Func.ResolutionApi.Models;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 {
+    [Collection("MatchResolutionApiTests")]
     public class GetMatchApiIntegrationTests : DbFixture
     {
-         static GetMatchApi Construct()
+        static GetMatchApi Construct()
         {
             Environment.SetEnvironmentVariable("States", "ea");
 
@@ -65,6 +67,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void GetMatch_Returns404IfNotFound()
         {
             // Arrange
+            // clear databases
+            ClearMatchRecords();
+            ClearMatchResEvents();
+
             var matchId = "foo";
             var api = Construct();
             var mockRequest = MockGetRequest(matchId);
@@ -81,6 +87,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void GetMatch_ReturnsIfFound()
         {
             // Arrange
+            // clear databases
+            ClearMatchRecords();
+            ClearMatchResEvents();
+
             var matchId = "ABC";
             var api = Construct();
             var mockRequest = MockGetRequest(matchId);
@@ -106,6 +116,56 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var resBody = response.Value as ApiResponse;
             Assert.NotNull(resBody);
             Assert.Equal("open", resBody.Data.Status);
+        }
+        // When match res events are added, GetMatch response should update accordingly
+        [Fact]
+        public async void GetMatch_ShowsUpdatedData()
+        {
+            // Arrange
+            // clear databases
+            ClearMatchRecords();
+            ClearMatchResEvents();
+
+            var matchId = "ABC";
+            var api = Construct();
+            var mockRequest = MockGetRequest(matchId);
+            var mockLogger = Mock.Of<ILogger>();
+
+            // insert into database
+            var match = new MatchRecordDbo() {
+                MatchId = matchId,
+                Initiator = "ea",
+                CreatedAt = DateTime.UtcNow,
+                States = new string[] { "ea", "bb" },
+                Hash = "foo",
+                HashType = "ldshash",
+                Data = "{}"
+            };
+            Insert(match);
+            // Act
+            var response = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as JsonResult;
+
+            // Assert first request
+            Assert.Equal(200, response.StatusCode);
+            var resBody = response.Value as ApiResponse;
+            Assert.False(resBody.Data.Dispositions[0].InvalidMatch);
+
+            // Act again
+            // creating an "invalid match" match event results in newly pulled Match request having invalid_match = true
+            var mre = new MatchResEventDbo() {
+                MatchId = matchId,
+                ActorState = "ea",
+                Actor = "user",
+                Delta = "{ \"invalid_match\": true }"
+            };
+            InsertMatchResEvent(mre);
+            var nextResponse = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as JsonResult;
+
+            // Assert next request
+            var nextResBody = nextResponse.Value as ApiResponse;
+            Assert.Equal(200, nextResponse.StatusCode);
+            // now this disposition's invalid flag should be true
+            Assert.True(nextResBody.Data.Dispositions[0].InvalidMatch);
         }
     }
 }

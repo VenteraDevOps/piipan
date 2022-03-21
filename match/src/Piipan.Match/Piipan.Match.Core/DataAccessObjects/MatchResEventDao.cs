@@ -28,6 +28,9 @@ namespace Piipan.Match.Core.DataAccessObjects
         {
             _dbConnectionFactory = dbConnectionFactory;
             _logger = logger;
+
+            // Removing this Dapper config may cause null values in expected columns
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
         /// <summary>

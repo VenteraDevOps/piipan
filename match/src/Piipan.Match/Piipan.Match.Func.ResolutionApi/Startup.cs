@@ -28,6 +28,8 @@ namespace Piipan.Match.Func.ResolutionApi
             builder.Services.AddTransient<IMatchRecordDao, MatchRecordDao>();
             builder.Services.AddTransient<IMatchResEventDao, MatchResEventDao>();
             builder.Services.AddTransient<IMatchResAggregator, MatchResAggregator>();
+            builder.Services.AddTransient<IValidator<AddEventRequest>, AddEventRequestValidator>();
+            builder.Services.AddTransient<IStreamParser<AddEventRequest>, AddEventRequestParser>();
 
             builder.Services.AddSingleton<DbProviderFactory>(NpgsqlFactory.Instance);
             builder.Services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
