@@ -1,0 +1,238 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    // Parameters named and organized to match Azure
+    "parameters": {
+        "autoProvisionSetting": {
+            "type": "string",
+            "defaultValue": "On",
+            "allowedValues": [
+                "On",
+                "Off"
+            ],
+            "metadata": {
+                "description": "Specify whether Auto Provisoning is turned On or Off"
+            }
+        },
+        "virtualMachinesTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Virtual Machines"
+            }
+        },
+        "appServicesTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for for Azure App Services"
+            }
+        },
+        "sqlServersTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Azure SQL Databases"
+            }
+        },
+        "sqlServerVirtualMachinesTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for SQL Servers on Virtual Machines"
+            }
+        },
+        "openSourceRelationalDatabasesTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Open-Source Relational Databases"
+            }
+        },
+        "storageAccountsTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Storage Accounts"
+            }
+        },
+        "cosmosDbsTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Azure Cosmos DB Accounts"
+            }
+        },
+        "containers": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Containers"
+            }
+        },
+        "keyVaultsTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Key Vaults"
+            }
+        },
+        "armTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for Azure Resource Manager"
+            }
+        },
+        "dnsTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Free"
+            ],
+            "metadata": {
+                "description": "Specify whether to enable Defender - Standard tier for DNS"
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Security/autoProvisioningSettings",
+            "apiVersion": "2017-08-01-preview",
+            "name": "default",
+            "properties": {
+                "autoProvision": "[parameters('autoProvisionSetting')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "VirtualMachines",
+            "properties": {
+                "pricingTier": "[parameters('virtualMachinesTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "AppServices",
+            "properties": {
+                "pricingTier": "[parameters('appServicesTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "SqlServers",
+            "properties": {
+                "pricingTier": "[parameters('sqlServersTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "SqlServerVirtualMachines",
+            "properties": {
+                "pricingTier": "[parameters('sqlServerVirtualMachinesTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "OpenSourceRelationalDatabases",
+            "properties": {
+                "pricingTier": "[parameters('openSourceRelationalDatabasesTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "StorageAccounts",
+            "properties": {
+                "pricingTier": "[parameters('storageAccountsTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "CosmosDbs",
+            "properties": {
+                "pricingTier": "[parameters('cosmosDbsTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "Containers",
+            "properties": {
+                "pricingTier": "[parameters('containers')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "KeyVaults",
+            "properties": {
+                "pricingTier": "[parameters('keyVaultsTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "Arm",
+            "properties": {
+                "pricingTier": "[parameters('armTier')]"
+            }
+        },
+        {
+            "type": "Microsoft.Security/pricings",
+            "apiVersion": "2018-06-01",
+            "name": "Dns",
+            "properties": {
+                "pricingTier": "[parameters('dnsTier')]"
+            }
+        }
+    ],
+    "outputs": {}
+}
