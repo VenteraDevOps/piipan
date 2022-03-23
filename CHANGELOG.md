@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [1.0.1.36] - 2022-03-22
 
+### Changed
+- Enabled Defender for all resources in IaC scripts
 ### Added
 - Added Match Collaboration page and Error pages.
 - Added Match Resolution App and GetMatch endpoint
