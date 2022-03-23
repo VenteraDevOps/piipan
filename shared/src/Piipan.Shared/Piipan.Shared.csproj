@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.23" />
     <PackageReference Include="Azure.Core" Version="1.22.0" />
     <PackageReference Include="Azure.Identity" Version="1.5.0" />
@@ -18,6 +19,11 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.23" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     <PackageReference Include="Npgsql" Version="6.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\ddl\per-state.sql" Link="per-state.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\match\ddl\match-record.sql" Link="match-record.sql" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -26,7 +26,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 .ReturnsAsync(() =>
                 {
                     var conn = Factory.CreateConnection();
-                    conn.ConnectionString = ConnectionString;
+                    conn.ConnectionString = CollabConnectionString;
                     conn.Open();
                     return conn;
                 });
@@ -40,7 +40,7 @@ namespace Piipan.Match.Core.IntegrationTests
             using (var conn = Factory.CreateConnection())
             {
                 // Arrange
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
                 ClearMatchResEvents();
 
@@ -83,7 +83,7 @@ namespace Piipan.Match.Core.IntegrationTests
             using (var conn = Factory.CreateConnection())
             {
                 // Arrange
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 var logger = Mock.Of<ILogger<MatchResEventDao>>();
@@ -142,7 +142,7 @@ namespace Piipan.Match.Core.IntegrationTests
             using (var conn = Factory.CreateConnection())
             {
                 // Arrange
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 var logger = Mock.Of<ILogger<MatchResEventDao>>();
@@ -203,7 +203,7 @@ namespace Piipan.Match.Core.IntegrationTests
             using (var conn = Factory.CreateConnection())
             {
                 // Arrange
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 var logger = Mock.Of<ILogger<MatchResEventDao>>();
@@ -229,7 +229,7 @@ namespace Piipan.Match.Core.IntegrationTests
             using (var conn = Factory.CreateConnection())
             {
                 // Arrange
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 var logger = Mock.Of<ILogger<MatchResEventDao>>();

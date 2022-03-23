@@ -7,128 +7,22 @@ using Npgsql;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Shared.Database;
 
 namespace Piipan.Match.Core.IntegrationTests
 {
     /// <summary>
-    /// Test fixture for match records integration testing.
-    /// Creates a fresh matches tables, dropping it when testing is complete.
+    /// Test database fixture for match records integration testing.
     /// </summary>
-    public class DbFixture : IDisposable
+    public class DbFixture : TestDbFixture
     {
-        public readonly string ConnectionString;
-        public readonly NpgsqlFactory Factory;
-
-        public DbFixture()
-        {
-            ConnectionString = Environment.GetEnvironmentVariable("CollaborationDatabaseConnectionString");
-            Factory = NpgsqlFactory.Instance;
-
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
-            Initialize();
-            ApplySchema();
-        }
-
-        /// <summary>
-        /// Ensure the database is able to receive connections before proceeding.
-        /// </summary>
-        public void Initialize()
-        {
-            var retries = 10;
-            var wait = 2000; // ms
-
-            while (retries >= 0)
-            {
-                try
-                {
-                    using (var conn = Factory.CreateConnection())
-                    {
-                        conn.ConnectionString = ConnectionString;
-                        conn.Open();
-                        conn.Close();
-
-                        return;
-                    }
-                }
-                catch (Npgsql.NpgsqlException ex)
-                {
-                    retries--;
-                    Console.WriteLine(ex.Message);
-                    Thread.Sleep(wait);
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
-                conn.Execute("DROP TABLE IF EXISTS match_res_events");
-                conn.Execute("DROP TABLE IF EXISTS matches");
-                conn.Execute("DROP TYPE IF EXISTS hash_type");
-
-                conn.Close();
-            }
-
-        }
-
-        private void ApplySchema()
-        {
-            string sqltext = System.IO.File.ReadAllText("match-record.sql", System.Text.Encoding.UTF8);
-
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
-                conn.Execute("DROP TABLE IF EXISTS match_res_events");
-                conn.Execute("DROP TABLE IF EXISTS matches");
-                conn.Execute("DROP TYPE IF EXISTS hash_type");
-                conn.Execute(sqltext);
-
-                conn.Close();
-            }
-        }
-
-        public void ClearMatchRecords()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DELETE FROM matches");
-
-                conn.Close();
-            }
-        }
-
-        public void ClearMatchResEvents()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DELETE FROM match_res_events");
-
-                conn.Close();
-            }
-        }
-
         public void Insert(MatchRecordDbo record)
         {
             var factory = NpgsqlFactory.Instance;
 
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 conn.Execute(@"
@@ -165,7 +59,7 @@ namespace Piipan.Match.Core.IntegrationTests
 
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 conn.Execute(@"
@@ -195,7 +89,7 @@ namespace Piipan.Match.Core.IntegrationTests
 
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 var row = conn.QuerySingle<MatchRecordDbo>(@"
@@ -225,7 +119,7 @@ namespace Piipan.Match.Core.IntegrationTests
 
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
                 var row = conn.QuerySingle<MatchResEventDbo>(@"
@@ -271,7 +165,7 @@ namespace Piipan.Match.Core.IntegrationTests
 
             using (var conn = factory.CreateConnection())
             {
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = CollabConnectionString;
                 conn.Open();
                 result = await conn.QueryAsync<MatchResEventDbo>(sql, parameters);
                 conn.Close();
