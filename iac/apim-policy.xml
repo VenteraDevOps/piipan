@@ -18,6 +18,10 @@
     <backend>
         <forward-request />
     </backend>
-    <outbound />
+    <outbound>
+        <set-header name="Strict-Transport-Security" exists-action="override">    
+            <value>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</value>    
+        </set-header>     
+    </outbound>
     <on-error />
 </policies>
