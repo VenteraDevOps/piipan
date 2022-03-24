@@ -90,6 +90,13 @@ main () {
   db_config_managed_role "$COLLAB_DB_NAME" "$orchestrator"
   db_grant_readwrite "$COLLAB_DB_NAME" "$orchestrator"
 
+  local matchRes
+  matchRes=$(get_resources "$MATCH_RES_API_TAG" "$MATCH_RESOURCE_GROUP")
+  echo "Configuring $COLLAB_DB_NAME access for $matchRes"
+  db_create_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
+  db_grant_readwrite "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
+
   db_leave_aad $PG_AAD_ADMIN
 
   echo "Secure database connection"

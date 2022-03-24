@@ -28,6 +28,9 @@ namespace Piipan.Match.Core.DataAccessObjects
         {
             _dbConnectionFactory = dbConnectionFactory;
             _logger = logger;
+
+            // Removing this Dapper config may cause null values in expected columns
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
         /// <summary>
@@ -40,7 +43,6 @@ namespace Piipan.Match.Core.DataAccessObjects
             const string sql = @"
                 INSERT INTO match_res_events
                 (
-                    inserted_at,
                     match_id,
                     actor,
                     actor_state,
@@ -48,7 +50,6 @@ namespace Piipan.Match.Core.DataAccessObjects
                 )
                 VALUES
                 (
-                    now() at time zone 'utc',
                     @MatchId,
                     @Actor,
                     @ActorState,
@@ -68,7 +69,7 @@ namespace Piipan.Match.Core.DataAccessObjects
         /// </summary>
         /// <param name="matchId">The given match ID</param>
         /// <param name="sortByAsc">Boolean indicating ascending sort order, defaults to true. Argument of false is descending order</param>
-        /// <returns>IEnumerable of IMatchResEvents</returns>
+        /// <returns>Task of IEnumerable of IMatchResEvents</returns>
         public async Task<IEnumerable<IMatchResEvent>> GetEvents(
             string matchId,
             bool sortByAsc = true

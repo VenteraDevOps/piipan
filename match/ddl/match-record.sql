@@ -32,7 +32,7 @@ COMMENT ON COLUMN matches.data IS 'Response data from match request.';
 CREATE TABLE IF NOT EXISTS match_res_events(
     id serial PRIMARY KEY,
     match_id text NOT NULL REFERENCES matches (match_id),
-    inserted_at timestamptz NOT NULL,
+    inserted_at timestamptz NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
     actor text NOT NULL,
     actor_state text,
     delta jsonb NOT NULL
