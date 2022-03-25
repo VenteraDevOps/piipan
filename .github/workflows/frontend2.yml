@@ -1,0 +1,118 @@
+### E2E Tests
+### Cypress, OWASP ZAP, and Pa11y
+name: Frontend
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      dashboard: ${{ steps.filter.outputs.dashboard }}
+      query-tool: ${{ steps.filter.outputs.query-tool }}
+      subsystems: ${{ steps.filter.outputs.changes }}
+
+    steps:
+      # Default Checkout
+      - name: Default Checkout
+        uses: actions/checkout@v2
+
+      # Only build subsystems with changes
+      # Use capitalization for filters due to linux case sensitivity
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            Dashboard: 'dashboard/**'
+            Query-Tool: 'query-tool/**'
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        subsystem: [Query-Tool]
+
+    steps:
+      ### Setup
+      - name: Default Checkout
+        uses: actions/checkout@v2
+
+      - name: Use node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Need to standardize naming using environment variables because of
+      # case sensitivity in linux, and query-tool versus QueryTool naming
+      - name: Configure Environment Variables
+        run: |
+          echo "SUBSYSTEM_LOWER=$(echo "${{ matrix.subsystem }}" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "SUBSYSTEM_PACKAGE=$(echo "${{ matrix.subsystem }}" | tr -d '-')" >> $GITHUB_ENV
+
+      - name: Install Pa11y
+        run: npm install -g pa11y-ci --unsafe-perm=true --allow-root
+
+      ### Build
+      - name: Build - ${{ matrix.subsystem }}
+        run: |
+          cd ${{ env.SUBSYSTEM_LOWER }}
+          ./build.bash
+          dotnet dev-certs https
+
+      ### Run
+      - name: Run Application - ${{ matrix.subsystem }}
+        working-directory: ${{ env.SUBSYSTEM_LOWER }}/src/Piipan.${{ env.SUBSYSTEM_PACKAGE }}
+        run: |
+          nohup dotnet run --no-build &>/dev/null &
+          sleep 20
+
+      ### ZAP
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.3.0
+        with:
+          allow_issue_writing: false
+          target: 'https://localhost:5001'
+
+      ### Pa11y
+      - name: Run Pa11y
+        working-directory: ${{ env.SUBSYSTEM_LOWER }}/src/Piipan.${{ env.SUBSYSTEM_PACKAGE }}
+        run: pa11y-ci
+
+      ### Cypress
+      - name: Run Cypress
+        working-directory: ${{ env.SUBSYSTEM_LOWER }}/src/Piipan.${{ env.SUBSYSTEM_PACKAGE }}
+        run: npx cypress run
+
+      - name: Artifact Cypress Screenshots
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'Cypress Screenshots - ${{ env.SUBSYSTEM_LOWER }}'
+          path: '**/cypress/screenshots/**/*.png'
+
+      - name: Artifact Cypress Videos
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'Cypress Videos - ${{ env.SUBSYSTEM_LOWER }}'
+          path: '**/cypress/videos/**/*.mp4'
+
+  ### Checks Workflow Result for PR Checks
+  frontend-results:
+    if: ${{ always() }}
+    needs: [setup,test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Workflow Conclusion
+        uses: technote-space/workflow-conclusion-action@v2
+
+      - name: Workflow Conclusion
+        if: ${{ env.WORKFLOW_CONCLUSION != 'success' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { GITHUB_WORKFLOW, WORKFLOW_CONCLUSION } = process.env
+            core.setFailed(`${GITHUB_WORKFLOW} ${WORKFLOW_CONCLUSION}`)
