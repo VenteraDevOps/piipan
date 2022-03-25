@@ -130,7 +130,7 @@ namespace Piipan.QueryTool.Tests
 
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
+                //FirstName = "Theodore",
                 LastName = "Farrington",
                 SocialSecurityNum = "987-65-4320",
                 DateOfBirth = new DateTime(1931, 10, 13)
@@ -184,7 +184,7 @@ namespace Piipan.QueryTool.Tests
 
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
+                //FirstName = "Theodore",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
@@ -217,8 +217,8 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
-                MiddleName = "Carri",
+                //FirstName = "Theodore",
+                //MiddleName = "Carri",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
@@ -257,8 +257,8 @@ namespace Piipan.QueryTool.Tests
             // Arrange
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
-                MiddleName = "Carri",
+                //FirstName = "Theodore",
+                //MiddleName = "Carri",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
