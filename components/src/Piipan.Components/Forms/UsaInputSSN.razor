@@ -15,6 +15,7 @@
         @onblur="BlurField"
         required="@FormGroup.Required" 
         id="@Id"
+        name="@Id.Replace("_", ".")"
         @attributes="AdditionalAttributes"
         @oninput="Input" maxlength="11"
         />

@@ -6,4 +6,5 @@
     @bind="CurrentValue" @onblur="BlurField"
     required="@FormGroup.Required" 
     id="@Id"
+    name="@Id.Replace("_", ".")"
     @attributes="AdditionalAttributes" style="@(Width != null ? $"width: {Width}px;" : "")"></textarea>

@@ -20,6 +20,10 @@ namespace Piipan.Components.Forms
             CurrentValue ??= "";
             string value = e.Value as string;
             var cursorPosition = await JSRuntime.InvokeAsync<int>("piipan.utilities.getCursorPosition", ElementReference);
+            if (cursorPosition > value.Length)
+            {
+                cursorPosition = value.Length;
+            }
             if (!visible)
             {
                 var beginningStr = "";
@@ -96,7 +100,7 @@ namespace Piipan.Components.Forms
                 tempValue = tempValue.Substring(0, 11);
                 invisibleValue = invisibleValue.Substring(0, 11);
             }
-            if (CurrentValue == tempValue)
+            if ((visible && CurrentValue == tempValue) || (!visible && InvisibleValue == invisibleValue))
             {
                 // Reset the value. Blazor won't rebind, but we need to refresh it anyway
                 await JSRuntime.InvokeVoidAsync("piipan.utilities.setValue", ElementReference, visible ? tempValue : invisibleValue);

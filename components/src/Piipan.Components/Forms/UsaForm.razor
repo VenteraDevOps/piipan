@@ -5,9 +5,11 @@
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public object Model { get; set; }
     [Parameter] public Func<bool, Task> OnSubmit { get; set; }
+    [Parameter] public List<string> InitialErrors { get; set; }
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
+    EditForm elementReference { get; set; }
     // More code in code behind
 }
 
@@ -21,7 +23,7 @@
                     foreach (var error in errorPair.Errors)
                     {
                         var linkPart = error.IndexOf("@@@");
-                        @if (linkPart >= 0)
+                        @if (linkPart >= 0 && errorPair.FormGroup != null)
                         {
                             <li>
                                 @if (linkPart > 0)
@@ -46,7 +48,7 @@
         </UsaAlertBox>
     }
     
-    <EditForm EditContext="editContext" class="@FormClass" OnSubmit="SubmitForm" @attributes="AdditionalAttributes" novalidate>
+    <EditForm id="@Id" EditContext="editContext" class="@FormClass" @attributes="AdditionalAttributes" novalidate>
         <DataAnnotationsValidator />  
         <fieldset class="@FieldsetClass">
             @ChildContent

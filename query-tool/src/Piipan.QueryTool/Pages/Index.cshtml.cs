@@ -29,7 +29,7 @@ namespace Piipan.QueryTool.Pages
         }
 
         [BindProperty]
-        public PiiRecord Query { get; set; }
+        public PiiRecord Query { get; set; } = new PiiRecord();
         public OrchMatchResponse QueryResult { get; private set; }
         public String RequestError { get; private set; }
         public bool NoResults = false;

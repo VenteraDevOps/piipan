@@ -6,4 +6,7 @@
     @bind="CurrentValue" @onblur="BlurField"
     required="@FormGroup.Required" 
     id="@Id"
+    name="@Id.Replace("_", ".")"
+    aria-errormessage="@(FormGroup.Status == InputStatus.Error ? $"{Id}-message" : null)"
+    aria-invalid="@(FormGroup.Status == InputStatus.Error ? "true" : null)"
     @attributes="AdditionalAttributes" style="@(Width != null ? $"width: {Width}px;" : "")" />

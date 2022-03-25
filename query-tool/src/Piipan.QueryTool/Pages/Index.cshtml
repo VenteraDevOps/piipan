@@ -1,63 +1,13 @@
 ﻿@page
+@using Microsoft.AspNetCore.Antiforgery
 @model IndexModel
-
+@inject IAntiforgery antiforgery
 @{
     ViewData["Title"] = "NAC Participant Search";
 }
 <div class="grid-container">
-    <h1>Search for SNAP participants</h1>
-    @if (!string.IsNullOrEmpty(Model.RequestError))
-    {
-        <div class="usa-alert usa-alert--error usa-alert--slim">
-            <div class="usa-alert__body">
-                <p class="usa-alert__text">@Model.RequestError</p>
-            </div>
-        </div>
-    }
-    else if (Model.NoResults)
-    {
-        <div class="usa-alert usa-alert--info usa-alert--slim usa-alert--validation">
-            <div class="usa-alert__body">
-                <p class="usa-alert__text">Your search did not return any results.</p>
-            </div>
-        </div>
-    }
-
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="usa-alert usa-alert--error usa-alert--validation usa-alert--slim">
-            <div class="usa-alert__body">
-                <ul>
-                    @foreach (var modelState in ViewData.ModelState.Values)
-                    {
-                        @foreach (var error in modelState.Errors)
-                        {
-                            <li>@error.ErrorMessage</li>
-                        }
-                    }
-                </ul>
-            </div>
-        </div>
-    }
-    <form asp-page="Index" class="usa-form">
-        <fieldset class="usa-fieldset">
-            <legend class="usa-sr-only">participant information</legend>
-            <label class="usa-label" asp-for="Query.FirstName"></label>
-            <input class="usa-input" type="text" asp-for="Query.FirstName" />
-            <label class="usa-label" for="Query_MiddleName">@Html.DisplayNameFor(m => m.Query.MiddleName) <span class="text-gray-50">(optional)</span></label>
-            <input class="usa-input" type="text" asp-for="Query.MiddleName" />
-            <label class="usa-label" asp-for="Query.LastName"></label>
-            <input class="usa-input" type="text" asp-for="Query.LastName" />
-            <label class="usa-label" asp-for="Query.DateOfBirth"></label>
-            <input class="usa-input" type="date" asp-for="Query.DateOfBirth">
-            <label class="usa-label" for="Query_SocialSecurityNum">@Html.DisplayNameFor(m => m.Query.SocialSecurityNum) <span class="text-gray-50">(xxx-xx-xxxx)</span></label>
-            <input class="usa-input" type="text" asp-for="Query.SocialSecurityNum">
-            <label class="usa-label" asp-for="Query.ParticipantId">@Html.DisplayNameFor(m => m.Query.ParticipantId) <span class="text-gray-50">(optional)</span></label>
-            <input class="usa-input" type="text" asp-for="Query.ParticipantId" />
-            <label class="usa-label" for="Query_CaseId">@Html.DisplayNameFor(m => m.Query.CaseId) <span class="text-gray-50">(optional)</span></label>
-            <input class="usa-input" type="text" asp-for="Query.CaseId" />
-            <input class="usa-button" type="submit" value="Search" />
-        </fieldset>
-    </form>
-    <partial name="_ResultsTable" model="Model.QueryResult" />
+    <component type="typeof(QueryTool.Components.QueryForm)" render-mode="Server" param-Query="Model.Query" />
+    <component type="typeof(QueryTool.Components.QueryForm2)" render-mode="Server" param-Query="Model.Query" 
+        param-SearchResponse="Model.QueryResult" param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
+        param-ServerError="Model.RequestError" />
 </div>

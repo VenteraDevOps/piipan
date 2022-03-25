@@ -1,3 +1,7 @@
+const pa11yOptions = {
+    hideElements: '.cui, [aria-controls="nav-user"]'
+};
+
 describe('query tool match query', () => {
   beforeEach(() => {
     cy.visit('https://localhost:5001');
@@ -6,37 +10,39 @@ describe('query tool match query', () => {
   it('shows required field errors when form is submitted with no data', () => {
     cy.get('form').submit();
 
-    cy.contains('The First name field is required').should('be.visible');
-    cy.contains('The Last name field is required').should('be.visible');
-    cy.contains('The Date of birth field is required').should('be.visible');
-    cy.contains('The SSN field is required').should('be.visible');
+    cy.contains('Last Name is required').should('be.visible');
+    cy.contains('Date of Birth is required').should('be.visible');
+      cy.contains('Social Security Number is required').should('be.visible');
+      cy.pa11y(pa11yOptions);
   });
 
   it("shows formatting error for incorrect SSN", () => {
-    cy.get('input[name="Query.SocialSecurityNum"]').type("12345");
-    cy.get('form').submit();
+      cy.get('#Query_SocialSecurityNum').type("12345");
+      cy.pause().debug();
+      cy.get('form').submit();
 
-    cy.contains('SSN must have the form XXX-XX-XXXX').should('be.visible');
+      cy.contains('Social Security Number must have the form ###-##-####').should('be.visible');
+      cy.pa11y(pa11yOptions);
   });
 
-  it("shows proper error for too old dates of birth", () => {
-    cy.get('input[name="Query.DateOfBirth"]').type("1899-12-31");
-    cy.get('form').submit();
+  //it("shows proper error for too old dates of birth", () => {
+  //  cy.get('#Query_DateOfBirth').type("1899-12-31");
+  //  cy.get('form').submit();
 
-    cy.contains('Date of birth must be between 01-01-1900 and today\'s date').should('be.visible');
-  });
+  //  cy.contains('Date of birth must be between 01-01-1900 and today\'s date').should('be.visible');
+  //});
 
-  it("shows proper error for non-ascii characters in last name", () => {
-    cy.get('input[name="Query.LastName"]').type("garcía");
-    // Enter other valid form inputs to isolate expected error
-    cy.get('input[name="Query.FirstName"]').type("joe");
-    cy.get('input[name="Query.DateOfBirth"]').type("1997-01-01");
-    cy.get('input[name="Query.SocialSecurityNum"]').type("550-01-6981");
+  //it("shows proper error for non-ascii characters in last name", () => {
+  //  cy.get('input[name="Query.LastName"]').type("garcía");
+  //  // Enter other valid form inputs to isolate expected error
+  //  cy.get('input[name="Query.FirstName"]').type("joe");
+  //  cy.get('input[name="Query.DateOfBirth"]').type("1997-01-01");
+  //  cy.get('input[name="Query.SocialSecurityNum"]').type("550-01-6981");
 
-    cy.get('form').submit();
+  //  cy.get('form').submit();
 
-    cy.contains('Change í in garcía').should('be.visible');
-  });
+  //  cy.contains('Change í in garcía').should('be.visible');
+  //});
 
   // it("shows an empty state on successful submission without match", () => {
 

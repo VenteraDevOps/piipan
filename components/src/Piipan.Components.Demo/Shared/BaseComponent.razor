@@ -6,7 +6,8 @@
     {
         foreach (string file in Files)
         {
-            fileContents.Add(file, await httpClient.GetStringAsync("/" + file));
+            string renamedFile = file.Replace(".razor", ".txt").Replace(".cs", ".txt");
+            fileContents.Add(file, await httpClient.GetStringAsync("/" + renamedFile));
         }
     }
 }

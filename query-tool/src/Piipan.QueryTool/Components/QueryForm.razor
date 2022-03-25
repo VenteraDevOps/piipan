@@ -1,0 +1,82 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Newtonsoft.Json
+@using Piipan.Components.Forms
+@using Piipan.Components.Enums
+@using Piipan.Components
+@using System.Net.Http
+@using Piipan.Match.Api.Models
+@using Piipan.Components.Alerts
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory ClientFactory
+
+@code {
+    [Parameter] public PiiRecord Query { get; set; }
+
+    /// <summary>
+    /// The search response that is collected after the user hits "Search" and an API call is made
+    /// </summary>
+    private OrchMatchResponse searchResponse = null;
+    private bool NoResults => searchResponse != null &&
+        (searchResponse.Data.Results.Count == 0 || searchResponse.Data.Results[0].Matches.Count() == 0);
+
+    private bool searching = false;
+    private async Task SubmitForm(bool passedValidation)
+    {
+        if (passedValidation)
+        {
+            searching = true;
+            using var httpClient = ClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri(NavigationManager.BaseUri);
+            var post = await httpClient.PostAsJsonAsync("/api", Query);
+            if (post.IsSuccessStatusCode)
+            {
+                string searchResponseString = await post.Content.ReadAsStringAsync();
+                searchResponse = JsonConvert.DeserializeObject<OrchMatchResponse>(searchResponseString);
+                
+            }
+            searching = false;
+            StateHasChanged();
+        }
+        else
+        {
+            searchResponse = null;
+        }
+    }
+}
+
+<h1>Search for SNAP participants</h1>
+<p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
+@if (Query != null)
+{
+    <UsaForm Model="Query" OnSubmit="SubmitForm">
+        @if (NoResults)
+        {
+            <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Info">
+                <p>This participant does not have a matching record in any other states.</p>
+            </UsaAlertBox>
+        }
+        <legend class="usa-sr-only">participant information</legend>
+        <UsaFormGroup>
+            <UsaInputText @bind-Value="Query.LastName" />
+        </UsaFormGroup>
+        <UsaFormGroup>
+            <UsaInputDate @bind-Value="Query.DateOfBirth" />
+        </UsaFormGroup>
+        <UsaFormGroup>
+            <HintContent>###-##-####</HintContent>
+            <ChildContent>
+                <UsaInputSSN @bind-Value="Query.SocialSecurityNum" Width="108" />
+            </ChildContent>
+        </UsaFormGroup>
+        <UsaFormGroup>
+            <UsaInputText @bind-Value="Query.ParticipantId" Width="118" />
+        </UsaFormGroup>
+        <UsaFormGroup>
+            <UsaInputText @bind-Value="Query.CaseId" Width="143" />
+        </UsaFormGroup>
+        <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@searching">@(searching ? "Searching..." : "Search")</button>
+    </UsaForm>
+}
+@if (searchResponse?.Data?.Results?.Count > 0 && searchResponse.Data.Results[0].Matches?.Count() > 0) {
+    <QueryResults QueryResult="searchResponse" />
+}

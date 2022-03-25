@@ -10,8 +10,6 @@ namespace Piipan.Components.Forms
 {
     public partial class UsaFormGroup : IDisposable
     {
-        // prefix with a letter so it's a valid ID
-        public string GroupId { get; set; } = "g" + Guid.NewGuid().ToString();
         public bool Required { get; set; }
         public string Label { get; set; }
         public FieldIdentifier FieldIdentifier { get; set; }
@@ -51,6 +49,16 @@ namespace Piipan.Components.Forms
         protected override void OnInitialized()
         {
             Form.FormGroups.Add(this);
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            base.OnAfterRender(firstRender);
+            if (firstRender)
+            {
+                // We need to re-check the state since the GroupId was likely set by a form input
+                StateHasChanged();
+            }
         }
 
         /// <summary>

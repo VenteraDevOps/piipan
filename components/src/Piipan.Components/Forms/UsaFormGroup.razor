@@ -10,7 +10,7 @@
 }
 
 <CascadingValue Value="this">
-    <div id="@(GroupId)" class="@InputFormGroupClass @(HasErrors ? InputFormGroupErrorClass : "")">
+    <div class="@InputFormGroupClass @(HasErrors ? InputFormGroupErrorClass : "")">
         <UsaLabel Status="Status">
             @if (LabelOverride != null)
             {
@@ -27,7 +27,7 @@
         }
         @if (HasErrors)
         {
-            <span class="@InputErrorMessageClass" id="@(GroupId)-message">@ValidationMessages.First().Replace("@@@", Label)</span>
+            <span class="@InputErrorMessageClass" id="@(InputElementId)-message">@ValidationMessages.First().Replace("@@@", Label)</span>
         }
         @ChildContent
     </div>

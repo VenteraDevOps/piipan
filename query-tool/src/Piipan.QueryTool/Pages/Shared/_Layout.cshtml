@@ -80,7 +80,10 @@
             <partial name="_CUI" />
         </div>
     </div>
+    @Html.AntiForgeryToken()
     <script src="~/js/uswds.min.js" asp-append-version="true"></script>
+    <script src="_framework/blazor.server.js" asp-append-version="true"></script>
+    <script src="/js/utilities.js" asp-append-version="true"></script>
 </body>
 
 </html>

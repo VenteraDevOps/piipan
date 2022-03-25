@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace Piipan.Components.Helpers
 {
@@ -9,6 +10,32 @@ namespace Piipan.Components.Helpers
     /// </summary>
     public static class ExpressionHelpers
     {
+        /// <summary>
+        /// Gets an attribute from the property, if it exists
+        /// </summary>
+        /// <typeparam name="T">The underlying property type</typeparam>
+        /// <typeparam name="A">The attribute we are searching for</typeparam>
+        /// <param name="expression">An expression for the underlying property</param>
+        /// <returns>The attribute we are checking for</returns>
+        /// <exception cref="InvalidOperationException">Thrown if Expression is not a member expression</exception>
+        public static string GetExpressionName<T>(this Expression<Func<T>> expression)
+        {
+            var memberExpression = expression.Body as MemberExpression;
+            if (memberExpression == null)
+                throw new InvalidOperationException("Expression must be a member expression");
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(memberExpression.Member.Name);
+            var currentMemberExpression = memberExpression.Expression as MemberExpression;
+            while (currentMemberExpression != null)
+            {
+                sb.Insert(0, currentMemberExpression.Member.Name + "_");
+                currentMemberExpression = currentMemberExpression.Expression as MemberExpression;
+            }
+
+            return sb.ToString();
+        }
+
         /// <summary>
         /// Gets an attribute from the property, if it exists
         /// </summary>

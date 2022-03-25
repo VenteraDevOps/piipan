@@ -1,14 +1,4 @@
-﻿function getCursorPosition(element) {
-    return element.selectionStart;
-}
-function piipan_SetCursorPosition(element, position) {
-    return element.setSelectionRange(position, position);
-}
-function piipan_SetValue(element, value) {
-    element.value = value;
-}
-
-(function piipanUtilities() {
+﻿(function piipanUtilities() {
     if (!window.piipan) {
         window.piipan = {};
     }
@@ -29,5 +19,13 @@ function piipan_SetValue(element, value) {
     }
     window.piipan.utilities.doesElementHaveInvalidInput = (id) => {
         return document.getElementById(id)?.validity?.badInput || false;
+    }
+    window.piipan.utilities.validateForm = (form) => {
+        window.setTimeout(() => {
+            form.submit();
+        }, 2000)
+    }
+    window.piipan.utilities.registerFormValidation = (form) => {
+        form.addEventListener('submit', document.getElementById(form));
     }
 }());

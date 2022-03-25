@@ -1,0 +1,40 @@
+﻿@using Piipan.Match.Api.Models
+@using Piipan.QueryTool.Extensions;
+@code {
+    [Parameter] public OrchMatchResponse QueryResult { get; set; }
+}
+
+@if (QueryResult?.Data?.Results?.Count > 0)
+{
+    <section class="border-top-1px border-base-light margin-top-6">
+        <h2>SNAP Participants Search Results</h2>
+        <p>This participant was found in another state. Select the Match ID for more information.</p>
+        @foreach (var result in QueryResult.Data.Results)
+        {
+            @if (result.Matches.Any())
+            {
+                <table class="usa-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Match ID</th>
+                        <th scope="col">Matching State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in result.Matches)
+                        {
+                            <tr>
+                                <td><a href="/match/@record.MatchId">@record.MatchId</a></td>
+                                <td>@record.State</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            } else
+            {
+                <h3>No matches found</h3>
+            }
+        }
+    </section>
+}
+

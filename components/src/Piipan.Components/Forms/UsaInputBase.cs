@@ -26,7 +26,7 @@ namespace Piipan.Components.Forms
 
         protected ElementReference? ElementReference { get; set; }
 
-        protected string Id { get => $"{FormGroup?.GroupId}-input"; }
+        protected string Id { get; set; }
 
         /// <summary>
         /// When this input is created, update the form group's properties that are dependant on field
@@ -36,9 +36,10 @@ namespace Piipan.Components.Forms
             base.OnInitialized();
             FormGroup.PreverificationChecks = PreverificationChecks;
             FormGroup.FieldIdentifier = this.FieldIdentifier;
-            FormGroup.InputElementId = Id;
             FormGroup.Label = ValueExpression.GetAttribute<T, DisplayAttribute>()?.Name ?? ValueExpression.Name;
             FormGroup.Required = ValueExpression.HasAttribute<T, RequiredAttribute>();
+            Id = ValueExpression.GetExpressionName();
+            FormGroup.InputElementId = Id;
         }
 
         /// <summary>

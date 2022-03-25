@@ -1,6 +1,6 @@
 # 28. Create a Blazor Component Library for UI Use
 
-Date: 2022-03-15
+Date: 2022-03-16
 
 ## Status
 
@@ -28,4 +28,4 @@ We will develop a Blazor Component Library for use with the web applications in 
 * Unclear how incorporating a component library would work with server-side rendering when navigating to different pages in the app. We may want to switch to Web Assembly as a whole in the future.
 
 ## References
-* [_Component Library code](https://github.com/18F/piipan/components)
+* [Component Library code](https://github.com/18F/piipan/components)
