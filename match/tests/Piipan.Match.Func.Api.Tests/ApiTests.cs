@@ -20,6 +20,7 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Match.Func.Api.Models;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests
@@ -32,10 +33,10 @@ namespace Piipan.Match.Func.Api.Tests
             {
                 CaseId = "CaseIdExample",
                 ParticipantClosingDate = new DateTime(1970, 1, 31),
-                RecentBenefitMonths = new List<DateTime>() {
-                  new DateTime(2021, 5, 31),
-                  new DateTime(2021, 4, 30),
-                  new DateTime(2021, 3, 31)
+                RecentBenefitIssuanceDates = new List<DateRange>() {
+                  new DateRange(new DateTime(2021, 5, 31) , new DateTime(2021,6,15)),
+                  new DateRange(new DateTime(2021, 4, 30) , new DateTime(2021,5,1)),
+                  new DateRange(new DateTime(2021, 3, 31) , new DateTime(2021,5,15))
                 },
                 ProtectLocation = true
             };

@@ -2188,7 +2188,10 @@
         }
       },
       "piipan.participants.api": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Piipan.Shared": "1.0.0"
+        }
       },
       "piipan.participants.core": {
         "type": "Project",

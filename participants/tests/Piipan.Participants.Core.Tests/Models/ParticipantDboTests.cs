@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Piipan.Participants.Core.Models;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Models
@@ -17,7 +18,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -36,7 +37,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -59,7 +60,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -69,7 +70,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };
@@ -90,7 +91,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -100,7 +101,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId + "2",
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };
@@ -121,7 +122,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -131,7 +132,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId + "2",
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };
@@ -152,7 +153,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -162,7 +163,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate + TimeSpan.FromDays(1),
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };
@@ -183,7 +184,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -193,7 +194,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = new List<DateTime> { DateTime.UtcNow },
+                RecentBenefitIssuanceDates = new List<DateRange> {new DateRange( DateTime.UtcNow, DateTime.UtcNow )},
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };
@@ -214,7 +215,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -224,7 +225,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = !lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };
@@ -245,7 +246,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -255,7 +256,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId + 1
             };
@@ -276,7 +277,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = "c",
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
-                RecentBenefitMonths = new List<DateTime>(),
+                RecentBenefitIssuanceDates = new List<DateRange>(),
                 ProtectLocation = false,
                 UploadId = 1
             };
@@ -286,7 +287,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 CaseId = lhs.CaseId,
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
-                RecentBenefitMonths = lhs.RecentBenefitMonths,
+                RecentBenefitIssuanceDates = lhs.RecentBenefitIssuanceDates,
                 ProtectLocation = lhs.ProtectLocation,
                 UploadId = lhs.UploadId
             };

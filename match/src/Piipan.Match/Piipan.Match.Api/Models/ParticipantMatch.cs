@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Piipan.Match.Api.Serializers;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Utilities;
 
 namespace Piipan.Match.Api.Models
 {
@@ -28,9 +29,9 @@ namespace Piipan.Match.Api.Models
         [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
         public DateTime? ParticipantClosingDate { get; set; }
 
-        [JsonProperty("recent_benefit_months")]
-        [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
-        public IEnumerable<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
+        [JsonProperty("recent_benefit_issuance_dates")]
+        [JsonConverter(typeof(JsonConverters.DateRangeConverter))]
+        public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; } = new List<DateRange>();
 
         [JsonProperty("protect_location")]
         public bool? ProtectLocation { get; set; }
@@ -44,7 +45,7 @@ namespace Piipan.Match.Api.Models
             CaseId = p.CaseId;
             ParticipantId = p.ParticipantId;
             ParticipantClosingDate = p.ParticipantClosingDate;
-            RecentBenefitMonths = p.RecentBenefitMonths;
+            RecentBenefitIssuanceDates = p.RecentBenefitIssuanceDates;
             ProtectLocation = p.ProtectLocation;
         }
 

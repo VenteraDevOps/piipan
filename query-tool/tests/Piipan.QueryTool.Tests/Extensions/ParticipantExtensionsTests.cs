@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Moq;
 using Piipan.Participants.Api.Models;
 using Piipan.QueryTool.Extensions;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 #nullable enable
@@ -44,59 +45,59 @@ namespace Piipan.QueryTool.Tests.Extensions
         }
 
         [Fact]
-        public void RecentBenefitMonthsDisplay_Empty()
+        public void RecentBenefitIssuanceDatesDisplay_Empty()
         {
             // Arrange
             var participant = new Mock<IParticipant>();
             participant
-                .Setup(m => m.RecentBenefitMonths)
-                .Returns(new List<DateTime>());
+                .Setup(m => m.RecentBenefitIssuanceDates)
+                .Returns(new List<DateRange>());
 
             // Act
-            var result = participant.Object.RecentBenefitMonthsDisplay();
+            var result = participant.Object.RecentBenefitIssuanceDatesDisplay();
 
             // Assert
             Assert.Equal("", result);
         }
 
         [Fact]
-        public void RecentBenefitMonthsDisplay_Single()
+        public void RecentBenefitIssuanceDatesDisplay_Single()
         {
             // Arrange
             var participant = new Mock<IParticipant>();
             participant
-                .Setup(m => m.RecentBenefitMonths)
-                .Returns(new List<DateTime>
+                .Setup(m => m.RecentBenefitIssuanceDates)
+                .Returns(new List<DateRange>
                 {
-                    new DateTime(2021, 5, 1)
+                    new DateRange(new DateTime(2021, 4, 1),new DateTime(2021, 5, 1))
                 });
 
             // Act
-            var result = participant.Object.RecentBenefitMonthsDisplay();
+            var result = participant.Object.RecentBenefitIssuanceDatesDisplay();
 
             // Assert
-            Assert.Equal("2021-05", result);
+            Assert.Equal("2021-04-01/2021-05-01", result);
         }
 
         [Fact]
-        public void RecentBenefitMonthsDisplay_Multiple()
+        public void RecentBenefitIssuanceDatesDisplay_Multiple()
         {
             // Arrange
             var participant = new Mock<IParticipant>();
             participant
-                .Setup(m => m.RecentBenefitMonths)
-                .Returns(new List<DateTime>
+                .Setup(m => m.RecentBenefitIssuanceDates)
+                .Returns(new List<DateRange>
                 {
-                    new DateTime(2021, 5, 1),
-                    new DateTime(2021, 4, 30),
-                    new DateTime(2021, 3, 31)
+                    new DateRange(new DateTime(2021, 4, 1),new DateTime(2021, 5, 1)),
+                    new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
+                    new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                 });
 
             // Act
-            var result = participant.Object.RecentBenefitMonthsDisplay();
+            var result = participant.Object.RecentBenefitIssuanceDatesDisplay();
 
             // Assert
-            Assert.Equal("2021-05, 2021-04, 2021-03", result);
+            Assert.Equal("2021-04-01/2021-05-01, 2021-06-01/2021-07-01, 2021-02-28/2021-03-15", result);
         }
 
         [Theory]
