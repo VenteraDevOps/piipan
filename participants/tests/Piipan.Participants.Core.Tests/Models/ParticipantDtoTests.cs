@@ -18,7 +18,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
 
             // Act / Assert
@@ -36,7 +36,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new
             {
@@ -58,7 +58,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -67,7 +67,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
-                ProtectLocation = lhs.ProtectLocation
+                VulnerableIndividual = lhs.VulnerableIndividual
             };
             
 
@@ -87,7 +87,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -96,7 +96,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
-                ProtectLocation = lhs.ProtectLocation
+                VulnerableIndividual = lhs.VulnerableIndividual
             };
             
 
@@ -116,7 +116,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -125,7 +125,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId + "2",
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
-                ProtectLocation = lhs.ProtectLocation
+                VulnerableIndividual = lhs.VulnerableIndividual
             };
             
 
@@ -145,7 +145,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -154,7 +154,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate + TimeSpan.FromDays(1),
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
-                ProtectLocation = lhs.ProtectLocation
+                VulnerableIndividual = lhs.VulnerableIndividual
             };
             
 
@@ -174,7 +174,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -183,7 +183,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = new List<DateTime> { DateTime.UtcNow },
-                ProtectLocation = lhs.ProtectLocation
+                VulnerableIndividual = lhs.VulnerableIndividual
             };
             
 
@@ -193,7 +193,7 @@ namespace Piipan.Participants.Core.Tests.Models
         }
 
         [Fact]
-        public void Equals_ProtectLocationMismatch()
+        public void Equals_VulnerableIndividualMismatch()
         {
             // Arrange
             var lhs = new ParticipantDto
@@ -203,7 +203,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -212,7 +212,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
-                ProtectLocation = !lhs.ProtectLocation
+                VulnerableIndividual = !lhs.VulnerableIndividual
             };
             
 
@@ -232,7 +232,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = "p",
                 ParticipantClosingDate = DateTime.UtcNow.Date,
                 RecentBenefitMonths = new List<DateTime>(),
-                ProtectLocation = false
+                VulnerableIndividual = false
             };
             var rhs = new ParticipantDto
             {
@@ -241,7 +241,7 @@ namespace Piipan.Participants.Core.Tests.Models
                 ParticipantId = lhs.ParticipantId,
                 ParticipantClosingDate = lhs.ParticipantClosingDate,
                 RecentBenefitMonths = lhs.RecentBenefitMonths,
-                ProtectLocation = lhs.ProtectLocation
+                VulnerableIndividual = lhs.VulnerableIndividual
             };
             
 

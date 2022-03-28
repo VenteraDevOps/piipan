@@ -26,7 +26,7 @@ namespace Piipan.Participants.Core.Tests.Services
                     ParticipantId = Guid.NewGuid().ToString(),
                     ParticipantClosingDate = DateTime.UtcNow.Date,
                     RecentBenefitMonths = new List<DateTime>(),
-                    ProtectLocation = (new Random()).Next(2) == 0,
+                    VulnerableIndividual = (new Random()).Next(2) == 0,
                     UploadId = (new Random()).Next()
                 });
             }

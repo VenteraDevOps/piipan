@@ -135,8 +135,8 @@ namespace Piipan.Match.Core.Tests.Builders
             Assert.Equal("final disposition for eb", ebObj.FinalDisposition);
 
             // protect location
-            Assert.Null(eaObj.ProtectLocation);
-            Assert.Null(ebObj.ProtectLocation);
+            Assert.Null(eaObj.VulnerableIndividual);
+            Assert.Null(ebObj.VulnerableIndividual);
         }
     }
 }

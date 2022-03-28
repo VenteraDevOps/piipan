@@ -78,7 +78,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 })
                 .TypeConverter<ToMonthEndArrayConverter>().Optional();
 
-            Map(m => m.ProtectLocation).Name("protect_location")
+            Map(m => m.VulnerableIndividual).Name("vulnerable_individual")
                 .TypeConverterOption.NullValues(string.Empty).Optional();
 
         }

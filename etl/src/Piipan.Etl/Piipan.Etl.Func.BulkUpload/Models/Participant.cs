@@ -18,6 +18,6 @@ namespace Piipan.Etl.Func.BulkUpload.Models
         // Values should mimic what is set in the Bulk Upload import schema
         [BooleanTrueValues("true")]
         [BooleanFalseValues("false")]
-        public bool? ProtectLocation { get; set; }
+        public bool? VulnerableIndividual { get; set; }
     }
 }

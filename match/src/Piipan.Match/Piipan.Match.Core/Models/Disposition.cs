@@ -16,8 +16,8 @@ namespace Piipan.Match.Core.Models
         public bool InvalidMatch { get; set; } = false;
         [JsonProperty("final_disposition")]
         public string FinalDisposition { get; set; }
-        [JsonProperty("protect_location")]
-        public bool? ProtectLocation { get; set; }
+        [JsonProperty("vulnerable_individual")]
+        public bool? VulnerableIndividual { get; set; }
         public string State { get; set; }
     }
 }

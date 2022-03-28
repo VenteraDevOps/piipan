@@ -119,7 +119,7 @@ namespace Piipan.QueryTool.Tests
                                             new DateTime(2021, 03, 31),
                                             new DateTime(2021, 02, 28)
                                         },
-                                        ProtectLocation = false
+                                        VulnerableIndividual = false
                                     }
                                 }
                             }

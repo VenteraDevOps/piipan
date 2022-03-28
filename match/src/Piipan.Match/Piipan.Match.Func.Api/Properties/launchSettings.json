@@ -1,0 +1,12 @@
+﻿{
+  "profiles": {
+    "Piipan.Match.Func.Api": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "CollaborationDatabaseConnectionString": "Server=cjc-psql-core-cjc.postgres.database.azure.com;Database=collaboration;Port=5432;User Id=piipanadmin@cjc-psql-core-cjc;Password=WF5CISoGQUQmiHVUom6oyJZZW0WVMDx2pMIlnBydN807t8AiCQyI4qqeTsqFvxipaA1!;",
+        "DatabaseConnectionString": "Server=cjc-psql-participants-cjc.postgres.database.azure.com;Database=ea;Port=5432;User Id=postgres@cjc-psql-participants-cjc;Password=gCT281H9aKxiKpFxP7nG4FobZV201YVPCRSw5dLRnbbhKq3FCaKBd6p5cGreW1kfaA1!;SearchPath=piipan;",
+        "States": "ea"
+      }
+    }
+  }
+}

@@ -159,8 +159,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 parameters.Add("UploadId", lastval);
 
                 conn.Execute(@"
-                    INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, participant_closing_date, recent_benefit_months, protect_location)
-                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @ParticipantClosingDate, @RecentBenefitMonths::date[], @ProtectLocation)",
+                    INSERT INTO participants(lds_hash, upload_id, case_id, participant_id, participant_closing_date, recent_benefit_months, vulnerable_individual)
+                    VALUES (@LdsHash, @UploadId, @CaseId, @ParticipantId, @ParticipantClosingDate, @RecentBenefitMonths::date[], @VulnerableIndividual)",
                     parameters);
 
                 conn.Close();
@@ -196,7 +196,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                         case_id CaseId,
                         participant_closing_date ParticipantClosingDate,
                         recent_benefit_months RecentBenefitMonths,
-                        protect_location ProtectLocation,
+                        vulnerable_individual VulnerableIndividual,
                         upload_id UploadId
                     FROM participants
                     WHERE lds_hash=@LdsHash", participant).FirstOrDefault();

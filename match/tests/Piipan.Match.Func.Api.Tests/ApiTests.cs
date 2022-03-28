@@ -37,7 +37,7 @@ namespace Piipan.Match.Func.Api.Tests
                   new DateTime(2021, 4, 30),
                   new DateTime(2021, 3, 31)
                 },
-                ProtectLocation = true
+                VulnerableIndividual = true
             };
         }
 

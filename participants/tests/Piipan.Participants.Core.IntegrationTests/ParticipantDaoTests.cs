@@ -66,7 +66,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                         ParticipantId = p.ParticipantId,
                         ParticipantClosingDate = p.ParticipantClosingDate,
                         RecentBenefitMonths = p.RecentBenefitMonths,
-                        ProtectLocation = p.ProtectLocation,
+                        VulnerableIndividual = p.VulnerableIndividual,
                         UploadId = randoms.First().UploadId
                     };
                 });

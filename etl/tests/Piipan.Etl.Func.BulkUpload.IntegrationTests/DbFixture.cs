@@ -146,7 +146,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                             ParticipantId = reader[4].ToString(),
                             ParticipantClosingDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
                             RecentBenefitMonths = reader[6] is DBNull ? new List<DateTime>() : new List<DateTime>((DateTime[])reader[6]),
-                            ProtectLocation = reader[7] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[7])
+                            VulnerableIndividual = reader[7] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[7])
                         };
                         records.Add(record);
                     }

@@ -10,7 +10,7 @@ namespace Piipan.Match.Api.Tests.Models
         public void ParticipantRecordJson()
         {
             // Arrange
-            var json = @"{participant_id: 'baz', case_id: 'foo', participant_closing_date: '2020-01-12', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], protect_location: true}";
+            var json = @"{participant_id: 'baz', case_id: 'foo', participant_closing_date: '2020-01-12', recent_benefit_months: ['2019-12', '2019-11', '2019-10'], vulnerable_individual: true}";
             var record = JsonConvert.DeserializeObject<ParticipantMatch>(json);
 
             string jsonRecord = record.ToJson();
@@ -23,7 +23,7 @@ namespace Piipan.Match.Api.Tests.Models
             Assert.Contains("\"2019-12\",", jsonRecord);
             Assert.Contains("\"2019-11\",", jsonRecord);
             Assert.Contains("\"2019-10\"", jsonRecord);
-            Assert.Contains("\"protect_location\": true", jsonRecord);
+            Assert.Contains("\"vulnerable_individual\": true", jsonRecord);
         }
     }
 }

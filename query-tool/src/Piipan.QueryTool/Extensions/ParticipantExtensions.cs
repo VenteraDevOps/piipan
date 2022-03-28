@@ -16,13 +16,13 @@ namespace Piipan.QueryTool.Extensions
             return String.Join(", ", participant.RecentBenefitMonths.Select(dt => dt.ToString("yyyy-MM")));
         }
 
-        public static string ProtectLocationDisplay(this IParticipant participant)
+        public static string VulnerableIndividualDisplay(this IParticipant participant)
         {
-            if (participant.ProtectLocation == null)
+            if (participant.VulnerableIndividual == null)
             {
                 return "Yes";
             }
-            return participant.ProtectLocation.Value ? "Yes" : "No";
+            return participant.VulnerableIndividual.Value ? "Yes" : "No";
         }
     }
 }

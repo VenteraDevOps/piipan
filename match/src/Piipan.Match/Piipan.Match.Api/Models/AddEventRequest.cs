@@ -40,8 +40,8 @@ namespace Piipan.Match.Api.Models
             NullValueHandling = NullValueHandling.Ignore)]
         public bool? InvalidMatch { get; set; } = null;
 
-        [JsonProperty("protect_location",
+        [JsonProperty("vulnerable_individual",
             NullValueHandling = NullValueHandling.Ignore)]
-        public bool? ProtectLocation { get; set; } = null;
+        public bool? VulnerableIndividual { get; set; } = null;
     }
 }

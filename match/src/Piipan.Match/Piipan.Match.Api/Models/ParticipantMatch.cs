@@ -32,8 +32,8 @@ namespace Piipan.Match.Api.Models
         [JsonConverter(typeof(JsonConverters.MonthEndArrayConverter))]
         public IEnumerable<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
 
-        [JsonProperty("protect_location")]
-        public bool? ProtectLocation { get; set; }
+        [JsonProperty("vulnerable_individual")]
+        public bool? VulnerableIndividual { get; set; }
 
         public ParticipantMatch() { }
 
@@ -45,7 +45,7 @@ namespace Piipan.Match.Api.Models
             ParticipantId = p.ParticipantId;
             ParticipantClosingDate = p.ParticipantClosingDate;
             RecentBenefitMonths = p.RecentBenefitMonths;
-            ProtectLocation = p.ProtectLocation;
+            VulnerableIndividual = p.VulnerableIndividual;
         }
 
         public string ToJson()

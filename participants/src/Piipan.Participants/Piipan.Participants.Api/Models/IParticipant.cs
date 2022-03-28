@@ -11,6 +11,6 @@ namespace Piipan.Participants.Api.Models
         string ParticipantId { get; set; }
         DateTime? ParticipantClosingDate { get; set; }
         IEnumerable<DateTime> RecentBenefitMonths { get; set; }
-        bool? ProtectLocation { get; set; }
+        bool? VulnerableIndividual { get; set; }
     }
 }
