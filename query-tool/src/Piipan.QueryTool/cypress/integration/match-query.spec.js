@@ -11,12 +11,14 @@ const pa11yOptions = {
 describe('query tool match query', () => {
   beforeEach(() => {
       cy.visit('/');
+      cy.get('#query-form-search-btn', { timeout: 10000 }).should('be.visible');
   })
 
-  it('shows required field errors when form is submitted with no data', () => {
+    it('shows required field errors when form is submitted with no data', () => {
+        cy.screenshot();
       cy.get('#query-form-search-btn').click();
 
-      cy.contains('Last Name is required').should('be.visible');
+      cy.get('#Query_LastName-message').contains('Last Name is required').should('be.visible');
       cy.contains('Date of Birth is required').should('be.visible');
       cy.contains('Social Security Number is required').should('be.visible');
 
