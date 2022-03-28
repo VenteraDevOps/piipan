@@ -1,6 +1,6 @@
 ### E2E Tests
 ### Cypress, OWASP ZAP, and Pa11y
-name: Frontend
+name: Dan
 
 on:
   workflow_dispatch:
@@ -75,11 +75,6 @@ jobs:
         with:
           allow_issue_writing: false
           target: 'https://localhost:5001'
-
-      ### Pa11y
-      - name: Run Pa11y
-        working-directory: ${{ env.SUBSYSTEM_LOWER }}/src/Piipan.${{ env.SUBSYSTEM_PACKAGE }}
-        run: pa11y-ci
 
       ### Cypress
       - name: Run Cypress
