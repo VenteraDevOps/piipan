@@ -39,7 +39,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                         case_id CaseId,
                         participant_closing_date ParticipantClosingDate,
                         recent_benefit_issuance_dates RecentBenefitIssuanceDates,
-                        protect_location ProtectLocation,
+                        vulnerable_individual VulnerableIndividual,
                         upload_id UploadId
                     FROM participants
                     WHERE lds_hash=@ldsHash
@@ -64,7 +64,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     participant_id,
                     participant_closing_date,
                     recent_benefit_issuance_dates,
-                    protect_location
+                    vulnerable_individual
                 )
                 VALUES
                 (
@@ -74,7 +74,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     @ParticipantId,
                     @ParticipantClosingDate,
                     @RecentBenefitIssuanceDates::daterange[],
-                    @ProtectLocation
+                    @VulnerableIndividual
                 )
             ";
 

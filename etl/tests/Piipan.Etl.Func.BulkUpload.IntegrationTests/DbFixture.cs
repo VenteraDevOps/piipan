@@ -150,7 +150,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                             ParticipantId = reader[4].ToString(),
                             ParticipantClosingDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
                             RecentBenefitIssuanceDates = reader[reader.GetOrdinal("recent_benefit_issuance_dates")] is DBNull ? new List<DateRange>() : ((NpgsqlRange<DateTime>[])reader[reader.GetOrdinal("recent_benefit_issuance_dates")]).Select(user => new DateRange() { Start = user.LowerBound, End = user.UpperBound }).ToList(),
-                            ProtectLocation = reader[reader.GetOrdinal("protect_location")] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[reader.GetOrdinal("protect_location")])
+                            VulnerableIndividual = reader[reader.GetOrdinal("vulnerable_individual")] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[reader.GetOrdinal("vulnerable_individual")])
                         };
                         records.Add(record);
                     }
