@@ -1,12 +1,15 @@
 ﻿@page
 @using Microsoft.AspNetCore.Antiforgery
+@using Piipan.QueryTool.Extensions
 @model IndexModel
 @inject IAntiforgery antiforgery
 @{
     ViewData["Title"] = "NAC Participant Search";
 }
 <div class="grid-container">
-    <component type="typeof(QueryTool.Client.Components.QueryForm2)" render-mode="WebAssemblyPrerendered" 
-        param-SearchResponse="Model.QueryResult" param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
+    <component type="typeof(QueryTool.Client.Components.QueryForm2)" render-mode="WebAssembly"
+        param-Query="Model.Query"
+        param-SearchResponse="Model.QueryResult?.Data?.ToSharedOrchMatchResponseData()" 
+        param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
         param-ServerError="Model.RequestError" />
 </div>

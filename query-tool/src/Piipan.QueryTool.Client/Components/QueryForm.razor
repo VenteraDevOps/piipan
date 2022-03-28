@@ -1,12 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
-@using Newtonsoft.Json
 @using Piipan.Components.Forms
 @using Piipan.Components.Enums
 @using Piipan.Components
 @using System.Net.Http
-@using Piipan.Match.Api.Models
 @using Piipan.Components.Alerts
-@using Piipan.QueryTool.Shared
+@using Piipan.QueryTool.Client.Models
 @inject NavigationManager NavigationManager
 
 @code {
@@ -15,9 +13,9 @@
     /// <summary>
     /// The search response that is collected after the user hits "Search" and an API call is made
     /// </summary>
-    private OrchMatchResponse searchResponse = null;
+    private OrchMatchResponseData? searchResponse = null;
     private bool NoResults => searchResponse != null &&
-        (searchResponse.Data.Results.Count == 0 || searchResponse.Data.Results[0].Matches.Count() == 0);
+        (searchResponse.Results.Count == 0 || searchResponse.Results[0].Matches.Count() == 0);
 
     private bool searching = false;
     private async Task SubmitForm(bool passedValidation)
@@ -77,6 +75,6 @@
         <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@searching">@(searching ? "Searching..." : "Search")</button>
     </UsaForm>
 }
-@if (searchResponse?.Data?.Results?.Count > 0 && searchResponse.Data.Results[0].Matches?.Count() > 0) {
+@if (searchResponse?.Results?.Count > 0 && searchResponse.Results[0].Matches?.Count() > 0) {
     <QueryResults QueryResult="searchResponse" />
 }

@@ -1,9 +1,7 @@
 ﻿using Piipan.Components.Validation;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace Piipan.QueryTool.Shared
+namespace Piipan.QueryTool.Client.Models
 {
     /// <summary>
     /// Represents form input from user for a match query
@@ -21,6 +19,7 @@ namespace Piipan.QueryTool.Shared
         public DateTime? DateOfBirth { get; set; }
 
         [UsaRequired]
+        [UsaSSN]
         [Display(Name = "Social Security Number")]
         public string? SocialSecurityNum { get; set; }
 

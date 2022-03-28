@@ -1954,7 +1954,6 @@
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Match.Client": "1.0.0",
           "Piipan.QueryTool.Client": "1.0.0",
-          "Piipan.QueryTool.Shared": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "System.Text.Json": "6.0.2"
         }
@@ -1963,13 +1962,6 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.AspNetCore.Components.WebAssembly": "6.0.2",
-          "Piipan.Match.Api": "1.0.0",
-          "Piipan.QueryTool.Shared": "1.0.0"
-        }
-      },
-      "piipan.querytool.shared": {
-        "type": "Project",
-        "dependencies": {
           "Piipan.Components": "1.0.0"
         }
       },

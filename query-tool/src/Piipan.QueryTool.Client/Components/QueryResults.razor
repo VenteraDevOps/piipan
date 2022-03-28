@@ -1,14 +1,14 @@
-﻿@using Piipan.Match.Api.Models
+﻿@using Piipan.QueryTool.Client.Models
 @code {
-    [Parameter] public OrchMatchResponse QueryResult { get; set; }
+    [Parameter] public OrchMatchResponseData? QueryResult { get; set; }
 }
 
-@if (QueryResult?.Data?.Results?.Count > 0)
+@if (QueryResult?.Results?.Count > 0)
 {
     <section class="border-top-1px border-base-light margin-top-6">
         <h2>SNAP Participants Search Results</h2>
         <p>This participant was found in another state. Select the Match ID for more information.</p>
-        @foreach (var result in QueryResult.Data.Results)
+        @foreach (var result in QueryResult.Results)
         {
             @if (result.Matches.Any())
             {

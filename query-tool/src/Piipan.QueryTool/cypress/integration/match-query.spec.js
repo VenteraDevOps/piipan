@@ -1,25 +1,31 @@
 const pa11yOptions = {
-    hideElements: '.cui, [aria-controls="nav-user"]'
+    actions: [
+        'wait for element #Query_SocialSecurityNum to be added'
+    ],
+    standard: 'WCAG2AA',
+    runners: [
+        'htmlcs'
+    ]
 };
 
 describe('query tool match query', () => {
   beforeEach(() => {
-      cy.visit('https://localhost:5001');
-      cy.wait(3000)
+      cy.visit('/');
   })
 
   it('shows required field errors when form is submitted with no data', () => {
-    cy.get('form').submit();
+      cy.get('#query-form-search-btn').click();
 
-    cy.contains('Last Name is required').should('be.visible');
-    cy.contains('Date of Birth is required').should('be.visible');
+      cy.contains('Last Name is required').should('be.visible');
+      cy.contains('Date of Birth is required').should('be.visible');
       cy.contains('Social Security Number is required').should('be.visible');
+
+      pa11yOptions.actions.push('click element #query-form-search-btn');
       cy.pa11y(pa11yOptions);
   });
 
   it("shows formatting error for incorrect SSN", () => {
       cy.get('#Query_SocialSecurityNum').type("12345");
-      cy.pause().debug();
       cy.get('form').submit();
 
       cy.contains('Social Security Number must have the form ###-##-####').should('be.visible');

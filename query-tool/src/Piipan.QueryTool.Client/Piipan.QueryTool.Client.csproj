@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -17,8 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj" />
-    <ProjectReference Include="..\Piipan.QueryTool.Shared\Piipan.QueryTool.Shared.csproj" />
+    <ProjectReference Include="..\..\..\components\src\Piipan.Components\Piipan.Components.csproj" />
   </ItemGroup>
 
 </Project>

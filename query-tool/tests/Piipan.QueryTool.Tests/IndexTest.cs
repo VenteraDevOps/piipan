@@ -8,7 +8,6 @@ using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Pages;
-using Piipan.QueryTool.Shared;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using Xunit;
@@ -129,7 +128,7 @@ namespace Piipan.QueryTool.Tests
                     }
                 });
 
-            var requestPii = new PiiRecord
+            var requestPii = new Client.Models.PiiRecord
             {
                 //FirstName = "Theodore",
                 LastName = "Farrington",
@@ -183,7 +182,7 @@ namespace Piipan.QueryTool.Tests
                     }
                 });
 
-            var requestPii = new PiiRecord
+            var requestPii = new Client.Models.PiiRecord
             {
                 //FirstName = "Theodore",
                 LastName = "Farrington",
@@ -216,7 +215,7 @@ namespace Piipan.QueryTool.Tests
         public async void MatchCapturesApiError()
         {
             // arrange
-            var requestPii = new PiiRecord
+            var requestPii = new Client.Models.PiiRecord
             {
                 //FirstName = "Theodore",
                 //MiddleName = "Carri",
@@ -256,7 +255,7 @@ namespace Piipan.QueryTool.Tests
         public async Task InvalidDateFormat(string exceptionMessage, string expectedErrorMessage)
         {
             // Arrange
-            var requestPii = new PiiRecord
+            var requestPii = new Client.Models.PiiRecord
             {
                 //FirstName = "Theodore",
                 //MiddleName = "Carri",

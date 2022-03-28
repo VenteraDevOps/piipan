@@ -1798,13 +1798,6 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.AspNetCore.Components.WebAssembly": "6.0.2",
-          "Piipan.Match.Api": "1.0.0",
-          "Piipan.QueryTool.Shared": "1.0.0"
-        }
-      },
-      "piipan.querytool.shared": {
-        "type": "Project",
-        "dependencies": {
           "Piipan.Components": "1.0.0"
         }
       },
