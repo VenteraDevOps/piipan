@@ -1,10 +1,10 @@
-# shellcheck disable=SC2034
+# shellcheck disable=SC2034 
 
 # Deployment environment for resource identifiers
 ENV=$(basename "${BASH_SOURCE%.*}")
 
 # Default location
-LOCATION=westus2
+LOCATION=eastus
 
 # Default resource group
 RESOURCE_GROUP=rg-core-$ENV
@@ -13,26 +13,26 @@ RESOURCE_GROUP=rg-core-$ENV
 MATCH_RESOURCE_GROUP=rg-match-$ENV
 
 # Prefix for resource identifiers
-PREFIX=tts
+PREFIX=vennac
 
 # Either AzureCloud or AzureUSGovernment
 CLOUD_NAME=AzureCloud
 
 # used to create API Management resources
-APIM_EMAIL=noreply@tts.test
+APIM_EMAIL=noreply@ventera.test
 
 # OIDC configuration - all apps
 IDP_OIDC_IP_RANGES=""
 
 # OIDC configuration - Dashboard app
-DASHBOARD_APP_IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
+DASHBOARD_APP_IDP_OIDC_CONFIG_URI="https://venteranac.b2clogin.com/venteranac.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_SI"
 DASHBOARD_APP_IDP_OIDC_SCOPES='("openid","email","profile")'
-DASHBOARD_APP_IDP_CLIENT_ID=e7e769ad-e9bc-4c5f-8c3e-ebaf6cf9cacb
+DASHBOARD_APP_IDP_CLIENT_ID=cdfcf55a-5ac5-4f7d-ba9d-46217a41f9aa
 
 # OIDC configuration - Query Tool app
-QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI="https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_si"
+QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI="https://venteranac.b2clogin.com/venteranac.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_SI"
 QUERY_TOOL_APP_IDP_OIDC_SCOPES='("openid","email","profile")'
-QUERY_TOOL_APP_IDP_CLIENT_ID=a8e3c164-77a9-45fd-9950-cc9862aa774a
+QUERY_TOOL_APP_IDP_CLIENT_ID=9c2d426c-0748-42fd-a902-07b261759020
 
 # SIEM tool app registration name
 SIEM_RECEIVER=$PREFIX-siem-tool-$ENV

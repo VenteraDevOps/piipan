@@ -15,7 +15,7 @@ QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
 
 # Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
+# CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
 
 # The default Azure subscription
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
