@@ -34,6 +34,36 @@ namespace Piipan.Match.Core.Tests.Builders
             Assert.True(record.HashType == "ldshash");
         }
 
+
+        [Fact]
+        public void SetMatch_SetsJsonfields()
+        {
+            // Arrange
+            var builder = new ActiveMatchRecordBuilder();
+            var input = new RequestPerson
+            {
+                LdsHash = "foo",
+                CaseId = "ABC",
+                ParticipantId = "DEF"
+            };
+            var match = new ParticipantMatch
+            {
+                LdsHash = "foo",
+                CaseId = "XYZ",
+                ParticipantId = "TUV"
+            };
+
+            // Act
+            var record = builder
+                .SetMatch(input, match)
+                .GetRecord();
+
+            // Assert
+            Assert.Equal("{\"lds_hash\":\"foo\",\"participant_id\":\"DEF\",\"case_id\":\"ABC\"}", record.Input);
+            Assert.Equal("{\"match_id\":null,\"lds_hash\":\"foo\",\"state\":null,\"case_id\":\"XYZ\",\"participant_id\":\"TUV\",\"participant_closing_date\":null,\"recent_benefit_months\":[],\"protect_location\":null}", record.Data);
+
+        }
+
         [Fact]
         public void SetStates_SetsInitiatingState()
         {
