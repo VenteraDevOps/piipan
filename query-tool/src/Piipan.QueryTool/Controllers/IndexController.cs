@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.QueryTool.Shared;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 

@@ -6,7 +6,7 @@
     ViewData["Title"] = "NAC Participant Search";
 }
 <div class="grid-container">
-    <component type="typeof(QueryTool.Components.QueryForm2)" render-mode="Server" param-Query="Model.Query" 
+    <component type="typeof(QueryTool.Client.Components.QueryForm2)" render-mode="WebAssemblyPrerendered" 
         param-SearchResponse="Model.QueryResult" param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
         param-ServerError="Model.RequestError" />
 </div>

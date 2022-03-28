@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Antiforgery
-@using Microsoft.AspNetCore.Components.Forms
+﻿@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Http
 @using Newtonsoft.Json
 @using Piipan.Components.Forms
@@ -8,12 +7,11 @@
 @using System.Net.Http
 @using Piipan.Match.Api.Models
 @using Piipan.Components.Alerts
-@using Piipan.QueryTool.Pages
+@using Piipan.QueryTool.Shared
 @inject NavigationManager NavigationManager
-@inject IHttpClientFactory ClientFactory
 
 @code {
-    [Parameter] public PiiRecord Query { get; set; }
+    [Parameter] public PiiRecord Query { get; set; } = new();
 
     /// <summary>
     /// The search response that is collected after the user hits "Search" and an API call is made

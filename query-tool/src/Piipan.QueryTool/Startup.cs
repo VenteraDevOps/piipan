@@ -52,7 +52,6 @@ namespace Piipan.QueryTool
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
 
-            services.AddServerSideBlazor();
             services.AddHttpClient();
 
             services.AddHsts(options =>
@@ -74,18 +73,7 @@ namespace Piipan.QueryTool
             services.AddEasyAuth();
 
             services.AddDistributedMemoryCache();
-            if (_env.IsDevelopment())
-            {
-                services.AddSession((options) =>
-                {
-                    options.IdleTimeout = TimeSpan.FromSeconds(30);
-                });
-            }
-            else
-            {
-                services.AddSession();
-            }
-            
+            services.AddSession();
 
             services.AddAuthorizationCore(options => {
                 options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
@@ -122,6 +110,7 @@ namespace Piipan.QueryTool
             }
 
             app.UseHttpsRedirection();
+            app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
             app.UseAuthentication();
@@ -136,7 +125,6 @@ namespace Piipan.QueryTool
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapBlazorHub();
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });

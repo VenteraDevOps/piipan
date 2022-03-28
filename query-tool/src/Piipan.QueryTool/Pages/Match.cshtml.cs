@@ -38,9 +38,9 @@ namespace Piipan.QueryTool.Pages
 
         // [HttpGet("{id}")]
         public IActionResult OnGet(string id)
-        {   
-            
-            if(id != null) {
+        {
+            return Page();
+            if (id != null) {
                 //Prevents malicious user input
                 //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                 Regex r = new Regex("^[a-zA-Z0-9]*$");

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Piipan.QueryTool</RootNamespace>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
@@ -34,16 +34,17 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.22" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.3" />
     <PackageReference Include="NEasyAuthMiddleware" Version="2.0.0" />
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+    <PackageReference Include="System.Text.Json" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\components\src\Piipan.Components\Piipan.Components.csproj" />
     <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Client\Piipan.Match.Client.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\Piipan.QueryTool.Client\Piipan.QueryTool.Client.csproj" />
+    <ProjectReference Include="..\Piipan.QueryTool.Shared\Piipan.QueryTool.Shared.csproj" />
   </ItemGroup>
 </Project>

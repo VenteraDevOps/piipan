@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.QueryTool.Shared;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 

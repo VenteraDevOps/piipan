@@ -6,8 +6,8 @@
 @using System.Net.Http
 @using Piipan.Match.Api.Models
 @using Piipan.Components.Alerts
+@using Piipan.QueryTool.Shared
 @inject NavigationManager NavigationManager
-@inject IHttpClientFactory ClientFactory
 
 @code {
     [Parameter] public PiiRecord Query { get; set; }
@@ -22,25 +22,25 @@
     private bool searching = false;
     private async Task SubmitForm(bool passedValidation)
     {
-        if (passedValidation)
-        {
-            searching = true;
-            using var httpClient = ClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri(NavigationManager.BaseUri);
-            var post = await httpClient.PostAsJsonAsync("/api", Query);
-            if (post.IsSuccessStatusCode)
-            {
-                string searchResponseString = await post.Content.ReadAsStringAsync();
-                searchResponse = JsonConvert.DeserializeObject<OrchMatchResponse>(searchResponseString);
+        //if (passedValidation)
+        //{
+        //    searching = true;
+        //    using var httpClient = ClientFactory.CreateClient();
+        //    httpClient.BaseAddress = new Uri(NavigationManager.BaseUri);
+        //    var post = await httpClient.PostAsJsonAsync("/api", Query);
+        //    if (post.IsSuccessStatusCode)
+        //    {
+        //        string searchResponseString = await post.Content.ReadAsStringAsync();
+        //        searchResponse = JsonConvert.DeserializeObject<OrchMatchResponse>(searchResponseString);
                 
-            }
-            searching = false;
-            StateHasChanged();
-        }
-        else
-        {
-            searchResponse = null;
-        }
+        //    }
+        //    searching = false;
+        //    StateHasChanged();
+        //}
+        //else
+        //{
+        //    searchResponse = null;
+        //}
     }
 }
 

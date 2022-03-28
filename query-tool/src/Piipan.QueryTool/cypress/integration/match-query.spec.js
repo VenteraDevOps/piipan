@@ -4,7 +4,8 @@ const pa11yOptions = {
 
 describe('query tool match query', () => {
   beforeEach(() => {
-    cy.visit('https://localhost:5001');
+      cy.visit('https://localhost:5001');
+      cy.wait(3000)
   })
 
   it('shows required field errors when form is submitted with no data', () => {
