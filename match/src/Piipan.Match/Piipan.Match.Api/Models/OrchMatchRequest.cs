@@ -30,5 +30,9 @@ namespace Piipan.Match.Api.Models
         [JsonProperty("case_id",
             NullValueHandling = NullValueHandling.Ignore)]
         public string CaseId { get; set; }
+
+        [JsonProperty("search_reason",
+            NullValueHandling = NullValueHandling.Ignore)]
+        public string SearchReason { get; set; }
     }
 }

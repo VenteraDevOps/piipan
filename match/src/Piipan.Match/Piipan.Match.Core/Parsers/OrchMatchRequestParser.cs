@@ -56,6 +56,19 @@ namespace Piipan.Match.Core.Parsers
                 {
                     throw new ValidationException("request validation failed", validationResult.Errors);
                 }
+                ///Checking search_reason for valid reason. If reason given is not 
+                ///"Application","Recertification" or "New Household Member" setting to null
+                for (int i = 0; i < request.Data.Count; i++)
+                {
+                    if (request.Data[i].SearchReason != null)
+                    {
+                        if (!request.Data[i].SearchReason.ToLower().Contains("application") && !request.Data[i].SearchReason.ToLower().Contains("recertification") && !request.Data[i].SearchReason.ToLower().Contains("new household member"))
+                        {
+                            request.Data[i].SearchReason = null;
+                        }
+                    }
+                    
+                }
                 
                 return request;
             }
