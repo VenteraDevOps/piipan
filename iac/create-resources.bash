@@ -420,6 +420,9 @@ main () {
       --member-id "$CURRENT_USER_OBJID"
   fi
 
+# Create Payload encryption secrets
+  ./configure-payload-keys.bash "$azure_env"
+
   # Create per-state Function apps and assign corresponding managed identity for
   # access to the per-state blob-storage and database, set up system topics and
   # event subscription to bulk upload (blob creation) events
@@ -539,6 +542,8 @@ main () {
         $AZ_SERV_STR_KEY="$az_serv_str" \
         $BLOB_CONN_STR_KEY="$blob_conn_str" \
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
+        $UPLOAD_ENCRYPT_KEY="$BASE64UPLOADKEY" \
+        $UPLOAD_ENCRYPT_SHA_KEY="$BASE64UPLOADSHAKEY" \
       --output none
 
     event_grid_system_topic_id=$(\

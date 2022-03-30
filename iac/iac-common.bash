@@ -44,6 +44,12 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 # so that application code can use the appropriate, cloud-specific domain
 CLOUD_NAME_STR_KEY=CloudName
 
+# Name of Payload Encryption Key entry in Azure Key Vault
+UPLOAD_ENCRYPT_KEY=upload-payload-key
+
+# Name of Payload Encryption Key SHA entry in Azure Key Vault
+UPLOAD_ENCRYPT_SHA_KEY=upload-payload-key-sha
+
 # For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'
 DATABASE_PLACEHOLDER='{database}'
