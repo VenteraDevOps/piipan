@@ -16,7 +16,7 @@
 <CascadingValue Value="this">
     @if (ShowAlertBox && HasErrors)
     {
-        <UsaAlertBox Header="Errors">
+        <UsaAlertBox Header="Errors" id="@($"{Id}-alert")">
             <ul>
                 @foreach (var errorPair in currentErrors)
                 {
@@ -49,7 +49,7 @@
     }
     
     <EditForm id="@Id" EditContext="editContext" class="@FormClass" @attributes="AdditionalAttributes" novalidate>
-        <DataAnnotationsValidator />  
+        <DataAnnotationsValidator />
         <fieldset class="@FieldsetClass">
             @ChildContent
         </fieldset>

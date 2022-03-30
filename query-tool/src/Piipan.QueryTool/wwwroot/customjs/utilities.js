@@ -1,5 +1,4 @@
 ﻿(function piipanUtilities() {
-    let reference;
     if (!window.piipan) {
         window.piipan = {};
     }
@@ -18,12 +17,16 @@
     window.piipan.utilities.focusElement = (id) => {
         document.getElementById(id)?.focus();
     }
+    window.piipan.utilities.scrollToElement = (id) => {
+        document.getElementById(id)?.scrollIntoView();
+    }
     window.piipan.utilities.doesElementHaveInvalidInput = (id) => {
         return document.getElementById(id)?.validity?.badInput || false;
     }
     window.piipan.utilities.validateForm = async (event) => {
         const valid = await event.target.dotNetReference.invokeMethodAsync('ValidateForm');
         if (valid) {
+            await event.target.dotNetReference.invokeMethodAsync('PresubmitForm');
             event.target.submit();
         }
     }

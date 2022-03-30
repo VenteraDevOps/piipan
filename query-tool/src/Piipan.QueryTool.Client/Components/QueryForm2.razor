@@ -34,13 +34,22 @@
             };
         }
     }
+    private Task SubmitForm(bool valid)
+    {
+        if (valid)
+        {
+            searching = true;
+            StateHasChanged();
+        }
+        return Task.CompletedTask;
+    }
 }
 
-<h1>Search for SNAPS participants</h1>
+<h1>Search for SNAP participants</h1>
 <p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
 @if (Query != null)
 {
-    <UsaForm Model="Query" InitialErrors="serverErrorList" method="post">
+    <UsaForm Model="Query" InitialErrors="serverErrorList" method="post" OnSubmit="SubmitForm">
         <input type="hidden" name="__RequestVerificationToken" value="@Token" />
         @if (NoResults)
         {
@@ -70,6 +79,7 @@
         <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@searching">@(searching ? "Searching..." : "Search")</button>
     </UsaForm>
 }
-@if (SearchResponse?.Results?.Count > 0 && SearchResponse.Results[0].Matches?.Count() > 0) {
+@if (SearchResponse?.Results?.Count > 0 && SearchResponse.Results[0].Matches?.Count() > 0)
+{
     <QueryResults QueryResult="SearchResponse" />
 }

@@ -12,6 +12,15 @@ namespace Piipan.Components.Forms
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
 
+        protected override void OnInitialized()
+        {
+            if (!string.IsNullOrEmpty(CurrentValue))
+            {
+                InvisibleValue = string.Join("", CurrentValue.Select(x => x != '-' ? '*' : x));
+            }
+            base.OnInitialized();
+        }
+
         /// <summary>
         /// On input, we need to do add/remove hyphens, as well as potentially protect the value from prying eyes.
         /// </summary>

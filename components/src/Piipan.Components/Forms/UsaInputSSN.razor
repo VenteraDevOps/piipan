@@ -15,10 +15,10 @@
         @onblur="BlurField"
         required="@FormGroup.Required" 
         id="@Id"
-        name="@Id.Replace("_", ".")"
         @attributes="AdditionalAttributes"
         @oninput="Input" maxlength="11"
         />
+    <input type="hidden" name="@Id.Replace("_", ".")" value="@CurrentValue" />
     <button class="@ButtonClass @ButtonUnstyledClass" type="button" aria-label="@(visible ? "Hide" : "Show") Social Security Number"
         @onclick="() => visible = !visible">
         <svg class="@IconClass" aria-hidden="true" focusable="false" role="img">

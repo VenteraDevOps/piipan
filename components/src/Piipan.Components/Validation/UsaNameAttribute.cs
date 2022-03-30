@@ -1,38 +1,43 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace Piipan.Shared.Deidentification
+namespace Piipan.Components.Validation
 {
-    /// <summary>
-    /// Normalizes last name according to PPRL specifications.
-    /// </summary>
-    public class NameNormalizer : INameNormalizer
+    public class UsaNameAttribute : ValidationAttribute
     {
-        /// <summary>
-        /// Public entrypoint for functionality
-        /// </summary>
-        /// <param name="lname">last name of individual, expects only ASCII characters</param>
-        public string Run(string lname)
+        public override bool IsValid(object value)
         {
+            var stringValue = value?.ToString();
+
+            // If the name is required, we'll pick it up with a UsaRequired attribute. Don't flag it here
+            if (string.IsNullOrEmpty(stringValue))
+            {
+                return true;
+            }
+
             // Loud failure for non-ascii chars
             string nonasciirgx = @"[^\x00-\x7F]";
-            MatchCollection matches = Regex.Matches(lname, nonasciirgx, RegexOptions.IgnoreCase);
+            MatchCollection matches = Regex.Matches(stringValue, nonasciirgx, RegexOptions.IgnoreCase);
             if (matches.Count > 0)
             {
                 List<string> invalidValues = new List<string>();
                 foreach (Match match in matches)
                 {
-                    if (invalidValues.Contains(match.Value))
+                    if (!invalidValues.Contains(match.Value))
                     {
                         invalidValues.Add(match.Value);
                     }
                 }
-                throw new ArgumentException($"Change {string.Join(',', invalidValues)} in {lname}. The Last name should only contain standard ASCII characters, including the letters A-Z, numbers 0-9, and some select characters including hyphens.");
+                ErrorMessage = $"Change {string.Join(',', invalidValues)} in {stringValue}. The @@@ should only contain standard ASCII characters, including the letters A-Z, numbers 0-9, and some select characters including hyphens.";
+                return false;
             }
             // Convert to lower case
-            string result = lname.ToLower();
+            string result = stringValue.ToLower();
             // Replace hyphens with a space
             result = result.Replace("-", " ");
             // Replace multiple spaces with one space
@@ -47,9 +52,10 @@ namespace Piipan.Shared.Deidentification
             // Validate that the resulting value is at least one ASCII character in length
             if (result.Length < 1) // not at least one char
             {
-                throw new ArgumentException("Normalized name must be at least 1 character long.");
+                ErrorMessage = "Normalized @@@ must be at least 1 character long.";
+                return false;
             }
-            return result;
+            return true;
         }
     }
 }

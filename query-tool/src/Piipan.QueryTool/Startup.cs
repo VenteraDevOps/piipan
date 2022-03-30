@@ -113,6 +113,17 @@ namespace Piipan.QueryTool
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
+            //Perform middleware for custom 404 page
+            app.Use(async (context, next) => {
+                await next();
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Request.Path = "/Error";
+                    context.Response.StatusCode = 200;
+                    await next();
+                }
+            });
+
             app.UseAuthentication();
             app.UseRouting();
 
@@ -127,6 +138,7 @@ namespace Piipan.QueryTool
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapFallbackToPage("/Error");
             });
 
             app.Use(async (context, next) =>

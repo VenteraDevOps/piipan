@@ -67,9 +67,15 @@ namespace Piipan.Components.Forms
             UpdateState();
             ShowAlertBox = currentErrors.Count != 0;
             StateHasChanged();
+            if (ShowAlertBox)
+            {
+                await ScrollToElement($"{Id}-alert");
+            }
             return !ShowAlertBox;
         }
-        private async Task SubmitForm()
+
+        [JSInvokable]
+        public async Task PresubmitForm()
         {
             if (OnSubmit != null)
             {
@@ -80,6 +86,11 @@ namespace Piipan.Components.Forms
         private async Task FocusElement(string elementId)
         {
             await JSRuntime.InvokeVoidAsync("piipan.utilities.focusElement", elementId);
+        }
+
+        private async Task ScrollToElement(string elementId)
+        {
+            await JSRuntime.InvokeVoidAsync("piipan.utilities.scrollToElement", elementId);
         }
     }
 }

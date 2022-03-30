@@ -9,6 +9,7 @@ namespace Piipan.QueryTool.Client.Models
     public class PiiRecord
     {
         [UsaRequired]
+        [UsaName]
         [Display(Name = "Last Name")]
         public string? LastName { get; set; }
 
@@ -16,6 +17,7 @@ namespace Piipan.QueryTool.Client.Models
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        [DateOfBirthRange("01/01/1900", ErrorMessage = "@@@ must be between 01-01-1900 and today's date")]
         public DateTime? DateOfBirth { get; set; }
 
         [UsaRequired]

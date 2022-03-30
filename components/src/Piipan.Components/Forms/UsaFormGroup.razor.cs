@@ -18,7 +18,6 @@ namespace Piipan.Components.Forms
 
         public List<string> ValidationMessages { get; set; } = new List<string>();
         public Func<Task<List<string>>> PreverificationChecks { get; set; } = null;
-
         private bool HasErrors => ValidationMessages?.Count > 0;
 
         /// <summary>
