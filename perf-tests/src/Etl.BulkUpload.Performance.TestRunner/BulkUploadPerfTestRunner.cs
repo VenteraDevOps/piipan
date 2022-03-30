@@ -23,7 +23,7 @@ namespace Etl.BulkUpload.Performance.TestRunner
 
         public async Task runTest(long desiredParticipantCount)
         {
-            string headers = "lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_issuance_dates,protect_location";
+            string headers = "lds_hash,case_id,participant_id,participant_closing_date,recent_benefit_issuance_dates,protect_location";
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -75,7 +75,7 @@ namespace Etl.BulkUpload.Performance.TestRunner
             record.Append(createMockHash(128));
             record.Append(",case-" + state + "-" + padRecId);
             record.Append(",part-" + state + "-" + padRecId);
-            record.Append(",,2021-12 2021-11 2021-10,false");
+            record.Append(",,2021-05-01/2021-05-31 2021-04-01/2021-04-30 2021-03-01/2021-03-31,false");
             return record.ToString();
 
         }
