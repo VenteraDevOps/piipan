@@ -656,23 +656,14 @@ main () {
   #   - OrchestratorApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
-  # Configure Microsoft Defender for Cloud for all Azure resources.
-  # Defender only incurs costs for running resources, so there is no harm in
-  # enabling for all resources.
-  echo "Configure Microsoft Defender for Cloud"
-  az deployment sub create \
-    --name "defender-$LOCATION" \
-    --location $LOCATION \
-    --template-file ./arm-templates/defender.json
+  # Configure Microsoft Defender for Cloud and assign Azure CIS 1.3.0 benchmark
+  ./configure-defender-and-policy.bash "$azure_env"
 
   echo "Secure database connection"
   ./remove-external-network.bash \
     "$azure_env" \
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
-
-  # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
-  ./configure-cis-policy.bash "$azure_env"
 
   script_completed
 }
