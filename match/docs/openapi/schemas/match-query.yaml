@@ -48,6 +48,9 @@ Person:
     case_id:
       type: string
       description: "Participant's state-specific case number"
+    search_reason:
+      type: string
+      description: "User's reason for running match query. Must be either 'Application', 'Recertification', or 'New Household Member'"
 PersonWithPii:
   type: object
   required:

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Piipan.Match.Api.Models;
 using Newtonsoft.Json;
 using FluentValidation;
+using System.Linq;
 
 namespace Piipan.Match.Core.Parsers
 {
@@ -57,15 +58,23 @@ namespace Piipan.Match.Core.Parsers
                     throw new ValidationException("request validation failed", validationResult.Errors);
                 }
                 ///Checking search_reason for valid reason. If reason given is not 
-                ///"Application","Recertification" or "New Household Member" setting to null
+                ///in allowed list of search reasons then setting reason to null
+                string[] validSearchReasons =
+                {
+                    "application",
+                    "recertification",
+                    "new household member"
+                };
                 for (int i = 0; i < request.Data.Count; i++)
                 {
                     if (request.Data[i].SearchReason != null)
                     {
-                        if (!request.Data[i].SearchReason.ToLower().Contains("application") && !request.Data[i].SearchReason.ToLower().Contains("recertification") && !request.Data[i].SearchReason.ToLower().Contains("new household member"))
+                        
+                        if (!validSearchReasons.Contains(request.Data[i].SearchReason.ToLower()))
                         {
                             request.Data[i].SearchReason = null;
                         }
+                        
                     }
                     
                 }
