@@ -11,7 +11,6 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
-using Piipan.Match.Core.IntegrationTests;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Validators;
 using Piipan.Shared.Database;

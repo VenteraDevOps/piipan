@@ -23,11 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\ddl\match-record.sql" Link="match-record.sql" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Match\Piipan.Match.Core\Piipan.Match.Core.csproj" />
+    <ProjectReference Include="..\..\..\shared\src\Piipan.Shared.TestFixtures\Piipan.Shared.TestFixtures.csproj" />
   </ItemGroup>
 
 </Project>

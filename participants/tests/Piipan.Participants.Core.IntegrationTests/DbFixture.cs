@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Piipan.Participants.Core.Models;
+using Piipan.Shared.TestFixtures;
 
 namespace Piipan.Participants.Core.IntegrationTests
 {
@@ -13,137 +14,8 @@ namespace Piipan.Participants.Core.IntegrationTests
     /// Creates a fresh set of participants and uploads tables, dropping them
     /// when testing is complete.
     /// </summary>
-    public class DbFixture : IDisposable
+    public class DbFixture : ParticipantsDbFixture
     {
-        public readonly string ConnectionString;
-        public readonly NpgsqlFactory Factory;
-
-        public DbFixture()
-        {
-            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
-            if(string.IsNullOrEmpty(ConnectionString))
-            {
-                IConfiguration config = InitConfiguration();
-                ConnectionString = config.GetConnectionString("DatabaseConnectionString");
-            }
-            Factory = NpgsqlFactory.Instance;
-
-            Initialize();
-            ApplySchema();
-        }
-
-        public static IConfiguration InitConfiguration()
-        {
-            var config = new ConfigurationBuilder()
-               .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
-            return config;
-        }
-
-        /// <summary>
-        /// Ensure the database is able to receive connections before proceeding.
-        /// </summary>
-        public void Initialize()
-        {
-            var retries = 10;
-            var wait = 2000; // ms
-
-            while (retries >= 0)
-            {
-                try
-                {
-                    using (var conn = Factory.CreateConnection())
-                    {
-                        conn.ConnectionString = ConnectionString;
-                        conn.Open();
-                        conn.Close();
-
-                        return;
-                    }
-                }
-                catch (Npgsql.NpgsqlException ex)
-                {
-                    retries--;
-                    Console.WriteLine(ex.Message);
-                    Thread.Sleep(wait);
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DROP TABLE IF EXISTS participants");
-                conn.Execute("DROP TABLE IF EXISTS uploads");
-
-                conn.Close();
-            }
-
-        }
-
-        private void ApplySchema()
-        {
-            string sqltext = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
-
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DROP TABLE IF EXISTS participants");
-                conn.Execute("DROP TABLE IF EXISTS uploads");
-                conn.Execute(sqltext);
-                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now() at time zone 'utc', current_user)");
-
-                conn.Close();
-            }
-        }
-
-        public void ClearParticipants()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DELETE FROM participants");
-
-                conn.Close();
-            }
-        }
-
-        public void ClearUploads()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DELETE FROM uploads");
-
-                conn.Close();
-            }
-        }
-
-        public Int64 GetLastUploadId()
-        {
-            Int64 result = 0;
-            var factory = NpgsqlFactory.Instance;
-
-            using (var conn = factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-                result = conn.ExecuteScalar<Int64>("SELECT MAX(id) FROM uploads");
-                conn.Close();
-            }
-            return result;
-        }
 
         public void Insert(ParticipantDbo participant)
         {

@@ -13,7 +13,6 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
-using Piipan.Match.Core.IntegrationTests;
 using Piipan.Match.Func.ResolutionApi.Models;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests

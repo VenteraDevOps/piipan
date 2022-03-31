@@ -2060,6 +2060,13 @@
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.3"
         }
+      },
+      "piipan.shared.testfixtures": {
+        "type": "Project",
+        "dependencies": {
+          "dapper": "2.0.123",
+          "npgsql": "6.0.3"
+        }
       }
     }
   }

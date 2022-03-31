@@ -389,3 +389,8 @@ updates:
   schedule:
     interval: daily
     time: "09:00"
+- package-ecosystem: nuget
+  directory: "/shared/src/Piipan.Shared.TestFixtures"
+  schedule:
+    interval: daily
+    time: "09:00"

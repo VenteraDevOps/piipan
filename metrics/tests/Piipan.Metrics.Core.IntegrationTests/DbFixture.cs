@@ -3,6 +3,7 @@ using System.Threading;
 using Dapper;
 using Npgsql;
 using Piipan.Metrics.Api;
+using Piipan.Shared.TestFixtures;
 
 namespace Piipan.Metrics.Core.IntegrationTests
 {
@@ -10,79 +11,8 @@ namespace Piipan.Metrics.Core.IntegrationTests
     /// Test fixture for metrics API database integration testing.
     /// Creates a fresh metrics database, dropping it when complete
     /// </summary>
-    public class DbFixture : IDisposable
+    public class DbFixture : MetricsDbFixture
     {
-        public readonly string ConnectionString;
-        public readonly NpgsqlFactory Factory;
-
-        public DbFixture()
-        {
-            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
-            Factory = NpgsqlFactory.Instance;
-
-            Initialize();
-            ApplySchema();
-        }
-
-        /// <summary>
-        /// Ensure the database is able to receive connections before proceeding.
-        /// </summary>
-        public void Initialize()
-        {
-            var retries = 10;
-            var wait = 2000; // ms
-
-            while (retries >= 0)
-            {
-                try
-                {
-                    using (var conn = Factory.CreateConnection())
-                    {
-                        conn.ConnectionString = ConnectionString;
-                        conn.Open();
-                        conn.Close();
-
-                        return;
-                    }
-                }
-                catch (Npgsql.NpgsqlException ex)
-                {
-                    retries--;
-                    Console.WriteLine(ex.Message);
-                    Thread.Sleep(wait);
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DROP TABLE IF EXISTS participant_uploads");
-
-                conn.Close();
-            }
-
-        }
-
-        private void ApplySchema()
-        {
-            string sqltext = System.IO.File.ReadAllText("metrics.sql", System.Text.Encoding.UTF8);
-
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DROP TABLE IF EXISTS participant_uploads");
-                conn.Execute(sqltext);
-
-                conn.Close();
-            }
-        }
 
         protected void Insert(string state, DateTime uploadedAt)
         {
@@ -110,11 +40,11 @@ namespace Piipan.Metrics.Core.IntegrationTests
                 conn.Open();
 
                 var record = conn.QuerySingle<ParticipantUpload>(@"
-                    SELECT 
+                    SELECT
                         state State,
                         uploaded_at UploadedAt
                     FROM participant_uploads
-                    WHERE 
+                    WHERE
                         lower(state) LIKE @state AND
                         uploaded_at = @uploadedAt",
                     new

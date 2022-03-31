@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dapper" Version="2.0.123" />
+    <PackageReference Include="npgsql" Version="6.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\match\ddl\match-record.sql" Link="match-record.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\metrics\ddl\metrics.sql" Link="metrics.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\ddl\per-state.sql" Link="per-state.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
