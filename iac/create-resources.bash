@@ -546,6 +546,12 @@ main () {
         $UPLOAD_ENCRYPT_SHA_KEY="$BASE64UPLOADSHAKEY" \
       --output none
 
+    keyVaultScope=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.KeyVault/vaults/$VAULT_NAME
+
+    funcPrincipalId=$(az functionapp identity show --resource-group "${RESOURCE_GROUP}" --name "$func_app" --query principalId)
+
+    az role assignment create --role "Key Vault Secrets User" --assignee "$funcPrincipalId" --scope "$keyVaultScope"
+
     event_grid_system_topic_id=$(\
       az eventgrid system-topic create \
         --location "$LOCATION" \
