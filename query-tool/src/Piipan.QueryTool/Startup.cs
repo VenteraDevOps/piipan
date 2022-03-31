@@ -70,7 +70,10 @@ namespace Piipan.QueryTool
             services.AddSingleton<ILdsDeidentifier, LdsDeidentifier>();
 
             services.AddHttpContextAccessor();
-            services.AddEasyAuth();
+            services.AddEasyAuth((e) =>
+            {
+                e.
+            });
 
             services.AddDistributedMemoryCache();
             services.AddSession();
@@ -113,6 +116,13 @@ namespace Piipan.QueryTool
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
+            app.UseAuthentication();
+            app.UseRouting();
+
+            app.UseSession();
+
+            app.UseAuthorization();
+
             //Perform middleware for custom 404 page
             app.Use(async (context, next) => {
                 await next();
@@ -123,13 +133,6 @@ namespace Piipan.QueryTool
                     await next();
                 }
             });
-
-            app.UseAuthentication();
-            app.UseRouting();
-
-            app.UseSession();
-
-            app.UseAuthorization();
 
             app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseMiddleware<AuthenticationLoggingMiddleware>();
