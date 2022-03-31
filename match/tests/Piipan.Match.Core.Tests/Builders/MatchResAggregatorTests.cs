@@ -6,6 +6,7 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
+using Piipan.Shared.Utilities;
 using Xunit;
 using Moq;
 
@@ -24,7 +25,10 @@ namespace Piipan.Match.Core.Tests.Builders
             _match = new MatchRecordDbo()
             {
                 MatchId = _matchId,
-                States = new string[] { "ea", "eb" }
+                States = new string[] { "ea", "eb" },
+                Initiator = "ea",
+                Input = "{\"CaseId\": \"ABC\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"DEF\"}",
+                Data = "{\"State\": \"eb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"ProtectLocation\": true, \"RecentBenefitIssuanceDates\": [{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}]}"
             };
 
             _match_res_events = new List<MatchResEventDbo>()
@@ -138,5 +142,33 @@ namespace Piipan.Match.Core.Tests.Builders
             Assert.Null(eaObj.ProtectLocation);
             Assert.Null(ebObj.ProtectLocation);
         }
+
+        [Fact]
+        public void Build_ReturnsCorrectParticipantData()
+        {
+            // Act
+            var result = Builder().Build(_match, _match_res_events);
+            var ebParticipant = result.Participants[0];
+            var eaParticipant = result.Participants[1];
+
+            // Assert
+            Assert.Equal(2, result.Participants.Length);
+
+            // Assert ea
+            Assert.Equal("ABC", eaParticipant.CaseId);
+            Assert.Equal("DEF", eaParticipant.ParticipantId);
+            // NOTE: initiator ParticipantClosingDate and RecentBenefitIssuanceDates
+            // are not represented in the match data yet
+
+            // Assert eb
+            Assert.Equal("GHI", ebParticipant.CaseId);
+            Assert.Equal("JKL", ebParticipant.ParticipantId);
+            Assert.Equal(new DateTime(2021, 2, 28), ebParticipant.ParticipantClosingDate);
+            Assert.Single(ebParticipant.RecentBenefitIssuanceDates);
+            Assert.Collection(ebParticipant.RecentBenefitIssuanceDates,
+                item => item.Equals(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03,31)))
+            );
+        }
+
     }
 }

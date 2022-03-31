@@ -14,6 +14,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
 using Piipan.Match.Func.ResolutionApi.Models;
+using Newtonsoft.Json;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 {
@@ -83,7 +84,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         }
 
         [Fact]
-        public async void GetMatch_ReturnsIfFound()
+        public async void GetMatch_ReturnsCorrectSchemaIfFound()
         {
             // Arrange
             // clear databases
@@ -97,24 +98,26 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 
             // insert into database
             var match = new MatchRecordDbo() {
-                MatchId = matchId,
-                Initiator = "ea",
                 CreatedAt = DateTime.UtcNow,
-                States = new string[] { "ea", "bb" },
+                Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"ProtectLocation\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
                 Hash = "foo",
                 HashType = "ldshash",
-                Data = "{}"
+                Initiator = "ea",
+                Input = "{\"CaseId\": \"ABC\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"DEF\"}",
+                MatchId = matchId,
+                States = new string[] { "ea", "bb" }
             };
             Insert(match);
 
             // Act
             var response = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as JsonResult;
+            string resString = JsonConvert.SerializeObject(response.Value);
 
             // Assert
             Assert.Equal(200, response.StatusCode);
-            var resBody = response.Value as ApiResponse;
-            Assert.NotNull(resBody);
-            Assert.Equal("open", resBody.Data.Status);
+            // Assert Participant Data
+            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"protect_location\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"protect_location\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":\"0001-01-01\",\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
+            Assert.Equal(expected, resString);
         }
         // When match res events are added, GetMatch response should update accordingly
         [Fact]
@@ -138,7 +141,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 States = new string[] { "ea", "bb" },
                 Hash = "foo",
                 HashType = "ldshash",
-                Data = "{}"
+                Data = "{}",
+                Input = "{}"
             };
             Insert(match);
             // Act

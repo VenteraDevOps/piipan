@@ -6,6 +6,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Participants.Api.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
 
 namespace Piipan.Match.Core.Builders
@@ -28,7 +29,10 @@ namespace Piipan.Match.Core.Builders
             string jsonString = MergeEvents(match_res_events);
             var aggregate = JsonConvert.DeserializeObject<MatchResRecord>(jsonString);
             aggregate.Dispositions = AggregateDispositions(match, match_res_events);
-            // TODO: aggregate state participant data. This will need to come from whatever json schema we have on match query and data fields
+            aggregate.Participants = CollectParticipantData(match);
+            aggregate.MatchId = match.MatchId;
+            aggregate.States = match.States;
+            aggregate.Initiator = match.Initiator;
             return aggregate;
         }
 
@@ -62,6 +66,17 @@ namespace Piipan.Match.Core.Builders
                     return acc;
                 })
                 .ToString();
+        }
+
+        private Participant[] CollectParticipantData(IMatchRecord match)
+        {
+            var collect = new List<Participant>();
+            var data = JsonConvert.DeserializeObject<Participant>(match.Data);
+            collect.Add(data);
+            var input = JsonConvert.DeserializeObject<Participant>(match.Input);
+            input.State = match.Initiator; // data has a State property, but input doesn't
+            collect.Add(input);
+            return collect.ToArray();
         }
     }
 }

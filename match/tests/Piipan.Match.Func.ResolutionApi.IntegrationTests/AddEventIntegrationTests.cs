@@ -126,7 +126,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 States = new string[] { "ea", "eb" },
                 Hash = "foo",
                 HashType = "ldshash",
-                Data = "{}"
+                Data = "{}",
+                Input = "{}"
             };
             Insert(match);
             // insert an event into the database
@@ -164,7 +165,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 States = new string[] { "ea", "eb" },
                 Hash = "foo",
                 HashType = "ldshash",
-                Data = "{}"
+                Data = "{}",
+                Input = "{}"
             };
             Insert(match);
 
@@ -201,7 +203,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 States = new string[] { "ea", "eb" },
                 Hash = "foo",
                 HashType = "ldshash",
-                Data = "{}"
+                Data = "{}",
+                Input = "{}"
             };
             Insert(match);
             // insert final disposition event into db
