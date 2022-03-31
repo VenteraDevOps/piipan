@@ -23,6 +23,7 @@ using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 
@@ -30,7 +31,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {
-        private const string InitiatingState = "ea";
+        private const string InitiatingState = "eb";
 
         static ParticipantDbo FullRecord()
         {
@@ -41,10 +42,11 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 CaseId = "CaseIdExample",
                 ParticipantId = "ParticipantIdExample",
                 ParticipantClosingDate = new DateTime(1970, 1, 15),
-                RecentBenefitMonths = new List<DateTime>() {
-                  new DateTime(2021, 5, 31),
-                  new DateTime(2021, 4, 30),
-                  new DateTime(2021, 3, 31)
+                RecentBenefitIssuanceDates = new List<DateRange>
+                {
+                    new DateRange(new DateTime(2021, 4, 1),new DateTime(2021, 5, 1)),
+                    new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
+                    new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                 },
                 ProtectLocation = true
             };
@@ -154,13 +156,12 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Assert.Equal(record.ParticipantId, person.Matches.First().ParticipantId);
             Assert.Equal(state[0], person.Matches.First().State);
             Assert.Equal(record.ParticipantClosingDate, person.Matches.First().ParticipantClosingDate);
-            Assert.Equal(record.RecentBenefitMonths, person.Matches.First().RecentBenefitMonths);
             Assert.Equal(record.ProtectLocation, person.Matches.First().ProtectLocation);
             // serialization
             var match = person.Matches.First();
             var json = JsonConvert.SerializeObject(match);
             Assert.Contains("participant_id", json);
-            Assert.Contains("recent_benefit_months", json);
+            Assert.Contains("recent_benefit_issuance_dates", json);
         }
 
         [Fact]

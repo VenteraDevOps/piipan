@@ -64,6 +64,8 @@ namespace Piipan.Match.Core.Services
         private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index, string initiatingState)
         {
             var states = await _participantApi.GetStates();
+            //Removing the initiatingState from the list of states for Match.
+            states = states.Where(state => state != initiatingState);
 
             var matches = (await states
                 .SelectManyAsync(state => _participantApi.GetParticipants(state, person.LdsHash)))

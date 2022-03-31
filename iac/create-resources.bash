@@ -617,7 +617,7 @@ main () {
   echo "az network front-door waf-policy rule show"
 
   #Create the custom rule on the WAF Polity that match with any POST request method
-  echo "az network front-door waf-policy rule match-condition add" 
+  echo "az network front-door waf-policy rule match-condition add"
   az network front-door waf-policy rule match-condition add \
     --resource-group "$RESOURCE_GROUP" \
     --policy-name "$QUERY_TOOL_WAF_NAME" \
@@ -684,9 +684,14 @@ main () {
   #   - OrchestratorApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
-  # Configures Azure Defender at the subscription level for:
-  #   - Storage accounts
-  ./configure-defender.bash "$azure_env"
+  # Configure Microsoft Defender for Cloud for all Azure resources.
+  # Defender only incurs costs for running resources, so there is no harm in
+  # enabling for all resources.
+  echo "Configure Microsoft Defender for Cloud"
+  az deployment sub create \
+    --name "defender-$LOCATION" \
+    --location $LOCATION \
+    --template-file ./arm-templates/defender.json
 
   echo "Secure database connection"
   ./remove-external-network.bash \

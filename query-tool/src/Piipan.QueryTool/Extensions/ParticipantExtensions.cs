@@ -11,9 +11,9 @@ namespace Piipan.QueryTool.Extensions
             return participant.ParticipantClosingDate?.ToString("yyyy-MM-dd");
         }
 
-        public static string RecentBenefitMonthsDisplay(this IParticipant participant)
+        public static string RecentBenefitIssuanceDatesDisplay(this IParticipant participant)
         {
-            return String.Join(", ", participant.RecentBenefitMonths.Select(dt => dt.ToString("yyyy-MM")));
+            return String.Join(", ", participant.RecentBenefitIssuanceDates.Select(dt => dt.Start.ToString("yyyy-MM-dd") +"/" + dt.End.ToString("yyyy-MM-dd")));
         }
 
         public static string ProtectLocationDisplay(this IParticipant participant)

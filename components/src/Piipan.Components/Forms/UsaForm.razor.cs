@@ -14,7 +14,7 @@ namespace Piipan.Components.Forms
         private bool HasErrors => currentErrors?.Count() > 0;
         private EditContext editContext;
         private bool ShowAlertBox { get; set; } = false;
-        private string Id { get; } = "f" + Guid.NewGuid();
+        [Parameter] public string Id { get; set; } = "f" + Guid.NewGuid();
         public List<UsaFormGroup> FormGroups { get; set; } = new List<UsaFormGroup>();
         private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors = new List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)>();
 

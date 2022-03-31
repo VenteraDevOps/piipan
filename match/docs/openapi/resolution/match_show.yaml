@@ -55,7 +55,7 @@ get:
                       - case_id
                       - participant_id
                       - participant_closing_date
-                      - recent_benefit_months
+                      - recent_benefit_issuance_dates
                     items:
                       type: object
                       properties:

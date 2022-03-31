@@ -8,6 +8,7 @@ using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Piipan.Shared.Utilities;
 
 namespace Piipan.Participants.Core.Tests.Services
 {
@@ -25,7 +26,7 @@ namespace Piipan.Participants.Core.Tests.Services
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
                     ParticipantClosingDate = DateTime.UtcNow.Date,
-                    RecentBenefitMonths = new List<DateTime>(),
+                    RecentBenefitIssuanceDates = new List<DateRange>(),
                     ProtectLocation = (new Random()).Next(2) == 0,
                     UploadId = (new Random()).Next()
                 });

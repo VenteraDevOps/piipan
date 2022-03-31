@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1.36] - 2022-03-22
+
+### Changed
+- Enabled Defender for all resources in IaC scripts
+### Added
+- Added Match Collaboration page and Error pages.
+- Added Match Resolution App and GetMatch endpoint
+- Added Bulk Upload Performance Test Runner utility
+### Fixed
+- Fixed middleware initialization ordering issue for HSTS
+- Fixed search logic to avoid searching within the initiating state's own database for matches.
+
 ## [1.0.1] - 2022-03-08
 
 ### Changed

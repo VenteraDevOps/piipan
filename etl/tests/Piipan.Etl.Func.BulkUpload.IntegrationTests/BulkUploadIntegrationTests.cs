@@ -1,23 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
+using Dapper;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
+using Piipan.Participants.Core;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Database;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
-    /// <summary>
-    /// Integration tests for saving csv records to the database on a bulk upload
-    /// </summary>
     public class BulkUploadIntegrationTests : DbFixture
     {
         private ServiceProvider BuildServices()
@@ -25,6 +27,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = new ServiceCollection();
 
             services.AddLogging();
+            SqlMapper.AddTypeHandler(new DateRangeListHandler());
             services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(c =>
             {
                 var factory = new Mock<IDbConnectionFactory<ParticipantsDb>>();
@@ -38,7 +41,6 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                     });
                 return factory.Object;
             });
-
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
             services.RegisterParticipantsServices();
 
@@ -83,9 +85,9 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             }
             Assert.Equal("a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec", records.First().LdsHash);
             Assert.Equal(new DateTime(2021, 05, 15), records.First().ParticipantClosingDate);
-            Assert.Equal(new DateTime(2021, 04, 30), records.First().RecentBenefitMonths.First());
-            Assert.Equal(new DateTime(2021, 03, 31), records.First().RecentBenefitMonths.ElementAt(1));
-            Assert.Equal(new DateTime(2021, 02, 28), records.First().RecentBenefitMonths.ElementAt(2));
+            Assert.Equal(new DateRange(new DateTime(2021, 04, 01) , new DateTime(2021, 04, 15)), records.First().RecentBenefitIssuanceDates.First());
+            Assert.Equal(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30)), records.First().RecentBenefitIssuanceDates.ElementAt(1));
+            Assert.Equal(new DateRange(new DateTime(2021, 02, 01), new DateTime(2021, 02, 28)), records.First().RecentBenefitIssuanceDates.ElementAt(2));
             Assert.True(records.First().ProtectLocation);
         }
     }

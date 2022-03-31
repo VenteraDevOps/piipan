@@ -14,7 +14,6 @@ namespace Piipan.QueryTool.Extensions
                 CaseId = participantMatch.CaseId,
                 ParticipantId = participantMatch.ParticipantId,
                 ParticipantClosingDate = participantMatch.ParticipantClosingDate,
-                RecentBenefitMonths = participantMatch.RecentBenefitMonths,
                 ProtectLocation = participantMatch.ProtectLocation
             };
         }

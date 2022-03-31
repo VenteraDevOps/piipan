@@ -14,7 +14,7 @@
 
         public DateTime? ParticipantClosingDate { get; set; }
 
-        public IEnumerable<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
+        //public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; } = new List<DateRange>();
 
         public bool? ProtectLocation { get; set; }
     }

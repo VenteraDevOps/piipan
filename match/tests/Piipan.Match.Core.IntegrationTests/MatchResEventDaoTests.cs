@@ -192,6 +192,8 @@ namespace Piipan.Match.Core.IntegrationTests
                 Assert.Equal(result.ElementAt(0).Delta, record2.Delta);
                 Assert.Equal(result.ElementAt(1).Delta, record1.Delta);
                 Assert.True(result.ElementAt(1).InsertedAt < result.ElementAt(0).InsertedAt); // desc order
+
+                conn.Close();
             }
         }
 
@@ -216,6 +218,61 @@ namespace Piipan.Match.Core.IntegrationTests
 
                 // Assert
                 Assert.Empty(result);
+
+                conn.Close();
+            }
+        }
+
+        [Fact]
+        public async void GetEvents_ReturnsExpectedEventValues()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchResEventDao>>();
+                var matchLogger = Mock.Of<ILogger<MatchRecordDao>>();
+
+                var dao = new MatchResEventDao(DbConnFactory(), logger);
+                var matchRecordDao = new MatchRecordDao(DbConnFactory(), matchLogger);
+
+                var idService = new MatchIdService();
+                var matchId = idService.GenerateId();
+
+                var match = new MatchRecordDbo
+                {
+                    MatchId = matchId,
+                    Hash = "foo",
+                    HashType = "ldshash",
+                    Initiator = "ea",
+                    States = new string[] { "ea", "eb" },
+                    Data = "{}"
+                };
+                // related match events
+                var mre = new MatchResEventDbo
+                {
+                    MatchId = matchId,
+                    Actor = "noreply@example.com",
+                    ActorState = "ea",
+                    Delta = "{\"status\": \"open\"}"
+                };
+
+                // Act
+                await matchRecordDao.AddRecord(match);
+                await dao.AddEvent(mre);
+
+                // Assert
+                var results = await dao.GetEvents(matchId, false);
+                var result = results.First();
+                Assert.Equal(matchId, result.MatchId);
+                Assert.Equal("noreply@example.com", result.Actor);
+                Assert.Equal("ea", result.ActorState);
+                Assert.Equal("{\"status\": \"open\"}", result.Delta);
+                Assert.True(new DateTime() < result.InsertedAt); // greater than default datetime (1/1/0001 12:00:00 AM)
+
+                conn.Close();
             }
         }
     }

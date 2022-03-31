@@ -4,6 +4,10 @@ using System.Threading;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Npgsql;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Utilities;
+using NpgsqlTypes;
+using System.Linq;
+using Dapper;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
@@ -145,8 +149,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                             CaseId = reader[3].ToString(),
                             ParticipantId = reader[4].ToString(),
                             ParticipantClosingDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
-                            RecentBenefitMonths = reader[6] is DBNull ? new List<DateTime>() : new List<DateTime>((DateTime[])reader[6]),
-                            ProtectLocation = reader[7] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[7])
+                            RecentBenefitIssuanceDates = reader[reader.GetOrdinal("recent_benefit_issuance_dates")] is DBNull ? new List<DateRange>() : ((NpgsqlRange<DateTime>[])reader[reader.GetOrdinal("recent_benefit_issuance_dates")]).Select(user => new DateRange() { Start = user.LowerBound, End = user.UpperBound }).ToList(),
+                            ProtectLocation = reader[reader.GetOrdinal("protect_location")] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[reader.GetOrdinal("protect_location")])
                         };
                         records.Add(record);
                     }

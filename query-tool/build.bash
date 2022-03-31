@@ -35,8 +35,8 @@ run_deploy () {
   popd
   az webapp deployment \
     source config-zip \
-    -g "rg-core-dev" \
-    -n "vennac-app-querytool-dev" \
+    -g "$RESOURCE_GROUP" \
+    -n "$QUERY_TOOL_APP_NAME" \
     --src ./artifacts/dashboard.zip
 
   popd

@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS participants(
     	case_id text NOT NULL,
     	participant_id text NOT NULL,
 	participant_closing_date   date,
-    	recent_benefit_months date[],
+    	recent_benefit_issuance_dates daterange[],
     	protect_location boolean
 );
 
@@ -32,7 +32,7 @@ COMMENT ON COLUMN participants.lds_hash IS 'Participant''s deidentified data as 
 COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
 COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
 COMMENT ON COLUMN participants.participant_closing_date   IS 'Date when the Participant''s case will close. This will be the last date the participate is eligible to receive benefits.';
-COMMENT ON COLUMN participants.recent_benefit_months IS 'Participant''s recent benefit months';
+COMMENT ON COLUMN participants.recent_benefit_issuance_dates IS 'Participant''s recent benefit months issuances date ranges.';
 COMMENT ON COLUMN participants.protect_location IS 'Participant''s vulnerability status';
 
 CREATE INDEX IF NOT EXISTS participants_lds_hash_idx ON participants (lds_hash, upload_id);
