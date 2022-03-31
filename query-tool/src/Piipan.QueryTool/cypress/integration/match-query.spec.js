@@ -60,7 +60,6 @@ describe('query tool match query', () => {
         cy.get('form').submit();
 
         cy.contains('This participant does not have a matching record in any other states.').should('be.visible');
-        pa11yOptions.screenCapture = `C:/Users/dborgen/Pictures/test.png`;
         cy.pa11y(pa11yOptions);
     });
 
@@ -74,7 +73,6 @@ describe('query tool match query', () => {
         cy.contains('Match ID').should('be.visible');
         cy.contains('Matching State').should('be.visible');
 
-        pa11yOptions.screenCapture = `C:/Users/dborgen/Pictures/test2.png`;
         pa11yOptions.headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         };
@@ -91,15 +89,6 @@ describe('query tool match query', () => {
                 }
             }
         });
-            
-        
-            //.spread(value => {
-            //    pa11yOptions.postData = 'Query.LastName=Farrington&Query.DateOfBirth=1931-10-13&Query.SocialSecurityNum=425-46-5417&__RequestVerificationToken=' + value;
-            //});
-            
-            //.then(value => {
-            //    pa11yOptions.postData = 'Query.LastName=Farrington&Query.DateOfBirth=1931-10-13&Query.SocialSecurityNum=425-46-5417&__RequestVerificationToken=' + value;
-            //});
         
         cy.pa11y(pa11yOptions);
     });
