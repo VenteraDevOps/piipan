@@ -69,12 +69,10 @@ namespace Piipan.Match.Core.Parsers
                 {
                     if (request.Data[i].SearchReason != null)
                     {
-                        
                         if (!validSearchReasons.Contains(request.Data[i].SearchReason.ToLower()))
                         {
                             request.Data[i].SearchReason = null;
                         }
-                        
                     }
                     
                 }
