@@ -116,7 +116,7 @@ namespace Piipan.QueryTool
             //Perform middleware for custom 404 page
             app.Use(async (context, next) => {
                 await next();
-                if (context.Response.StatusCode == 404)
+                if (context.Response.StatusCode == 404 || context.Response.StatusCode == 500)
                 {
                     context.Request.Path = "/Error";
                     context.Response.StatusCode = 200;

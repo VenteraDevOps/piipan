@@ -49,7 +49,7 @@
 <p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
 @if (Query != null)
 {
-    <UsaForm Model="Query" InitialErrors="serverErrorList" method="post" OnSubmit="SubmitForm">
+    <UsaForm id="snap-participants-query-form" Model="Query" InitialErrors="serverErrorList" method="post" OnSubmit="SubmitForm">
         <input type="hidden" name="__RequestVerificationToken" value="@Token" />
         @if (NoResults)
         {

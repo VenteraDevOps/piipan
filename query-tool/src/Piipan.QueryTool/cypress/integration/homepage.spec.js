@@ -42,15 +42,15 @@ describe('query tool homepage', () => {
   });
 
   it('collapses user navigation on page load', () => {
-    cy.get('.usa-accordion__button.usa-nav__link')
+      cy.get('.usa-nav__primary.usa-accordion .usa-accordion__button')
       .should('have.attr', 'aria-expanded')
       .and('equal', 'false');
   });
 
   it('shows sign out button on click of user navigation', () => {
-    cy.get('.usa-accordion__button.usa-nav__link').click();
+      cy.get('.usa-nav__primary.usa-accordion .usa-accordion__button').click();
 
-    cy.get('.usa-accordion__button.usa-nav__link')
+      cy.get('.usa-nav__primary.usa-accordion .usa-accordion__button')
       .should('have.attr', 'aria-expanded')
       .and('equal', 'true');
 

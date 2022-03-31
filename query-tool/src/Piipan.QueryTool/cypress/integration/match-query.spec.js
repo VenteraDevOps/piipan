@@ -9,7 +9,7 @@ describe('query tool match query', () => {
             standard: 'WCAG2AA',
             runners: [
                 'htmlcs'
-            ]
+            ],
         };
         cy.visit('/');
         cy.get('#query-form-search-btn', { timeout: 10000 }).should('be.visible');
@@ -41,47 +41,76 @@ describe('query tool match query', () => {
         cy.get('#Query_DateOfBirth-message').contains('Date of Birth must be between 01-01-1900 and today\'s date').should('be.visible');
         cy.get('form').submit();
 
-        cy.get('.usa-alert').contains('Date of birth must be between 01-01-1900 and today\'s date').should('be.visible');
+        cy.get('.usa-alert').contains('Date of Birth must be between 01-01-1900 and today\'s date').should('be.visible');
     });
 
     it("shows proper error for non-ascii characters in last name", () => {
-        cy.get('input[name="Query.LastName"]').type("garcía");
-        // Enter other valid form inputs to isolate expected error
-        cy.get('input[name="Query.DateOfBirth"]').type("1997-01-01");
-        cy.get('input[name="Query.SocialSecurityNum"]').type("550-01-6981");
-
+        cy.get('#Query_LastName').type("garcía").blur();
+        cy.get('#Query_LastName-message').contains('Change í in garcía').should('be.visible');
         cy.get('form').submit();
 
-        cy.contains('Change í in garcía').should('be.visible');
+        cy.get('.usa-alert').contains('Change í in garcía').should('be.visible');
     });
 
     it("shows an empty state on successful submission without match", () => {
-        cy.get('input[name="Query.LastName"]').type("schmo");
-        cy.get('input[name="Query.DateOfBirth"]').type("1997-01-01");
-        cy.get('input[name="Query.SocialSecurityNum"]').type("550-01-6981");
+        cy.get('#Query_LastName').type("schmo");
+        cy.get('#Query_DateOfBirth').type("1997-01-01");
+        cy.get('#Query_SocialSecurityNum').type("550-01-6981");
 
         cy.get('form').submit();
 
         cy.contains('This participant does not have a matching record in any other states.').should('be.visible');
+        pa11yOptions.screenCapture = `C:/Users/dborgen/Pictures/test.png`;
+        cy.pa11y(pa11yOptions);
     });
 
-    it("shows results table on successful submission with a match", () => {
+    it.only("shows results table on successful submission with a match", async () => {
         // TODO: stub out submit request
-        cy.get('input[name="Query.LastName"]').type("Farrington");
-        cy.get('input[name="Query.DateOfBirth"]').type("1931-10-13");
-        cy.get('input[name="Query.SocialSecurityNum"]').type("425-46-5417");
-
-        cy.get('form').submit();
+        setValue('#Query_LastName', 'Farrington');
+        setValue('#Query_DateOfBirth', '1931-10-13');
+        setValue('#Query_SocialSecurityNum', '425-46-5417');
+        click('#query-form-search-btn');
 
         cy.contains('Match ID').should('be.visible');
         cy.contains('Matching State').should('be.visible');
 
-        pa11yOptions.actions = [
-            ...pa11yOptions.actions,
-            'set field #Query_LastName to Farrington',
-            'check field #Query_LastName',
-
-        ]
-        pa11yOptions.actions.push('click element #query-form-search-btn');
+        pa11yOptions.screenCapture = `C:/Users/dborgen/Pictures/test2.png`;
+        pa11yOptions.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
+        pa11yOptions.method = 'POST';
+        cy.get('#snap-participants-query-form input[name]').each(el => {
+            const value = el.val();
+            const name = el.attr('name');
+            if (value && name) {
+                if (pa11yOptions.postData) {
+                    pa11yOptions.postData += `&${name}=${value}`;
+                }
+                else {
+                    pa11yOptions.postData = `${name}=${value}`;
+                }
+            }
+        });
+            
+        
+            //.spread(value => {
+            //    pa11yOptions.postData = 'Query.LastName=Farrington&Query.DateOfBirth=1931-10-13&Query.SocialSecurityNum=425-46-5417&__RequestVerificationToken=' + value;
+            //});
+            
+            //.then(value => {
+            //    pa11yOptions.postData = 'Query.LastName=Farrington&Query.DateOfBirth=1931-10-13&Query.SocialSecurityNum=425-46-5417&__RequestVerificationToken=' + value;
+            //});
+        
+        cy.pa11y(pa11yOptions);
     });
 })
+
+function setValue(cssSelector, value) {
+    cy.get(cssSelector).type(value);
+}
+function click(cssSelector) {
+    cy.get(cssSelector).click();
+    pa11yOptions.actions = [
+        ...pa11yOptions.actions,
+    ];
+}
