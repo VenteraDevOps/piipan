@@ -63,8 +63,8 @@
       },
       "Azure.Core": {
         "type": "Transitive",
-        "resolved": "1.22.0",
-        "contentHash": "ze/xRCHSSDe5TIk5vBDbVrauW1EN7UIbnBvIBfMH8KSt/I9+/7yPAjTBDgNBk0IwG6WBV+BBHp4IUtS/PGAQwQ==",
+        "resolved": "1.23.0",
+        "contentHash": "myulcGStD89NN7BUhAjkcfDhIvRj2UUwZHEgjB50pL3vb0LEunrtinxKqUGUuOheQVCHlILKLNoUeCThQ1iCOg==",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "1.1.1",
           "System.Diagnostics.DiagnosticSource": "4.6.0",
@@ -711,8 +711,8 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.13",
-        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
+        "resolved": "3.1.0",
+        "contentHash": "feeLs1Yhi5biYGZq589bafyz25cOGkJ6C0yK5ez120fA81sPJQU69r+3efxh+Ygs13pq9qxSkj/JWrzUH90a/g==",
         "dependencies": {
           "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
@@ -2326,7 +2326,7 @@
           "Microsoft.Azure.Cosmos.Table": "1.0.8",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Extensions.Http": "3.1.23",
-          "Microsoft.NET.Sdk.Functions": "3.0.13",
+          "Microsoft.NET.Sdk.Functions": "3.1.0",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.3",
@@ -2356,7 +2356,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.22.0",
+          "Azure.Core": "1.23.0",
           "Azure.Identity": "1.5.0",
           "Microsoft.AspNetCore.Authorization": "3.1.23",
           "Microsoft.AspNetCore.Http": "2.2.2",
