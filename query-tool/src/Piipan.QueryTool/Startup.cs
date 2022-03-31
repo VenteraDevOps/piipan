@@ -111,14 +111,6 @@ namespace Piipan.QueryTool
 
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
-            app.UseStaticFiles();
-
-            app.UseAuthentication();
-            app.UseRouting();
-
-            app.UseSession();
-
-            app.UseAuthorization();
 
             //Perform middleware for custom 404 page
             app.Use(async (context, next) => {
@@ -139,6 +131,14 @@ namespace Piipan.QueryTool
                     await next();
                 }
             });
+            app.UseStaticFiles();
+
+            app.UseAuthentication();
+            app.UseRouting();
+
+            app.UseSession();
+
+            app.UseAuthorization();
 
             app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseMiddleware<AuthenticationLoggingMiddleware>();
