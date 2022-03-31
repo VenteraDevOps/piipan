@@ -4,6 +4,7 @@ using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Etl.Func.BulkUpload.Services;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Database;
@@ -28,6 +29,7 @@ namespace Piipan.Etl.Func.BulkUpload
                 );
             });
             builder.Services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
+            builder.Services.AddTransient<ICustomerEncryptedBlobRetrievalService, CustomerEncryptedBlobRetrievalService>();
 
             builder.Services.RegisterParticipantsServices();
         }

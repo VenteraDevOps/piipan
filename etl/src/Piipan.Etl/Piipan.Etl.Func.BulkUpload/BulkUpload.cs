@@ -3,10 +3,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Etl.Func.BulkUpload.Services;
 using Piipan.Participants.Api;
 
 namespace Piipan.Etl.Func.BulkUpload
@@ -20,13 +20,16 @@ namespace Piipan.Etl.Func.BulkUpload
     {
         private readonly IParticipantApi _participantApi;
         private readonly IParticipantStreamParser _participantParser;
+        private readonly IBlobRetrievalService _blobRetrievalService;
 
         public BulkUpload(
             IParticipantApi participantApi,
-            IParticipantStreamParser participantParser)
+            IParticipantStreamParser participantParser, 
+            IBlobRetrievalService blobRetrievalService)
         {
             _participantApi = participantApi;
             _participantParser = participantParser;
+            _blobRetrievalService = blobRetrievalService;
         }
 
         /// <summary>
@@ -50,13 +53,11 @@ namespace Piipan.Etl.Func.BulkUpload
         {
             //log.LogInformation(eventGridEvent.Data.ToString());
 
-            //x- Verify decryption works
-            //x- Pull from KeyVault instead - grant access to Azure Function with links below
-            //x (not possible!) - Try RSA or alternative instead of customer provided key?
-            //Research other options for Blob input bindings & decryption
-            //Update APIM to enforce customer provided key encryption
-            //Switch APIM to pull secrets from Azure Key Vault
-            //script to rotate/change keys in Key Vault -> generate console application. Spits values out when called. Potentially even updates Key vault using Azure SDK. Would be separate JIRA ticket
+            //add named values to APIM
+            //add Application Setting to Azure Function
+            //Assign a key vault access policy to the managed identity with permissions to get and list secrets from the vault.
+            //Add role assignment to Azure Function for role assignment
+            //Unit tests for BulkUpload.cs, BlobRetrievalService.cs
 
             log.LogWarning("Starting new ETL at {0}", DateTime.Now);
             Console.WriteLine("Starting new ETL at {0}", DateTime.Now);
@@ -64,14 +65,10 @@ namespace Piipan.Etl.Func.BulkUpload
             //https://dev.to/pwd9000/protect-secrets-in-azure-functions-using-key-vault-d2i
             //https://docs.microsoft.com/en-us/azure/app-service/app-service-key-vault-references#granting-your-app-access-to-key-vault
             string connectionString = Environment.GetEnvironmentVariable("BlobStorageConnectionString");
-            string myKey = Environment.GetEnvironmentVariable("kv_MyAzEncryptKey");
+            string uploadEncryptionKey = Environment.GetEnvironmentVariable("kv_UploadEncryptKey");
 
-            BlobClientOptions blobClientOptions = new BlobClientOptions() { CustomerProvidedKey = new Azure.Storage.Blobs.Models.CustomerProvidedKey(myKey) };
-            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString,
-                blobClientOptions);
+            var blobClient = _blobRetrievalService.RetrieveBlob(connectionString, filename, uploadEncryptionKey);
 
-            BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient("upload");
-            BlobClient blobClient = blobContainerClient.GetBlobClient(filename);
             using (Stream input = blobClient.OpenRead())
             {
                 try
