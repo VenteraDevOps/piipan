@@ -70,10 +70,7 @@ namespace Piipan.QueryTool
             services.AddSingleton<ILdsDeidentifier, LdsDeidentifier>();
 
             services.AddHttpContextAccessor();
-            services.AddEasyAuth((e) =>
-            {
-                e.
-            });
+            services.AddEasyAuth();
 
             services.AddDistributedMemoryCache();
             services.AddSession();
