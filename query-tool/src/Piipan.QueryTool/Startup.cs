@@ -70,7 +70,9 @@ namespace Piipan.QueryTool
             services.AddSingleton<ILdsDeidentifier, LdsDeidentifier>();
 
             services.AddHttpContextAccessor();
-            services.AddEasyAuth();
+            services.AddEasyAuth((e) =>
+            {
+            });
 
             services.AddDistributedMemoryCache();
             services.AddSession();
@@ -122,8 +124,17 @@ namespace Piipan.QueryTool
 
             //Perform middleware for custom 404 page
             app.Use(async (context, next) => {
-                await next();
-                if (context.Response.StatusCode == 404 || context.Response.StatusCode == 500)
+                try
+                {
+                    await next();
+                    if (context.Response.StatusCode == 404 || context.Response.StatusCode == 500)
+                    {
+                        context.Request.Path = "/Error";
+                        context.Response.StatusCode = 200;
+                        await next();
+                    }
+                }
+                catch
                 {
                     context.Request.Path = "/Error";
                     context.Response.StatusCode = 200;
