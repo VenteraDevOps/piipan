@@ -31,9 +31,6 @@ set_constants () {
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
-
-  # Query rool cWAF custom rule
-  WAF_CUSTOM_RULE_NAME=rateLimitRuleByRequestMethod
 }
 
 # Generate the storage account connection string for the corresponding
@@ -601,31 +598,6 @@ main () {
   echo "Front Door iD: ${front_door_id}"
 
   front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
-
-  # Create WAF Policy on the front door
-  echo "az network front-door waf-policy rule create "
-  az network front-door waf-policy rule create \
-    --name $WAF_CUSTOM_RULE_NAME \
-    --priority 1 \
-    --action Block \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME" \
-    --rule-type ratelimitrule \
-    --rate-limit-duration 5 \
-    --rate-limit-threshold 10000 --defer
-
-  echo "az network front-door waf-policy rule show"
-
-  #Create the custom rule on the WAF Polity that match with any POST request method
-  echo "az network front-door waf-policy rule match-condition add"
-  az network front-door waf-policy rule match-condition add \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME" \
-    --name $WAF_CUSTOM_RULE_NAME \
-    --match-variable RequestMethod \
-    --operator Equal \
-    --values POST
-
   orch_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
