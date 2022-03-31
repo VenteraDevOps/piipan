@@ -20,9 +20,7 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "OrchApiUri": "https://kc-func-orchestrator-krishna.azurewebsites.net/api/v1/",
-        "OrchApiAppId": "72f01997-3fcd-46c7-a58d-7ab6068f41d6"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
