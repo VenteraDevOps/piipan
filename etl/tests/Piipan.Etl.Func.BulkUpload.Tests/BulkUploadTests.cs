@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
+using Azure.Storage.Blobs;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Etl.Func.BulkUpload.Services;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Xunit;
@@ -15,6 +16,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 {
     public class BulkUploadTests
     {
+        private const string FAKE_CONTAINER_URL = "https://myTest.blob.core.windows.net/mycontainer/example.csv";
+
         private Stream ToStream(string s)
         {
             var stream = new MemoryStream();
@@ -26,11 +29,21 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             return stream;
         }
 
+        private BlobClient BlobClientMock()
+        {
+            Stream data = ToStream("data");
+
+            var blobClient = new Mock<BlobClient>();
+            blobClient.Setup(x => x.OpenRead(0, null, null, default)).Returns(data);
+
+            return blobClient.Object;
+        }
+
         private EventGridEvent EventMock()
         {
             var e = Mock.Of<EventGridEvent>();
             // Can't override Data in Setup, just use a real one
-            e.Data = new Object();
+            e.Data = new StorageBlobCreatedEventData() { Url= FAKE_CONTAINER_URL };
             return e;
         }
 
@@ -50,12 +63,20 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
+            var blobRetrievalService = new Mock<ICustomerEncryptedBlobRetrievalService>();
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi, participantStreamParser);
+
+            var blobClient = new Mock<BlobClient>();
+
+            blobRetrievalService
+                .Setup(x => x.RetrieveBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(blobClient.Object);
+
+            var function = new BulkUpload(participantApi, participantStreamParser, blobRetrievalService.Object);
 
             // Act
-            await function.Run(EventMock(), null, logger.Object);
+            await function.Run(EventMock(), logger.Object);
 
             // Assert
             VerifyLogError(logger, "No input stream was provided");
@@ -65,17 +86,24 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         public async void Run_ParserThrows()
         {
             // Arrange
+            var blobRetrievalService = new Mock<ICustomerEncryptedBlobRetrievalService>();
             var participantApi = Mock.Of<IParticipantApi>();
             var participantStreamParser = new Mock<IParticipantStreamParser>();
             participantStreamParser
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
                 .Throws(new Exception("the parser broke"));
 
+            var blobClient = BlobClientMock();
+            
+            blobRetrievalService
+                .Setup(x => x.RetrieveBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(blobClient);
+
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi, participantStreamParser.Object);
+            var function = new BulkUpload(participantApi, participantStreamParser.Object, blobRetrievalService.Object);
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), ToStream("data"), logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), logger.Object));
             VerifyLogError(logger, "the parser broke");
         }
 
@@ -83,6 +111,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         public async void Run_ApiThrows()
         {
             // Arrange
+            var blobRetrievalService = new Mock<ICustomerEncryptedBlobRetrievalService>();
+
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>()))
@@ -90,11 +120,17 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
+            var blobClient = BlobClientMock();
+
+            blobRetrievalService
+                .Setup(x => x.RetrieveBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(blobClient);
+
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi.Object, participantStreamParser);
+            var function = new BulkUpload(participantApi.Object, participantStreamParser, blobRetrievalService.Object);
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), ToStream("data"), logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), logger.Object));
             VerifyLogError(logger, "the api broke");
         }
 
@@ -102,6 +138,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         public async void Run_ParsedInputPassedToApi()
         {
             // Arrange
+            var blobRetrievalService = new Mock<ICustomerEncryptedBlobRetrievalService>();
+
             var participants = new List<Participant>
             {
                 new Participant
@@ -121,12 +159,18 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
                 .Returns(participants);
 
+            var blobClient = BlobClientMock();
+
+            blobRetrievalService
+                .Setup(x => x.RetrieveBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(blobClient);
+
             var participantApi = new Mock<IParticipantApi>();
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object);
+            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobRetrievalService.Object);
 
             // Act
-            await function.Run(EventMock(), ToStream("data"), logger.Object);
+            await function.Run(EventMock(), logger.Object);
 
             // Assert
             participantApi.Verify(m => m.AddParticipants(participants), Times.Once);
