@@ -780,8 +780,8 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.13",
-        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
+        "resolved": "3.1.0",
+        "contentHash": "feeLs1Yhi5biYGZq589bafyz25cOGkJ6C0yK5ez120fA81sPJQU69r+3efxh+Ygs13pq9qxSkj/JWrzUH90a/g==",
         "dependencies": {
           "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
@@ -2166,7 +2166,7 @@
           "Microsoft.Azure.WebJobs.Extensions.Storage": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "3.1.23",
           "Microsoft.Extensions.Logging": "3.1.23",
-          "Microsoft.NET.Sdk.Functions": "3.0.13",
+          "Microsoft.NET.Sdk.Functions": "3.1.0",
           "Npgsql": "6.0.3",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Participants.Core": "1.0.0",
@@ -2174,7 +2174,10 @@
         }
       },
       "piipan.participants.api": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Piipan.Shared": "1.0.0"
+        }
       },
       "piipan.participants.core": {
         "type": "Project",
@@ -2189,7 +2192,7 @@
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.22.0",
+          "Azure.Core": "1.23.0",
           "Azure.Identity": "1.5.0",
           "Microsoft.AspNetCore.Authorization": "3.1.23",
           "Microsoft.AspNetCore.Http": "2.2.2",
