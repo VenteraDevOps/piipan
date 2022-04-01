@@ -150,6 +150,16 @@ main () {
       --query id \
       --output tsv)
 
+
+UploadEncryptionKeyRefName=UploadEncryptionKey
+UploadEncryptionKeyShaRefName=UploadEncryptionKeySha256
+  # echo "Adding Named Values for Upload Encryption key vault references"
+  # az apim nv create --service-name "$APIM_NAME" -g "$RESOURCE_GROUP" --named-value-id "$UploadEncryptionKeyRefName" \
+  #  --display-name 'Upload Encryption Key Reference' --value 'foo'
+
+  # az apim nv create --service-name "$APIM_NAME" -g "$RESOURCE_GROUP" --named-value-id "$UploadEncryptionKeyShaRefName" \
+  # --display-name 'Upload Encryption Key SHA Reference' --value 'foo'
+
   echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))
 
