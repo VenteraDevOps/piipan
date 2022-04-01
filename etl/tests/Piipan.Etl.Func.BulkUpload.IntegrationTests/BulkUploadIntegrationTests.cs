@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-<<<<<<< HEAD
-using System.Text;
 using Dapper;
-=======
 using Azure.Storage.Blobs;
->>>>>>> 96a41c6a (Fix BulkUploadIntegrationTests.cs)
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
