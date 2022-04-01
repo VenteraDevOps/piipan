@@ -85,22 +85,22 @@ main () {
   # Virtual network is used to secure connections between
   # participant records database and all apps that communicate with it.
   # Apps will be integrated with VNet as they're created.
-  echo "Creating Virtual Network and Subnets"
-  az deployment group create \
-    --name "$VNET_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-      --template-file ./arm-templates/virtual-network.json \
-      --parameters \
-        location="$LOCATION" \
-        resourceTags="$RESOURCE_TAGS" \
-        vnetName="$VNET_NAME" \
-        peParticipantsSubnetName="$DB_SUBNET_NAME" \
-        peCoreSubnetName="$DB_2_SUBNET_NAME" \
-        funcAppServicePlanSubnetName="$FUNC_SUBNET_NAME" \
-        funcAppServicePlanNsgName="$FUNC_NSG_NAME" \
-        webAppServicePlanSubnetName="$WEBAPP_SUBNET_NAME" \
-        webAppServicePlanNsgName="$WEBAPP_NSG_NAME" \
-        idpOidcIpRanges="$IDP_OIDC_IP_RANGES"
+  # echo "Creating Virtual Network and Subnets"
+  # az deployment group create \
+  #   --name "$VNET_NAME" \
+  #   --resource-group "$RESOURCE_GROUP" \
+  #     --template-file ./arm-templates/virtual-network.json \
+  #     --parameters \
+  #       location="$LOCATION" \
+  #       resourceTags="$RESOURCE_TAGS" \
+  #       vnetName="$VNET_NAME" \
+  #       peParticipantsSubnetName="$DB_SUBNET_NAME" \
+  #       peCoreSubnetName="$DB_2_SUBNET_NAME" \
+  #       funcAppServicePlanSubnetName="$FUNC_SUBNET_NAME" \
+  #       funcAppServicePlanNsgName="$FUNC_NSG_NAME" \
+  #       webAppServicePlanSubnetName="$WEBAPP_SUBNET_NAME" \
+  #       webAppServicePlanNsgName="$WEBAPP_NSG_NAME" \
+  #       idpOidcIpRanges="$IDP_OIDC_IP_RANGES"
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
@@ -137,37 +137,29 @@ main () {
   fi
 
   # Create event hub and assign role to app registration
-  az deployment group create \
-    --name monitoring \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file  ./arm-templates/event-hub-monitoring.json \
-    --parameters \
-      resourceTags="$RESOURCE_TAGS" \
-      location="$LOCATION" \
-      env="$ENV" \
-      prefix="$PREFIX" \
-      receiverId="$siem_app_id"
+  # az deployment group create \
+  #   --name monitoring \
+  #   --resource-group "$RESOURCE_GROUP" \
+  #   --template-file  ./arm-templates/event-hub-monitoring.json \
+  #   --parameters \
+  #     resourceTags="$RESOURCE_TAGS" \
+  #     location="$LOCATION" \
+  #     env="$ENV" \
+  #     prefix="$PREFIX" \
+  #     receiverId="$siem_app_id"
 
-  # Create a key vault which will store credentials for use in other templates
-  az deployment group create \
-    --name "$VAULT_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/key-vault.json \
-    --parameters \
-      name="$VAULT_NAME" \
-      location="$LOCATION" \
-      objectId="$CURRENT_USER_OBJID" \
-      resourceTags="$RESOURCE_TAGS" \
-      eventHubName="$EVENT_HUB_NAME"
+  # # Create a key vault which will store credentials for use in other templates
+  # az deployment group create \
+  #   --name "$VAULT_NAME" \
+  #   --resource-group "$RESOURCE_GROUP" \
+  #   --template-file ./arm-templates/key-vault.json \
+  #   --parameters \
+  #     name="$VAULT_NAME" \
+  #     location="$LOCATION" \
+  #     objectId="$CURRENT_USER_OBJID" \
+  #     resourceTags="$RESOURCE_TAGS" \
+  #     eventHubName="$EVENT_HUB_NAME"
 
-  # Send Policy events from subscription's activity log to event hub
-  az deployment sub create \
-    --name activity-log-diagnostics-$LOCATION \
-    --location "$LOCATION" \
-    --template-file ./arm-templates/activity-log.json \
-    --parameters \
-      eventHubName="$EVENT_HUB_NAME" \
-      coreResourceGroup="$RESOURCE_GROUP"
 
   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
@@ -185,116 +177,20 @@ main () {
         location="$LOCATION" \
         vnet="$VNET_ID" \
         subnet="$FUNC_SUBNET_NAME" \
-        sku="$STORAGE_SKU" \
+          sku="$STORAGE_SKU" \
         eventHubNamespace="$EVENT_HUB_NAME"
   done < states.csv
 
-  # Avoid echoing passwords in a manner that may show up in process listing,
-  # or storing it in a temp file that may be read, or appearing in a CI/CD log.
-  #
-  # By default, Azure CLI will print the password set in Key Vault; instead
-  # just extract and print the secret id from the JSON response.
-  PG_SECRET=$(random_password)
-  export PG_SECRET
-  printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
-    --vault-name "$VAULT_NAME" \
-    --name "$PG_SECRET_NAME" \
-    --file /dev/stdin \
-    --query id
-
-  echo "Creating PostgreSQL server"
-  az deployment group create \
-    --name participant-records \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/participant-records.json \
-    --parameters \
-      administratorLogin=$PG_SUPERUSER \
-      serverName="$PG_SERVER_NAME" \
-      secretName="$PG_SECRET_NAME" \
-      vaultName="$VAULT_NAME" \
-      resourceTags="$RESOURCE_TAGS" \
-      vnetName="$VNET_NAME" \
-      subnetName="$DB_SUBNET_NAME" \
-      privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
-      privateDnsZoneName="$PRIVATE_DNS_ZONE" \
-      eventHubName="$EVENT_HUB_NAME"
 
 
-  # The AD admin can't be specified in the PostgreSQL ARM template,
-  # unlike in Azure SQL
-  az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
-  PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
-  az postgres server ad-admin create \
-    --resource-group "$RESOURCE_GROUP" \
-    --server "$PG_SERVER_NAME" \
-    --display-name "$PG_AAD_ADMIN" \
-    --object-id "$PG_AAD_ADMIN_OBJID"
 
-  # Create managed identities to admin each state's database
-  while IFS=, read -r abbr name ; do
-      echo "Creating managed identity for $name ($abbr)"
-      abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
-      identity=$(state_managed_id_name "$abbr" "$ENV")
-      az identity create -g "$RESOURCE_GROUP" -n "$identity"
-  done < states.csv
+ 
 
-  exists=$(az ad group member check \
-    --group "$PG_AAD_ADMIN" \
-    --member-id "$CURRENT_USER_OBJID" \
-    --query value -o tsv)
 
-  if [ "$exists" = "true" ]; then
-    echo "$CURRENT_USER_OBJID is already a member of $PG_AAD_ADMIN"
-  else
-    # Temporarily add current user as a PostgreSQL AD admin
-    # to allow provisioning of managed identity roles
-    az ad group member add \
-      --group "$PG_AAD_ADMIN" \
-      --member-id "$CURRENT_USER_OBJID"
-  fi
-
-  PGPASSWORD=$PG_SECRET
-  export PGPASSWORD
-  PGUSER=${PG_SUPERUSER}@${PG_SERVER_NAME}
-  export PGUSER
-  PGHOST=$(az resource show \
-    --resource-group "$RESOURCE_GROUP" \
-    --name "$PG_SERVER_NAME" \
-    --resource-type "Microsoft.DbForPostgreSQL/servers" \
-    --query properties.fullyQualifiedDomainName -o tsv)
-  export PGHOST
-  export ENV
-  export PREFIX
-  # Multiple PostgreSQL databases cannot be created with an ARM template;
-  # detailed database/schema/role configuration can't be done with an ARM
-  # template either. Instead, we access the PostgreSQL server from a trusted
-  # network (as established by its ARM template firewall variable), and apply
-  # various Data Definition (DDL) scripts for each state.
-  ./create-databases.bash "$RESOURCE_GROUP"
-
-  # Apply DDL shared between the ETL and match API subsystems.
-  # XXX This should be moved out of IaC, which is not run in CI/CD,
-  #     to a continuously deployable workflow that accomodates schema
-  #     changes over time.
-  pushd ../ddl
-  ./apply-ddl.bash
-  popd
 
   # This is a subscription-level resource provider
-  az provider register --wait --namespace Microsoft.EventGrid
+  # az provider register --wait --namespace Microsoft.EventGrid
 
-  # Function apps need an app service plan with private endpoint abilities
-  echo "Creating app service plan ${APP_SERVICE_PLAN_FUNC_NAME}"
-  az deployment group create \
-    --name "$APP_SERVICE_PLAN_FUNC_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/app-service-plan.json \
-    --parameters \
-      name="$APP_SERVICE_PLAN_FUNC_NAME" \
-      location="$LOCATION" \
-      kind="$APP_SERVICE_PLAN_FUNC_KIND" \
-      sku="$APP_SERVICE_PLAN_FUNC_SKU" \
-      resourceTags="$RESOURCE_TAGS"
 
   # Function apps need an Event Hub authorization rule ID for log streaming
   eh_rule_id=$(\
@@ -315,114 +211,118 @@ main () {
   # deploy project code using functions core tools. Networking
   # restrictions for the function app and storage account are added
   # in a separate step to avoid deployment and publishing issues.
-  db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
-  collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
-  az deployment group create \
-    --name orch-api \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --template-file  ./arm-templates/function-orch-match.json \
-    --parameters \
-      resourceTags="$RESOURCE_TAGS" \
-      location="$LOCATION" \
-      functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
-      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
-      storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-      databaseConnectionString="$db_conn_str" \
-      collabDatabaseConnectionString="$collab_db_conn_str" \
-      cloudName="$CLOUD_NAME" \
-      states="$state_abbrs" \
-      coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
+  # db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
+  # collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
+  # az deployment group create \
+  #   --name orch-api \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --template-file  ./arm-templates/function-orch-match.json \
+  #   --parameters \
+  #     resourceTags="$RESOURCE_TAGS" \
+  #     location="$LOCATION" \
+  #     functionAppName="$ORCHESTRATOR_FUNC_APP_NAME" \
+  #     appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+  #     storageAccountName="$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+  #     databaseConnectionString="$db_conn_str" \
+  #     collabDatabaseConnectionString="$collab_db_conn_str" \
+  #     cloudName="$CLOUD_NAME" \
+  #     states="$state_abbrs" \
+  #     coreResourceGroup="$RESOURCE_GROUP" \
+  #     eventHubName="$EVENT_HUB_NAME"
 
   # Publish function app
-  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+  # try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
-  echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
-  # Subnet ID is needed when vnet and storage are in different resource groups
-  func_subnet_id=$(\
-    az network vnet subnet show \
-      --vnet-name "$VNET_NAME" \
-      --name "$FUNC_SUBNET_NAME" \
-      --resource-group "$RESOURCE_GROUP" \
-      --query id \
-      -o tsv)
-  az storage account network-rule add \
-    --account-name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --subnet "$func_subnet_id"
-  az storage account update \
-    --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --default-action Deny
+  # echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
+  # # Subnet ID is needed when vnet and storage are in different resource groups
+  # func_subnet_id=$(\
+  #   az network vnet subnet show \
+  #     --vnet-name "$VNET_NAME" \
+  #     --name "$FUNC_SUBNET_NAME" \
+  #     --resource-group "$RESOURCE_GROUP" \
+  #     --query id \
+  #     -o tsv)
+  # az storage account network-rule add \
+  #   --account-name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --subnet "$func_subnet_id"
+  # az storage account update \
+  #   --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --default-action Deny
 
-  echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
-  az functionapp vnet-integration add \
-    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --subnet "$FUNC_SUBNET_NAME" \
-    --vnet "$VNET_ID"
-  az functionapp config appsettings set \
-    --name "$ORCHESTRATOR_FUNC_APP_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --settings \
-      WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1
+  # echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
+  # az functionapp vnet-integration add \
+  #   --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --subnet "$FUNC_SUBNET_NAME" \
+  #   --vnet "$VNET_ID"
+  # az functionapp config appsettings set \
+  #   --name "$ORCHESTRATOR_FUNC_APP_NAME" \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --settings \
+  #     WEBSITE_CONTENTOVERVNET=1 \
+  #     WEBSITE_VNET_ROUTE_ALL=1
 
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
-  az ad app create \
-    --display-name "$ORCHESTRATOR_FUNC_APP_NAME" \
-    --available-to-other-tenants false
+  # az ad app create \
+  #   --display-name "$ORCHESTRATOR_FUNC_APP_NAME" \
+  #   --available-to-other-tenants false
 
-  ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
+  # ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
-  # Create Match Resolution API Function App
-  echo "Create Match Resolution API Function App"
-  collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME")
-  az deployment group create \
-    --name match-res-api \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --template-file  ./arm-templates/function-match-res.json \
-    --parameters \
-      resourceTags="$RESOURCE_TAGS" \
-      location="$LOCATION" \
-      functionAppName="$MATCH_RES_FUNC_APP_NAME" \
-      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
-      storageAccountName="$MATCH_RES_FUNC_APP_STORAGE_NAME" \
-      collabDatabaseConnectionString="$collab_db_conn_str" \
-      cloudName="$CLOUD_NAME" \
-      states="$state_abbrs" \
-      coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
+  # # Create Match Resolution API Function App
+  # echo "Create Match Resolution API Function App"
+  # collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME")
+  # az deployment group create \
+  #   --name match-res-api \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --template-file  ./arm-templates/function-match-res.json \
+  #   --parameters \
+  #     resourceTags="$RESOURCE_TAGS" \
+  #     location="$LOCATION" \
+  #     functionAppName="$MATCH_RES_FUNC_APP_NAME" \
+  #     appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+  #     storageAccountName="$MATCH_RES_FUNC_APP_STORAGE_NAME" \
+  #     collabDatabaseConnectionString="$collab_db_conn_str" \
+  #     cloudName="$CLOUD_NAME" \
+  #     states="$state_abbrs" \
+  #     coreResourceGroup="$RESOURCE_GROUP" \
+  #     eventHubName="$EVENT_HUB_NAME"
 
-  echo "Publish Match Resolution API Function App"
-  try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
+  # echo "Publish Match Resolution API Function App"
+  # try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
 
-  echo "Integrating ${MATCH_RES_FUNC_APP_NAME} into virtual network"
-  az functionapp vnet-integration add \
-    --name "$MATCH_RES_FUNC_APP_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --subnet "$FUNC_SUBNET_NAME" \
-    --vnet "$VNET_ID"
-  az functionapp config appsettings set \
-    --name "$MATCH_RES_FUNC_APP_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --settings \
-      WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1
+  # echo "Integrating ${MATCH_RES_FUNC_APP_NAME} into virtual network"
+  # az functionapp vnet-integration add \
+  #   --name "$MATCH_RES_FUNC_APP_NAME" \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --subnet "$FUNC_SUBNET_NAME" \
+  #   --vnet "$VNET_ID"
+  # az functionapp config appsettings set \
+  #   --name "$MATCH_RES_FUNC_APP_NAME" \
+  #   --resource-group "$MATCH_RESOURCE_GROUP" \
+  #   --settings \
+  #     WEBSITE_CONTENTOVERVNET=1 \
+  #     WEBSITE_VNET_ROUTE_ALL=1
 
-  if [ "$exists" = "true" ]; then
-    echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
-  else
-    # Revoke temporary assignment of current user as a PostgreSQL AD admin
-    az ad group member remove \
-      --group "$PG_AAD_ADMIN" \
-      --member-id "$CURRENT_USER_OBJID"
-  fi
+  # if [ "$exists" = "true" ]; then
+  #   echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
+  # else
+  #   # Revoke temporary assignment of current user as a PostgreSQL AD admin
+  #   az ad group member remove \
+  #     --group "$PG_AAD_ADMIN" \
+  #     --member-id "$CURRENT_USER_OBJID"
+  # fi
 
   # Create per-state Function apps and assign corresponding managed identity for
   # access to the per-state blob-storage and database, set up system topics and
   # event subscription to bulk upload (blob creation) events
+  # while IFS=, read -r abbr name ; do
+  # echo "Creating function app for $name ($abbr)"
+  # done < states.csv
+
   while IFS=, read -r abbr name ; do
     echo "Creating function app for $name ($abbr)"
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
@@ -483,7 +383,7 @@ main () {
       --name "$func_app" \
       --storage-account "$func_stor"
 
-    # Integrate function app into Virtual Network
+    # # Integrate function app into Virtual Network
     echo "Integrating ${func_app} into virtual network"
     az functionapp vnet-integration add \
       --name "$func_app" \
@@ -514,7 +414,7 @@ main () {
         }
       ]'
 
-    # XXX Assumes if any identity is set, it is the one we are specifying below
+    #  Assumes if any identity is set, it is the one we are specifying below
     exists=$(az functionapp identity show \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app")
@@ -528,18 +428,24 @@ main () {
         --identities "${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}"
     fi
 
-    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
+    # db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
     blob_conn_str=$(blob_connection_string "$RESOURCE_GROUP" "$stor_name")
     az_serv_str=$(az_connection_string "$RESOURCE_GROUP" "$identity")
+
     az functionapp config appsettings set \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app" \
       --settings \
-        $DB_CONN_STR_KEY="$db_conn_str" \
         $AZ_SERV_STR_KEY="$az_serv_str" \
+        $DB_CONN_STR_KEY="Server=tts-psql-participants-dev.postgres.database.azure.com;Database=ea;Port=5432;User Id=id_eaadmin_dev@tts-psql-participants-dev;Password={password};Ssl Mode=VerifyFull;;Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;" \
         $BLOB_CONN_STR_KEY="$blob_conn_str" \
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       --output none
+
+              # $DB_CONN_STR_KEY="$db_conn_str" \
+              # 
+
+
 
     event_grid_system_topic_id=$(\
       az eventgrid system-topic create \
@@ -551,7 +457,9 @@ main () {
         -o tsv \
         --query id)
 
-    # Create Function endpoint before setting up event subscription
+
+    echo "try_run func azure functionapp publish ${func_app} --dotnet 7 ../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
+    # # Create Function endpoint before setting up event subscription
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
     az eventgrid system-topic event-subscription create \
@@ -577,126 +485,7 @@ main () {
       ]'
   done < states.csv
 
-  # Create App Service resources for query tool app.
-  # This needs to happen after the orchestrator is created in order for
-  # $orch_api to be set.
-  echo "Creating App Service resources for query tool app"
-
-  echo "Create Front Door and WAF policy for query tool app"
-  suffix=$(web_app_host_suffix)
-  query_tool_host=${QUERY_TOOL_APP_NAME}${suffix}
-  ./add-front-door-to-app.bash \
-    "$azure_env" \
-    "$RESOURCE_GROUP" \
-    "$QUERY_TOOL_FRONTDOOR_NAME" \
-    "$QUERY_TOOL_WAF_NAME" \
-    "$query_tool_host"
-
-  front_door_id=$(\
-  az network front-door show \
-    --name "$QUERY_TOOL_FRONTDOOR_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --query frontdoorId \
-    --output tsv)
-  echo "Front Door iD: ${front_door_id}"
-
-  front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
-
-  # Create WAF Policy on the front door
-  echo "az network front-door waf-policy rule create "
-  az network front-door waf-policy rule create \
-    --name $WAF_CUSTOM_RULE_NAME \
-    --priority 1 \
-    --action Block \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME" \
-    --rule-type ratelimitrule \
-    --rate-limit-duration 5 \
-    --rate-limit-threshold 10000 --defer
-
-  echo "az network front-door waf-policy rule show"
-
-  #Create the custom rule on the WAF Polity that match with any POST request method
-  echo "az network front-door waf-policy rule match-condition add" 
-  az network front-door waf-policy rule match-condition add \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME" \
-    --name $WAF_CUSTOM_RULE_NAME \
-    --match-variable RequestMethod \
-    --operator Equal \
-    --values POST
-
-  orch_api_uri=$(\
-    az functionapp show \
-      -g "$MATCH_RESOURCE_GROUP" \
-      -n "$ORCHESTRATOR_FUNC_APP_NAME" \
-      --query defaultHostName \
-      -o tsv)
-  orch_api_uri="https://${orch_api_uri}/api/v1/"
-  orch_api_app_id=$(\
-    az ad app list \
-      --display-name "${ORCHESTRATOR_FUNC_APP_NAME}" \
-      --filter "displayName eq '${ORCHESTRATOR_FUNC_APP_NAME}'" \
-      --query "[0].appId" \
-      --output tsv)
-
-  echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
-  az deployment group create \
-    --name "$QUERY_TOOL_APP_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file ./arm-templates/query-tool-app.json \
-    --parameters \
-      location="$LOCATION" \
-      resourceTags="$RESOURCE_TAGS" \
-      appName="$QUERY_TOOL_APP_NAME" \
-      servicePlan="$APP_SERVICE_PLAN" \
-      OrchApiUri="$orch_api_uri" \
-      OrchApiAppId="$orch_api_app_id" \
-      eventHubName="$EVENT_HUB_NAME" \
-      idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
-      idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
-      idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
-      aspNetCoreEnvironment="$PREFIX" \
-      frontDoorId="$front_door_id" \
-      frontDoorUri="$front_door_uri"
-
-  echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
-  az functionapp vnet-integration add \
-    --name "$QUERY_TOOL_APP_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --subnet "$WEBAPP_SUBNET_NAME" \
-    --vnet "$VNET_ID"
-
-  # Create a placeholder OIDC IdP secret
-  create_oidc_secret "$QUERY_TOOL_APP_NAME"
-
-  # Establish metrics sub-system
-  ./create-metrics-resources.bash "$azure_env"
-
-  # Core database server and schemas
-  ./create-core-databases.bash "$azure_env"
-
-  # API Management instances need to be created before configuring Easy Auth.
-  ./create-apim.bash "$azure_env" "$APIM_EMAIL"
-
-  # Configures App Service Authentication between:
-  #   - PerStateMatchApi and OrchestratorApi
-  #   - OrchestratorApi and QueryApp
-  ./configure-easy-auth.bash "$azure_env"
-
-  # Configures Azure Defender at the subscription level for:
-  #   - Storage accounts
-  ./configure-defender.bash "$azure_env"
-
-  echo "Secure database connection"
-  ./remove-external-network.bash \
-    "$azure_env" \
-    "$RESOURCE_GROUP" \
-    "$PG_SERVER_NAME"
-
-  # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
-  ./configure-cis-policy.bash "$azure_env"
-
+ 
   script_completed
 }
 

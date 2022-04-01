@@ -10,6 +10,7 @@ using CsvHelper.TypeConversion;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.Helpers;
+using Piipan.Shared.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Parsers
 {
@@ -56,27 +57,37 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 })
                 .TypeConverterOption.NullValues(string.Empty).Optional();
 
-            Map(m => m.RecentBenefitMonths)
-                .Name("recent_benefit_months")
-                .Validate(field => {
-                    if (String.IsNullOrEmpty(field.Field)) return true;
+            Map(m => m.RecentBenefitIssuanceDates)
+               .Name("recent_benefit_issuance_dates")
+               .Validate(field =>
+               {
+                   if (String.IsNullOrEmpty(field.Field)) return true;
 
-                    string[] formats={"yyyy-MM", "yyyy-M"};
-                    string[] dates = field.Field.Split(' ');
-                    foreach (string date in dates)
-                    {
-                        DateTime dateValue;
-                        var result = DateTime.TryParseExact(
-                            date,
-                            formats,
-                            new CultureInfo("en-US"),
-                            DateTimeStyles.None,
-                            out dateValue);
-                        if (!result) return false;
-                    }
-                    return true;
-                })
-                .TypeConverter<ToMonthEndArrayConverter>().Optional();
+                   string[] formats = { "yyyy-MM-dd", "yyyy-M-dd" };
+                   string[] dateRanges = field.Field.Split(' ');
+                   foreach (string dateRange in dateRanges)
+                   {
+                       string[] dates = dateRange.Split('/');
+                       DateTime startValue;
+                       var result = DateTime.TryParseExact(
+                           dates[0],
+                           formats,
+                           new CultureInfo("en-US"),
+                           DateTimeStyles.None,
+                           out startValue);
+                       if (!result) return false;
+                       DateTime endValue;
+                       result = DateTime.TryParseExact(
+                           dates[1],
+                           formats,
+                           new CultureInfo("en-US"),
+                           DateTimeStyles.None,
+                           out endValue);
+                       if (!result) return false;
+                   }
+                   return true;
+               })
+              .TypeConverter<ToDateRangeArrayConverter>().Optional();
 
             Map(m => m.ProtectLocation).Name("protect_location")
                 .TypeConverterOption.NullValues(string.Empty).Optional();
@@ -98,6 +109,24 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 			return new List<DateTime>(elementsAsDateTimes);
       	}
   	}
+    /// <summary>
+    /// Converts to list of Date range - ISO 8601 year-months-date when as a string
+    /// </summary>
+    public class ToDateRangeArrayConverter : DefaultTypeConverter
+    {
+        public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+        {
+            if (text == "") return new List<DateRange>();
+            string[] allElements = text.Split(' ');
+            List<DateRange> range = new List<DateRange>();
+            foreach ( string strRange in allElements)
+            {
+                DateTime[] elementsAsDateTimes = strRange.Split('/').Select(s => DateTime.Parse(s)).ToArray();
+                range.Add(new DateRange(elementsAsDateTimes[0], elementsAsDateTimes[1]));
+            }
+            return range;
+        }
+    }
 
     public class ParticipantCsvStreamParser : IParticipantStreamParser
     {

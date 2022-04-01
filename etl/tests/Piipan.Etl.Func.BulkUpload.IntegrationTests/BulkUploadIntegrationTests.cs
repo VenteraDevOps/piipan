@@ -1,92 +1,164 @@
 using System;
-using System.Data;
-using System.IO;
+using System.Collections.Generic;
+using System.Threading;
+using Piipan.Etl.Func.BulkUpload.Models;
+using Npgsql;
+using Piipan.Participants.Api.Models;
+using Piipan.Shared.Utilities;
+using NpgsqlTypes;
 using System.Linq;
-using Microsoft.Azure.EventGrid.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Piipan.Etl.Func.BulkUpload.Parsers;
-using Piipan.Participants.Api;
-using Piipan.Participants.Core.DataAccessObjects;
-using Piipan.Participants.Core.Extensions;
-using Piipan.Shared.Database;
-using Xunit;
+using Dapper;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
     /// <summary>
-    /// Integration tests for saving csv records to the database on a bulk upload
+    /// Test fixture for per-state match API database integration testing.
+    /// Creates a fresh set of participants and uploads tables, dropping them
+    /// when testing is complete.
     /// </summary>
-    public class BulkUploadIntegrationTests : DbFixture
+    public class DbFixture : IDisposable
     {
-        private ServiceProvider BuildServices()
-        {
-            var services = new ServiceCollection();
+        public readonly string ConnectionString;
+        public readonly NpgsqlFactory Factory;
 
-            services.AddLogging();
-            services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(c =>
+        public DbFixture()
+        {
+            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            Factory = NpgsqlFactory.Instance;
+
+            Initialize();
+            ApplySchema();
+        }
+
+        /// <summary>
+        /// Ensure the database is able to receive connections before proceeding.
+        /// </summary>
+        public void Initialize()
+        {
+            var retries = 10;
+            var wait = 2000; // ms
+
+            while (retries >= 0)
             {
-                var factory = new Mock<IDbConnectionFactory<ParticipantsDb>>();
-                factory
-                    .Setup(m => m.Build(It.IsAny<string>()))
-                    .ReturnsAsync(() =>
+                try
+                {
+                    using (var conn = Factory.CreateConnection())
                     {
-                        var connection = Factory.CreateConnection();
-                        connection.ConnectionString = ConnectionString;
-                        return connection;
-                    });
-                return factory.Object;
-            });
+                        conn.ConnectionString = ConnectionString;
+                        conn.Open();
+                        conn.Close();
 
-            services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
-            services.RegisterParticipantsServices();
-
-            return services.BuildServiceProvider();
-        }
-
-        private BulkUpload BuildFunction()
-        {
-            var services = BuildServices();
-            return new BulkUpload(
-                services.GetService<IParticipantApi>(),
-                services.GetService<IParticipantStreamParser>()
-            );
-        }
-
-        [Fact]
-        public async void SavesCsvRecords()
-        {
-            // setup
-            var services = BuildServices();
-            ClearParticipants();
-            var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
-            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
-            var logger = Mock.Of<ILogger>();
-            var function = BuildFunction();
-
-            // act
-            await function.Run(
-                eventGridEvent,
-                input,
-                logger
-            );
-
-            var records = QueryParticipants("SELECT * from participants;").ToList();
-
-            // assert
-            for (int i = 0; i < records.Count(); i++)
-            {
-                Assert.Equal($"caseid{i + 1}", records.ElementAt(i).CaseId);
-                Assert.Equal($"participantid{i + 1}", records.ElementAt(i).ParticipantId);
+                        return;
+                    }
+                }
+                catch (Npgsql.NpgsqlException ex)
+                {
+                    retries--;
+                    Console.WriteLine(ex.Message);
+                    Thread.Sleep(wait);
+                }
             }
-            Assert.Equal("a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec", records.First().LdsHash);
-            Assert.Equal(new DateTime(2021, 05, 15), records.First().ParticipantClosingDate);
-            Assert.Equal(new DateTime(2021, 04, 30), records.First().RecentBenefitMonths.First());
-            Assert.Equal(new DateTime(2021, 03, 31), records.First().RecentBenefitMonths.ElementAt(1));
-            Assert.Equal(new DateTime(2021, 02, 28), records.First().RecentBenefitMonths.ElementAt(2));
-            Assert.True(records.First().ProtectLocation);
+        }
+
+        public void Dispose()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                using (var cmd = Factory.CreateCommand())
+                {
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = "DROP TABLE IF EXISTS participants;";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = "DROP TABLE IF EXISTS uploads;";
+                    cmd.ExecuteNonQuery();
+                }
+
+                conn.Close();
+            }
+        }
+
+        private void ApplySchema()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                using (var cmd = Factory.CreateCommand())
+                {
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = "DROP TABLE IF EXISTS participants;";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = "DROP TABLE IF EXISTS uploads;";
+                    cmd.ExecuteNonQuery();
+
+                    string sqltext = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
+                    cmd.CommandText = sqltext;
+                    cmd.ExecuteNonQuery();
+                }
+
+                conn.Close();
+            }
+        }
+
+        public void ClearParticipants()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                using (var cmd = Factory.CreateCommand())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = "DELETE FROM participants";
+                    cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+            }
+        }
+
+        public IEnumerable<IParticipant> QueryParticipants(string sql)
+        {
+            var records = new List<IParticipant>();
+
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+
+                using (var cmd = Factory.CreateCommand())
+                {
+
+                    cmd.Connection = conn;
+                    cmd.CommandText = sql;
+                    var reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var record = new Participant
+                        {
+                            LdsHash = reader[1].ToString(),
+                            CaseId = reader[3].ToString(),
+                            ParticipantId = reader[4].ToString(),
+                            ParticipantClosingDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
+                            RecentBenefitIssuanceDates = reader[reader.GetOrdinal("recent_benefit_issuance_dates")] is DBNull ? new List<DateRange>() : ((NpgsqlRange<DateTime>[])reader[reader.GetOrdinal("recent_benefit_issuance_dates")]).Select(user => new DateRange() { Start = user.LowerBound, End = user.UpperBound }).ToList(),
+                            ProtectLocation = reader[reader.GetOrdinal("protect_location")] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[reader.GetOrdinal("protect_location")])
+                        };
+                        records.Add(record);
+                    }
+
+                    conn.Close();
+                }
+            }
+            return records;
         }
     }
 }
