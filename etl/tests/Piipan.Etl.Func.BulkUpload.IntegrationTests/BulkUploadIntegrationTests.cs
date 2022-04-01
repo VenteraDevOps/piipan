@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+<<<<<<< HEAD
 using System.Text;
 using Dapper;
+=======
+using Azure.Storage.Blobs;
+>>>>>>> 96a41c6a (Fix BulkUploadIntegrationTests.cs)
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,6 +27,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
     public class BulkUploadIntegrationTests : DbFixture
     {
+        private const string FAKE_CONTAINER_URL = "https://myTest.blob.core.windows.net/mycontainer/example.csv";
+
         private ServiceProvider BuildServices()
         {
             var services = new ServiceCollection();
@@ -43,7 +49,21 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 return factory.Object;
             });
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
-            services.AddTransient<ICustomerEncryptedBlobRetrievalService, CustomerEncryptedBlobRetrievalService>();
+
+            services.AddTransient<ICustomerEncryptedBlobRetrievalService>(x =>
+            {
+                var blobRetrievalService = new Mock<ICustomerEncryptedBlobRetrievalService>();
+                var input = new MemoryStream(File.ReadAllBytes("example.csv"));
+                var blobClient = new Mock<BlobClient>();
+                blobClient.Setup(x => x.OpenRead(0, null, null, default)).Returns(input);
+
+                blobRetrievalService
+                    .Setup(x => x.RetrieveBlob(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns(blobClient.Object);
+
+                return blobRetrievalService.Object;
+            });
+
             services.RegisterParticipantsServices();
 
             return services.BuildServiceProvider();
@@ -58,7 +78,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 services.GetService<ICustomerEncryptedBlobRetrievalService>()
             );
         }
-
+                
         [Fact]
         public async void SavesCsvRecords()
         {
@@ -66,8 +86,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = BuildServices();
             ClearParticipants();
             var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
-            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
+            eventGridEvent.Data = new StorageBlobCreatedEventData() { Url = FAKE_CONTAINER_URL };
+            
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
 
