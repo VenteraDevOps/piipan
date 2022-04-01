@@ -10,7 +10,6 @@ namespace Piipan.QueryTool.Pages
         [JsonProperty("match_status")]
         public string Status { get; set; }
 
-
         public MatchData() { }
 
         public MatchData(MatchData p)

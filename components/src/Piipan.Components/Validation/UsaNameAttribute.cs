@@ -33,7 +33,7 @@ namespace Piipan.Components.Validation
                         invalidValues.Add(match.Value);
                     }
                 }
-                ErrorMessage = $"Change {string.Join(',', invalidValues)} in {stringValue}. The @@@ should only contain standard ASCII characters, including the letters A-Z, numbers 0-9, and some select characters including hyphens.";
+                ErrorMessage = string.Format(ValidationConstants.InvalidCharacterInNameMessage, string.Join(',', invalidValues), stringValue);
                 return false;
             }
             // Convert to lower case
@@ -52,7 +52,7 @@ namespace Piipan.Components.Validation
             // Validate that the resulting value is at least one ASCII character in length
             if (result.Length < 1) // not at least one char
             {
-                ErrorMessage = "Normalized @@@ must be at least 1 character long.";
+                ErrorMessage = ValidationConstants.NormalizedNameTooShortMessage;
                 return false;
             }
             return true;

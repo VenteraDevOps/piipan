@@ -10,14 +10,14 @@ namespace Piipan.Components.Validation
         public UsaSSNAttribute()
             : base(@"^\d{3}-\d{2}-\d{4}$")
         {
-            ErrorMessage = ValidationConstants.SSNInvalidMessage;
+            ErrorMessage = ValidationConstants.SSNInvalidFormatMessage;
         }
 
         public override bool IsValid(object value)
         {
             if (!base.IsValid(value))
             {
-                ErrorMessage = ValidationConstants.SSNInvalidMessage;
+                ErrorMessage = ValidationConstants.SSNInvalidFormatMessage;
                 return false;
             }
             var stringValue = value?.ToString();
@@ -33,23 +33,23 @@ namespace Piipan.Components.Validation
                 var areaNumber = int.Parse(stringValue[0..3]);
                 if (areaNumber == 0 || areaNumber == 666 || areaNumber >= 900)
                 {
-                    ErrorMessage = $"The first three numbers of @@@ cannot be {stringValue[0..3]}";
+                    ErrorMessage = string.Format(ValidationConstants.SSNInvalidFirstThreeDigitsMessage, stringValue[0..3]);
                     return false;
                 }
                 if (stringValue[4..6] == "00")
                 {
-                    ErrorMessage = $"The middle two numbers of @@@ cannot be 00";
+                    ErrorMessage = ValidationConstants.SSNInvalidMiddleTwoDigitsMessage;
                     return false;
                 }
                 if (stringValue[7..11] == "0000")
                 {
-                    ErrorMessage = $"The last four numbers of @@@ cannot be 0000";
+                    ErrorMessage = ValidationConstants.SSNInvalidLastFourDigitsMessage;
                     return false;
                 }
             }
             catch
             {
-                ErrorMessage = "@@@ is invalid";
+                ErrorMessage = ValidationConstants.InvalidMessage;
                 return false;
             }
             return true;

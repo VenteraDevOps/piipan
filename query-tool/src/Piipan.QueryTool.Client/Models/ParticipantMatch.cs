@@ -1,4 +1,6 @@
-﻿namespace Piipan.QueryTool.Client.Models
+﻿using Piipan.QueryTool.Client.Utilities;
+
+namespace Piipan.QueryTool.Client.Models
 {
     public class ParticipantMatch
     {
@@ -14,7 +16,7 @@
 
         public DateTime? ParticipantClosingDate { get; set; }
 
-        //public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; } = new List<DateRange>();
+        public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; } = new List<DateRange>();
 
         public bool? ProtectLocation { get; set; }
     }
