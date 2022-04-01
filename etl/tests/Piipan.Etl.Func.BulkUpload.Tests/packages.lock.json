@@ -88,6 +88,16 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
+      "Azure.Messaging.EventGrid": {
+        "type": "Transitive",
+        "resolved": "4.8.1",
+        "contentHash": "nKQ4koesqFOYGW2/mkaRL7CpbpM1Bl/DvbfgsFLMKNdTeGiZUWcXA9+fLoRupmLtuQ+At9PuniyAtayzLLudWg==",
+        "dependencies": {
+          "Azure.Core": "1.21.0",
+          "System.Memory.Data": "1.0.2",
+          "System.Text.Json": "4.7.2"
+        }
+      },
       "Azure.Storage.Blobs": {
         "type": "Transitive",
         "resolved": "12.10.0",
@@ -345,18 +355,6 @@
           "System.Text.Encodings.Web": "4.5.0"
         }
       },
-      "Microsoft.Azure.EventGrid": {
-        "type": "Transitive",
-        "resolved": "1.3.0",
-        "contentHash": "LjrB8bknpLAe8x56tPeqKyKE945Y/wNTUqb/yScxqqdX/n0q+RsfUIf0P1V0pD3YoOkiAfqj2bxB0dYaT7zBvA==",
-        "dependencies": {
-          "Microsoft.Rest.ClientRuntime": "[2.3.11, 3.0.0)",
-          "Microsoft.Rest.ClientRuntime.Azure": "[3.3.12, 4.0.0)",
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1",
-          "System.Net.Http": "4.3.0"
-        }
-      },
       "Microsoft.Azure.Functions.Analyzers": {
         "type": "Transitive",
         "resolved": "1.0.0",
@@ -420,11 +418,11 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.EventGrid": {
         "type": "Transitive",
-        "resolved": "2.1.0",
-        "contentHash": "fU5mA523E2f9UpBHP77y7ZfZ1UpRKnRIpYMXUEz0wuanmpZgy/OshoS8x6fgTqpLp1vKXLBIbpfy5uiYK3w0Sg==",
+        "resolved": "3.1.0",
+        "contentHash": "DoUJ6f0h3YUHbYYNwlJGRH7zMDLsPhuxbTz5g88zrh9DkUD71jtbdgGJOY1jMdTa0ijSpTuHJdFM8/+69ewFgQ==",
         "dependencies": {
-          "Microsoft.Azure.EventGrid": "1.3.0",
-          "Microsoft.Azure.WebJobs": "3.0.0"
+          "Azure.Messaging.EventGrid": "4.8.1",
+          "Microsoft.Azure.WebJobs": "3.0.30"
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.Http": {
@@ -481,8 +479,8 @@
       },
       "Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator": {
         "type": "Transitive",
-        "resolved": "1.2.2",
-        "contentHash": "vpiNt3JM1pt/WrDIkg7G2DHhIpI4t5I+R9rmXCxIGiby5oPGEolyfiYZdEf2kMMN3SbWzVAbk4Q3jKgFhO9MaQ==",
+        "resolved": "4.0.1",
+        "contentHash": "o1E0hetLv8Ix0teA1hGH9D136RGSs24Njm5+a4FKzJHLlxfclvmOxmcg87vcr6LIszKzenNKd1oJGnOwg2WMnw==",
         "dependencies": {
           "System.Runtime.Loader": "4.3.0"
         }
@@ -768,14 +766,14 @@
       },
       "Microsoft.NET.Sdk.Functions": {
         "type": "Transitive",
-        "resolved": "3.0.13",
-        "contentHash": "8BEt6I6OLm7fo9bh8VGI7Mkc7xs/vI/KDira8MQcfZIA+K+lmDRb2PAL/+728eYfXI4SVrGs4MLhUZvKtpWfvQ==",
+        "resolved": "4.1.0",
+        "contentHash": "ycPJA1emOWi5p/gxiPhaWJD9Lxc7S6dAU5fbhopOtd25VoWZPx62J7Hqk5RdpiWsRAuxWPSIs4WdJF3oYaHVLg==",
         "dependencies": {
           "Microsoft.Azure.Functions.Analyzers": "[1.0.0, 2.0.0)",
           "Microsoft.Azure.WebJobs": "[3.0.23, 3.1.0)",
           "Microsoft.Azure.WebJobs.Extensions": "3.0.6",
           "Microsoft.Azure.WebJobs.Extensions.Http": "[3.0.2, 3.1.0)",
-          "Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator": "1.2.2",
+          "Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator": "4.0.1",
           "Newtonsoft.Json": "11.0.2"
         }
       },
@@ -788,25 +786,6 @@
         "type": "Transitive",
         "resolved": "1.1.3",
         "contentHash": "3Wrmi0kJDzClwAC+iBdUBpEKmEle8FQNsCs77fkiOIw/9oYA07bL1EZNX0kQ2OMN3xpwvl0vAtOCYY3ndDNlhQ=="
-      },
-      "Microsoft.Rest.ClientRuntime": {
-        "type": "Transitive",
-        "resolved": "2.3.11",
-        "contentHash": "0WOjf6O3H7XPrjBxK5H1kHqyO+PLvzwJ5Zc1pXkimQ1FrroLuhRYtG5XW70qbq0AFFoS/3vsua0h19GLLXomTg==",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1"
-        }
-      },
-      "Microsoft.Rest.ClientRuntime.Azure": {
-        "type": "Transitive",
-        "resolved": "3.3.12",
-        "contentHash": "dJP3X+kO1pspVnZwaXQOclfxx/7Js1TakyooMESwBK8DgdfDBbdr3BMT3fKN3s6iH2ffz/DaCs8Pqn3fnS9ZqQ==",
-        "dependencies": {
-          "Microsoft.Rest.ClientRuntime": "[2.3.10, 3.0.0)",
-          "NETStandard.Library": "1.6.1",
-          "Newtonsoft.Json": "9.0.1"
-        }
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
@@ -2154,11 +2133,11 @@
           "CsvHelper": "27.2.1",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
-          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "2.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
-          "Microsoft.NET.Sdk.Functions": "3.0.13",
+          "Microsoft.NET.Sdk.Functions": "4.1.0",
           "Npgsql": "6.0.3",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Participants.Core": "1.0.0",

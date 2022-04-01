@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
-using Microsoft.Azure.EventGrid.Models;
+using Azure.Messaging.EventGrid;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Models;
@@ -30,8 +30,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         private EventGridEvent EventMock()
         {
             var e = Mock.Of<EventGridEvent>();
-            // Can't override Data in Setup, just use a real one
-            e.Data = new Object();
+            // Can't override Data in Setup, just use a real one TODO_KC
+            e.Data = new BinaryData(String.Empty);
             return e;
         }
 
