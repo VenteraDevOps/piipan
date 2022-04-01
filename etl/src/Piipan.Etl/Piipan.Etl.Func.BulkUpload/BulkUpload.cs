@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
+using Azure.Storage.Blobs;
 
 namespace Piipan.Etl.Func.BulkUpload
 {
@@ -41,32 +42,17 @@ namespace Piipan.Etl.Func.BulkUpload
         /// to the per-state storage account and write access to the per-state database.
         /// </remarks>
         [FunctionName("BulkUpload")]
-        public async Task Run(
+        [return: Queue("qupload", Connection = "BlobStorageConnectionString")]
+        public static string Run(
             [EventGridTrigger] EventGridEvent eventGridEvent,
-            [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] Stream input,
+            [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] BlobClient blob,
             ILogger log)
         {
             log.LogInformation(eventGridEvent.Data.ToString());
 
-            try
-            {
-                if (input != null)
-                {
-                    var participants = _participantParser.Parse(input);
-                    await _participantApi.AddParticipants(participants);
-                }
-                else
-                {
-                    // Can get here if Function does not have
-                    // permission to access blob URL
-                    log.LogError("No input stream was provided");
-                }
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex.Message);
-                throw;
-            }
+		    log.LogInformation($"{blob.Name}");
+
+  	        return blob.Name;
         }
     }
 }
