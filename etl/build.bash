@@ -21,7 +21,7 @@ run_deploy () {
   do
     echo "Publish ${app} to Azure Environment ${azure_env}"
     pushd ./src/Piipan.Etl/Piipan.Etl.Func.BulkUpload
-      func azure functionapp publish "$app" --dotnet
+      func azure functionapp publish "kc-func-eaetl-krishna" --dotnet
     popd
   done
 }
