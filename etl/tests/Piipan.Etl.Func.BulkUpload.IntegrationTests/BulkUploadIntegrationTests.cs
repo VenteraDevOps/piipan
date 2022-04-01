@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Etl.Func.BulkUpload.Services;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core;
 using Piipan.Participants.Core.DataAccessObjects;
@@ -42,6 +43,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 return factory.Object;
             });
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
+            services.AddTransient<ICustomerEncryptedBlobRetrievalService, CustomerEncryptedBlobRetrievalService>();
             services.RegisterParticipantsServices();
 
             return services.BuildServiceProvider();
@@ -52,7 +54,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = BuildServices();
             return new BulkUpload(
                 services.GetService<IParticipantApi>(),
-                services.GetService<IParticipantStreamParser>()
+                services.GetService<IParticipantStreamParser>(),
+                services.GetService<ICustomerEncryptedBlobRetrievalService>()
             );
         }
 
@@ -71,7 +74,6 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             // act
             await function.Run(
                 eventGridEvent,
-                input,
                 logger
             );
 
