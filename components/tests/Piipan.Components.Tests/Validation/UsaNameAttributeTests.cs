@@ -34,13 +34,34 @@ namespace Piipan.Components.Tests.Validation
         /// Validate that if an error occurs that the correct error message is returned
         /// </summary>
         [Fact]
-        public void CorrectErrorMessageIsUsed()
+        public void CorrectErrorMessageForNormalizedNameTooShort()
         {
             // Arrange
             var attribute = new UsaNameAttribute();
 
+            // Act
+            var result = attribute.IsValid("-&123");
+
             // Assert
-            Assert.Equal(ValidationConstants.RequiredMessage, attribute.ErrorMessage);
+            Assert.False(result);
+            Assert.Equal(ValidationConstants.NormalizedNameTooShortMessage, attribute.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Validate that if an error occurs that the correct error message is returned
+        /// </summary>
+        [Fact]
+        public void CorrectErrorMessageForInvalidCharacter()
+        {
+            // Arrange
+            var attribute = new UsaNameAttribute();
+
+            // Act
+            var result = attribute.IsValid("García");
+
+            // Assert
+            Assert.False(result);
+            Assert.Equal(string.Format(ValidationConstants.InvalidCharacterInNameMessage, "í", "García"), attribute.ErrorMessage);
         }
     }
 }

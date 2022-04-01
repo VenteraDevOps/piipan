@@ -32,7 +32,8 @@
         // Assert
         Component!.MarkupMatches(
             @<div class="usa-ssn-group" >
-              <input class="@InputClass" id:ignore maxlength="11"  >
+              <input class="@InputClass" id="model_NotRequiredField" maxlength="11"  >
+              <input type="hidden" name="model.NotRequiredField">
               <button class="@ButtonClass @ButtonUnstyledClass" type="button" aria-label="Show Social Security Number"  >
                 <svg class="@IconClass" aria-hidden="true" focusable="false" role="img" >
                   <use xlink:href="/images/sprite.svg#visibility_off" ></use>
@@ -364,6 +365,7 @@
 
     protected override void CreateTestComponent()
     {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true);
         var componentFragment = Render<UsaForm>(
             @<UsaForm Model="model">
                 <UsaFormGroup>

@@ -7,38 +7,41 @@
 @using Piipan.QueryTool.Client.Models
 @inject NavigationManager NavigationManager
 
+
 @code {
-    [Parameter] public PiiRecord Query { get; set; }
+    [Parameter] public PiiRecord Query { get; set; } = new();
 
     /// <summary>
     /// The search response that is collected after the user hits "Search" and an API call is made
     /// </summary>
-    private OrchMatchResponseData? searchResponse = null;
-    private bool NoResults => searchResponse != null &&
-        (searchResponse.Results.Count == 0 || searchResponse.Results[0].Matches.Count() == 0);
+    [Parameter] public OrchMatchResponseData SearchResponse { get; set; }
+    [Parameter] public string Token { get; set; }
+    [Parameter] public string ServerError { get; set; }
+
+    private bool NoResults => SearchResponse != null &&
+        (SearchResponse.Results.Count == 0 || SearchResponse.Results[0].Matches.Count() == 0);
 
     private bool searching = false;
-    private async Task SubmitForm(bool passedValidation)
+    List<string> serverErrorList;
+    protected override void OnInitialized()
     {
-        //if (passedValidation)
-        //{
-        //    searching = true;
-        //    using var httpClient = ClientFactory.CreateClient();
-        //    httpClient.BaseAddress = new Uri(NavigationManager.BaseUri);
-        //    var post = await httpClient.PostAsJsonAsync("/api", Query);
-        //    if (post.IsSuccessStatusCode)
-        //    {
-        //        string searchResponseString = await post.Content.ReadAsStringAsync();
-        //        searchResponse = JsonConvert.DeserializeObject<OrchMatchResponse>(searchResponseString);
-                
-        //    }
-        //    searching = false;
-        //    StateHasChanged();
-        //}
-        //else
-        //{
-        //    searchResponse = null;
-        //}
+        base.OnInitialized();
+        if (!string.IsNullOrEmpty(ServerError))
+        {
+            serverErrorList = new List<string>
+            {
+                ServerError
+            };
+        }
+    }
+    private Task SubmitForm(bool valid)
+    {
+        if (valid)
+        {
+            searching = true;
+            StateHasChanged();
+        }
+        return Task.CompletedTask;
     }
 }
 
@@ -46,7 +49,8 @@
 <p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
 @if (Query != null)
 {
-    <UsaForm Model="Query" OnSubmit="SubmitForm">
+    <UsaForm Id="snap-participants-query-form" Model="Query" InitialErrors="serverErrorList" method="post" OnSubmit="SubmitForm">
+        <input type="hidden" name="__RequestVerificationToken" value="@Token" />
         @if (NoResults)
         {
             <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Info">
@@ -75,6 +79,7 @@
         <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@searching">@(searching ? "Searching..." : "Search")</button>
     </UsaForm>
 }
-@if (searchResponse?.Results?.Count > 0 && searchResponse.Results[0].Matches?.Count() > 0) {
-    <QueryResults QueryResult="searchResponse" />
+@if (SearchResponse?.Results?.Count > 0 && SearchResponse.Results[0].Matches?.Count() > 0)
+{
+    <QueryResults QueryResult="SearchResponse" />
 }

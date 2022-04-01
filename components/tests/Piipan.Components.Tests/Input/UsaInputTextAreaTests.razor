@@ -27,7 +27,7 @@
 
         // Assert
         Component!.MarkupMatches(
-            @<textarea class="@InputTextAreaClass" id:ignore style=""></textarea>
+            @<textarea class="@InputTextAreaClass" id="model_NotRequiredField" name="model.NotRequiredField" style=""></textarea>
         );
     }
 
@@ -187,6 +187,7 @@
 
     protected override void CreateTestComponent()
     {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true);
         var componentFragment = Render<UsaForm>(
             @<UsaForm Model="model">
                 <UsaFormGroup>

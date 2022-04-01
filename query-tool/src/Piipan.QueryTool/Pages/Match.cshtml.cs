@@ -39,7 +39,6 @@ namespace Piipan.QueryTool.Pages
         // [HttpGet("{id}")]
         public IActionResult OnGet(string id)
         {
-            return Page();
             if (id != null) {
                 //Prevents malicious user input
                 //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033

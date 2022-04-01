@@ -7,7 +7,7 @@
     ViewData["Title"] = "NAC Participant Search";
 }
 <div class="grid-container">
-    <component type="typeof(QueryTool.Client.Components.QueryForm2)" render-mode="WebAssembly"
+    <component type="typeof(QueryTool.Client.Components.QueryForm)" render-mode="WebAssembly"
         param-Query="Model.Query"
         param-SearchResponse="Model.QueryResult?.Data?.ToSharedOrchMatchResponseData()" 
         param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"

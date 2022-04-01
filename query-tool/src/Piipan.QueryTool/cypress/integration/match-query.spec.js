@@ -60,36 +60,21 @@ describe('query tool match query', () => {
         cy.get('form').submit();
 
         cy.contains('This participant does not have a matching record in any other states.').should('be.visible');
+
+        setupPa11yPost();
         cy.pa11y(pa11yOptions);
     });
 
-    it.only("shows results table on successful submission with a match", async () => {
-        // TODO: stub out submit request
+    it("shows results table on successful submission with a match", () => {
         setValue('#Query_LastName', 'Farrington');
         setValue('#Query_DateOfBirth', '1931-10-13');
         setValue('#Query_SocialSecurityNum', '425-46-5417');
-        click('#query-form-search-btn');
+        cy.get('#query-form-search-btn').click();
 
         cy.contains('Match ID').should('be.visible');
         cy.contains('Matching State').should('be.visible');
 
-        pa11yOptions.headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        };
-        pa11yOptions.method = 'POST';
-        cy.get('#snap-participants-query-form input[name]').each(el => {
-            const value = el.val();
-            const name = el.attr('name');
-            if (value && name) {
-                if (pa11yOptions.postData) {
-                    pa11yOptions.postData += `&${name}=${value}`;
-                }
-                else {
-                    pa11yOptions.postData = `${name}=${value}`;
-                }
-            }
-        });
-        
+        setupPa11yPost();
         cy.pa11y(pa11yOptions);
     });
 })
@@ -97,9 +82,21 @@ describe('query tool match query', () => {
 function setValue(cssSelector, value) {
     cy.get(cssSelector).type(value);
 }
-function click(cssSelector) {
-    cy.get(cssSelector).click();
-    pa11yOptions.actions = [
-        ...pa11yOptions.actions,
-    ];
+function setupPa11yPost() {
+    pa11yOptions.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    pa11yOptions.method = 'POST';
+    cy.get('#snap-participants-query-form input[name]').each(el => {
+        const value = el.val();
+        const name = el.attr('name');
+        if (value && name) {
+            if (pa11yOptions.postData) {
+                pa11yOptions.postData += `&${name}=${value}`;
+            }
+            else {
+                pa11yOptions.postData = `${name}=${value}`;
+            }
+        }
+    });
 }
