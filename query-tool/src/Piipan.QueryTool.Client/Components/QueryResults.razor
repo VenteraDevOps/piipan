@@ -33,7 +33,7 @@
                     @foreach (var record in result.Matches)
                         {
                             <tr>
-                                <td><a href="/match/@record.MatchId">@record.MatchId</a></td>
+                                <td><a href="/match?id=@record.MatchId">@record.MatchId</a></td>
                                 <td>@record.State</td>
                             </tr>
                         }
