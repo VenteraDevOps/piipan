@@ -62,8 +62,6 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation("Starting new ETL at {0}", DateTime.Now);
             Console.WriteLine("Starting new ETL at {0}", DateTime.Now);
 
-            //https://dev.to/pwd9000/protect-secrets-in-azure-functions-using-key-vault-d2i
-            //https://docs.microsoft.com/en-us/azure/app-service/app-service-key-vault-references#granting-your-app-access-to-key-vault
             string connectionString = Environment.GetEnvironmentVariable(BLOB_STORAGE_CONNECTION_STRING);
             string uploadEncryptionKey = Environment.GetEnvironmentVariable(UPLOAD_PAYLOAD_KEY);
 
