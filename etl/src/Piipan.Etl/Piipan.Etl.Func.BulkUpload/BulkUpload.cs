@@ -3,7 +3,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Etl.Func.BulkUpload.Services;
@@ -18,14 +21,17 @@ namespace Piipan.Etl.Func.BulkUpload
     /// </summary>
     public class BulkUpload
     {
+        private const string UPLOAD_PAYLOAD_KEY = "upload-payload-key";
+        private const string BLOB_STORAGE_CONNECTION_STRING = "BlobStorageConnectionString";
+
         private readonly IParticipantApi _participantApi;
         private readonly IParticipantStreamParser _participantParser;
-        private readonly IBlobRetrievalService _blobRetrievalService;
+        private readonly ICustomerEncryptedBlobRetrievalService _blobRetrievalService;
 
         public BulkUpload(
             IParticipantApi participantApi,
-            IParticipantStreamParser participantParser, 
-            IBlobRetrievalService blobRetrievalService)
+            IParticipantStreamParser participantParser,
+            ICustomerEncryptedBlobRetrievalService blobRetrievalService)
         {
             _participantApi = participantApi;
             _participantParser = participantParser;
@@ -44,28 +50,22 @@ namespace Piipan.Etl.Func.BulkUpload
         /// </remarks>
         [FunctionName("BulkUpload")]
         public async Task Run(
-        //[EventGridTrigger] EventGridEvent eventGridEvent,
-        //[Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] Stream input,
-        //ILogger log)
-        [QueueTrigger("filenames", Connection = "BlobStorageConnectionString")]
-        string filename,
-        ILogger log)
+            [EventGridTrigger] EventGridEvent eventGridEvent,
+            ILogger log)
         {
-            //log.LogInformation(eventGridEvent.Data.ToString());
+            StorageBlobCreatedEventData blobCreatedEvent = eventGridEvent.Data as StorageBlobCreatedEventData;
+            BlobUriBuilder blobUriBuilder = new BlobUriBuilder(new Uri(blobCreatedEvent.Url));
+            var filename = blobUriBuilder.BlobName;
 
-            //add named values to APIM
-            //add Application Setting to Azure Function
-            //Assign a key vault access policy to the managed identity with permissions to get and list secrets from the vault.
-            //Add role assignment to Azure Function for role assignment
-            //Unit tests for BulkUpload.cs, BlobRetrievalService.cs
+            log.LogInformation($"ETL triggered by filename: {filename}");         
 
-            log.LogWarning("Starting new ETL at {0}", DateTime.Now);
+            log.LogInformation("Starting new ETL at {0}", DateTime.Now);
             Console.WriteLine("Starting new ETL at {0}", DateTime.Now);
 
             //https://dev.to/pwd9000/protect-secrets-in-azure-functions-using-key-vault-d2i
             //https://docs.microsoft.com/en-us/azure/app-service/app-service-key-vault-references#granting-your-app-access-to-key-vault
-            string connectionString = Environment.GetEnvironmentVariable("BlobStorageConnectionString");
-            string uploadEncryptionKey = Environment.GetEnvironmentVariable("kv_UploadEncryptKey");
+            string connectionString = Environment.GetEnvironmentVariable(BLOB_STORAGE_CONNECTION_STRING);
+            string uploadEncryptionKey = Environment.GetEnvironmentVariable(UPLOAD_PAYLOAD_KEY);
 
             var blobClient = _blobRetrievalService.RetrieveBlob(connectionString, filename, uploadEncryptionKey);
 
@@ -91,7 +91,7 @@ namespace Piipan.Etl.Func.BulkUpload
                     throw;
                 }
 
-                log.LogWarning("Finished ETL at {0}", DateTime.Now);
+                log.LogInformation("Finished ETL at {0}", DateTime.Now);
                 Console.WriteLine("Finished new ETL at {0}", DateTime.Now);
             }
         }
