@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
+using Azure.Storage.Blobs;
 
 namespace Piipan.Etl.Func.BulkUpload
 {
