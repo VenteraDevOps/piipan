@@ -115,6 +115,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `MetricsApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Metrics API's Azure Active Directory application object | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
+| `QueryToolUrl` | URL for the associated Query Tool. | Piipan.Match.Orchestrator |
 
 
 ## `SysType` resource tag

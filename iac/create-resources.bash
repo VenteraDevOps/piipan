@@ -31,6 +31,8 @@ set_constants () {
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
+
+  QUERY_TOOL_URL="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
 }
 
 # Generate the storage account connection string for the corresponding
@@ -363,7 +365,8 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --settings \
       WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1
+      WEBSITE_VNET_ROUTE_ALL=1 \
+      QueryToolUrl="$QUERY_TOOL_URL"
 
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
@@ -597,7 +600,6 @@ main () {
     --output tsv)
   echo "Front Door iD: ${front_door_id}"
 
-  front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
   orch_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
@@ -630,7 +632,7 @@ main () {
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
-      frontDoorUri="$front_door_uri"
+      frontDoorUri="$QUERY_TOOL_URL"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
   az functionapp vnet-integration add \

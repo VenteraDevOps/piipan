@@ -38,6 +38,9 @@ ParticipantRecord:
       nullable: true
       example: true
       description: "Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values."
+    match_url:
+      type: string
+      description: "URL to visit to view details about this match."
 
 ParticipantRecordExamples:
   All:
@@ -51,6 +54,7 @@ ParticipantRecordExamples:
       - "2021-04-01/2021-04-30"
       - "2021-03-01/2021-03-31"
     protect_location: true
+    match_url: "https://test.com/match?id=BCD2345"
   AllEB:
     match_id: "XYZ9876"
     state: "eb"
@@ -62,6 +66,7 @@ ParticipantRecordExamples:
       - "2021-04-01/2021-04-30"
       - "2021-03-01/2021-03-31"
     protect_location: true
+    match_url: "https://test.com/match?id=XYZ9876"
   Required:
     match_id: "4567CDF"
     state: "ec"
@@ -69,3 +74,4 @@ ParticipantRecordExamples:
     participant_id: "string"
     participant_closing_date: null
     protect_location: null
+    match_url: "https://test.com/match?id=4567CDF"

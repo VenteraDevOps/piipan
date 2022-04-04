@@ -1,0 +1,34 @@
+﻿@using static FormConstants
+@using static Shared.CommonConstants
+@code {
+    [CascadingParameter] public UsaForm Form { get; set; }
+    [Parameter] public RenderFragment LabelOverride { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public RenderFragment HintContent { get; set; }
+
+    // More code in code behind
+}
+
+<CascadingValue Value="this">
+    <div class="@InputFormGroupClass @(HasErrors ? InputFormGroupErrorClass : "")">
+        <UsaLabel Status="Status">
+            @if (LabelOverride != null)
+            {
+                @LabelOverride
+            }
+            else
+            {
+                @Label
+            }
+        </UsaLabel>
+        @if (HintContent != null)
+        {
+            <span class="@HintClass">@HintContent</span>
+        }
+        @if (HasErrors)
+        {
+            <span class="@InputErrorMessageClass" id="@(InputElementId)-message">@ValidationMessages.First().Replace("@@@", Label)</span>
+        }
+        @ChildContent
+    </div>
+</CascadingValue>

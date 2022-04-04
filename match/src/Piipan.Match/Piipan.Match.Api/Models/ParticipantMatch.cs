@@ -36,6 +36,9 @@ namespace Piipan.Match.Api.Models
         [JsonProperty("vulnerable_individual")]
         public bool? VulnerableIndividual { get; set; }
 
+        [JsonProperty("match_url")]
+        public string MatchUrl { get; set; }
+
         public ParticipantMatch() { }
 
         public ParticipantMatch(IParticipant p)
