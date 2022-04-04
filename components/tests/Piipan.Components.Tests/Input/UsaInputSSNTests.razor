@@ -1,0 +1,413 @@
+﻿@using Piipan.Components.Forms
+@using static Piipan.Components.Forms.FormConstants
+@using static Piipan.Components.Shared.CommonConstants
+@inherits BaseTest<UsaInputSSN>
+@code {
+    public class TestModel {
+        [UsaSSN]
+        [Display(Name = "Optional Field")]
+        public string? NotRequiredField { get; set; }
+
+        [UsaRequired]
+        [UsaSSN]
+        [Display(Name = "Required Field")]
+        public string? RequiredField { get; set; }
+    }
+    private IRenderedComponent<UsaForm>? form = null;
+    private IElement? inputElement = null;
+    private TestModel model = new TestModel();
+    private RenderFragment? renderFragment = null;
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of an input SSN
+    /// </summary>
+    [Fact]
+    public void Input_Should_Exist_And_Have_Correct_Markup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="usa-ssn-group" >
+              <input class="@InputClass" id="model_NotRequiredField" maxlength="11"  >
+              <input type="hidden" name="model.NotRequiredField">
+              <button class="@ButtonClass @ButtonUnstyledClass" type="button" aria-label="Show Social Security Number"  >
+                <svg class="@IconClass" aria-hidden="true" focusable="false" role="img" >
+                  <use xlink:href="/images/sprite.svg#visibility_off" ></use>
+                </svg>
+              </button>
+            </div>
+        );
+    }
+
+    /// <summary>
+    /// Verify that when the value changes, the backend model is updated
+    /// </summary>
+    [Fact]
+    public void Input_Should_Bind_Value_On_Change()
+    {
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        inputElement!.Input("123-12-1234");
+
+        // Assert
+        Assert.Equal("123-12-1234", model.NotRequiredField);
+    }
+
+    /// <summary>
+    /// Verify the label "for" attribute matches the input's ID
+    /// </summary>
+    [Fact]
+    public void Input_Should_Have_An_Accessible_Label()
+    {
+        // Arrange
+        CreateTestComponent();
+        var labelElement = form!.Find("label");
+
+        // Assert
+        Assert.Equal(labelElement.GetAttribute("for"), inputElement!.Id);
+    }
+
+    /// <summary>
+    /// Verify the required attribute is present when the field has the UsaRequired data annotation
+    /// </summary>
+    [Fact]
+    public void Input_Should_Have_Required_Attribute_When_Field_Is_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Assert
+        Assert.True(inputElement!.HasAttribute("required"));
+    }
+
+    /// <summary>
+    /// Verify the required attribute is NOT present when the field does NOT have the UsaRequired data annotation
+    /// </summary>
+    [Fact]
+    public void Input_Should_Not_Have_Required_Attribute_When_Field_Is_Not_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.False(inputElement!.HasAttribute("required"));
+    }
+
+    /// <summary>
+    /// Verify that any additional html attributes are added to the input field
+    /// </summary>
+    [Fact]
+    public void Input_Should_Be_Able_To_Take_Extra_Parameters()
+    {
+        // Arrange
+        renderFragment = 
+            @<UsaInputSSN @bind-Value=model.RequiredField data-extra-param="test" />;
+        CreateTestComponent();
+
+        // Assert
+        Assert.Equal("test", inputElement!.GetAttribute("data-extra-param"));
+    }
+
+    /// <summary>
+    /// Verify that if the value isn't set that we don't get errors if field is not required
+    /// </summary>
+    [Fact]
+    public void Input_Should_Not_Have_Errors_When_Empty_And_Not_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+    }
+
+    /// <summary>
+    /// Verify that if the value isn't set that we get errors if field is required
+    /// </summary>
+    [Fact]
+    public void Input_Should_Have_Errors_When_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasRequiredErrors();
+    }
+
+    /// <summary>
+    /// Verify that if the value is set that we do NOT get errors if field is required
+    /// </summary>
+    [Fact]
+    public void Input_Should_Not_Have_Errors_When_Not_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Act
+        inputElement!.Input("123-12-1234");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+    }
+
+    /// <summary>
+    /// Verify that if the value is invalid that we get an invalid error
+    /// </summary>
+    [Fact]
+    public void Input_Should_Have_Errors_When_Not_Empty_And_Invalid()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(4);
+
+        // Act
+        inputElement!.Input("tes-t");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasErrors("Optional Field must have the form ###-##-####");
+    }
+
+    /// <summary>
+    /// Verify that we get errors when the value is set and then cleared if field is required
+    /// </summary>
+    [Fact]
+    public void Input_Should_Have_Errors_When_Changed_Back_To_Empty_And_Required()
+    {
+        // Arrange
+        renderFragment = RequiredFieldRenderFragment();
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Act
+        inputElement!.Input("123-12-1234");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasNoErrors();
+
+        // Act
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(0);
+        inputElement!.Input("");
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasRequiredErrors();
+    }
+
+    /// <summary>
+    /// Verify that hyphens are automatically added to the SSN so that it matches the correct format
+    /// </summary>
+    [Fact]
+    public void Input_Should_Put_In_Hyphens_Automatically()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(9);
+
+        // Act
+        inputElement!.Input("123121234");
+
+        // Assert
+        Assert.Equal("123-12-1234", model.NotRequiredField);
+        // Verify cursor position
+        foreach (var invocation in JSInterop.Invocations.Where(n => n.Identifier == "piipan.utilities.setCursorPosition"))
+        {
+            // the second argument in this call is the new cursor position. After adding in the hyphens, it should be 11
+            Assert.Equal(11, invocation.Arguments[1]);
+        }
+    }
+
+    /// <summary>
+    /// Verify that a hyphen is added to the end of the input value when the input value only has 3 characters
+    /// </summary>
+    [Fact]
+    public void Input_Should_Put_In_One_Hyphen_Automatically_With_3_Characters()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(3);
+
+        // Act
+        inputElement!.Input("123");
+
+        // Assert
+        Assert.Equal("123-", model.NotRequiredField);
+        // Verify cursor position
+        foreach (var invocation in JSInterop.Invocations.Where(n => n.Identifier == "piipan.utilities.setCursorPosition"))
+        {
+            // the second argument in this call is the new cursor position. After adding in the hyphen, it should be 4
+            Assert.Equal(4, invocation.Arguments[1]);
+        }
+    }
+
+    /// <summary>
+    /// Verify that a hyphen is added to the end of the input value when the input value only has 6 characters
+    /// </summary>
+    [Fact]
+    public void Input_Should_Put_In_Two_Hyphen_Automatically_With_6_Characters()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(6);
+
+        // Act
+        inputElement!.Input("123-12");
+
+        // Assert
+        Assert.Equal("123-12-", model.NotRequiredField);
+        // Verify cursor position
+        foreach (var invocation in JSInterop.Invocations.Where(n => n.Identifier == "piipan.utilities.setCursorPosition"))
+        {
+            // the second argument in this call is the new cursor position. After adding in the hyphen, it should be 7
+            Assert.Equal(7, invocation.Arguments[1]);
+        }
+    }
+
+    /// <summary>
+    /// Verify that when you are deleting the last character in the string and it is a hyphen, that the hyphen does not get put back in
+    /// </summary>
+    [Fact]
+    public void Input_Should_Allow_Hyphen_Deletion_If_Last_Character()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(6);
+        
+        // Act
+        inputElement!.Input("123-12-");
+
+        // Assert it gets set to all 6 characters
+        Assert.Equal("123-12-", model.NotRequiredField);
+
+        // Act (remove last hyphen)
+        inputElement!.Input("123-12");
+
+        // Assert the last hyphen got deleted and not added back in
+        Assert.Equal("123-12", model.NotRequiredField);
+    }
+
+    /// <summary>
+    /// Verify that the SSN is protected (looks like ***-**-****) if the visibility button is not clicked
+    /// </summary>
+    [Fact]
+    public void Input_Should_Appear_Invisible_If_Protected()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Act
+        inputElement!.Input("123-12-1234");
+
+        // Assert
+        Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
+    /// Verify that the SSN is not protected if the visibility button is clicked once
+    /// </summary>
+    [Fact]
+    public void Input_Should_Appear_Normal_If_Not_Protected()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Act
+        form!.Find($".usa-button").Click(); // Click the view/hide button to view
+        inputElement!.Input("123-12-1234");
+
+        // Assert
+        Assert.Equal("123-12-1234", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
+    /// Verify that the SSN is protected again if the visibility button is clicked twice
+    /// </summary>
+    [Fact]
+    public void Input_Should_Appear_Invisible_If_After_Protecting()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Act
+        form!.Find($".usa-button").Click(); // Click the view/hide button to view
+        inputElement!.Input("123-12-1234");
+        form!.Find($".usa-button").Click(); // Click the view/hide button again to hide
+
+        // Assert
+        Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
+    }
+
+    #endregion Tests
+
+    #region Helper Function
+
+    private RenderFragment RequiredFieldRenderFragment() => 
+        @<UsaInputSSN @bind-Value="model.RequiredField" />;
+
+    protected override void CreateTestComponent()
+    {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true);
+        var componentFragment = Render<UsaForm>(
+            @<UsaForm Model="model">
+                <UsaFormGroup>
+                    @if (renderFragment == null)
+                    {
+                        <UsaInputSSN @bind-Value="model.NotRequiredField" />
+                    }
+                    else
+                    {
+                        @renderFragment
+                    }
+                </UsaFormGroup>
+            </UsaForm>
+        );
+        form = componentFragment;
+        Component = componentFragment.FindComponent<UsaInputSSN>();
+        inputElement = componentFragment.Find($".{InputClass}");
+        JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true);
+    }
+
+    private void AssertHasNoErrors()
+    {
+        Assert.False(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorSpans = form!.FindAll($".{InputErrorMessageClass}");
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        Assert.Equal(0, errorForms.Count);
+        Assert.Equal(0, errorSpans.Count);
+    }
+
+    private void AssertHasRequiredErrors()
+    {
+        AssertHasErrors("Required Field is required");
+    }
+
+    private void AssertHasErrors(string error)
+    {
+        Assert.True(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        var errorSpan = form!.Find($".{InputErrorMessageClass}");
+        Assert.Equal(error, errorSpan.TextContent);
+        Assert.Equal(1, errorForms.Count);
+    }
+
+    #endregion Helper Functions
+}
