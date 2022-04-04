@@ -50,12 +50,19 @@
 
 		<Exec Command="npx gulp build" />
 	</Target>
+
+	<!--
+      3. Moves models and components to wwwroot and renames them as .txt, so they can get pulled in to the Demo Code section
+
+      Because our static analysis tool, CodeQL, autobuilds C# with the UseSharedCompilation flag, we check this flag to avoid running npm tasks for these types of builds.
+   -->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(UseSharedCompilation)' != 'false'">
+		<Exec Condition="$(ContinuousIntegrationBuild) != 'true'" Command="xcopy /Y &quot;$(ProjectDir)Components&quot; &quot;$(ProjectDir)wwwroot\components\*.txt&quot;&#xD;&#xA;xcopy /Y &quot;$(ProjectDir)Models&quot; &quot;$(ProjectDir)wwwroot\models\*.txt&quot;" />
+	</Target>
   <ItemGroup>
     <ProjectReference Include="..\Piipan.Components\Piipan.Components.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y &quot;$(ProjectDir)Components&quot; &quot;$(ProjectDir)wwwroot\components\*.txt&quot;&#xD;&#xA;xcopy /Y &quot;$(ProjectDir)Models&quot; &quot;$(ProjectDir)wwwroot\models\*.txt&quot;" />
-  </Target>
+
 
 </Project>
