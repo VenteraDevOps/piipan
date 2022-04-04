@@ -36,6 +36,9 @@ namespace Piipan.Match.Api.Models
         [JsonProperty("protect_location")]
         public bool? ProtectLocation { get; set; }
 
+        [JsonProperty("match_url")]
+        public string MatchUrl { get; set; }
+
         public ParticipantMatch() { }
 
         public ParticipantMatch(IParticipant p)
