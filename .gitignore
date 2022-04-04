@@ -7,11 +7,6 @@
 !.vscode/extensions.json
 *.code-workspace
 **/local.settings.json
-**/launchSettings.json
-**/appsettings.conner.json
-**/create-resources1.bash
-**/cjc.bash
-**/ventera.bash
 
 
 # Visual Studio Ignores
