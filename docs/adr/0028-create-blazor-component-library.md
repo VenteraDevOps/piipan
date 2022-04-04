@@ -22,12 +22,19 @@ By agreeing to use a Blazor component library in the app, this may open the door
 
 ## Decision
 
-We will develop a Blazor Component Library for use with the web applications in Piipan.
+Continuing to use server-side rendered pages from the Query Tool and Dashboard are still possible using Blazor components. After testing both Blazor Server and Blazor Web Assembly, Web Assembly is better for our use case for a few reasons:
+1. We will not have to have an open SignalR connection to the server, which will alleviate some strain on our server and eliminate the need for considering architectural changes, such as Azure SignalR.
+2. User interactions will be immediate and not have to go over the wire and back. An example of this was the SSN field, where if we used Blazor Server the checking that occurred after every character input was slow and not responsive when going over the wire. With Blazor Web Assembly it was instantaneous.
+3. There were some errors even getting the web sockets working with Blazor Server. This problem could probably have been fixed, but due to the first two items it was decided that it wasn't worth looking into it.
+
+Thus, the proposal is to use server-side rendered pages that incorporate Blazor Web Assembly.
 
 ## Consequences
 
-* A lot of error handling with forms that was previously done on the server side can be immediately done on the client side with Blazor, which makes for a better experience.
-* Unclear how incorporating a component library would work with server-side rendering when navigating to different pages in the app. We may want to switch to Web Assembly as a whole in the future.
+* Projects that incorporate the Blazor Component Library must either be full Web Assembly projects using .Net 3.1, or server-side rendered using .Net 6. Since our current projects are server-side rendered, they will need to upgrade to .Net 6.
+* We will need to make a concious effort not to push any secrets to the client side. For the Query Tool web assembly project, that means only incorporating the component library and possibly a shared client library, but none of the server side libraries.
+* Users would need a browser that supports web assembly, but only Internet Explorer could be an issue. After discussion with the team, it was determined that Internet Explorer would not be an acceptable browser and the user should upgrade.
 
 ## References
 * [Component Library code](https://github.com/18F/piipan/components)
+* [Web Assembly from Server Side pages](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/component-tag-helper?view=aspnetcore-6.0)
