@@ -24,6 +24,7 @@ The following environment variables are required by the orchestrator and are set
 |---|---|
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) — Additionally, `Database` is set to the placeholder value `{database}`. The relevant per-state database name is inserted at run-time as needed. |
 | `States` | [details](../../docs/iac.md#\:\~\:text=States) |
+| `QueryToolUrl` | [details](../../docs/iac.md#\:\~\:text=QueryToolUrl) |
 
 ## Local development
 
