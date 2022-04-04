@@ -8,7 +8,6 @@
 *.code-workspace
 **/local.settings.json
 
-
 # Visual Studio Ignores
 **/.vs/*
 
