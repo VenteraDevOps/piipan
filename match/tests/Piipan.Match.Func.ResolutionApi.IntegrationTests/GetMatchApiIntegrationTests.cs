@@ -99,7 +99,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // insert into database
             var match = new MatchRecordDbo() {
                 CreatedAt = DateTime.UtcNow,
-                Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"ProtectLocation\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
+                Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
                 Hash = "foo",
                 HashType = "ldshash",
                 Initiator = "ea",
@@ -116,7 +116,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // Assert
             Assert.Equal(200, response.StatusCode);
             // Assert Participant Data
-            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"protect_location\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"protect_location\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":\"0001-01-01\",\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
+            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":\"0001-01-01\",\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
             Assert.Equal(expected, resString);
         }
         // When match res events are added, GetMatch response should update accordingly
