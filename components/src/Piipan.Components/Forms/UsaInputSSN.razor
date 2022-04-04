@@ -1,0 +1,35 @@
+﻿@using static Shared.CommonConstants
+@using static FormConstants
+@inherits UsaInputBase<string>
+
+@code {
+    public string InvisibleValue { get; set; }
+    private bool visible = false;
+    
+    // More code in code behind file
+}
+
+<div class="usa-ssn-group">
+    <input @ref="ElementReference" class="@InputClass @(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")"
+        value="@(visible ? CurrentValue : InvisibleValue)"
+        @onblur="BlurField"
+        required="@FormGroup.Required" 
+        id="@Id"
+        @attributes="AdditionalAttributes"
+        @oninput="Input" maxlength="11"
+        />
+    <input type="hidden" name="@Id.Replace("_", ".")" value="@CurrentValue" />
+    <button class="@ButtonClass @ButtonUnstyledClass" type="button" aria-label="@(visible ? "Hide" : "Show") Social Security Number"
+        @onclick="() => visible = !visible">
+        <svg class="@IconClass" aria-hidden="true" focusable="false" role="img">
+        @if (visible)
+        {
+            <use xlink:href="/images/sprite.svg#visibility"></use>
+        }
+        else
+        {
+            <use xlink:href="/images/sprite.svg#visibility_off"></use>
+        }
+        </svg>
+    </button>
+</div>
