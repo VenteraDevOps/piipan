@@ -15,6 +15,13 @@ namespace Piipan.Match.Core.Tests.Services
 {
     public class MatchEventServiceTests
     {
+        private const string QueryToolUrl = "https://tts.test";
+
+        public MatchEventServiceTests()
+        {
+            Environment.SetEnvironmentVariable("QueryToolUrl", QueryToolUrl);
+        }
+
         private Mock<IActiveMatchRecordBuilder> BuilderMock(MatchRecordDbo record)
         {
             var recordBuilder = new Mock<IActiveMatchRecordBuilder>();
@@ -174,8 +181,6 @@ namespace Piipan.Match.Core.Tests.Services
         public async void Resolve_InsertsMatchId()
         {
             // Arrange
-            var queryToolUrl = "https://tts.test";
-            Environment.SetEnvironmentVariable("QueryToolUrl", queryToolUrl);
             var mockMatchId = "BDC2345";
             var record = new MatchRecordDbo
             {
@@ -215,7 +220,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
 
             // Assert
-            Assert.Equal($"{queryToolUrl}/match?id={mockMatchId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match?id={mockMatchId}", firstMatch.MatchUrl);
             Assert.Equal(mockMatchId, resolvedResponse.Data.Results.First().Matches.First().MatchId);
         }
 
@@ -223,8 +228,6 @@ namespace Piipan.Match.Core.Tests.Services
         public async void Resolve_InsertsMostRecentMatchId()
         {
             // Arrange
-            var queryToolUrl = "https://tts.test";
-            Environment.SetEnvironmentVariable("QueryToolUrl", queryToolUrl);
             var openMatchId = "BDC2345";
             var closedMatchId = "CDB5432";
             var record = new MatchRecordDbo
@@ -276,7 +279,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
             
             // Assert
-            Assert.Equal($"{queryToolUrl}/match?id={openMatchId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match?id={openMatchId}", firstMatch.MatchUrl);
             Assert.Equal(openMatchId, firstMatch.MatchId);
         }
 
@@ -284,8 +287,6 @@ namespace Piipan.Match.Core.Tests.Services
         public async void Resolve_InsertsOpenMatchId()
         {
             // Arrange
-            var queryToolUrl = "https://tts.test";
-            Environment.SetEnvironmentVariable("QueryToolUrl", queryToolUrl);
             var openMatchId = "BDC2345";
             var record = new MatchRecordDbo
             {
@@ -331,7 +332,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
 
             // Assert
-            Assert.Equal($"{queryToolUrl}/match?id={openMatchId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match?id={openMatchId}", firstMatch.MatchUrl);
             Assert.Equal(openMatchId, firstMatch.MatchId);
         }
 
@@ -339,9 +340,6 @@ namespace Piipan.Match.Core.Tests.Services
         public async void Resolve_InsertsNewMatchIdIfMostRecentRecordIsClosed()
         {
             // Arrange
-            var queryToolUrl = "https://tts.test";
-            Environment.SetEnvironmentVariable("QueryToolUrl", queryToolUrl);
-
             var newId = "newId";
             var record = new MatchRecordDbo
             {
@@ -390,7 +388,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
 
             // Assert
-            Assert.Equal($"{queryToolUrl}/match?id={newId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match?id={newId}", firstMatch.MatchUrl);
             Assert.Equal(newId, firstMatch.MatchId);
         }
     }
