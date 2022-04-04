@@ -91,7 +91,7 @@ namespace Piipan.Match.Core.Services
             }
             if (participantMatchRecord != null)
             {
-                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUri");
+                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
                 participantMatchRecord.MatchUrl = $"{queryToolUrl}/match?id={participantMatchRecord.MatchId}";
             }
             return participantMatchRecord;
