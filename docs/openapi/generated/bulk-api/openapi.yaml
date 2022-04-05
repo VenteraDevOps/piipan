@@ -47,7 +47,7 @@ paths:
           description: Content-Length not provided
   '/upload/{filename}':
     $ref: '#/paths/~1uploadAllParticipants~1%7Bfilename%7D'
-    description: A Deprecated endpoint. Will be removed in later sprint
+    description: A Deprecated endpoint.
 security:
   - ApiKeyAuth: []
 components:
