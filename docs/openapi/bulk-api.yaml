@@ -16,7 +16,7 @@ paths:
     $ref: '../../etl/docs/openapi/upload.yaml'
   '/upload/{filename}':
     $ref: '../../etl/docs/openapi/upload.yaml'
-    description: 'A Deprecated endpoint. Will be removed in later sprint'
+    description: 'A Deprecated endpoint.'
 security:
   - ApiKeyAuth: []
 components:
