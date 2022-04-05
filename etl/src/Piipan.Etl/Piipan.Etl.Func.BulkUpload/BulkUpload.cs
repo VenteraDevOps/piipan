@@ -43,16 +43,36 @@ namespace Piipan.Etl.Func.BulkUpload
         /// </remarks>
         [FunctionName("BulkUpload")]
         [return: Queue("qupload", Connection = "BlobStorageConnectionString")]
-        public static string Run(
+        public string Run(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] BlobClient blob,
             ILogger log)
         {
-            log.LogInformation(eventGridEvent.Data.ToString());
 
-		    log.LogInformation($"{blob.Name}");
+            try
+            {
 
-  	        return blob.Name;
+                if (blob != null)
+                {
+
+                    log.LogInformation(eventGridEvent.Data.ToString());
+                    log.LogInformation($"{blob.Name}");
+
+                    return blob.Name;
+                }
+                else
+                {
+
+                    log.LogError("No input stream was provided");
+                    return "";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex.Message);
+                throw;
+            }
         }
     }
 }

@@ -35,6 +35,14 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             return e;
         }
 
+        // private QueueTrigger QueueTriggerMock()
+        // {
+        //     var e = Mock.Of<QueueTrigger>();
+        //     // Can't override Data in Setup, just use a real one
+        //     e.Data = new Object();
+        //     return e;
+        // }
+
         private void VerifyLogError(Mock<ILogger> logger, String expected)
         {
             logger.Verify(x => x.Log(
@@ -56,10 +64,11 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var function = new BulkUpload(participantApi, participantStreamParser);
 
             // Act
-            await function.Run(EventMock(), null, logger.Object);
+            var name = function.Run(EventMock(), null, logger.Object);
 
             // Assert
             VerifyLogError(logger, "No input stream was provided");
+            
         }
 
         [Fact]
@@ -73,10 +82,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 .Throws(new Exception("the parser broke"));
 
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi, participantStreamParser.Object);
+            var function = new QueueBulkUpload(participantApi, participantStreamParser.Object);
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), ToStream("data"), logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run("QueueTriggerMock", ToStream("data"), logger.Object));
             VerifyLogError(logger, "the parser broke");
         }
 
@@ -92,10 +101,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi.Object, participantStreamParser);
+            var function = new QueueBulkUpload(participantApi.Object, participantStreamParser);
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), ToStream("data"), logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run("QueueTriggerMock", ToStream("data"), logger.Object));
             VerifyLogError(logger, "the api broke");
         }
 
@@ -124,10 +133,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var participantApi = new Mock<IParticipantApi>();
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object);
+            var function = new QueueBulkUpload(participantApi.Object, participantStreamParser.Object);
 
             // Act
-            await function.Run(EventMock(), ToStream("data"), logger.Object);
+            await function.Run("QueueTriggerMock", ToStream("data"), logger.Object);
 
             // Assert
             participantApi.Verify(m => m.AddParticipants(participants), Times.Once);
