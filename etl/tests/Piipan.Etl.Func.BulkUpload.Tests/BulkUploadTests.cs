@@ -55,7 +55,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         }
 
         [Fact]
-        public async void Run_NullInputStream()
+        public async void Run_NullInputBlob()
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
@@ -65,6 +65,23 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             // Act
             var name = function.Run(EventMock(), null, logger.Object);
+
+            // Assert
+            VerifyLogError(logger, "No input stream was provided");
+            
+        }
+
+        [Fact]
+        public async void Run_NullInputStream()
+        {
+            // Arrange
+            var participantApi = Mock.Of<IParticipantApi>();
+            var participantStreamParser = Mock.Of<IParticipantStreamParser>();
+            var logger = new Mock<ILogger>();
+            var function = new QueueBulkUpload(participantApi, participantStreamParser);
+
+            // Act
+            var name = function.Run("QueueTriggerMock", null, logger.Object);
 
             // Assert
             VerifyLogError(logger, "No input stream was provided");
