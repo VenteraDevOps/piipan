@@ -278,7 +278,7 @@
                 "count": "[length(variables('uploadStatesList'))]"
             }
         },
-		{
+	{
             "type": "Microsoft.ApiManagement/service/apis/operations",
             "apiVersion": "2020-06-01-preview",
             "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload')]",
