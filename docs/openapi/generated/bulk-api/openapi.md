@@ -26,14 +26,14 @@ Base URLs:
 
 ```shell
 # You can also use wget
-curl -X PUT /bulk/{stateAbbr}/v2/uploadAllParticipants/{filename} \
+curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
   -H 'Content-Type: text/plain' \
   -H 'Content-Length: 6413' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
 
-`PUT /uploadAllParticipants/{filename}`
+`PUT /upload/{filename}`
 
 *Upload a CSV file of bulk participant data*
 

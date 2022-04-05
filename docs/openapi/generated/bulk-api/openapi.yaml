@@ -4,7 +4,7 @@ info:
   version: 2.0.0
   description: The API for performing bulk uploads
 tags:
-  - name: Upload
+  - name: UploadAllParticipants
 servers:
   - url: '/bulk/{stateAbbr}/v2'
     variables:
@@ -45,6 +45,9 @@ paths:
           description: Access denied
         '411':
           description: Content-Length not provided
+  '/upload/{filename}':
+    $ref: '#/paths/~1uploadAllParticipants~1%7Bfilename%7D'
+    description: A Deprecated endpoint. Will be removed in later sprint
 security:
   - ApiKeyAuth: []
 components:
