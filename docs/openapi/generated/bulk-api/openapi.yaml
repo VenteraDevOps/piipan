@@ -46,8 +46,39 @@ paths:
         '411':
           description: Content-Length not provided
   '/upload/{filename}':
-    $ref: '#/paths/~1uploadAllParticipants~1%7Bfilename%7D'
-    description: A Deprecated endpoint. Will be removed in later sprint
+    description: A Deprecated endpoint.
+    put:
+      operationId: Upload a File
+      summary: Upload a CSV file of bulk participant data
+      tags:
+        - Upload
+      parameters:
+        - name: filename
+          in: path
+          description: Name of file being uploaded
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Content-Length
+          schema:
+            type: integer
+          required: true
+          description: Deprecated. Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.
+          example: 6413
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: File uploaded
+        '401':
+          description: Access denied
+        '411':
+          description: Content-Length not provided
 security:
   - ApiKeyAuth: []
 components:
