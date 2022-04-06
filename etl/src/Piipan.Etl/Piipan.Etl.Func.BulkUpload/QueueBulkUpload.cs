@@ -12,21 +12,6 @@ using Piipan.Participants.Api;
 using Azure.Storage.Blobs;
 
 
-
-
-
-/**************************************
-1. create the queue
-2. copy [FunctionName("BulkUpload")] and change it (or create a new functiona) to [FunctionName("EventGridBlobTrigger")] from https://medium.com/@adrianivan/processing-files-from-azure-blob-storage-using-event-grid-and-storage-queue-in-a-reactive-way-ef3ad30cd081
-3. copy [FunctionName("BulkUpload")] logic and create [FunctionName("QueueBulkUpload")] puting the logic under //code for blob processing
-**************************************/
-
-
-
-
-
-
-
 namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>

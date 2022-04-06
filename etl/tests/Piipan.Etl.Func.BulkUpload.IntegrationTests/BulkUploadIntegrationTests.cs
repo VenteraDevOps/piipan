@@ -17,6 +17,7 @@ using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Database;
 using Piipan.Shared.Utilities;
 using Xunit;
+using Azure.Storage.Blobs;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
@@ -56,6 +57,15 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             );
         }
 
+        private QueueBulkUpload BuildQueueFunction()
+        {
+            var services = BuildServices();
+            return new QueueBulkUpload(
+                services.GetService<IParticipantApi>(),
+                services.GetService<IParticipantStreamParser>()
+            );
+        }
+
         [Fact]
         public async void SavesCsvRecords()
         {
@@ -64,14 +74,20 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             ClearParticipants();
             var eventGridEvent = Mock.Of<EventGridEvent>();
             eventGridEvent.Data = new Object();
-            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
+            // var input = new MemoryStream(File.ReadAllText("example.csv"));
+            var input = File.ReadAllText("example.csv");
+            BlobServiceClient blobServiceClient = Mock.Of<BlobServiceClient>();
+            var containerClient = blobServiceClient.GetBlobContainerClient("containerName");
+            // string content = Convert.ToBase64String(File.ReadAllBytes("example.csv"));
+            BlobClient blobClient = containerClient.GetBlobClient(input);
+            
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
 
             // act
-            await function.Run(
+            function.Run(
                 eventGridEvent,
-                input,
+                blobClient,
                 logger
             );
 
