@@ -12,7 +12,7 @@ servers:
         default: none
         description: Lowercase two-letter postal code abbreviation
 paths:
-  '/uploadAllParticipants/{filename}':
+  '/upload_all_participants/{filename}':
     $ref: '../../etl/docs/openapi/uploadAllParticipants.yaml'
   '/upload/{filename}':
     $ref: '../../etl/docs/openapi/upload.yaml'
