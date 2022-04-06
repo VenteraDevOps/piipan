@@ -15,9 +15,9 @@ using Azure.Storage.Blobs;
 namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>
-    /// Azure Function implementing basic Extract-Transform-Load of piipan
-    /// bulk import CSV files via Storage Containers, Event Grid, and
-    /// PostgreSQL.
+    /// Azure Function implementing basic Transform-Load of piipan
+    /// bulk import CSV files to  PostgreSQL via Storage Containers using a Queue Storage
+    /// 
     /// </summary>
     public class QueueBulkUpload
     {
