@@ -306,7 +306,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 matchResAggregator.Object,
                 requestParser
             );
-            var mockRequest = MockRequest("{ \"data\": { \"protect_location\": true } }");
+            var mockRequest = MockRequest("{ \"data\": { \"vulnerable_individual\": true } }");
             var logger = new Mock<ILogger>();
 
             // Act
