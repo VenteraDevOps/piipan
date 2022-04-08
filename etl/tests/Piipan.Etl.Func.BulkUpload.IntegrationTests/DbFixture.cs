@@ -132,7 +132,6 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-
                 records = conn.Query<Participant>(sql);
                 conn.Close();
             }
