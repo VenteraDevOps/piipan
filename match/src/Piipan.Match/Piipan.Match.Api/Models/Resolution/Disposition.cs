@@ -13,8 +13,8 @@ namespace Piipan.Match.Api.Models.Resolution
         public bool InvalidMatch { get; set; } = false;
         [JsonProperty("final_disposition")]
         public string FinalDisposition { get; set; }
-        [JsonProperty("protect_location")]
-        public bool? ProtectLocation { get; set; }
+        [JsonProperty("vulnerable_individual")]
+        public bool? VulnerableIndividual { get; set; }
         [JsonProperty("state")]
         public string State { get; set; }
     }

@@ -23,7 +23,7 @@ namespace Etl.BulkUpload.Performance.TestRunner
 
         public async Task runTest(long desiredParticipantCount)
         {
-            string headers = "lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_issuance_dates,protect_location";
+            string headers = "lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_issuance_dates,vulnerable_individual";
 
             using (MemoryStream ms = new MemoryStream())
             {

@@ -48,7 +48,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
                     new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                 },
-                ProtectLocation = true
+                VulnerableIndividual = true
             };
         }
 
@@ -156,7 +156,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Assert.Equal(record.ParticipantId, person.Matches.First().ParticipantId);
             Assert.Equal(state[0], person.Matches.First().State);
             Assert.Equal(record.ParticipantClosingDate, person.Matches.First().ParticipantClosingDate);
-            Assert.Equal(record.ProtectLocation, person.Matches.First().ProtectLocation);
+            Assert.Equal(record.VulnerableIndividual, person.Matches.First().VulnerableIndividual);
             // serialization
             var match = person.Matches.First();
             var json = JsonConvert.SerializeObject(match);

@@ -49,7 +49,7 @@ string
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |filename|path|string|true|Name of file being uploaded|
-|Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
+|Content-Length|header|integer|true|Deprecated. Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
 
 <h3 id="upload-a-file-responses">Responses</h3>
 

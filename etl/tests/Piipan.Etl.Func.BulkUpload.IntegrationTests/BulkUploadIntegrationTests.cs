@@ -88,7 +88,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             Assert.Equal(new DateRange(new DateTime(2021, 04, 01) , new DateTime(2021, 04, 15)), records.First().RecentBenefitIssuanceDates.First());
             Assert.Equal(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30)), records.First().RecentBenefitIssuanceDates.ElementAt(1));
             Assert.Equal(new DateRange(new DateTime(2021, 02, 01), new DateTime(2021, 02, 28)), records.First().RecentBenefitIssuanceDates.ElementAt(2));
-            Assert.True(records.First().ProtectLocation);
+            Assert.True(records.First().VulnerableIndividual);
         }
     }
 }

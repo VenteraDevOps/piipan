@@ -28,7 +28,7 @@ namespace Piipan.Match.Core.Tests.Builders
                 States = new string[] { "ea", "eb" },
                 Initiator = "ea",
                 Input = "{\"CaseId\": \"ABC\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"DEF\"}",
-                Data = "{\"State\": \"eb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"ProtectLocation\": true, \"RecentBenefitIssuanceDates\": [{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}]}"
+                Data = "{\"State\": \"eb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}]}"
             };
 
             _match_res_events = new List<MatchResEventDbo>()
@@ -139,8 +139,8 @@ namespace Piipan.Match.Core.Tests.Builders
             Assert.Equal("final disposition for eb", ebObj.FinalDisposition);
 
             // protect location
-            Assert.Null(eaObj.ProtectLocation);
-            Assert.Null(ebObj.ProtectLocation);
+            Assert.Null(eaObj.VulnerableIndividual);
+            Assert.Null(ebObj.VulnerableIndividual);
         }
 
         [Fact]
