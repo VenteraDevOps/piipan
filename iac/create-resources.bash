@@ -315,6 +315,9 @@ main () {
   # restrictions for the function app and storage account are added
   # in a separate step to avoid deployment and publishing issues.
   db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
+  # Long-running bulk upload queries require some specific connection
+  # details that are not part of default connection string
+  db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
     --name orch-api \
