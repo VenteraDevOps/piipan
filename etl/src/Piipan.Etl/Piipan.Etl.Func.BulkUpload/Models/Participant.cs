@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using CsvHelper.Configuration.Attributes;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Models
 {

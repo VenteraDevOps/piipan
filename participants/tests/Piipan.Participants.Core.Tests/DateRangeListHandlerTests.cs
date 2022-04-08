@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using Moq;
 using NpgsqlTypes;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Participants.Core.Tests

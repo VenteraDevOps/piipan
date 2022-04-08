@@ -453,8 +453,8 @@
       },
       "Newtonsoft.Json": {
         "type": "Transitive",
-        "resolved": "12.0.3",
-        "contentHash": "6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg=="
+        "resolved": "13.0.1",
+        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
       "Newtonsoft.Json.Schema": {
         "type": "Transitive",
@@ -1644,7 +1644,7 @@
       "piipan.participants.api": {
         "type": "Project",
         "dependencies": {
-          "Piipan.Shared": "1.0.0"
+          "Piipan.Shared.API": "1.0.0"
         }
       },
       "piipan.participants.core": {
@@ -1671,6 +1671,12 @@
           "Microsoft.Extensions.Options": "3.1.23",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.3"
+        }
+      },
+      "piipan.shared.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
         }
       }
     }

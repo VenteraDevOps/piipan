@@ -4,10 +4,10 @@ using System.Threading;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Npgsql;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
 using NpgsqlTypes;
 using System.Linq;
 using Dapper;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {

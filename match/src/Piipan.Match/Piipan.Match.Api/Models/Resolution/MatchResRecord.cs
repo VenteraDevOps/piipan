@@ -1,10 +1,7 @@
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using Piipan.Match.Api.Models;
 using Newtonsoft.Json;
+using System;
 
-namespace Piipan.Match.Core.Models
+namespace Piipan.Match.Api.Models.Resolution
 {
     /// <summary>
     /// Aggregate match resolution data that a MatchResAggregator returns

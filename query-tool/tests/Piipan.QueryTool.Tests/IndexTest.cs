@@ -8,9 +8,9 @@ using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Pages;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
-using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests

@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using NpgsqlTypes;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;

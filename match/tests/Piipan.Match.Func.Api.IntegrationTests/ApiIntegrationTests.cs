@@ -22,8 +22,8 @@ using Piipan.Match.Core.Validators;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Database;
-using Piipan.Shared.Utilities;
 using Xunit;
 
 

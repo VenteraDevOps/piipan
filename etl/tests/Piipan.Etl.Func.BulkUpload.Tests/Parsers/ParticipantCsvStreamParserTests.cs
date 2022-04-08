@@ -1,13 +1,9 @@
+using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Shared.API.Utilities;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Piipan.Etl.Func.BulkUpload.Parsers;
 using Xunit;
-using Moq;
-using Piipan.Etl.Func.BulkUpload.Models;
-using Piipan.Shared.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 {

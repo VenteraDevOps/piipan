@@ -2,8 +2,8 @@
 using Npgsql;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Database;
-using Piipan.Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;

@@ -79,6 +79,7 @@ namespace Piipan.QueryTool
             });
 
             services.RegisterMatchClientServices(_env);
+            services.RegisterMatchResolutionClientServices(_env);
 
             if (_env.IsDevelopment())
             {

@@ -8,6 +8,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using System.Text.RegularExpressions;
+using Piipan.Match.Api.Models.Resolution;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -16,28 +17,23 @@ namespace Piipan.QueryTool.Pages
 
         private readonly ILogger<MatchModel> _logger;
         private readonly ILdsDeidentifier _ldsDeidentifier;
-        private readonly IMatchApi _matchApi;
+        private readonly IMatchResolutionApi _matchResolutionApi;
 
-        public MatchData Match = new MatchData();
-
-        List<MatchData> Matches = new List<MatchData>();
+        public MatchResApiResponse Match = new MatchResApiResponse();
 
         public MatchModel(ILogger<MatchModel> logger
                            , IClaimsProvider claimsProvider
                            , ILdsDeidentifier ldsDeidentifier
-                           , IMatchApi matchApi)
+                           , IMatchResolutionApi matchResolutionApi)
                            : base(claimsProvider)
 
         {
             _logger = logger;
             _ldsDeidentifier = ldsDeidentifier;
-            _matchApi = matchApi;
-
-            GetFakeData();
+            _matchResolutionApi = matchResolutionApi;
         }
 
-        // [HttpGet("{id}")]
-        public IActionResult OnGet(string id)
+        public async Task<IActionResult> OnGet([FromRoute] string id)
         {   
             
             if(id != null) {
@@ -45,12 +41,14 @@ namespace Piipan.QueryTool.Pages
                 //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                 Regex r = new Regex("^[a-zA-Z0-9]*$");
                 if (r.IsMatch(id)) {
-
-                    Match = Matches.Find(item => item.MatchId == id);
-
                     //Match ID length = 7 characters
                     //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
-                    if(Match == null || id.Length != 7) {
+                    if(id.Length != 7) {
+                        return RedirectToPage("Error", new { message = "MatchId not found" });
+                    }
+
+                    Match = await _matchResolutionApi.GetMatch(id);
+                    if (Match == null) {
                         return RedirectToPage("Error", new { message = "MatchId not found" });
                     }
 
@@ -67,15 +65,5 @@ namespace Piipan.QueryTool.Pages
 
 
         }
-
-        private void GetFakeData()
-        {
-            Matches.Add(new MatchData()
-            {
-                MatchId = "m123456",
-                Status = "Open"
-            });
-        }
-
     }
 }

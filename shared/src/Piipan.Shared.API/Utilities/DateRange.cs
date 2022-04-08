@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
- using System.Text;
 
-namespace Piipan.Shared.Utilities
+namespace Piipan.Shared.API.Utilities
 {
-	public class DateRange
+    public class DateRange
 	{
 		/// <summary>
 		///     Initializes a new instance of the <see cref="DateRange" /> structure to the specified start and end date.

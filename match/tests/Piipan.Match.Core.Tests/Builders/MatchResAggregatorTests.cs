@@ -6,9 +6,9 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
-using Piipan.Shared.Utilities;
 using Xunit;
 using Moq;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Match.Core.Tests.Builders
 {

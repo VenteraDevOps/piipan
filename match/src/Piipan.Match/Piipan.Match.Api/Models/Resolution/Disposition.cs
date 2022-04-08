@@ -1,9 +1,6 @@
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using Piipan.Match.Api.Models;
 using Newtonsoft.Json;
-namespace Piipan.Match.Core.Models
+using System;
+namespace Piipan.Match.Api.Models.Resolution
 {
     /// <summary>
     /// Disposition data for each related state in a match
