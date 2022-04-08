@@ -15,7 +15,7 @@ put:
       schema:
         type: integer
       required: true
-      description: Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.
+      description: Deprecated. Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.
       example: 6413
   requestBody:
     content:

@@ -56,7 +56,7 @@
         "uploadUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.blob.core.usgovcloudapi.net/', '.blob.core.windows.net/')]",
         "matchDisplayName": "Duplicate participation API",
         "matchSetName": "match",
-        "uploadDisplayName": "Bulk upload API",
+        "uploadDisplayName": "Bulk API",
         "uploadSetName": "bulk",
         "uploadStatesList": "[split(toLower(parameters('uploadStates')), ' ')]",
         "copy": [
@@ -253,13 +253,41 @@
         {
             "type": "Microsoft.ApiManagement/service/apis/operations",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload')]",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload_all_participants')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
             ],
             "properties": {
                 "displayName": "Upload bulk PII data",
+                "method": "PUT",
+                "urlTemplate": "/upload_all_participants/{filename}",
+                "description": "Upload a CSV file of bulk PII data",
+                "templateParameters": [
+                    {
+                        "name": "filename",
+                        "description": "User-provided CSV filename",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": []
+            },
+            "copy": {
+                "name": "per-state-upload-ops",
+                "count": "[length(variables('uploadStatesList'))]"
+            }
+        },
+	{
+            "type": "Microsoft.ApiManagement/service/apis/operations",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+            ],
+            "properties": {
+                "displayName": "(Deprecated) Upload bulk PII data",
                 "method": "PUT",
                 "urlTemplate": "/upload/{filename}",
                 "description": "Upload a CSV file of bulk PII data",
