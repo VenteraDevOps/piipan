@@ -3,6 +3,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1.37] - 2022-04-05
+
+### Changed
+- Added WAF Rules to handle short file name attacks
+- Update Duplicate Participation API to return Match url in match responses
+- Replaced recent_benefit_months with recent_benefit_issuance_dates. Accept recent benefit issuance dates in the form of date ranges.
+- Updated API documentation for 'recent_benefit_issuance_dates'
+- Updated Participant Closing date to be nullable
+- Updated blob storage ARM templates to include dependency on parent storage account resource
+- Updated APIM match test script to use EB subscription
+### Added
+- UI Component Library
+- Added HSTS Error page and policy for errors
+- ADR for using Snake case for JSON and Pascal Case for C#
+- New project for common DbFixture to be reused across test projects
+### Fixed
+- Fixed middleware initialization ordering issue for HSTS
+- Fixed search logic to avoid searching within the initiating state's own database for matches.
+
 ## [1.0.1.36] - 2022-03-22
 
 ### Changed

@@ -24,10 +24,10 @@ namespace Piipan.Match.Core.Models
         private string CaseId2 { set { CaseId = value; } }
         [JsonProperty("participant_closing_date")]
         [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
-        public DateTime ParticipantClosingDate { get; set; }
+        public DateTime? ParticipantClosingDate { get; set; }
         [JsonProperty("ParticipantClosingDate")]
         [JsonConverter(typeof(JsonConverters.DateTimeConverter))]
-        private DateTime ParticipantClosingDate2 { set { ParticipantClosingDate = value; } }
+        private DateTime? ParticipantClosingDate2 { set { ParticipantClosingDate = value; } }
         [JsonProperty("participant_id")]
         public string ParticipantId { get; set; }
         [JsonProperty("ParticipantId")]

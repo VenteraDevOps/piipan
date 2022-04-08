@@ -80,9 +80,18 @@ Searches all state databases for any participant records that are an exact match
             "participant_id": "string",
             "participant_closing_date": "2021-10-13",
             "recent_benefit_issuance_dates": [
-              "2021-05-01/2021-05-31",
-              "2021-04-01/2021-04-30",
-              "2021-03-01/2021-03-31"
+              {
+                "start": "2021-05-01",
+                "end": "2021-05-31"
+              },
+              {
+                "start": "2021-04-01",
+                "end": "2021-04-30"
+              },
+              {
+                "start": "2021-03-01",
+                "end": "2021-03-31"
+              }
             ],
             "protect_location": true
           }
@@ -126,9 +135,18 @@ Searches all state databases for any participant records that are an exact match
             "participant_id": "string",
             "participant_closing_date": "2021-10-13",
             "recent_benefit_issuance_dates": [
-              "2021-05-01/2021-05-31",
-              "2021-04-01/2021-04-30",
-              "2021-03-01/2021-03-31"
+              {
+                "start": "2021-05-01",
+                "end": "2021-05-31"
+              },
+              {
+                "start": "2021-04-01",
+                "end": "2021-04-30"
+              },
+              {
+                "start": "2021-03-01",
+                "end": "2021-03-31"
+              }
             ],
             "protect_location": true
           },
@@ -177,9 +195,18 @@ Searches all state databases for any participant records that are an exact match
             "participant_id": "string",
             "participant_closing_date": "2021-10-13",
             "recent_benefit_issuance_dates": [
-              "2021-05-01/2021-05-31",
-              "2021-04-01/2021-04-30",
-              "2021-03-01/2021-03-31"
+              {
+                "start": "2021-05-01",
+                "end": "2021-05-31"
+              },
+              {
+                "start": "2021-04-01",
+                "end": "2021-04-30"
+              },
+              {
+                "start": "2021-03-01",
+                "end": "2021-03-31"
+              }
             ],
             "protect_location": true
           }
@@ -292,7 +319,9 @@ Status Code **200**
 |»»»» case_id|string|true|none|Participant's state-specific case identifier. Can be the same for multiple participants.|
 |»»»» participant_id|string|true|none|Participant's state-specific identifier. Is unique to the participant. Must not be social security number or any PII.|
 |»»»» participant_closing_date|string|false|none|Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits.|
-|»»»» recent_benefit_issuance_dates|array|false|none|List of up to the last 3 date ranges that participant received benefits, in descending order. Each date range is formatted as ISO 8601 year, month and day. Does not include current benefit issuances date range.|
+|»»»» recent_benefit_issuance_dates|array|false|none|Collection of up to 3 date ranges that participant has been receiving benefits at the time the match was found.|
+|»»»»» start|string|false|none|start date for date range|
+|»»»»» end|string|false|none|end date for date range|
 |»»»» protect_location|boolean|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
 |»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
