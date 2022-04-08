@@ -253,7 +253,7 @@
         {
             "type": "Microsoft.ApiManagement/service/apis/operations",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-uploadAllParticipants')]",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload_all_participants')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]",
                 "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
@@ -261,7 +261,7 @@
             "properties": {
                 "displayName": "Upload bulk PII data",
                 "method": "PUT",
-                "urlTemplate": "/uploadAllParticipants/{filename}",
+                "urlTemplate": "/upload_all_participants/{filename}",
                 "description": "Upload a CSV file of bulk PII data",
                 "templateParameters": [
                     {
