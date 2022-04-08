@@ -1,7 +1,7 @@
-using System.Text.Json;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Participants.Api.Models;
+using Newtonsoft.Json;
 
 namespace Piipan.Match.Core.Builders
 {
@@ -39,8 +39,8 @@ namespace Piipan.Match.Core.Builders
         /// <returns>`this` to allow for method chanining.</returns>
         public IActiveMatchRecordBuilder SetMatch(RequestPerson input, IParticipant match)
         {
-            this._record.Input = JsonSerializer.Serialize(input);
-            this._record.Data = JsonSerializer.Serialize(match);
+            this._record.Input = JsonConvert.SerializeObject(input);
+            this._record.Data = JsonConvert.SerializeObject(match);
 
             // ldshash is currently the only hash type
             this._record.Hash = input.LdsHash;

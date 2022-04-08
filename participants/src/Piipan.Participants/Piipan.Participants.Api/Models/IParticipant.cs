@@ -1,3 +1,4 @@
+using Piipan.Shared.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -10,7 +11,7 @@ namespace Piipan.Participants.Api.Models
         string CaseId { get; set; }
         string ParticipantId { get; set; }
         DateTime? ParticipantClosingDate { get; set; }
-        IEnumerable<DateTime> RecentBenefitMonths { get; set; }
+        IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; }
         bool? ProtectLocation { get; set; }
     }
 }

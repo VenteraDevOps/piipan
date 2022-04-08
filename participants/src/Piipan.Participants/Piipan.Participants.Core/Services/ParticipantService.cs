@@ -8,6 +8,7 @@ using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using System;
 using System.Transactions;
+using Dapper;
 
 namespace Piipan.Participants.Core.Services
 {

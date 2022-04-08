@@ -35,15 +35,30 @@ get:
                 type: object
                 description: "The response payload representing match data."
                 required:
+                  - initiator
                   - match_id
+                  - states
                   - status
                   - participants
                   - dispositions
                 properties:
+                  initiator:
+                    type: string
+                    description: "Two-letter postal abbreviation of the state that initiated the match"
+                    example: "IA"
                   match_id:
                     type: string
                     description: "The Match ID"
                     example: "EBOINR"
+                  states:
+                    type: array
+                    description: "Array of two-letter postal abbreviations of states involved in a match"
+                    minLength: 2
+                    maxLength: 2
+                    items:
+                      type: string
+                      description: "two-letter postal abbreviations of a state involved in a match"
+                      example: "MO"
                   status:
                     type: string
                     description: "The Match's status"
@@ -75,13 +90,19 @@ get:
                           minLength: 0
                           maxLength: 3
                           items:
-                            type: array
+                            type: object
                             description: "A single date range"
-                            minLength: 2
-                            maxLength: 2
-                            items:
-                              type: string
-                              format: date
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                pattern: '^\d{4}-\d{2}-\d{2}$'
+                                description: "start date for date range"
+                              end:
+                                type: string
+                                format: date
+                                pattern: '^\d{4}-\d{2}-\d{2}$'
+                                description: "end date for date range"
                         state:
                           type: string
                           description: "Two-letter postal abbreviation for the state to which this data belongs"

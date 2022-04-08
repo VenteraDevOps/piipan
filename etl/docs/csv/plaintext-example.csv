@@ -1,8 +1,8 @@
-last,first,middle,dob,ssn,case_id,participant_id,participant_closing_date,recent_benefit_months,protect_location
-Farrington,Theodore,Carri,1931-10-13,425-46-5417,caseid1,participantid1,2021-05-15,2021-04 2021-03 2021-02,TRUE
-Lynn,Wesley,Eura,1940-08-01,195-26-4789,caseid2,participantid2,2021-04-03,2021-05 2021-04,FALSE
-Cullen,S,,1915-01-01,357-18-1705,caseid3,participantid3,2020-12-30,2021-05,
-Alger,Megan,Kamala,1920-01-25,400-36-2448,caseid4,participantid4,2021-10-01,,
+last,first,middle,dob,ssn,case_id,participant_id,participant_closing_date,recent_benefit_issuance_dates,protect_location
+Farrington,Theodore,Carri,1931-10-13,425-46-5417,caseid1,participantid1,2021-05-15,2021-04-01/2021-04-15 2021-03-01/2021-03-30 2021-02-01/2021-02-28,true
+Lynn,Wesley,Eura,1940-08-01,195-26-4789,caseid2,participantid2,2021-04-03,2021-12-01/2022-04-15 2021-03-01/2021-03-30,false
+Cullen,S,,1915-01-01,357-18-1705,caseid3,participantid3,2020-12-30,2021-04-01/2021-04-15 2021-03-01/2021-03-30,
+Alger,Megan,Kamala,1920-01-25,400-36-2448,caseid4,participantid4,2021-10-01,2021-02-01/2021-02-28,
 Yu,,,1973-11-02,282-20-6988,caseid5,participantid5,,,
 Wallen,Homer,Madonna,1913-04-04,127-20-6810,caseid6,participantid6,,,
 Benner,Cristina,Wilton,1961-07-22,375-30-7787,caseid7,participantid7,,,

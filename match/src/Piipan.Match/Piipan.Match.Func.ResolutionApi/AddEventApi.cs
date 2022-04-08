@@ -96,7 +96,7 @@ namespace Piipan.Match.Func.ResolutionApi
                     };
                     await _matchResEventDao.AddEvent(newEvent);
                     // determine if match should be closed
-                    DetermineClosure(reqObj, match.Result, matchResEvents.Result);
+                    await DetermineClosure(reqObj, match.Result, matchResEvents.Result);
                     return new OkResult();
                 }
                 catch (StreamParserException ex)
@@ -121,7 +121,7 @@ namespace Piipan.Match.Func.ResolutionApi
                 }
             }
 
-            private async void DetermineClosure(
+            private async Task DetermineClosure(
                 AddEventRequest reqObj,
                 IMatchRecord match,
                 IEnumerable<IMatchResEvent> matchResEvents

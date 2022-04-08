@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Utilities;
 
 namespace Piipan.Participants.Core.Models
 {
@@ -12,7 +13,7 @@ namespace Piipan.Participants.Core.Models
         public string CaseId { get; set; }
         public string ParticipantId { get; set; }
         public DateTime? ParticipantClosingDate { get; set; }
-        public IEnumerable<DateTime> RecentBenefitMonths { get; set; }
+        public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; }
         public bool? ProtectLocation { get; set; }
         public Int64 UploadId { get; set; }
 
@@ -28,7 +29,7 @@ namespace Piipan.Participants.Core.Models
             CaseId = participant.CaseId;
             ParticipantId = participant.ParticipantId;
             ParticipantClosingDate = participant.ParticipantClosingDate;
-            RecentBenefitMonths = participant.RecentBenefitMonths;
+            RecentBenefitIssuanceDates = participant.RecentBenefitIssuanceDates;
             ProtectLocation = participant.ProtectLocation;
         }
 
@@ -51,7 +52,7 @@ namespace Piipan.Participants.Core.Models
                 CaseId == p.CaseId &&
                 ParticipantId == p.ParticipantId &&
                 ParticipantClosingDate.Value.Date == p.ParticipantClosingDate.Value.Date &&
-                RecentBenefitMonths.SequenceEqual(p.RecentBenefitMonths) &&
+                RecentBenefitIssuanceDates.SequenceEqual(p.RecentBenefitIssuanceDates) &&
                 ProtectLocation == p.ProtectLocation &&
                 UploadId == p.UploadId;
         }
@@ -64,7 +65,7 @@ namespace Piipan.Participants.Core.Models
                 CaseId,
                 ParticipantId,
                 ParticipantClosingDate,
-                RecentBenefitMonths,
+                RecentBenefitIssuanceDates,
                 ProtectLocation,
                 UploadId
             );

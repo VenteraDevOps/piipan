@@ -10,6 +10,9 @@
                     <set-header name="Content-Type" exists-action="override">
                         <value>application/json; charset=UTF-8</value>
                     </set-header>
+                    <set-header name="Strict-Transport-Security" exists-action="override">    
+                        <value>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</value>
+                    </set-header>     
                     <set-body>{"statusCode": 401, "message": "Access denied due to invalid subscription key. Make sure to provide a valid key for an active subscription."}</set-body>
                 </return-response>
             </when>
@@ -18,6 +21,14 @@
     <backend>
         <forward-request />
     </backend>
-    <outbound />
-    <on-error />
+    <outbound>
+        <set-header name="Strict-Transport-Security" exists-action="override">    
+            <value>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</value>
+        </set-header>     
+    </outbound>
+    <on-error>
+        <set-header name="Strict-Transport-Security" exists-action="override">    
+            <value>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</value>
+        </set-header>  
+    </on-error>
 </policies>

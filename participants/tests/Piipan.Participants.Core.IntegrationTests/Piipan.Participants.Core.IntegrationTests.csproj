@@ -29,10 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Piipan.Participants\Piipan.Participants.Core\Piipan.Participants.Core.csproj" />
     <ProjectReference Include="..\..\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\..\..\ddl\per-state.sql" Link="per-state.sql" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\..\..\shared\src\Piipan.Shared.TestFixtures\Piipan.Shared.TestFixtures.csproj" />
   </ItemGroup>
 
   <ItemGroup>

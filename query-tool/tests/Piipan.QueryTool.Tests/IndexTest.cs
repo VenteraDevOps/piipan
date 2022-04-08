@@ -10,6 +10,7 @@ using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -113,11 +114,11 @@ namespace Piipan.QueryTool.Tests
                                         CaseId = "caseId",
                                         ParticipantId = "pId",
                                         ParticipantClosingDate = new DateTime(2021, 05, 31),
-                                        RecentBenefitMonths = new List<DateTime>
+                                        RecentBenefitIssuanceDates = new List<DateRange>
                                         {
-                                            new DateTime(2021, 04, 30),
-                                            new DateTime(2021, 03, 31),
-                                            new DateTime(2021, 02, 28)
+                                            new DateRange(new DateTime(2021, 4, 1),new DateTime(2021, 5, 1)),
+                                            new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
+                                            new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                                         },
                                         ProtectLocation = false
                                     }

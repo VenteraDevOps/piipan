@@ -13,8 +13,8 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
-using Piipan.Match.Func.Api.DataTypeHandlers;
 using Piipan.Match.Func.Api.Models;
+using Piipan.Participants.Core;
 
 namespace Piipan.Match.Func.Api
 {
@@ -35,8 +35,7 @@ namespace Piipan.Match.Func.Api
             _matchApi = matchApi;
             _requestParser = requestParser;
             _matchEventService = matchEventService;
-
-            SqlMapper.AddTypeHandler(new DateTimeListHandler());
+            SqlMapper.AddTypeHandler(new DateRangeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 

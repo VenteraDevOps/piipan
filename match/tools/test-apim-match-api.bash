@@ -12,7 +12,7 @@
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit
 
-SUBSCRIPTION_NAME="EA-DupPart"
+SUBSCRIPTION_NAME="EB-DupPart"
 MATCH_API_PATH="/match/v2/find_matches"
 
 # Hash digest for farrington,10/13/31,425-46-5417

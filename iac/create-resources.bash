@@ -32,8 +32,7 @@ set_constants () {
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
 
-  # Query rool cWAF custom rule
-  WAF_CUSTOM_RULE_NAME=rateLimitRuleByRequestMethod
+  QUERY_TOOL_URL="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
 }
 
 # Generate the storage account connection string for the corresponding
@@ -366,7 +365,8 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --settings \
       WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1
+      WEBSITE_VNET_ROUTE_ALL=1 \
+      QueryToolUrl="$QUERY_TOOL_URL"
 
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
@@ -600,32 +600,6 @@ main () {
     --output tsv)
   echo "Front Door iD: ${front_door_id}"
 
-  front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
-
-  # Create WAF Policy on the front door
-  echo "az network front-door waf-policy rule create "
-  az network front-door waf-policy rule create \
-    --name $WAF_CUSTOM_RULE_NAME \
-    --priority 1 \
-    --action Block \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME" \
-    --rule-type ratelimitrule \
-    --rate-limit-duration 5 \
-    --rate-limit-threshold 10000 --defer
-
-  echo "az network front-door waf-policy rule show"
-
-  #Create the custom rule on the WAF Polity that match with any POST request method
-  echo "az network front-door waf-policy rule match-condition add"
-  az network front-door waf-policy rule match-condition add \
-    --resource-group "$RESOURCE_GROUP" \
-    --policy-name "$QUERY_TOOL_WAF_NAME" \
-    --name $WAF_CUSTOM_RULE_NAME \
-    --match-variable RequestMethod \
-    --operator Equal \
-    --values POST
-
   orch_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
@@ -658,7 +632,7 @@ main () {
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
-      frontDoorUri="$front_door_uri"
+      frontDoorUri="$QUERY_TOOL_URL"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -684,23 +658,14 @@ main () {
   #   - OrchestratorApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
-  # Configure Microsoft Defender for Cloud for all Azure resources.
-  # Defender only incurs costs for running resources, so there is no harm in
-  # enabling for all resources.
-  echo "Configure Microsoft Defender for Cloud"
-  az deployment sub create \
-    --name "defender-$LOCATION" \
-    --location $LOCATION \
-    --template-file ./arm-templates/defender.json
+  # Configure Microsoft Defender for Cloud and assign Azure CIS 1.3.0 benchmark
+  ./configure-defender-and-policy.bash "$azure_env"
 
   echo "Secure database connection"
   ./remove-external-network.bash \
     "$azure_env" \
     "$RESOURCE_GROUP" \
     "$PG_SERVER_NAME"
-
-  # Assign CIS Microsoft Azure Foundations Benchmark policy set-definition
-  ./configure-cis-policy.bash "$azure_env"
 
   script_completed
 }

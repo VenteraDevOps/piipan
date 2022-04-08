@@ -28,10 +28,7 @@
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Core\Piipan.Metrics.Core.csproj" />
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="..\..\ddl\metrics.sql" Link="metrics.sql" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\..\..\shared\src\Piipan.Shared.TestFixtures\Piipan.Shared.TestFixtures.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@ using Npgsql;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
+using Piipan.Shared.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -52,10 +53,10 @@ namespace Piipan.Participants.Core.IntegrationTests
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
                     ParticipantClosingDate = DateTime.UtcNow.Date,
-                    RecentBenefitMonths = new List<DateTime>
+                    RecentBenefitIssuanceDates = new List<DateRange>
                     {
-                        new DateTime(2021, 4, 1),
-                        new DateTime(2021, 5, 1)
+                       new DateRange(new DateTime(2021, 4, 1),new DateTime(2021, 5, 1)),
+                       new DateRange(new DateTime(2021, 5, 1),new DateTime(2021, 6, 1))
                     },
                     ProtectLocation = (new Random()).Next(2) == 0,
                     UploadId = uploadId

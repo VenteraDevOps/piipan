@@ -9,6 +9,7 @@ using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests
@@ -111,7 +112,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                     CaseId = Guid.NewGuid().ToString(),
                     ParticipantId = Guid.NewGuid().ToString(),
                     ParticipantClosingDate = DateTime.UtcNow,
-                    RecentBenefitMonths = new List<DateTime>(),
+                    RecentBenefitIssuanceDates = new List<DateRange>(),
                     ProtectLocation = (new Random()).Next(2) == 1
                 }
             };

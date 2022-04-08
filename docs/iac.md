@@ -47,10 +47,10 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./configure-oidc-apps.bash tts/dev
 ```
 
-7. Create a subscription in the API Management service. For now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EA-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
+7. Create a subscription in the API Management service. For now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EB-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
 
 ```
-    ./match/tools/create-apim-match-subscription.bash tts/dev ea
+    ./match/tools/create-apim-match-subscription.bash tts/dev eb
     ./etl/tools/create-apim-bulk-subscription.bash tts/dev ea
 ```
 
@@ -115,6 +115,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `MetricsApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Metrics API's Azure Active Directory application object | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
+| `QueryToolUrl` | URL for the associated Query Tool. | Piipan.Match.Orchestrator |
 
 
 ## `SysType` resource tag

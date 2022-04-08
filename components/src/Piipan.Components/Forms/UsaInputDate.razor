@@ -1,0 +1,32 @@
+﻿@using static FormConstants
+@inherits UsaInputBase<DateTime?>
+@inject IJSRuntime JSRuntime
+@code {
+    InputDate<DateTime?> InputDateReference { get; set; }
+    public override int? Width { get; set; } = 180;
+
+    protected override async Task<List<string>> PreverificationChecks()
+    {
+        bool hasBadInput = await JSRuntime.InvokeAsync<bool>("piipan.utilities.doesElementHaveInvalidInput", Id);
+        if (hasBadInput)
+        {
+            return new List<string>() { ValidationConstants.InvalidMessage };
+        }
+        else
+        {
+            return null;
+        }
+    }
+}
+
+<InputDate @ref="InputDateReference"
+           class="@($"{InputClass} {(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")}")"
+           @bind-Value="CurrentValue" @onblur="BlurField"
+           required="@FormGroup.Required"
+           id="@Id"
+           name="@Id.Replace("_", ".")"
+           aria-errormessage="@(FormGroup.Status == InputStatus.Error ? $"{Id}-message" : null)"
+           aria-invalid="@(FormGroup.Status == InputStatus.Error ? "true" : null)"
+           @attributes="AdditionalAttributes"
+           style="@(Width != null ? $"width: {Width}px;" : "")">
+</InputDate>

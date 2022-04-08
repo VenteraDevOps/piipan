@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CsvHelper.Configuration.Attributes;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Models
 {
@@ -12,7 +13,7 @@ namespace Piipan.Etl.Func.BulkUpload.Models
         public string CaseId { get; set; } = null!;
         public string ParticipantId { get; set; } = null!;
         public DateTime? ParticipantClosingDate { get; set; }
-        public IEnumerable<DateTime> RecentBenefitMonths { get; set; } = new List<DateTime>();
+        public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; } = new List<DateRange>();
         // Set Boolean values here, based on:
         // https://joshclose.github.io/CsvHelper/examples/configuration/attributes/
         // Values should mimic what is set in the Bulk Upload import schema

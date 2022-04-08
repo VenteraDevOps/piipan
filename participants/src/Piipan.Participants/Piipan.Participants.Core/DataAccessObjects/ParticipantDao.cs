@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
+using Piipan.Shared.Utilities;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -20,6 +24,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
         {
             _dbConnectionFactory = dbConnectionFactory;
             _logger = logger;
+            SqlMapper.AddTypeHandler(new DateRangeListHandler());
         }
 
         public async Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId)
@@ -33,7 +38,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                         participant_id ParticipantId,
                         case_id CaseId,
                         participant_closing_date ParticipantClosingDate,
-                        recent_benefit_months RecentBenefitMonths,
+                        recent_benefit_issuance_dates RecentBenefitIssuanceDates,
                         protect_location ProtectLocation,
                         upload_id UploadId
                     FROM participants
@@ -58,7 +63,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     case_id,
                     participant_id,
                     participant_closing_date,
-                    recent_benefit_months,
+                    recent_benefit_issuance_dates,
                     protect_location
                 )
                 VALUES
@@ -68,7 +73,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     @CaseId,
                     @ParticipantId,
                     @ParticipantClosingDate,
-                    @RecentBenefitMonths::date[],
+                    @RecentBenefitIssuanceDates::daterange[],
                     @ProtectLocation
                 )
             ";
@@ -85,7 +90,6 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     {
                         _logger.LogDebug(
                             $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
-
                         await connection.ExecuteAsync(sql, participant);
                     }
                 }

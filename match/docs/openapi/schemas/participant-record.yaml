@@ -22,22 +22,35 @@ ParticipantRecord:
     participant_closing_date:
       type: string
       pattern: '^\d{4}-\d{2}-\d{2}$'
-      example: "2021-01"
+      example: "2021-01-31"
       description: "Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits."
-    recent_benefit_months:
+    recent_benefit_issuance_dates:
       type: array
+      description: "Collection of up to 3 date ranges that participant has been receiving benefits at the time the match was found."
+      minLength: 0
+      maxLength: 3
       items:
-        type: string
-        pattern: '^\d{4}-\d{2}$'
-        example: "2021-01"
-      minItems: 0
-      maxItems: 3
-      description: "List of up to the last 3 months that participant received benefits, in descending order. Each month is formatted as ISO 8601 year and month. Does not include current benefit month."
+        type: object
+        description: "A single date range"
+        properties:
+          start:
+            type: string
+            format: date
+            pattern: '^\d{4}-\d{2}-\d{2}$'
+            description: "start date for date range"
+          end:
+            type: string
+            format: date
+            pattern: '^\d{4}-\d{2}-\d{2}$'
+            description: "end date for date range"
     protect_location:
       type: boolean
       nullable: true
       example: true
       description: "Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values."
+    match_url:
+      type: string
+      description: "URL to visit to view details about this match."
 
 ParticipantRecordExamples:
   All:
@@ -46,22 +59,46 @@ ParticipantRecordExamples:
     case_id: "string"
     participant_id: "string"
     participant_closing_date: "2021-10-13"
-    recent_benefit_months:
-      - "2021-05"
-      - "2021-04"
-      - "2021-03"
+    recent_benefit_issuance_dates:
+     [
+      {
+        "start": "2021-05-01",
+        "end": "2021-05-31"
+      },
+      {
+        "start": "2021-04-01",
+        "end": "2021-04-30"
+      },
+      {
+        "start": "2021-03-01",
+        "end": "2021-03-31"
+      }
+    ]
     protect_location: true
+    match_url: "https://test.com/match?id=BCD2345"
   AllEB:
     match_id: "XYZ9876"
     state: "eb"
     case_id: "string"
     participant_id: "string"
     participant_closing_date: "2021-10-13"
-    recent_benefit_months:
-      - "2021-05"
-      - "2021-04"
-      - "2021-03"
+    recent_benefit_issuance_dates:
+     [
+      {
+        "start": "2021-05-01",
+        "end": "2021-05-31"
+      },
+      {
+        "start": "2021-04-01",
+        "end": "2021-04-30"
+      },
+      {
+        "start": "2021-03-01",
+        "end": "2021-03-31"
+      }
+    ]
     protect_location: true
+    match_url: "https://test.com/match?id=XYZ9876"
   Required:
     match_id: "4567CDF"
     state: "ec"
@@ -69,3 +106,4 @@ ParticipantRecordExamples:
     participant_id: "string"
     participant_closing_date: null
     protect_location: null
+    match_url: "https://test.com/match?id=4567CDF"
