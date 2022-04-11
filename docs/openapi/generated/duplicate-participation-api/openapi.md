@@ -61,6 +61,7 @@ Searches all state databases for any participant records that are an exact match
 |» lds_hash|body|string|true|SHA-512 digest of participant's last name, DoB, and SSN. See docs/pprl.md for details|
 |» participant_id|body|string|false|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
 |» case_id|body|string|false|Participant's state-specific case number|
+|» search_reason|body|string|false|User's reason for running match query. Must be either 'Application', 'Recertification', or 'New Household Member'|
 
 > Example responses
 
