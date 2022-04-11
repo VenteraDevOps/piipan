@@ -6,6 +6,19 @@ namespace Piipan.Shared.API.Utilities
     public class DateRangeTests
     {
         [Fact]
+        public void Constructor_SetsValues()
+        {
+            var start = new DateTime(2021, 1, 1);
+            var end = new DateTime(2021, 1, 31);
+            // Arrange
+            var range = new DateRange(start, end);
+
+            // Act / Assert
+            Assert.Equal(start, range.Start);
+            Assert.Equal(end, range.End);
+        }
+
+        [Fact]
         public void Equals_NullObj()
         {
             // Arrange
