@@ -84,7 +84,7 @@ namespace Piipan.Shared.Helpers.Tests
         }
 
         [Fact]
-        public void RelativeTimeReturnsTwoHourAgo()
+        public void RelativeTimeReturnsTwoHoursAgo()
         {
             var dtnow = new DateTime(2020, 12, 2, 1, 0, 0);
             var dtrel = new DateTime(2020, 12, 1, 23, 0, 0);
