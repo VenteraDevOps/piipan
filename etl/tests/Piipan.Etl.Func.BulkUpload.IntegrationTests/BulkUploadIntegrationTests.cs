@@ -4,8 +4,8 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Azure.Messaging.EventGrid;
 using Dapper;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -63,7 +63,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = BuildServices();
             ClearParticipants();
             var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
+            eventGridEvent.Data = new BinaryData(string.Empty);
             var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
