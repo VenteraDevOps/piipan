@@ -1,13 +1,10 @@
+using Dapper;
+using Npgsql;
+using Piipan.Etl.Func.BulkUpload.Models;
+using Piipan.Participants.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Piipan.Etl.Func.BulkUpload.Models;
-using Npgsql;
-using Piipan.Participants.Api.Models;
-using NpgsqlTypes;
-using System.Linq;
-using Dapper;
-using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
