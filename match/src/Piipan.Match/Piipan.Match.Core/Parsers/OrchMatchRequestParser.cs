@@ -6,6 +6,7 @@ using Piipan.Match.Api.Models;
 using Newtonsoft.Json;
 using FluentValidation;
 using System.Linq;
+using Piipan.Match.Core.Enums;
 
 namespace Piipan.Match.Core.Parsers
 {
@@ -59,19 +60,14 @@ namespace Piipan.Match.Core.Parsers
                 }
                 ///Checking search_reason for valid reason. If reason given is not 
                 ///in allowed list of search reasons then setting reason to null
-                string[] validSearchReasons =
-                {
-                    "application",
-                    "recertification",
-                    "new household member"
-                };
                 for (int i = 0; i < request.Data.Count; i++)
                 {
                     if (request.Data[i].SearchReason != null)
                     {
-                        if (!validSearchReasons.Contains(request.Data[i].SearchReason.ToLower()))
+                        request.Data[i].SearchReason = request.Data[i].SearchReason.ToLower();
+                        if (!Enum.IsDefined(typeof(ValidSearchReasons), request.Data[i].SearchReason))
                         {
-                            request.Data[i].SearchReason = null;
+                            request.Data[i].SearchReason = ValidSearchReasons.other.ToString();
                         }
                     }
                     
