@@ -75,7 +75,7 @@ ParticipantRecordExamples:
       }
     ]
     protect_location: true
-    match_url: "https://test.com/match?id=BCD2345"
+    match_url: "https://nac.example/match/BCD2345"
   AllEB:
     match_id: "XYZ9876"
     state: "eb"
@@ -98,7 +98,7 @@ ParticipantRecordExamples:
       }
     ]
     protect_location: true
-    match_url: "https://test.com/match?id=XYZ9876"
+    match_url: "https://nac.example/match/XYZ9876"
   Required:
     match_id: "4567CDF"
     state: "ec"
@@ -106,4 +106,4 @@ ParticipantRecordExamples:
     participant_id: "string"
     participant_closing_date: null
     protect_location: null
-    match_url: "https://test.com/match?id=4567CDF"
+    match_url: "https://nac.example/match/4567CDF"
