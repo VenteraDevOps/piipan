@@ -10,6 +10,8 @@ using Moq;
 using Xunit;
 using FluentValidation;
 using FluentValidation.Results;
+using Newtonsoft.Json;
+using Piipan.Match.Core.Enums;
 
 namespace Piipan.Match.Core.Tests.Parsers
 {
@@ -76,6 +78,45 @@ namespace Piipan.Match.Core.Tests.Parsers
             Assert.Equal(count, request.Data.Count());
         }
 
+        [Theory]
+        [InlineData("Application", ValidSearchReasons.application)]
+        [InlineData("ASDF", ValidSearchReasons.other)]
+        [InlineData("Recertification", ValidSearchReasons.recertification)]
+        [InlineData("New_household_member", ValidSearchReasons.new_household_member)]
+        [InlineData("New household member", ValidSearchReasons.other)]
+        [InlineData("OTHER", ValidSearchReasons.other)]
+        [InlineData("", ValidSearchReasons.other)]
+        public async Task ValidSearchReason(string searchReason, ValidSearchReasons expectedSearchReason)
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
+            var validator = new Mock<IValidator<OrchMatchRequest>>();
+            validator
+                .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var parser = new OrchMatchRequestParser(validator.Object, logger);
+
+            var orchMatchRequest = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>()
+                {
+                    new RequestPerson
+                    {
+                        LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
+                        SearchReason = searchReason
+                    }
+                }
+            };
+
+            //Act
+            var request = await parser.Parse(BuildStream(JsonConvert.SerializeObject(orchMatchRequest)));
+
+            // Assert
+            Assert.NotNull(request);
+            Assert.Equal(expectedSearchReason.ToString(), request.Data[0].SearchReason);
+        }
+
         [Fact]
         public async Task ThrowsWhenValidatorThrows()
         {
@@ -83,7 +124,7 @@ namespace Piipan.Match.Core.Tests.Parsers
             var body = @"{'data':[
                 { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458' }
             ]}";
-        
+            
             var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
             var validator = new Mock<IValidator<OrchMatchRequest>>();
             validator

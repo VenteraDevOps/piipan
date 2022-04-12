@@ -131,15 +131,17 @@
                             "name": "[parameters('serverName')]",
                             "properties": {
                                 "version": "11",
+                                "createMode": "Default",
                                 "administratorLogin": "[parameters('administratorLogin')]",
                                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
                                 "storageProfile": {
-                                    "storageMB": 5120,
+                                    // Increase available IOPS by setting storage larger
+                                    // than strictly necessary for volume of stored data
+                                    "storageMB": 307200,
                                     "backupRetentionDays": 7,
                                     "geoRedundantBackup": "Enabled",
                                     "storageAutoGrow": "Enabled"
                                 },
-                                "previewFeature": "",
                                 "infrastructureEncryption": "Disabled",
                                 "publicNetworkAccess": "Enabled" // This gets disabled later in iac
                             },
@@ -148,7 +150,6 @@
                                 "name": "GP_Gen5_2",
                                 "tier": "GeneralPurpose",
                                 "capacity": 2,
-                                "size": 5120,
                                 "family": "Gen5"
                             }
                         },

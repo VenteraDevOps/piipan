@@ -61,6 +61,7 @@ Searches all state databases for any participant records that are an exact match
 |» lds_hash|body|string|true|SHA-512 digest of participant's last name, DoB, and SSN. See docs/pprl.md for details|
 |» participant_id|body|string|false|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
 |» case_id|body|string|false|Participant's state-specific case number|
+|» search_reason|body|string|false|User's reason for running match query. Must be either 'Application', 'Recertification', or 'New Household Member'|
 
 > Example responses
 
@@ -93,7 +94,8 @@ Searches all state databases for any participant records that are an exact match
                 "end": "2021-03-31"
               }
             ],
-            "protect_location": true
+            "protect_location": true,
+            "match_url": "https://nac.example/match/BCD2345"
           }
         ]
       }
@@ -148,7 +150,8 @@ Searches all state databases for any participant records that are an exact match
                 "end": "2021-03-31"
               }
             ],
-            "protect_location": true
+            "protect_location": true,
+            "match_url": "https://nac.example/match/XYZ9876"
           },
           {
             "match_id": "4567CDF",
@@ -156,7 +159,8 @@ Searches all state databases for any participant records that are an exact match
             "case_id": "string",
             "participant_id": "string",
             "participant_closing_date": null,
-            "protect_location": null
+            "protect_location": null,
+            "match_url": "https://nac.example/match/4567CDF"
           }
         ]
       }
@@ -181,7 +185,8 @@ Searches all state databases for any participant records that are an exact match
             "case_id": "string",
             "participant_id": "string",
             "participant_closing_date": null,
-            "protect_location": null
+            "protect_location": null,
+            "match_url": "https://nac.example/match/4567CDF"
           }
         ]
       },
@@ -208,7 +213,8 @@ Searches all state databases for any participant records that are an exact match
                 "end": "2021-03-31"
               }
             ],
-            "protect_location": true
+            "protect_location": true,
+            "match_url": "https://nac.example/match/BCD2345"
           }
         ]
       }
@@ -237,7 +243,8 @@ Searches all state databases for any participant records that are an exact match
             "case_id": "string",
             "participant_id": "string",
             "participant_closing_date": null,
-            "protect_location": null
+            "protect_location": null,
+            "match_url": "https://nac.example/match/4567CDF"
           }
         ]
       }
@@ -262,7 +269,8 @@ Searches all state databases for any participant records that are an exact match
             "case_id": "string",
             "participant_id": "string",
             "participant_closing_date": null,
-            "protect_location": null
+            "protect_location": null,
+            "match_url": "https://nac.example/match/4567CDF"
           }
         ]
       }
@@ -323,6 +331,7 @@ Status Code **200**
 |»»»»» start|string|false|none|start date for date range|
 |»»»»» end|string|false|none|end date for date range|
 |»»»» protect_location|boolean|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
+|»»»» match_url|string|true|none|The URL to visit to acquire more information about this match.|
 |»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» code|string|false|none|The application-specific error code|

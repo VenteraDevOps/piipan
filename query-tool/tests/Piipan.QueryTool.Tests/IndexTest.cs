@@ -120,7 +120,7 @@ namespace Piipan.QueryTool.Tests
                                             new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
                                             new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                                         },
-                                        ProtectLocation = false
+                                        VulnerableIndividual = false
                                     }
                                 }
                             }

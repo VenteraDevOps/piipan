@@ -19,6 +19,12 @@ paths:
           schema:
             type: string
           description: 'As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.'
+        - in: header
+          name: X-Initiating-State
+          schema:
+            type: string
+          description: Two-letter postal abbreviation for the caller's state role
+          required: true
       requestBody:
         required: true
         content:
@@ -47,6 +53,9 @@ paths:
                       case_id:
                         type: string
                         description: Participant's state-specific case number
+                      search_reason:
+                        type: string
+                        description: 'User''s reason for running match query. Must be either ''Application'', ''Recertification'', or ''New Household Member'''
             examples:
               Single person:
                 description: 'An example request to query a single person, with values for all fields'
@@ -139,6 +148,9 @@ paths:
                                     nullable: true
                                     example: true
                                     description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
+                                  match_url:
+                                    type: string
+                                    description: URL to visit to view details about this match.
                       errors:
                         type: array
                         description: 'Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.'
@@ -201,6 +213,7 @@ paths:
                                 - start: '2021-03-01'
                                   end: '2021-03-31'
                               protect_location: true
+                              match_url: 'https://nac.example/match/BCD2345'
                       errors: []
                 No matches:
                   description: A query for a single person returning no matches
@@ -230,12 +243,14 @@ paths:
                                 - start: '2021-03-01'
                                   end: '2021-03-31'
                               protect_location: true
+                              match_url: 'https://nac.example/match/XYZ9876'
                             - match_id: 4567CDF
                               state: ec
                               case_id: string
                               participant_id: string
                               participant_closing_date: null
                               protect_location: null
+                              match_url: 'https://nac.example/match/4567CDF'
                       errors: []
                 Multiple persons with matches:
                   description: A query for two persons returning one match for each person
