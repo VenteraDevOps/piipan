@@ -4,7 +4,7 @@
 
 - [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.30.0
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
 - `psql` client for PostgreSQL – included in Azure Cloud Shell
 - [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during the build of ASP.NET Core web applications
@@ -153,7 +153,6 @@ az resource list  --tag SysType=PerStateMatchApi --query "[? resourceGroup == 'r
     1. `az rest --method DELETE --uri https://management.azure.com/subscriptions/<subscription-id>/providers/Microsoft.ApiManagement/locations/<region>/deletedservices/<apim-service-id>?api-version=2020-06-01-preview` for each relevant APIM instance.
     1. Now when you re-run `create-resources`, you should not get an `DeploymentFailed` error in `create-apim`.
 - Some Azure CLI provisioning commands will return before all of their behind-the-scenes operations complete in the Azure environment. Very occasionally, subsequent provisioning commands in `create-resources` will fail as it won't be able to locate services it expects to be present; e.g., `Can't find app with name` when publishing a Function to a Function App. As a workaround, re-run the script.
-- .NET 5 with Azure Functions v3 is [not (yet) supported by Microsoft](https://github.com/Azure/azure-functions-host/issues/6674).
 - `iac/.azure` contains local Azure CLI configuration that is used by `create-resources`
 - In order for IaC to automatically configure the OIDC client secrets for the Dashboard and Query Tool applications, the secrets need to be present in a key vault with a particular naming format. See `configure-oidc.bash` for details.
 - The iac docker container in the `iac` folder has all pre-requisite for running the IAC code, with tested software versions. If you only need to deploy the infrastructure, you can run the docker container to skip installing pre-requisite software.

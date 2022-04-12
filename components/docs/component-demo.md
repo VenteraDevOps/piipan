@@ -1,7 +1,7 @@
 # Dashboard application
 
 ## Prerequisites
-- [.NET Core SDK 3.1](https://dotnet.microsoft.com/download)
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
 - [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during build
 
 ## Local development
