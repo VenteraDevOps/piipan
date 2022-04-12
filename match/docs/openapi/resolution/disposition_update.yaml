@@ -45,7 +45,7 @@ patch:
                 invalid:
                   type: boolean
                   description: "The state's determination of whether the match is invalid"
-                protect_location:
+                vulnerable_individual:
                   type: boolean
                   description: "Determines whether states should protect location of the individual when resolving matches"
         examples:
