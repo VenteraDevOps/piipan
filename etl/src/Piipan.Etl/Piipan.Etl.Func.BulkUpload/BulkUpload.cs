@@ -9,6 +9,13 @@ using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Linq;
+using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 
 namespace Piipan.Etl.Func.BulkUpload
 {
@@ -42,14 +49,26 @@ namespace Piipan.Etl.Func.BulkUpload
         /// </remarks>
         [FunctionName("BulkUpload")]
         public async Task Run(
-            [EventGridTrigger] EventGridEvent eventGridEvent,
-            [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] Stream input,
+            [QueueTrigger("qupload", Connection = "BlobStorageConnectionString")] string myQueueItem,
             ILogger log)
         {
-            log.LogInformation(eventGridEvent.Data.ToString());
+            log.LogInformation(myQueueItem);
 
             try
             {
+                //parse queue event
+                var queuedEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
+                var createdBlobEvent = JsonConvert.DeserializeObject<StorageBlobCreatedEventData>(queuedEvent.Data.ToString());
+
+                //Get blob name from the blob url
+                var blobUrl = new Uri(createdBlobEvent.Url);                 
+                string[] urlParts = blobUrl.Segments;
+                string blobName = urlParts[urlParts.Length-1];
+
+                BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
+
+                Stream input = blob.OpenRead();
+
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
@@ -61,12 +80,15 @@ namespace Piipan.Etl.Func.BulkUpload
                     // permission to access blob URL
                     log.LogError("No input stream was provided");
                 }
+                
+     
             }
             catch (Exception ex)
             {
                 log.LogError(ex.Message);
                 throw;
             }
+
         }
     }
 }
