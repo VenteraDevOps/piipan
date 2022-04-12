@@ -21,6 +21,8 @@ Note that the following groups of individuals are not considered active particip
 - Applicants who have not yet been certified for benefits.
 - Participants who are no longer receiving benefits.  These records should only be included through the last day of the participant's final benefit month and excluded from subsequent uploads.
 
+The [example test scenarios](./example-test-scenarios.md) file contains several examples of correct behavior after relevant case actions that you can use to develop tests for the contents of your daily uploads.
+
 ## Cleaning participant records
 
 The `lds_hash` csv column represents the hashed value of the various identity data necessary for matching participants. Refer to [our Privacy-Preserving Record Linkage approach](../../docs/pprl.md) for how to validate, normalize, concatenate, and hash this data. [Csv-level validation](#validating-files) will only validate that the column data is a hexadecimal digest as specified in the PPRL documententation.
