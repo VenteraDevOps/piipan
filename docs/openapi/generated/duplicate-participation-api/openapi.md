@@ -46,7 +46,10 @@ Searches all state databases for any participant records that are an exact match
 {
   "data": [
     {
-      "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
+      "lds_hash": "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
+      "case_id": "CaseNumber12345",
+      "participant_id": "ParticipantId12345",
+      "search_reason": "application"
     }
   ]
 }
