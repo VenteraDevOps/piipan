@@ -245,8 +245,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [0.4] - 2021-06-15
 ### Added
-- `benefits_end_month`, `vulnerable_individual`, and `recent_benefit_months` to query response.
-- `vulnerable_individual` and `recent_benefit_months` to CSV.
+- `benefits_end_month`, `protect_location`, and `recent_benefit_months` to query response.
+- `protect_location` and `recent_benefit_months` to CSV.
 - `case_id`, `participant_id` to query tool.
 - logging to indicate identity of Function App callers.
 - log streaming to an Event Hub for remaining Azure resources.
