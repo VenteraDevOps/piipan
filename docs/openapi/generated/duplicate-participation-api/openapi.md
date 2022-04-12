@@ -331,7 +331,7 @@ Status Code **200**
 |»»»»» start|string|false|none|start date for date range|
 |»»»»» end|string|false|none|end date for date range|
 |»»»» vulnerable_individual|boolean|false|none|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
-|»»»» match_url|string|false|none|URL to visit to view details about this match.|
+|»»»» match_url|string|true|none|URL to visit to view details about this match.|
 |»» errors|array|true|none|Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.|
 |»»» index|integer|true|none|The index of the person that the result corresponds to, starting from 0. Index is derived from the implicit order of persons provided in the request.|
 |»»» code|string|false|none|The application-specific error code|

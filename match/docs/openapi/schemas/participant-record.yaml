@@ -6,6 +6,7 @@ ParticipantRecord:
     - participant_id
     - case_id
     - match_id
+    - match_url
   properties:
     match_id:
       type: string
