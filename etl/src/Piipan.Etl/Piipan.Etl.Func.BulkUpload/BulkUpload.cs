@@ -85,8 +85,7 @@ namespace Piipan.Etl.Func.BulkUpload
             }
             catch (Exception ex)
             {
-                log.LogError(ex.Message);
-                throw;
+                log.LogError("No grid event raised");
             }
 
         }
