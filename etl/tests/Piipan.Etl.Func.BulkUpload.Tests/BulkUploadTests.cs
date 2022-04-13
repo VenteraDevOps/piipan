@@ -35,14 +35,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             return e;
         }
 
-        // private QueueTrigger QueueTriggerMock()
-        // {
-        //     var e = Mock.Of<QueueTrigger>();
-        //     // Can't override Data in Setup, just use a real one
-        //     e.Data = new Object();
-        //     return e;
-        // }
-
         private void VerifyLogError(Mock<ILogger> logger, String expected)
         {
             logger.Verify(x => x.Log(
@@ -52,23 +44,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
             ));
-        }
-
-        [Fact]
-        public async void Run_NullInputBlob()
-        {
-            // Arrange
-            var participantApi = Mock.Of<IParticipantApi>();
-            var participantStreamParser = Mock.Of<IParticipantStreamParser>();
-            var logger = new Mock<ILogger>();
-            var function = new BlobEventTriggerProcessing(participantApi, participantStreamParser);
-
-            // Act
-            var name = function.Run(EventMock(), null, logger.Object);
-
-            // Assert
-            VerifyLogError(logger, "No input stream was provided");
-            
         }
 
         [Fact]

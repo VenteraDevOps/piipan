@@ -11,7 +11,7 @@ using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Azure.Storage.Blobs;
 
-namespace Piipan.Etl.Func.BulkUpload
+namespace Piipan.Etl.Func.BlobEventTriggerProcessing
 {
     /// <summary>
     /// Azure Function implementing basic Extract-Transform-Load of piipan

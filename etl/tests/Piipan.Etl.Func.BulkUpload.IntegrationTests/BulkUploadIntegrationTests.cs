@@ -70,7 +70,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 
             // act
             await function.Run(
-                "Queue",
+                "QueueTriggerMock",
                 input,
                 logger
             );
