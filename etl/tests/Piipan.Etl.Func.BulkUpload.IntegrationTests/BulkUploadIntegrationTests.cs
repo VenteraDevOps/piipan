@@ -48,16 +48,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             return services.BuildServiceProvider();
         }
 
-        private BlobEventTriggerProcessing BuildFunction()
-        {
-            var services = BuildServices();
-            return new BlobEventTriggerProcessing(
-                services.GetService<IParticipantApi>(),
-                services.GetService<IParticipantStreamParser>()
-            );
-        }
-
-        private BulkUpload BuildQueueFunction()
+        private BulkUpload BuildFunction()
         {
             var services = BuildServices();
             return new BulkUpload(
@@ -72,23 +63,15 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             // setup
             var services = BuildServices();
             ClearParticipants();
-            var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
-            // var input = new MemoryStream(File.ReadAllText("example.csv"));
-            var input = File.ReadAllText("example.csv");
-            BlobServiceClient blobServiceClient = Mock.Of<BlobServiceClient>();
-            var containerClient = blobServiceClient.GetBlobContainerClient("containerName");
-            // string content = Convert.ToBase64String(File.ReadAllBytes("example.csv"));
-            
-            BlobClient blobClient = Mock.Of<BlobClient>();
-            
+            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
+            
             var function = BuildFunction();
 
             // act
-            function.Run(
-                eventGridEvent,
-                blobClient,
+            await function.Run(
+                "Queue",
+                input,
                 logger
             );
 
