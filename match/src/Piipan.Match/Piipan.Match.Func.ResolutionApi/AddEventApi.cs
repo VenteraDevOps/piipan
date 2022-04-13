@@ -153,7 +153,7 @@ namespace Piipan.Match.Func.ResolutionApi
 
             private void LogRequest(ILogger logger, HttpRequest request)
             {
-                logger.LogInformation("Executing request from user {User}", request.HttpContext?.User.Identity.Name);
+                logger.LogInformation("Executing request from user {User}", request.HttpContext?.User.Identity?.Name);
 
                 string subscription = request.Headers["Ocp-Apim-Subscription-Name"];
                 if (subscription != null)

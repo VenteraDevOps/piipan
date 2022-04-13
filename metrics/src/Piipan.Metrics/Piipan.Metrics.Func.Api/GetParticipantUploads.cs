@@ -26,7 +26,7 @@ namespace Piipan.Metrics.Func.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity.Name);
+            log.LogInformation("Executing request from user {User}", req.HttpContext?.User.Identity?.Name);
 
             try
             {
