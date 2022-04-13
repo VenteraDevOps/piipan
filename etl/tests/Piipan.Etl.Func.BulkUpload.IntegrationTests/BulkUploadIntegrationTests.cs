@@ -80,8 +80,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var containerClient = blobServiceClient.GetBlobContainerClient("containerName");
             // string content = Convert.ToBase64String(File.ReadAllBytes("example.csv"));
             
-
-            BlobClient blobClient = containerClient.GetBlobClient(input);
+            BlobClient blobClient = Mock.Of<BlobClient>();
             
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
