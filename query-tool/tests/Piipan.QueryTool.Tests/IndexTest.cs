@@ -8,9 +8,9 @@ using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Pages;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
-using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -120,7 +120,7 @@ namespace Piipan.QueryTool.Tests
                                             new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
                                             new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                                         },
-                                        ProtectLocation = false
+                                        VulnerableIndividual = false
                                     }
                                 }
                             }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Participants.Core.Models
 {
@@ -14,7 +14,7 @@ namespace Piipan.Participants.Core.Models
         public string ParticipantId { get; set; }
         public DateTime? ParticipantClosingDate { get; set; }
         public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; }
-        public bool? ProtectLocation { get; set; }
+        public bool? VulnerableIndividual { get; set; }
 
         public ParticipantDto()
         {
@@ -29,7 +29,7 @@ namespace Piipan.Participants.Core.Models
             ParticipantId = participant.ParticipantId;
             ParticipantClosingDate = participant.ParticipantClosingDate;
             RecentBenefitIssuanceDates = participant.RecentBenefitIssuanceDates;
-            ProtectLocation = participant.ProtectLocation;
+            VulnerableIndividual = participant.VulnerableIndividual;
         }
 
         public override bool Equals(Object obj)
@@ -52,7 +52,7 @@ namespace Piipan.Participants.Core.Models
                 ParticipantId == p.ParticipantId &&
                 ParticipantClosingDate.Value.Date == p.ParticipantClosingDate.Value.Date &&
                 RecentBenefitIssuanceDates.SequenceEqual(p.RecentBenefitIssuanceDates) &&
-                ProtectLocation == p.ProtectLocation;
+                VulnerableIndividual == p.VulnerableIndividual;
         }
 
         public override int GetHashCode()
@@ -64,7 +64,7 @@ namespace Piipan.Participants.Core.Models
                 ParticipantId,
                 ParticipantClosingDate,
                 RecentBenefitIssuanceDates,
-                ProtectLocation
+                VulnerableIndividual
             );
         }
     }

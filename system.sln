@@ -101,13 +101,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{28EA778D-49E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Piipan.Match", "Piipan.Match", "{207255D2-37B1-410D-91BC-8EBE735088CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Match.Func.ResolutionApi", "match\src\Piipan.Match\Piipan.Match.Func.ResolutionApi\Piipan.Match.Func.ResolutionApi.csproj", "{FC81EDEF-C422-433E-9F41-E2BCB7A09847}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.ResolutionApi", "match\src\Piipan.Match\Piipan.Match.Func.ResolutionApi\Piipan.Match.Func.ResolutionApi.csproj", "{FC81EDEF-C422-433E-9F41-E2BCB7A09847}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Etl.BulkUpload.Performance.TestRunner", "perf-tests\src\Etl.BulkUpload.Performance.TestRunner\Etl.BulkUpload.Performance.TestRunner.csproj", "{6EF00102-6EEB-4C30-AEF8-73702E7809DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9169E592-EBFA-4340-A7F8-02BBE3ADFBE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Shared.TestFixtures", "shared\src\Piipan.Shared.TestFixtures\Piipan.Shared.TestFixtures.csproj", "{C4C13056-4C2E-4346-AF59-C81FD7D762C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.TestFixtures", "shared\src\Piipan.Shared.TestFixtures\Piipan.Shared.TestFixtures.csproj", "{C4C13056-4C2E-4346-AF59-C81FD7D762C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{70704195-7073-4B52-92D9-80A69E08C62D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A94C2C6-C587-4C3F-AFFF-CA3C1D6BF4DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components.Tests", "components\tests\Piipan.Components.Tests\Piipan.Components.Tests.csproj", "{E098FC96-C47A-4699-81EA-150F36EC65B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components.Demo", "components\src\Piipan.Components.Demo\Piipan.Components.Demo.csproj", "{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components", "components\src\Piipan.Components\Piipan.Components.csproj", "{8DC9F512-C28F-4827-A18F-69741004A364}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API", "shared\src\Piipan.Shared.API\Piipan.Shared.API.csproj", "{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API.Tests", "shared\tests\Piipan.Shared.API.Tests\Piipan.Shared.API.Tests.csproj", "{1245270B-EB8C-4267-A325-8A649944937F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.ResolutionApi.Tests", "match\tests\Piipan.Match.Func.ResolutionApi.Tests\Piipan.Match.Func.ResolutionApi.Tests.csproj", "{E5540158-9A24-4370-9B1B-8327B72B4E51}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.ResolutionApi.IntegrationTests", "match\tests\Piipan.Match.Func.ResolutionApi.IntegrationTests\Piipan.Match.Func.ResolutionApi.IntegrationTests.csproj", "{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -259,6 +277,34 @@ Global
 		{C4C13056-4C2E-4346-AF59-C81FD7D762C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4C13056-4C2E-4346-AF59-C81FD7D762C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4C13056-4C2E-4346-AF59-C81FD7D762C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E098FC96-C47A-4699-81EA-150F36EC65B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E098FC96-C47A-4699-81EA-150F36EC65B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E098FC96-C47A-4699-81EA-150F36EC65B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E098FC96-C47A-4699-81EA-150F36EC65B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DC9F512-C28F-4827-A18F-69741004A364}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DC9F512-C28F-4827-A18F-69741004A364}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DC9F512-C28F-4827-A18F-69741004A364}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DC9F512-C28F-4827-A18F-69741004A364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -307,9 +353,16 @@ Global
 		{28EA778D-49E0-49F6-92E7-56391E11D0E3} = {F29F0445-423E-4A01-905B-B1EE387F9BF7}
 		{207255D2-37B1-410D-91BC-8EBE735088CD} = {28EA778D-49E0-49F6-92E7-56391E11D0E3}
 		{FC81EDEF-C422-433E-9F41-E2BCB7A09847} = {207255D2-37B1-410D-91BC-8EBE735088CD}
-		{6EF00102-6EEB-4C30-AEF8-73702E7809DD} = {6A81DE97-0B8C-428C-9D5D-3FC6B3EBF12F}
 		{9169E592-EBFA-4340-A7F8-02BBE3ADFBE1} = {9D76C087-50BA-499A-BC9C-9029DF0DE7F5}
 		{C4C13056-4C2E-4346-AF59-C81FD7D762C2} = {9169E592-EBFA-4340-A7F8-02BBE3ADFBE1}
+		{7A94C2C6-C587-4C3F-AFFF-CA3C1D6BF4DD} = {70704195-7073-4B52-92D9-80A69E08C62D}
+		{E098FC96-C47A-4699-81EA-150F36EC65B9} = {7A94C2C6-C587-4C3F-AFFF-CA3C1D6BF4DD}
+		{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34} = {70704195-7073-4B52-92D9-80A69E08C62D}
+		{8DC9F512-C28F-4827-A18F-69741004A364} = {70704195-7073-4B52-92D9-80A69E08C62D}
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947} = {9D76C087-50BA-499A-BC9C-9029DF0DE7F5}
+		{1245270B-EB8C-4267-A325-8A649944937F} = {692D4B76-E6E3-4BCA-B731-89943ED3C2C8}
+		{E5540158-9A24-4370-9B1B-8327B72B4E51} = {0CBFFA5D-4CFF-4823-9C9F-6350C7B9CA18}
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430} = {0CBFFA5D-4CFF-4823-9C9F-6350C7B9CA18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B44BDF3-D32A-4F70-B573-1AD075EEF0EA}

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using CsvHelper.Configuration.Attributes;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Models
 {
@@ -19,6 +19,6 @@ namespace Piipan.Etl.Func.BulkUpload.Models
         // Values should mimic what is set in the Bulk Upload import schema
         [BooleanTrueValues("true")]
         [BooleanFalseValues("false")]
-        public bool? ProtectLocation { get; set; }
+        public bool? VulnerableIndividual { get; set; }
     }
 }

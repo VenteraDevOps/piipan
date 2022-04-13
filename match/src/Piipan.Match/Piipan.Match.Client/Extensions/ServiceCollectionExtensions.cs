@@ -2,6 +2,7 @@ using System;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Piipan.Match.Api;
 using Piipan.Shared.Authentication;
@@ -19,13 +20,14 @@ namespace Piipan.Match.Client.Extensions
                 options.ResourceUri = $"api://{appId}";
             });
 
+            // Add token credential services if it hasn't already been added
             if (env.IsDevelopment())
             {
-                serviceCollection.AddTransient<TokenCredential, AzureCliCredential>();
+                serviceCollection.TryAddTransient<TokenCredential, AzureCliCredential>();
             }
             else
             {
-                serviceCollection.AddTransient<TokenCredential, ManagedIdentityCredential>();
+                serviceCollection.TryAddTransient<TokenCredential, ManagedIdentityCredential>();
             }
 
             serviceCollection.AddHttpClient<MatchClient>((c) =>
@@ -35,6 +37,33 @@ namespace Piipan.Match.Client.Extensions
             serviceCollection.AddTransient<ITokenProvider<MatchClient>, AzureTokenProvider<MatchClient>>();
             serviceCollection.AddTransient<IAuthorizedApiClient<MatchClient>, AuthorizedJsonApiClient<MatchClient>>();
             serviceCollection.AddTransient<IMatchApi, MatchClient>();
+        }
+
+        public static void RegisterMatchResolutionClientServices(this IServiceCollection serviceCollection, IHostEnvironment env)
+        {
+            serviceCollection.Configure<AzureTokenProviderOptions<MatchResolutionClient>>(options =>
+            {
+                var appId = Environment.GetEnvironmentVariable("MatchResApiAppId");
+                options.ResourceUri = $"api://{appId}";
+            });
+
+            // Add token credential services if it hasn't already been added
+            if (env.IsDevelopment())
+            {
+                serviceCollection.TryAddTransient<TokenCredential, AzureCliCredential>();
+            }
+            else
+            {
+                serviceCollection.TryAddTransient<TokenCredential, ManagedIdentityCredential>();
+            }
+
+            serviceCollection.AddHttpClient<MatchResolutionClient>((c) =>
+            {
+                c.BaseAddress = new Uri(Environment.GetEnvironmentVariable("MatchResApiUri"));
+            });
+            serviceCollection.AddTransient<ITokenProvider<MatchResolutionClient>, AzureTokenProvider<MatchResolutionClient>>();
+            serviceCollection.AddTransient<IAuthorizedApiClient<MatchResolutionClient>, AuthorizedJsonApiClient<MatchResolutionClient>>();
+            serviceCollection.AddTransient<IMatchResolutionApi, MatchResolutionClient>();
         }
     }
 }

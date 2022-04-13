@@ -1,4 +1,5 @@
-﻿@page
+﻿@page "{id}"
+@using Newtonsoft.Json
 @model Piipan.QueryTool.Pages.MatchModel
 @{
     ViewData["Title"] = "NAC Participant Search";
@@ -8,13 +9,14 @@
 
     <!-- Match header -->
     <div class="grid-row">
-        <h3><span class="usa-tag bg-mint">@Model.Match.Status</span> Match ID: @Model.Match.MatchId</h3>
+        <h3><span class="usa-tag bg-mint">@Model.Match.Data.Status</span> Match ID: @Model.Match.Data.MatchId</h3>
     </div>
     <!-- \match header -->
 
     
 
-    </div>
+    <div>
     <!-- \match content -->
-
+        @JsonConvert.SerializeObject(Model.Match)
+    </div>
 </div> 

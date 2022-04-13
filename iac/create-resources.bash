@@ -31,6 +31,8 @@ set_constants () {
   ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
+
+  QUERY_TOOL_URL="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
 }
 
 # Generate the storage account connection string for the corresponding
@@ -313,6 +315,9 @@ main () {
   # restrictions for the function app and storage account are added
   # in a separate step to avoid deployment and publishing issues.
   db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
+  # Long-running bulk upload queries require some specific connection
+  # details that are not part of default connection string
+  db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
     --name orch-api \
@@ -363,7 +368,8 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --settings \
       WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1
+      WEBSITE_VNET_ROUTE_ALL=1 \
+      QueryToolUrl="$QUERY_TOOL_URL"
 
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
@@ -407,6 +413,12 @@ main () {
     --settings \
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
+
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$MATCH_RES_FUNC_APP_NAME" \
+    --available-to-other-tenants false
 
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
@@ -597,7 +609,6 @@ main () {
     --output tsv)
   echo "Front Door iD: ${front_door_id}"
 
-  front_door_uri="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
   orch_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
@@ -612,6 +623,20 @@ main () {
       --query "[0].appId" \
       --output tsv)
 
+  match_res_api_uri=$(\
+    az functionapp show \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$MATCH_RES_FUNC_APP_NAME" \
+      --query defaultHostName \
+      -o tsv)
+  match_res_api_uri="https://${match_res_api_uri}/api/v1/"
+  match_res_api_app_id=$(\
+    az ad app list \
+      --display-name "${MATCH_RES_FUNC_APP_NAME}" \
+      --filter "displayName eq '${MATCH_RES_FUNC_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
+ 
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
@@ -624,13 +649,15 @@ main () {
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
       OrchApiAppId="$orch_api_app_id" \
+      MatchResApiUri="$match_res_api_uri" \
+      MatchResApiAppId="$match_res_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
-      frontDoorUri="$front_door_uri"
+      frontDoorUri="$QUERY_TOOL_URL"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -649,11 +676,12 @@ main () {
   ./create-core-databases.bash "$azure_env"
 
   # API Management instances need to be created before configuring Easy Auth.
-  ./create-apim.bash "$azure_env" "$APIM_EMAIL"
+   ./create-apim.bash "$azure_env" "$APIM_EMAIL"
 
   # Configures App Service Authentication between:
   #   - PerStateMatchApi and OrchestratorApi
   #   - OrchestratorApi and QueryApp
+  #   - MatchResApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
   # Configure Microsoft Defender for Cloud and assign Azure CIS 1.3.0 benchmark

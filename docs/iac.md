@@ -110,11 +110,14 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
 | `OrchApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Orchestrator API's Azure Active Directory application object | Piipan.QueryTool |
+| `MatchResApiUri` | URI for the Match Resolution API endpoint. | Piipan.QueryTool |
+| `MatchResAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Match Resolution API's Azure Active Directory application object | Piipan.QueryTool |
 | `States` | Comma-separated list of the lower-case two letter abbreviations for each participating state. | Piipan.Match.Orchestrator |
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 | `MetricsApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Metrics API's Azure Active Directory application object | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
+| `QueryToolUrl` | URL for the associated Query Tool. | Piipan.Match.Orchestrator |
 
 
 ## `SysType` resource tag

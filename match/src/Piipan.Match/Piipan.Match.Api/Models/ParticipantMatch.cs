@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Piipan.Match.Api.Serializers;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Match.Api.Models
 {
@@ -33,8 +33,11 @@ namespace Piipan.Match.Api.Models
         [JsonConverter(typeof(JsonConverters.DateRangeConverter))]
         public IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; } = new List<DateRange>();
 
-        [JsonProperty("protect_location")]
-        public bool? ProtectLocation { get; set; }
+        [JsonProperty("vulnerable_individual")]
+        public bool? VulnerableIndividual { get; set; }
+
+        [JsonProperty("match_url")]
+        public string MatchUrl { get; set; }
 
         public ParticipantMatch() { }
 
@@ -46,7 +49,7 @@ namespace Piipan.Match.Api.Models
             ParticipantId = p.ParticipantId;
             ParticipantClosingDate = p.ParticipantClosingDate;
             RecentBenefitIssuanceDates = p.RecentBenefitIssuanceDates;
-            ProtectLocation = p.ProtectLocation;
+            VulnerableIndividual = p.VulnerableIndividual;
         }
 
         public string ToJson()

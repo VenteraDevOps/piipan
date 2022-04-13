@@ -1,6 +1,6 @@
 put:
-  operationId: "Upload a File"
-  summary: Upload a CSV file of bulk participant data
+  operationId: "Upload a File (deprecated)"
+  summary: Deprecated. This endpoint has been renamed to `upload_all_participants` and will be removed in a future version. Upload a CSV file of bulk participant data.
   tags:
     - "Upload"
   parameters:

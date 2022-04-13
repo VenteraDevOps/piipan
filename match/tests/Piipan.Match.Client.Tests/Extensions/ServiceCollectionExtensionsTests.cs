@@ -13,6 +13,11 @@ namespace Piipan.Match.Client.Tests.Extensions
 {
     public class ServiceCollectionExtensionsTests
     {
+        public ServiceCollectionExtensionsTests()
+        {
+            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
+            Environment.SetEnvironmentVariable("MatchResApiUri", "https://tts.test");
+        }
         [Fact]
         public void RegisterMatchClientServices_DevelopmentServicesResolve()
         {
@@ -20,7 +25,6 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
-            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -38,7 +42,6 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Staging;
-            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -56,7 +59,6 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Production;
-            Environment.SetEnvironmentVariable("OrchApiUri", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -74,7 +76,6 @@ namespace Piipan.Match.Client.Tests.Extensions
             var services = new ServiceCollection();
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
-            Environment.SetEnvironmentVariable("OrchApiUrl", "https://tts.test");
 
             // Act
             services.RegisterMatchClientServices(env);
@@ -83,6 +84,93 @@ namespace Piipan.Match.Client.Tests.Extensions
             var clientFactory = provider.GetService<IHttpClientFactory>();
             var client = clientFactory.CreateClient("MatchClient");
             Assert.Equal("https://tts.test/", client.BaseAddress.ToString());
+        }
+
+        [Fact]
+        public void RegisterMatchResolutionClientServices_DevelopmentServicesResolve()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            var env = Mock.Of<IHostEnvironment>();
+            env.EnvironmentName = Environments.Development;
+
+            // Act
+            services.RegisterMatchResolutionClientServices(env);
+            var provider = services.BuildServiceProvider();
+
+            // Assert
+            Assert.NotNull(provider.GetService<IMatchResolutionApi>());
+            Assert.IsType<AzureCliCredential>(provider.GetService<TokenCredential>());
+        }
+
+        [Fact]
+        public void RegisterMatchResolutionClientServices_StagingServicesResolve()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            var env = Mock.Of<IHostEnvironment>();
+            env.EnvironmentName = Environments.Staging;
+
+            // Act
+            services.RegisterMatchResolutionClientServices(env);
+            var provider = services.BuildServiceProvider();
+
+            // Assert
+            Assert.NotNull(provider.GetService<IMatchResolutionApi>());
+            Assert.IsType<ManagedIdentityCredential>(provider.GetService<TokenCredential>());
+        }
+
+        [Fact]
+        public void RegisterMatchResolutionClientServices_ProductionServicesResolve()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            var env = Mock.Of<IHostEnvironment>();
+            env.EnvironmentName = Environments.Production;
+
+            // Act
+            services.RegisterMatchResolutionClientServices(env);
+            var provider = services.BuildServiceProvider();
+
+            // Assert
+            Assert.NotNull(provider.GetService<IMatchResolutionApi>());
+            Assert.IsType<ManagedIdentityCredential>(provider.GetService<TokenCredential>());
+        }
+
+        [Fact]
+        public void RegisterMatchResolutionClientServices_HttpClientBaseAddressSet()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            var env = Mock.Of<IHostEnvironment>();
+            env.EnvironmentName = Environments.Development;
+
+            // Act
+            services.RegisterMatchResolutionClientServices(env);
+            var provider = services.BuildServiceProvider();
+
+            var clientFactory = provider.GetService<IHttpClientFactory>();
+            var client = clientFactory.CreateClient("MatchResolutionClient");
+            Assert.Equal("https://tts.test/", client.BaseAddress.ToString());
+        }
+
+        [Fact]
+        public void RegisterBothMatchClientServices_VerifyOnlyOneTokenCredential()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+            var env = Mock.Of<IHostEnvironment>();
+            env.EnvironmentName = Environments.Development;
+
+            // Act
+            services.RegisterMatchClientServices(env);
+            int serviceCount = services.Count;
+            services.RegisterMatchResolutionClientServices(env);
+
+            // Assert
+            // Register Match Resolution Client Services will add 6 services
+            // if the token credential is not added, otherwise 7.
+            Assert.Equal(serviceCount + 6, services.Count);
         }
     }
 }

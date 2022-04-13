@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.API\Piipan.Shared.API.csproj" />
   </ItemGroup>
 
 </Project>

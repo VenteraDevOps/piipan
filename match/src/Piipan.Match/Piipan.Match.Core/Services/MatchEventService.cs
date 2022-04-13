@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -75,17 +76,25 @@ namespace Piipan.Match.Core.Services
         private async Task<ParticipantMatch> ResolveSingleMatch(IParticipant match, IMatchRecord record)
         {
             var existingRecords = await _recordApi.GetRecords(record);
-
+            ParticipantMatch participantMatchRecord;
             if (existingRecords.Any())
             {
-                return await Reconcile(match, record, existingRecords);
+                participantMatchRecord = await Reconcile(match, record, existingRecords);
             }
-
-            // No existing records
-            return new ParticipantMatch(match)
+            else
             {
-                MatchId = await _recordApi.AddRecord(record)
-            };
+                // No existing records
+                participantMatchRecord = new ParticipantMatch(match)
+                {
+                    MatchId = await _recordApi.AddRecord(record)
+                };
+            }
+            if (participantMatchRecord != null)
+            {
+                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
+                participantMatchRecord.MatchUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}";
+            }
+            return participantMatchRecord;
         }
 
         private async Task<ParticipantMatch> Reconcile(IParticipant match, IMatchRecord pendingRecord, IEnumerable<IMatchRecord> existingRecords)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
     <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
   </ItemGroup>
 

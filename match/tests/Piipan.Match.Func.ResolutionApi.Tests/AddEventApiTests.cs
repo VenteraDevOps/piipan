@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
@@ -306,7 +307,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 matchResAggregator.Object,
                 requestParser
             );
-            var mockRequest = MockRequest("{ \"data\": { \"protect_location\": true } }");
+            var mockRequest = MockRequest("{ \"data\": { \"vulnerable_individual\": true } }");
             var logger = new Mock<ILogger>();
 
             // Act

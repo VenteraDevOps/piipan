@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Models;
-using Piipan.Participants.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
+using System.Collections.Generic;
 
 namespace Piipan.Match.Core.Builders
 {

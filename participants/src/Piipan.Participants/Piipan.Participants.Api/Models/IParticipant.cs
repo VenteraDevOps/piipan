@@ -1,4 +1,4 @@
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +12,6 @@ namespace Piipan.Participants.Api.Models
         string ParticipantId { get; set; }
         DateTime? ParticipantClosingDate { get; set; }
         IEnumerable<DateRange> RecentBenefitIssuanceDates { get; set; }
-        bool? ProtectLocation { get; set; }
+        bool? VulnerableIndividual { get; set; }
     }
 }

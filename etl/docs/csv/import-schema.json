@@ -34,13 +34,13 @@
       {
         "name": "recent_benefit_issuance_dates",
         "type": "string",
-        "description": "List of up to the last 3 months that participant received benefits, formatted as yearmonths separated by spaces. Does not include current benefit month. Months do not need to be consecutive. Fewer than 3 months can be entered for newer participants.",
+        "description": "List of up to the last 3 date ranges that participant received benefits, formatted as ISO 8601 time intervals (YYYY-MM-DD/YYYY-MM-DD) separated by spaces. Date ranges do not need to be consecutive. Fewer than 3 months can be entered for newer participants. This should only include the last three dates for the most recent benefits issued.",
         "constraints": {
           "pattern": "([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}/[0-9]{4}-[0-9]{1,2}-[0-9]{1,2} ?){0,3}"
         }
       },
       {
-        "name": "protect_location",
+        "name": "vulnerable_individual",
         "type": "boolean",
         "description": "Location protection flag for vulnerable individuals. True values indicate that the individual's location must be protected from disclosure to avoid harm to the individual. The field value can be omitted if the risk of harm has not been assessed.",
         "trueValues": [
