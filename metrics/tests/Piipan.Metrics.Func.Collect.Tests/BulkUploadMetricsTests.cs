@@ -13,10 +13,9 @@ namespace Piipan.Metrics.Func.Collect.Tests
     {
         private EventGridEvent MockEvent(string url, DateTime eventTime)
         {
-            var gridEvent = Mock.Of<EventGridEvent>();
-            gridEvent.Data = new BinaryData(url);
-            gridEvent.EventTime = eventTime;
-            return gridEvent;
+            var gridEvent = new Mock<EventGridEvent>(("", "", "", new BinaryData(url)));
+            gridEvent.Object.EventTime = eventTime.ToUniversalTime();
+            return gridEvent.Object;
         }
 
         [Fact]

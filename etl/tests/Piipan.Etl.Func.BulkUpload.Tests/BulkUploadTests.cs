@@ -29,10 +29,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
         private EventGridEvent EventMock()
         {
-            var e = Mock.Of<EventGridEvent>();
-            // Can't override Data in Setup, just use a real one
-            e.Data = new BinaryData(string.Empty);
-            return e;
+            var e = new Mock<EventGridEvent>("", "", "", new BinaryData(string.Empty));
+ 
+            return e.Object;
         }
 
         private void VerifyLogError(Mock<ILogger> logger, String expected)

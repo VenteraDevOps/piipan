@@ -90,10 +90,10 @@
       },
       "Azure.Messaging.EventGrid": {
         "type": "Transitive",
-        "resolved": "4.8.1",
-        "contentHash": "nKQ4koesqFOYGW2/mkaRL7CpbpM1Bl/DvbfgsFLMKNdTeGiZUWcXA9+fLoRupmLtuQ+At9PuniyAtayzLLudWg==",
+        "resolved": "4.10.0",
+        "contentHash": "X3dh3Cek/7wFPUrBJ2KbnkJteGjWvKBoSBmD/uQm8reMIavCFTKhnl95F937eLn/2cSsm5l3oPHtYPFtDerA7Q==",
         "dependencies": {
-          "Azure.Core": "1.21.0",
+          "Azure.Core": "1.24.0",
           "System.Memory.Data": "1.0.2",
           "System.Text.Json": "4.7.2"
         }
@@ -2130,6 +2130,7 @@
       "piipan.etl.func.bulkupload": {
         "type": "Project",
         "dependencies": {
+          "Azure.Messaging.EventGrid": "4.10.0",
           "CsvHelper": "27.2.1",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
