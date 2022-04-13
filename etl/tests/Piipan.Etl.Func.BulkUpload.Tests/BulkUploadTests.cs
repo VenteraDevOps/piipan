@@ -61,7 +61,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantApi = Mock.Of<IParticipantApi>();
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi, participantStreamParser);
+            var function = new BlobEventTriggerProcessing(participantApi, participantStreamParser);
 
             // Act
             var name = function.Run(EventMock(), null, logger.Object);
@@ -78,7 +78,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantApi = Mock.Of<IParticipantApi>();
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
             var logger = new Mock<ILogger>();
-            var function = new QueueBulkUpload(participantApi, participantStreamParser);
+            var function = new BulkUpload(participantApi, participantStreamParser);
 
             // Act
             var name = function.Run("QueueTriggerMock", null, logger.Object);
@@ -99,7 +99,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 .Throws(new Exception("the parser broke"));
 
             var logger = new Mock<ILogger>();
-            var function = new QueueBulkUpload(participantApi, participantStreamParser.Object);
+            var function = new BulkUpload(participantApi, participantStreamParser.Object);
 
             // Act / Assert
             await Assert.ThrowsAsync<Exception>(() => function.Run("QueueTriggerMock", ToStream("data"), logger.Object));
@@ -118,7 +118,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
             var logger = new Mock<ILogger>();
-            var function = new QueueBulkUpload(participantApi.Object, participantStreamParser);
+            var function = new BulkUpload(participantApi.Object, participantStreamParser);
 
             // Act / Assert
             await Assert.ThrowsAsync<Exception>(() => function.Run("QueueTriggerMock", ToStream("data"), logger.Object));
@@ -150,7 +150,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var participantApi = new Mock<IParticipantApi>();
             var logger = new Mock<ILogger>();
-            var function = new QueueBulkUpload(participantApi.Object, participantStreamParser.Object);
+            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object);
 
             // Act
             await function.Run("QueueTriggerMock", ToStream("data"), logger.Object);

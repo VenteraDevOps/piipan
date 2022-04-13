@@ -11,11 +11,13 @@ using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Azure.Storage.Blobs;
 
+
 namespace Piipan.Etl.Func.BulkUpload
 {
     /// <summary>
-    /// Azure Function implementing basic Extract-Transform-Load of piipan
-    /// bulk import put the CSV file names, that where imported in the Storage Container, in a Queue Storage.
+    /// Azure Function implementing basic Transform-Load of piipan
+    /// bulk import CSV files to  PostgreSQL via Storage Containers using a Queue Storage
+    /// 
     /// </summary>
     public class BulkUpload
     {
@@ -30,42 +32,27 @@ namespace Piipan.Etl.Func.BulkUpload
             _participantParser = participantParser;
         }
 
-        /// <summary>
-        /// Entry point for the state-specific Azure Function instance
-        /// </summary>
-        /// <param name="eventGridEvent">storage container blob creation event</param>
-        /// <param name="input">handle to CSV file uploaded to a state-specific container</param>
-        /// <param name="log">handle to the function log</param>
-        /// <remarks>
-        /// The function is expected to be executing as a managed identity that has read access
-        /// to the per-state storage account and write access to the per-state database.
-        /// </remarks>
         [FunctionName("BulkUpload")]
-        [return: Queue("qupload", Connection = "BlobStorageConnectionString")]
-        public string Run(
-            [EventGridTrigger] EventGridEvent eventGridEvent,
-            [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] BlobClient blob,
+        public async Task Run(
+            [QueueTrigger("qupload", Connection = "BlobStorageConnectionString")] string myQueueItem,
+            [Blob("upload/{queueTrigger}", FileAccess.Read, Connection = "BlobStorageConnectionString")] Stream input,
             ILogger log)
         {
 
             try
             {
-
-                if (blob != null)
+                if (input != null)
                 {
-
-                    log.LogInformation(eventGridEvent.Data.ToString());
-                    log.LogInformation($"{blob.Name}");
-
-                    return blob.Name;
+                    log.LogError("Check this: " + input.ToString());
+                    var participants = _participantParser.Parse(input);
+                    await _participantApi.AddParticipants(participants);
                 }
                 else
                 {
-
+                    // Can get here if Function does not have
+                    // permission to access blob URL
                     log.LogError("No input stream was provided");
-                    return "";
                 }
-
             }
             catch (Exception ex)
             {
@@ -73,5 +60,6 @@ namespace Piipan.Etl.Func.BulkUpload
                 throw;
             }
         }
+
     }
 }

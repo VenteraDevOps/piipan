@@ -48,19 +48,19 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             return services.BuildServiceProvider();
         }
 
-        private BulkUpload BuildFunction()
+        private BlobEventTriggerProcessing BuildFunction()
         {
             var services = BuildServices();
-            return new BulkUpload(
+            return new BlobEventTriggerProcessing(
                 services.GetService<IParticipantApi>(),
                 services.GetService<IParticipantStreamParser>()
             );
         }
 
-        private QueueBulkUpload BuildQueueFunction()
+        private BulkUpload BuildQueueFunction()
         {
             var services = BuildServices();
-            return new QueueBulkUpload(
+            return new BulkUpload(
                 services.GetService<IParticipantApi>(),
                 services.GetService<IParticipantStreamParser>()
             );
@@ -79,6 +79,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             BlobServiceClient blobServiceClient = Mock.Of<BlobServiceClient>();
             var containerClient = blobServiceClient.GetBlobContainerClient("containerName");
             // string content = Convert.ToBase64String(File.ReadAllBytes("example.csv"));
+            
+
             BlobClient blobClient = containerClient.GetBlobClient(input);
             
             var logger = Mock.Of<ILogger>();
