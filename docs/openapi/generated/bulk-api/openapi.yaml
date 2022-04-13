@@ -48,8 +48,8 @@ paths:
   '/upload/{filename}':
     description: A Deprecated endpoint.
     put:
-      operationId: Upload a File
-      summary: Upload a CSV file of bulk participant data
+      operationId: Upload a File (deprecated)
+      summary: Deprecated. This endpoint has been renamed to `upload_all_participants` and will be removed in a future version. Upload a CSV file of bulk participant data.
       tags:
         - Upload
       parameters:
@@ -64,7 +64,7 @@ paths:
           schema:
             type: integer
           required: true
-          description: Deprecated. Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.
+          description: Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.
           example: 6413
       requestBody:
         content:
