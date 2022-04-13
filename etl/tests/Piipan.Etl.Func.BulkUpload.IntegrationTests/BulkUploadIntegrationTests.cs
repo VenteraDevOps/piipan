@@ -62,7 +62,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             // setup
             var services = BuildServices();
             ClearParticipants();
-            var eventGridEvent =  new Mock<EventGridEvent>(("", "", "", new BinaryData(String.Empty)));
+            var eventGridEvent =  new Mock<EventGridEvent>("", "", "", new BinaryData(String.Empty));
             var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
