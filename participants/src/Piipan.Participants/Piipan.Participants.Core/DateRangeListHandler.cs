@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Dapper;
+using NpgsqlTypes;
+using Piipan.Shared.API.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Dapper;
-using NpgsqlTypes;
-using Piipan.Shared.Utilities;
 
 namespace Piipan.Participants.Core
 {

@@ -20,6 +20,12 @@
         "OrchApiAppId": {
             "type": "string"
         },
+        "MatchResApiUri": {
+            "type": "string"
+        },
+        "MatchResApiAppId": {
+            "type": "string"
+        },
         "eventHubName": {
             "type": "String"
         },
@@ -82,6 +88,14 @@
                 {
                     "name": "OrchApiAppId",
                     "value": "[parameters('OrchApiAppId')]"
+                },
+                {
+                    "name": "MatchResApiUri",
+                    "value": "[parameters('MatchResApiUri')]"
+                },
+                {
+                    "name": "MatchResApiAppId",
+                    "value": "[parameters('MatchResApiAppId')]"
                 },
                 {
                     "name": "ASPNETCORE_ENVIRONMENT",

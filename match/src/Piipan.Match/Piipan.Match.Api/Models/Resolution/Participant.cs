@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Serializers;
-using Piipan.Shared.Utilities;
 using Newtonsoft.Json;
+using Piipan.Shared.API.Utilities;
 
-namespace Piipan.Match.Core.Models
+namespace Piipan.Match.Api.Models.Resolution
 {
     /// <summary>
     /// Initial participant data for each related state in a match

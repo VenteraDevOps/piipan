@@ -9,7 +9,6 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
-using Piipan.Shared.Utilities;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {

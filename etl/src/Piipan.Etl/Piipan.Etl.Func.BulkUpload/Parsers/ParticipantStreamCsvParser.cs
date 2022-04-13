@@ -9,8 +9,8 @@ using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Helpers;
-using Piipan.Shared.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Parsers
 {

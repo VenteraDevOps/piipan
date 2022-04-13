@@ -1,13 +1,9 @@
-using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using System.Collections.Generic;
 using System.Linq;
-using Piipan.Match.Api.Models;
-using Piipan.Match.Core.DataAccessObjects;
-using Piipan.Match.Core.Models;
-using Piipan.Participants.Api.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Linq;
 
 namespace Piipan.Match.Core.Builders
 {

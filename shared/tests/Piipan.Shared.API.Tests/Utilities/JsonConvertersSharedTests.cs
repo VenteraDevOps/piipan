@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using Moq;
-using Newtonsoft.Json;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
-namespace Piipan.Match.Api.Tests.Serializers
+namespace Piipan.Shared.Api.Tests.Serializers
 {
     public class JsonConvertersSharedTests
     {

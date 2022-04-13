@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Moq;
 using Piipan.Participants.Api.Models;
 using Piipan.QueryTool.Extensions;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 #nullable enable

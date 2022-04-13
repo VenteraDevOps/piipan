@@ -28,5 +28,12 @@ namespace Piipan.Shared.Http
         /// </summary>
         /// <param name="path">path portion of the API endpoint</param>
         Task<TResponse> GetAsync<TResponse>(string path);
+
+        /// <summary>
+        /// Attempts to send an asynchronous GET request to an API endpoint. If a 404 is not found, 
+        /// it will return the default TResponse. Will return the status code whether a 404 or a success.
+        /// </summary>
+        /// <param name="path">path portion of the API endpoint</param>
+        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path);
     }
 }

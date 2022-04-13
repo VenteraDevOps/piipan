@@ -8,7 +8,7 @@ using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Participants.Core.Tests.Services
 {

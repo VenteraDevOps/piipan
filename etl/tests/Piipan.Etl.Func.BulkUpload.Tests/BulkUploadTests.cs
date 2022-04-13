@@ -9,7 +9,7 @@ using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests

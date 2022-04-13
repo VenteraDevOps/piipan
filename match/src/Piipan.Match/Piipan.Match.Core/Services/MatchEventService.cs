@@ -92,7 +92,7 @@ namespace Piipan.Match.Core.Services
             if (participantMatchRecord != null)
             {
                 var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
-                participantMatchRecord.MatchUrl = $"{queryToolUrl}/match?id={participantMatchRecord.MatchId}";
+                participantMatchRecord.MatchUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}";
             }
             return participantMatchRecord;
         }

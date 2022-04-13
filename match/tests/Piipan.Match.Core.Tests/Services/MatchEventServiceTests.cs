@@ -4,6 +4,7 @@ using System.Linq;
 using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
@@ -220,7 +221,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
 
             // Assert
-            Assert.Equal($"{QueryToolUrl}/match?id={mockMatchId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match/{mockMatchId}", firstMatch.MatchUrl);
             Assert.Equal(mockMatchId, resolvedResponse.Data.Results.First().Matches.First().MatchId);
         }
 
@@ -279,7 +280,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
             
             // Assert
-            Assert.Equal($"{QueryToolUrl}/match?id={openMatchId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match/{openMatchId}", firstMatch.MatchUrl);
             Assert.Equal(openMatchId, firstMatch.MatchId);
         }
 
@@ -332,7 +333,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
 
             // Assert
-            Assert.Equal($"{QueryToolUrl}/match?id={openMatchId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match/{openMatchId}", firstMatch.MatchUrl);
             Assert.Equal(openMatchId, firstMatch.MatchId);
         }
 
@@ -388,7 +389,7 @@ namespace Piipan.Match.Core.Tests.Services
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
 
             // Assert
-            Assert.Equal($"{QueryToolUrl}/match?id={newId}", firstMatch.MatchUrl);
+            Assert.Equal($"{QueryToolUrl}/match/{newId}", firstMatch.MatchUrl);
             Assert.Equal(newId, firstMatch.MatchId);
         }
     }

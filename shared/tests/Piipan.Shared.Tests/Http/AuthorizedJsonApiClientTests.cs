@@ -164,5 +164,121 @@ namespace Piipan.Shared.Tests.Http
             Assert.IsType<FakeResponseType>(response);
             Assert.Equal("this is a response message", response.ResponseMessage);
         }
+
+        [Fact]
+        public async Task TryGetAsync_SendsExpectedMessage()
+        {
+            // Arrange
+            var httpResponseContent = new FakeResponseType() { ResponseMessage = "this is a response message" };
+            var json = JsonSerializer.Serialize(httpResponseContent);
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) };
+
+            var expectedRequest = new HttpRequestMessage(HttpMethod.Get, "https://tts.test/path");
+            var httpMessageHandler = new Mock<HttpMessageHandler>();
+            httpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Get && m.RequestUri.ToString() == "https://tts.test/path"),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(httpResponse);
+
+            var client = new HttpClient(httpMessageHandler.Object)
+            {
+                BaseAddress = new Uri("https://tts.test")
+            };
+
+            var clientFactory = new Mock<IHttpClientFactory>();
+            clientFactory
+                .Setup(m => m.CreateClient(typeof(AuthorizedJsonApiClientTests).Name))
+                .Returns(client);
+
+            var tokenProvider = new Mock<ITokenProvider<AuthorizedJsonApiClientTests>>();
+            var apiClient = new AuthorizedJsonApiClient<AuthorizedJsonApiClientTests>(
+                clientFactory.Object,
+                tokenProvider.Object
+            );
+
+            // Act
+            var response = await apiClient.TryGetAsync<FakeResponseType>("/path");
+
+            // Assert
+            Assert.IsType<FakeResponseType>(response.Response);
+            Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("this is a response message", response.Response.ResponseMessage);
+        }
+
+        [Fact]
+        public async Task TryGetAsync_SendsNullOn404()
+        {
+            // Arrange
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.NotFound) { };
+
+            var expectedRequest = new HttpRequestMessage(HttpMethod.Get, "https://tts.test/path");
+            var httpMessageHandler = new Mock<HttpMessageHandler>();
+            httpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Get && m.RequestUri.ToString() == "https://tts.test/path"),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(httpResponse);
+
+            var client = new HttpClient(httpMessageHandler.Object)
+            {
+                BaseAddress = new Uri("https://tts.test")
+            };
+
+            var clientFactory = new Mock<IHttpClientFactory>();
+            clientFactory
+                .Setup(m => m.CreateClient(typeof(AuthorizedJsonApiClientTests).Name))
+                .Returns(client);
+
+            var tokenProvider = new Mock<ITokenProvider<AuthorizedJsonApiClientTests>>();
+            var apiClient = new AuthorizedJsonApiClient<AuthorizedJsonApiClientTests>(
+                clientFactory.Object,
+                tokenProvider.Object
+            );
+
+            // Act
+            var response = await apiClient.TryGetAsync<FakeResponseType>("/path");
+
+            // Assert
+            Assert.Null(response.Response);
+            Assert.Equal((int)HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TryGetAsync_ThrowsErrorOnOtherStatus()
+        {
+            // Arrange
+            var httpResponse = new HttpResponseMessage(HttpStatusCode.Unauthorized) { };
+
+            var expectedRequest = new HttpRequestMessage(HttpMethod.Get, "https://tts.test/path");
+            var httpMessageHandler = new Mock<HttpMessageHandler>();
+            httpMessageHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Get && m.RequestUri.ToString() == "https://tts.test/path"),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(httpResponse);
+
+            var client = new HttpClient(httpMessageHandler.Object)
+            {
+                BaseAddress = new Uri("https://tts.test")
+            };
+
+            var clientFactory = new Mock<IHttpClientFactory>();
+            clientFactory
+                .Setup(m => m.CreateClient(typeof(AuthorizedJsonApiClientTests).Name))
+                .Returns(client);
+
+            var tokenProvider = new Mock<ITokenProvider<AuthorizedJsonApiClientTests>>();
+            var apiClient = new AuthorizedJsonApiClient<AuthorizedJsonApiClientTests>(
+                clientFactory.Object,
+                tokenProvider.Object
+            );
+
+            // Assert
+            await Assert.ThrowsAnyAsync<HttpRequestException>(async () => await apiClient.TryGetAsync<FakeResponseType>("/path"));
+        }
     }
 }
