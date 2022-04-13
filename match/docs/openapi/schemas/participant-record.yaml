@@ -6,6 +6,7 @@ ParticipantRecord:
     - participant_id
     - case_id
     - match_id
+    - match_url
   properties:
     match_id:
       type: string
@@ -43,7 +44,7 @@ ParticipantRecord:
             format: date
             pattern: '^\d{4}-\d{2}-\d{2}$'
             description: "end date for date range"
-    protect_location:
+    vulnerable_individual:
       type: boolean
       nullable: true
       example: true
@@ -74,7 +75,7 @@ ParticipantRecordExamples:
         "end": "2021-03-31"
       }
     ]
-    protect_location: true
+    vulnerable_individual: true
     match_url: "https://nac.example/match/BCD2345"
   AllEB:
     match_id: "XYZ9876"
@@ -97,7 +98,7 @@ ParticipantRecordExamples:
         "end": "2021-03-31"
       }
     ]
-    protect_location: true
+    vulnerable_individual: true
     match_url: "https://nac.example/match/XYZ9876"
   Required:
     match_id: "4567CDF"
@@ -105,5 +106,5 @@ ParticipantRecordExamples:
     case_id: "string"
     participant_id: "string"
     participant_closing_date: null
-    protect_location: null
+    vulnerable_individual: null
     match_url: "https://nac.example/match/4567CDF"
