@@ -36,6 +36,7 @@ paths:
                     type: object
                     required:
                       - lds_hash
+                      - search_reason
                     properties:
                       lds_hash:
                         type: string
