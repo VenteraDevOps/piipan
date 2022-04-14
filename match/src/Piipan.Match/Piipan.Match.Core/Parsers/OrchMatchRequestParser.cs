@@ -67,7 +67,9 @@ namespace Piipan.Match.Core.Parsers
                         request.Data[i].SearchReason = request.Data[i].SearchReason.ToLower();
                         if (!Enum.IsDefined(typeof(ValidSearchReasons), request.Data[i].SearchReason))
                         {
-                            throw new Exception("Submitted option for 'search_reason' is not valid. Valid options are 'application', 'recertification', 'new_household_member', or 'other'.");
+                            var validValues = Enum.GetNames(typeof(ValidSearchReasons));
+                            string validOptionsString = string.Join(", ", validValues.Select(n => validValues.Last() == n ? $"or '{n}'" : $"'{n}'"));
+                            throw new Exception($"Submitted option for 'search_reason' is not valid. Valid options are {validOptionsString}.");
                         }
                     }
                 }
