@@ -50,7 +50,7 @@ Person:
       description: "Participant's state-specific case number"
     search_reason:
       type: string
-      description: "User's reason for running match query. Must be either 'Application', 'Recertification', or 'New Household Member'"
+      description: "The case action or other valid reason for performing the NAC search.  Valid options are 'application', 'recertification', 'new_household_member', or 'other'"
 PersonWithPii:
   type: object
   required:
