@@ -118,11 +118,11 @@ namespace Piipan.Match.Core.Tests.Parsers
         }
 
         [Theory]
-        [InlineData("ASDF", ValidSearchReasons.other)]
-        [InlineData("New household member", ValidSearchReasons.other)]
-        [InlineData("", ValidSearchReasons.other)]
-        [InlineData(null, ValidSearchReasons.other)]
-        public async Task InvalidSearchReason(string searchReason, ValidSearchReasons expectedSearchReason)
+        [InlineData("ASDF")]
+        [InlineData("New household member")]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task InvalidSearchReason(string searchReason)
         {
             // Arrange
             var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
