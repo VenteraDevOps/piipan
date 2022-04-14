@@ -54,7 +54,7 @@ namespace Piipan.Metrics.Func.Collect
         {
             try
             {
-                var jsondata = JsonConvert.SerializeObject(eventGridEvent.Data);
+                var jsondata =  eventGridEvent.Data.ToString();
                 var tmp = new { url = "" };
                 var data = JsonConvert.DeserializeAnonymousType(jsondata, tmp);
 

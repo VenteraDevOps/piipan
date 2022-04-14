@@ -13,12 +13,13 @@ namespace Piipan.Metrics.Func.Collect.Tests
     {
         private EventGridEvent MockEvent(string url, DateTime eventTime)
         {
-            var gridEvent = new Mock<EventGridEvent>(("", "", "", new BinaryData(url)));
-            gridEvent.Object.EventTime = eventTime.ToUniversalTime();
+            var gridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(new { url = url }));
+            gridEvent.Object.EventTime = eventTime;
             return gridEvent.Object;
+           
         }
-        
-        [Fact (Skip = "Need to reslove the url going back to Binarydata.  EventGridEvent is changed the Data object to a BinaryData object")]
+
+        [Fact ]
         public async Task Run_Success()
         {
             // Arrange
@@ -46,7 +47,7 @@ namespace Piipan.Metrics.Func.Collect.Tests
             ));
         }
 
-        [Theory(Skip = "Need to reslove the url going back to Binarydata.  EventGridEvent is changed the Data object to a BinaryData object")]
+        [Theory]
         [InlineData("badurl", "State not found")] // malformed url, can't parse the state
         [InlineData("https://eupload", "State not found")] // state is only one character
         public async Task Run_BadUrl(string url, string expectedLogMessage)
@@ -76,7 +77,7 @@ namespace Piipan.Metrics.Func.Collect.Tests
             ));
         }
 
-        [Fact(Skip = "Need to reslove the url going back to Binarydata.  EventGridEvent is changed the Data object to a BinaryData object")]
+        [Fact]
         public async Task Run_UploadApiThrows()
         {
             // Arrange
