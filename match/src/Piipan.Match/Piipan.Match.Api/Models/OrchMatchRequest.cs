@@ -32,6 +32,7 @@ namespace Piipan.Match.Api.Models
         public string CaseId { get; set; }
 
         [JsonProperty("search_reason",
+            Required = Required.Always,
             NullValueHandling = NullValueHandling.Ignore)]
         public string SearchReason { get; set; }
     }
