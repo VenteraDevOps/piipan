@@ -72,6 +72,17 @@ namespace Piipan.Match.Core.Parsers
                             throw new Exception($"Submitted option for 'search_reason' is not valid. Valid options are {validOptionsString}.");
                         }
                     }
+                    //checking if vulnerable individual field is valid. 
+                    //If not set to empty but still accept the request
+                    if (request.Data[i].VulnerableIndividual != null)
+                    {
+                        request.Data[i].VulnerableIndividual = request.Data[i].VulnerableIndividual.ToLower();
+                        string[] vulnerableIndividualResponses = { "yes", "no", "" };
+                        if (!vulnerableIndividualResponses.Contains(request.Data[i].VulnerableIndividual))
+                        {
+                            request.Data[i].VulnerableIndividual = "";
+                        }
+                    }
                 }
 
                 return request;

@@ -35,5 +35,9 @@ namespace Piipan.Match.Api.Models
             Required = Required.Always,
             NullValueHandling = NullValueHandling.Ignore)]
         public string SearchReason { get; set; }
+
+        [JsonProperty("vulnerable_individual",
+            NullValueHandling = NullValueHandling.Ignore)]
+        public string VulnerableIndividual { get; set; }
     }
 }

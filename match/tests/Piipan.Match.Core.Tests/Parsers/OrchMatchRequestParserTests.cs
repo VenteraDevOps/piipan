@@ -149,6 +149,76 @@ namespace Piipan.Match.Core.Tests.Parsers
             await Assert.ThrowsAsync<StreamParserException>(() => parser.Parse(BuildStream(JsonConvert.SerializeObject(orchMatchRequest))));
         }
 
+        [Theory]
+        [InlineData("yes", "yes")]
+        [InlineData("no", "no")]
+        [InlineData("test", "")]
+        [InlineData("", "")]
+        public async Task ValidVulnerableIndividual(string vulnerableStatus, string expectedVulnerableIndividual)
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
+            var validator = new Mock<IValidator<OrchMatchRequest>>();
+            validator
+                .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var parser = new OrchMatchRequestParser(validator.Object, logger);
+
+            var orchMatchRequest = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>()
+                {
+                    new RequestPerson
+                    {
+                        LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
+                        SearchReason = "other",
+                        VulnerableIndividual = vulnerableStatus
+                    }
+                }
+            };
+
+            //Act
+            var request = await parser.Parse(BuildStream(JsonConvert.SerializeObject(orchMatchRequest)));
+
+            // Assert
+            Assert.NotNull(request);
+            Assert.Equal(expectedVulnerableIndividual.ToString(), request.Data[0].VulnerableIndividual);
+        }
+
+        [Fact]
+        public async Task NullVulnerableIndividual()
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<OrchMatchRequestParser>>();
+            var validator = new Mock<IValidator<OrchMatchRequest>>();
+            validator
+                .Setup(m => m.ValidateAsync(It.IsAny<OrchMatchRequest>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var parser = new OrchMatchRequestParser(validator.Object, logger);
+
+            var orchMatchRequest = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>()
+                {
+                    new RequestPerson
+                    {
+                        LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
+                        SearchReason = "other",
+                        VulnerableIndividual = null
+                    }
+                }
+            };
+
+            //Act
+            var request = await parser.Parse(BuildStream(JsonConvert.SerializeObject(orchMatchRequest)));
+
+            // Assert
+            Assert.NotNull(request);
+            Assert.Null(request.Data[0].VulnerableIndividual);
+        }
+
         [Fact]
         public async Task ThrowsWhenValidatorThrows()
         {
