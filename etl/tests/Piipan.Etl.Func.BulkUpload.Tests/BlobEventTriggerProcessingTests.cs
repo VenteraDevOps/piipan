@@ -64,6 +64,42 @@ namespace Piipan.Etl.Func.BlobEventTriggerProcessing.Tests
             
         }
 
+        [Fact]
+        public async void Run_NullInputInvalidBlob()
+        {
+            // Arrange
+            var participantApi = Mock.Of<IParticipantApi>();
+            var participantStreamParser = Mock.Of<IParticipantStreamParser>();
+            var logger = new Mock<ILogger>();
+            var function = new BlobEventTriggerProcessing(participantApi, participantStreamParser);
+            var blob = Mock.Of<BlobClient>( m => m.Name == null);
+
+            // Act
+            var name = function.Run(EventMock(), blob, logger.Object);
+
+            // Assert
+            VerifyLogError(logger, "No input stream was provided");
+            
+        }
+
+        [Fact]
+        public async void Run_NullInputValidBlob()
+        {
+            // Arrange
+            var participantApi = Mock.Of<IParticipantApi>();
+            var participantStreamParser = Mock.Of<IParticipantStreamParser>();
+            var logger = new Mock<ILogger>();
+            var function = new BlobEventTriggerProcessing(participantApi, participantStreamParser);
+            var blob = Mock.Of<BlobClient>( m => m.Name == "BlobName");
+   
+            // Act
+            var name = function.Run(EventMock(), blob, logger.Object);
+
+            // Assert
+            Assert.Equal(name, "BlobName");
+            
+        }
+
 
     }
 }

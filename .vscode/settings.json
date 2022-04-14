@@ -4,5 +4,6 @@
     "azureFunctions.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.projectSubpath": "metrics/src/Piipan.Metrics/Piipan.Metrics.Api",
-    "azureFunctions.preDeployTask": "publish"
+    "azureFunctions.preDeployTask": "publish",
+    "coverage-gutters.coverageFileNames": ["coverage.info"]
 }

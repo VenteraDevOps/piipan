@@ -49,11 +49,9 @@ namespace Piipan.Etl.Func.BlobEventTriggerProcessing
         {
             try
             {
-                if (blob != null)
+                if (blob != null && blob.Name != null)
                 {
-                    log.LogInformation(eventGridEvent.Data.ToString());
                     log.LogInformation($"{blob.Name}");
-
                     return blob.Name;
                 }
                 else
@@ -61,11 +59,10 @@ namespace Piipan.Etl.Func.BlobEventTriggerProcessing
                     log.LogError("No input stream was provided");
                     return "";
                 }
-
             }
             catch (Exception ex)
             {
-                log.LogError(ex.Message);
+                log.LogError("No input stream was provided");
                 throw;
             }
         }
