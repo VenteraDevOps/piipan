@@ -46,7 +46,7 @@ namespace Piipan.Participants.Core.Services
             }
         }
 
-        public async Task AddParticipants(IEnumerable<IParticipant> participants)
+        public async Task AddParticipants(IEnumerable<IParticipant> participants,string uploadIdentifier)
         {
             // Large participant uploads can be long-running processes and require
             // an increased time out duration to avoid System.TimeoutException
@@ -55,7 +55,7 @@ namespace Piipan.Participants.Core.Services
                 TimeSpan.FromSeconds(600),
                 TransactionScopeAsyncFlowOption.Enabled))
             {
-                var upload = await _uploadDao.AddUpload();
+                var upload = await _uploadDao.AddUpload(uploadIdentifier);
 
                 var participantDbos = participants.Select(p => new ParticipantDbo(p)
                 {

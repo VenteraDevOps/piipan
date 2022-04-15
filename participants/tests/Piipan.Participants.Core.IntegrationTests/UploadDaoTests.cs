@@ -74,7 +74,7 @@ namespace Piipan.Participants.Core.IntegrationTests
             var dao = new UploadDao(DbConnFactory());
 
             // Act
-            var result = await dao.AddUpload();
+            var result = await dao.AddUpload("test-etag");
 
             // Assert
             Assert.Equal(GetLastUploadId(), result.Id);
