@@ -13,10 +13,12 @@ namespace Piipan.Components.Forms
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
         private bool HasErrors => currentErrors?.Count() > 0;
         private EditContext editContext;
-        private bool ShowAlertBox { get; set; } = false;
+        private bool showAlertBox = false;
+        private bool refreshAlertBox = false;
         [Parameter] public string Id { get; set; } = "f" + Guid.NewGuid();
         public List<UsaFormGroup> FormGroups { get; set; } = new List<UsaFormGroup>();
-        private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors = new List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)>();
+        private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors =
+            new List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)>();
 
         /// <summary>
         /// Set the edit context of this form when it's initialized
@@ -24,11 +26,6 @@ namespace Piipan.Components.Forms
         protected override void OnInitialized()
         {
             editContext = new EditContext(Model);
-            if (InitialErrors?.Count() > 0)
-            {
-                currentErrors.Add((null, InitialErrors));
-                ShowAlertBox = true;
-            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -36,6 +33,24 @@ namespace Piipan.Components.Forms
             await base.OnAfterRenderAsync(firstRender);
             if (firstRender)
             {
+                if (InitialErrors?.Count() > 0)
+                {
+                    foreach (var error in InitialErrors)
+                    {
+                        var foundFormGroup = string.IsNullOrEmpty(error.Property) ? null :
+                            FormGroups.FirstOrDefault(n => n.InputElementId == error.Property.Replace('.', '_'));
+                        if (foundFormGroup != null)
+                        {
+                            currentErrors.Add((foundFormGroup, new List<string>() { error.Error }));
+                        }
+                        else
+                        {
+                            currentErrors.Add((null, new List<string>() { error.Error }));
+                        }
+                    }
+                    showAlertBox = true;
+                    StateHasChanged();
+                }
                 await JSRuntime.InvokeVoidAsync("piipan.utilities.registerFormValidation", Id, DotNetObjectReference.Create(this));
             }
         }
@@ -45,17 +60,20 @@ namespace Piipan.Components.Forms
         /// </summary>
         public void UpdateState()
         {
-            currentErrors.Clear();
-            foreach (var formGroup in FormGroups)
+            if (refreshAlertBox)
             {
-                if (formGroup.ValidationMessages.Any())
+                currentErrors.Clear();
+                foreach (var formGroup in FormGroups)
                 {
-                    currentErrors.Add((formGroup, formGroup.ValidationMessages));
+                    if (formGroup.ValidationMessages.Any())
+                    {
+                        currentErrors.Add((formGroup, formGroup.ValidationMessages));
+                    }
                 }
+                StateHasChanged();
             }
-            StateHasChanged();
         }
-        
+
         [JSInvokable]
         public async Task<bool> ValidateForm()
         {
@@ -64,22 +82,23 @@ namespace Piipan.Components.Forms
             {
                 await formGroup.GetValidationErrorsAsync(editContext);
             }
+            refreshAlertBox = true;
             UpdateState();
-            ShowAlertBox = currentErrors.Count != 0;
+            showAlertBox = currentErrors.Count != 0;
             StateHasChanged();
-            if (ShowAlertBox)
+            if (showAlertBox)
             {
                 await ScrollToElement($"{Id}-alert");
             }
-            return !ShowAlertBox;
+            return !showAlertBox;
         }
 
         [JSInvokable]
         public async Task PresubmitForm()
         {
-            if (OnSubmit != null)
+            if (OnBeforeSubmit != null)
             {
-                await OnSubmit(currentErrors.Count == 0);
+                await OnBeforeSubmit(currentErrors.Count == 0);
             }
         }
 

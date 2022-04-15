@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Piipan.Components.Forms
 {
@@ -11,6 +13,7 @@ namespace Piipan.Components.Forms
     public partial class UsaInputSSN
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
+        Timer timer = new Timer();
 
         protected override void OnInitialized()
         {
@@ -19,6 +22,19 @@ namespace Piipan.Components.Forms
                 InvisibleValue = string.Join("", CurrentValue.Select(x => x != '-' ? '*' : x));
             }
             base.OnInitialized();
+            timer.Interval = 1000;
+            timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
+            {
+                timer.Stop();
+                if (!visible)
+                {
+                    InvisibleValue ??= "";
+                    InvisibleValue = string.Join("", InvisibleValue.Select(n => n != '-' ? '*' : n));
+                    int cursorPosition = await JSRuntime.InvokeAsync<int>("piipan.utilities.getCursorPosition", ElementReference);
+                    await JSRuntime.InvokeVoidAsync("piipan.utilities.setValue", ElementReference, InvisibleValue);
+                    await JSRuntime.InvokeVoidAsync("piipan.utilities.setCursorPosition", ElementReference, cursorPosition);
+                }
+            };
         }
 
         /// <summary>
@@ -35,6 +51,7 @@ namespace Piipan.Components.Forms
             }
             if (!visible)
             {
+                timer.Stop();
                 var beginningStr = "";
                 var endStr = "";
                 var middleStr = "";
@@ -79,13 +96,27 @@ namespace Piipan.Components.Forms
                         value = beginningStr + middleStr + endStr;
                     }
                 }
-
+                Console.WriteLine("Starting Timer");
+                timer.Start();
             }
             int hyphensRemovedBeforeCursor = value.Substring(0, cursorPosition).Count((c) => c == '-');
+            char? lastChar = null;
+            var inputString = e.Value as string;
+            if (inputString.Length > cursorPosition - 1 && cursorPosition > 0 && inputString.Length == InvisibleValue?.Length + 1)
+            {
+                lastChar = (e.Value as string)[cursorPosition - 1];
+            }
             cursorPosition -= hyphensRemovedBeforeCursor;
             bool isLonger = value.Length > CurrentValue.Length;
             var tempValue = value.Replace("-", "");
+
             var invisibleValue = new string('*', tempValue.Length);
+            if (lastChar != null)
+            {
+                char[] array = invisibleValue.ToCharArray();
+                array[cursorPosition - 1] = lastChar.Value;
+                invisibleValue = new string(array);
+            }
             if (tempValue.Length > 3 || (tempValue.Length == 3 && isLonger))
             {
                 tempValue = tempValue.Insert(3, "-");

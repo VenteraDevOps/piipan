@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Piipan.Components.Enums;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace Piipan.Components.Forms
                 editContext.Validate();
                 ValidationMessages = editContext.GetValidationMessages(FieldIdentifier).ToList();
             }
-            StateHasChanged();
+            this.StateHasChanged();
             Status = HasErrors ? InputStatus.Error : InputStatus.None;
             Form.UpdateState();
         }

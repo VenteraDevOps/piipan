@@ -1,0 +1,39 @@
+﻿@using Piipan.Match.Api.Models
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Helpers
+@inject IJSRuntime JSRuntime
+
+@code {
+    [Parameter] public List<MatchResApiResponse> QueryResult { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("piipan.utilities.scrollToElement", "match-results-area");
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
+
+<section class="border-top-1px border-base-light margin-top-6" id="match-results-area">
+    <h2>Find a Match Record Search Results</h2>
+    <p>This participant was found in another state. Select the Match ID for more information.</p>
+    <table class="usa-table">
+        <thead>
+            <tr>
+                <th scope="col">Match ID</th>
+                <th scope="col">Matching States</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var result in QueryResult)
+        {
+            <tr>
+                <td><a href="/match/@result.Data.MatchId">@result.Data.MatchId</a></td>
+                <td>@(string.Join(", ", result.Data.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state))))</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

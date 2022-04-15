@@ -2,5 +2,6 @@
   "viewportHeight": 1000,
   "viewportWidth": 1280,
   "screenshotOnRunFailure": false,
-  "video": false
+  "video": false,
+  "baseUrl": "https://localhost:5001"
 }

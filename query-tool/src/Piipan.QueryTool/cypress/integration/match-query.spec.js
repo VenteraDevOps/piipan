@@ -1,70 +1,96 @@
+﻿let pa11yOptions = {};
+
 describe('query tool match query', () => {
-  beforeEach(() => {
-    cy.visit('https://localhost:5001');
-  })
+    beforeEach(() => {
+        pa11yOptions = {
+            actions: [
+                'wait for element #match-form-search-btn to be added'
+            ],
+            standard: 'WCAG2AA',
+            runners: [
+                'htmlcs'
+            ],
+        };
+        cy.visit('/match');
+        cy.get('#match-form-search-btn', { timeout: 10000 }).should('be.visible');
+    })
 
-  it('shows required field errors when form is submitted with no data', () => {
-    cy.get('form').submit();
+    it('shows required field errors when form is submitted with no data', () => {
+        cy.get('form').submit();
 
-    cy.contains('The First name field is required').should('be.visible');
-    cy.contains('The Last name field is required').should('be.visible');
-    cy.contains('The Date of birth field is required').should('be.visible');
-    cy.contains('The SSN field is required').should('be.visible');
-  });
+        cy.get('#Query_MatchId-message').contains('Match ID is required').should('be.visible');
 
-  it("shows formatting error for incorrect SSN", () => {
-    cy.get('input[name="Query.SocialSecurityNum"]').type("12345");
-    cy.get('form').submit();
+        // make sure pa11y runs successfully when errors are shown
+        pa11yOptions.actions.push('click element #match-form-search-btn');
+        cy.pa11y(pa11yOptions);
+    });
 
-    cy.contains('SSN must have the form XXX-XX-XXXX').should('be.visible');
-  });
+    it("shows number of characters error for match ID", () => {
+        cy.get('#Query_MatchId').type("12345").blur();
+        cy.get('#Query_MatchId-message').contains('Match ID must be 7 characters').should('be.visible');
 
-  it("shows proper error for too old dates of birth", () => {
-    cy.get('input[name="Query.DateOfBirth"]').type("1899-12-31");
-    cy.get('form').submit();
+        cy.get('form').submit();
 
-    cy.contains('Date of birth must be between 01-01-1900 and today\'s date').should('be.visible');
-  });
+        cy.get('.usa-alert').contains('Match ID must be 7 characters').should('be.visible');
+    });
 
-  it("shows proper error for non-ascii characters in last name", () => {
-    cy.get('input[name="Query.LastName"]').type("garcía");
-    // Enter other valid form inputs to isolate expected error
-    cy.get('input[name="Query.FirstName"]').type("joe");
-    cy.get('input[name="Query.DateOfBirth"]').type("1997-01-01");
-    cy.get('input[name="Query.SocialSecurityNum"]').type("550-01-6981");
+    it("shows invalid characters error for match ID", () => {
+        cy.get('#Query_MatchId').type("m12$345").blur();
+        cy.get('#Query_MatchId-message').contains('Match ID contains invalid characters').should('be.visible');
 
-    cy.get('form').submit();
+        cy.get('form').submit();
 
-    cy.contains('Change í in garcía').should('be.visible');
-  });
+        cy.get('.usa-alert').contains('Match ID contains invalid characters').should('be.visible');
+    });
 
-  // it("shows an empty state on successful submission without match", () => {
+    it("shows an empty state on successful submission without match", () => {
+        cy.get('#Query_MatchId').type("1234567").blur();
 
+        cy.get('form').submit();
 
-  //   cy.get('input[name="Query.FirstName"]').type("joe");
-  //   cy.get('input[name="Query.LastName"]').type("schmo");
-  //   cy.get('input[name="Query.DateOfBirth"]').type("1997-01-01");
-  //   cy.get('input[name="Query.SocialSecurityNum"]').type("550-01-6981");
+        cy.contains('This Match ID does not have a matching record in any other states.').should('be.visible');
 
-  //   cy.get('form').submit();
+        setupPa11yPost();
+        cy.pa11y(pa11yOptions);
+    });
 
-  //   cy.contains('No matches found').should('be.visible');
-  // });
+    it("server errors are shown and accessible", () => {
+        cy.get('#Query_MatchId').type("123$567").blur();
 
-  // it("shows results table on successful submission with a match", () => {
-  //   // TODO: stub out submit request
-  //   cy.get('input[name="Query.FirstName"]').type("Theodore");
-  //   cy.get('input[name="Query.LastName"]').type("Farrington");
-  //   cy.get('input[name="Query.DateOfBirth"]').type("1931-10-13");
-  //   cy.get('input[name="Query.SocialSecurityNum"]').type("425-46-5417");
+        setupPa11yPost();
+        cy.pa11y(pa11yOptions);
+    });
 
-  //   cy.get('form').submit();
+    it("shows results table on successful submission with a match", () => {
+        cy.get('#Query_MatchId').type("ABCDEFG").blur();
+        cy.get('form').submit();
 
-  //   cy.contains('Results').should('be.visible');
-  //   cy.contains('Case ID').should('be.visible');
-  //   cy.contains('Participant ID').should('be.visible');
-  //   cy.contains('Benefits end month').should('be.visible');
-  //   cy.contains('Recent benefit months').should('be.visible');
-  //   cy.contains('Protect location?').should('be.visible');
-  // });
+        cy.contains('Match ID').should('be.visible');
+        cy.contains('Matching States').should('be.visible');
+
+        setupPa11yPost();
+        cy.pa11y(pa11yOptions);
+    });
 })
+
+function setValue(cssSelector, value) {
+    cy.get(cssSelector).type(value);
+}
+function setupPa11yPost() {
+    pa11yOptions.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    pa11yOptions.method = 'POST';
+    cy.get('#match-form input[name]').each(el => {
+        const value = el.val();
+        const name = el.attr('name');
+        if (value && name) {
+            if (pa11yOptions.postData) {
+                pa11yOptions.postData += `&${name}=${value}`;
+            }
+            else {
+                pa11yOptions.postData = `${name}=${value}`;
+            }
+        }
+    });
+}

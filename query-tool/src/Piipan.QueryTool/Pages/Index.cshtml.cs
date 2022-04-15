@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.QueryTool.Client.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -29,9 +30,9 @@ namespace Piipan.QueryTool.Pages
         }
 
         [BindProperty]
-        public PiiRecord Query { get; set; }
+        public PiiRecord Query { get; set; } = new PiiRecord();
         public OrchMatchResponse QueryResult { get; private set; }
-        public String RequestError { get; private set; }
+        public List<ServerError> RequestErrors { get; } = new();
         public bool NoResults = false;
 
         public async Task<IActionResult> OnPostAsync()
@@ -56,7 +57,7 @@ namespace Piipan.QueryTool.Pages
                         }
                     };
 
-                    var response = await _matchApi.FindMatches(request, "ea");
+                    var response = await _matchApi.FindMatches(request, "eb");
 
                     QueryResult = response;
                     NoResults = QueryResult.Data.Results.Count == 0 ||
@@ -69,17 +70,29 @@ namespace Piipan.QueryTool.Pages
                     _logger.LogError(ex, ex.Message);
                     if (ex.Message.ToLower().Contains("gregorian"))
                     {
-                        RequestError = "Date of birth must be a real date.";
+                        RequestErrors.Add(new("", "Date of birth must be a real date."));
                     }
                     else
                     {
-                        RequestError = $"{ex.Message}";
+                        RequestErrors.Add(new("", ex.Message));
                     }
                 }
                 catch (Exception exception)
                 {
                     _logger.LogError(exception, exception.Message);
-                    RequestError = "There was an error running your search. Please try again.";
+                    RequestErrors.Add(new("", "There was an error running your search. Please try again."));
+                }
+            }
+            else
+            {
+                var keys = ModelState.Keys;
+                foreach (var key in keys)
+                {
+                    if (ModelState[key]?.Errors?.Count > 0)
+                    {
+                        var error = ModelState[key].Errors[0];
+                        RequestErrors.Add(new(key, error.ErrorMessage));
+                    }
                 }
             }
 
