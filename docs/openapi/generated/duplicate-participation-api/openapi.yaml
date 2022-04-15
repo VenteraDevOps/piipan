@@ -53,7 +53,7 @@ paths:
                         description: 'The case action or other valid reason for performing the NAC search.  Valid options are ''application'', ''recertification'', ''new_household_member'', or ''other'''
                       vulnerable_individual:
                         type: string
-                        description: Location protection flag for vulnerable individuals. 'yes' values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual.
+                        description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
             examples:
               Single person:
                 description: 'An example request to query a single person, with values for all fields'
