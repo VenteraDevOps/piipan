@@ -28,13 +28,16 @@ namespace Piipan.Etl.Func.BulkUpload
     {
         private readonly IParticipantApi _participantApi;
         private readonly IParticipantStreamParser _participantParser;
+        private readonly IBlobClientStream _blobStream;
 
         public BulkUpload(
             IParticipantApi participantApi,
-            IParticipantStreamParser participantParser)
+            IParticipantStreamParser participantParser,
+            IBlobClientStream blobStream)
         {
             _participantApi = participantApi;
             _participantParser = participantParser;
+            _blobStream = blobStream;
         }
 
         /// <summary>
@@ -52,22 +55,12 @@ namespace Piipan.Etl.Func.BulkUpload
             [QueueTrigger("qupload", Connection = "BlobStorageConnectionString")] string myQueueItem,
             ILogger log)
         {
+            log.LogInformation("pepe");
             log.LogInformation(myQueueItem);
 
             try
             {
-                //parse queue event
-                var queuedEvent = JsonConvert.DeserializeObject<EventGridEvent>(myQueueItem);
-                var createdBlobEvent = JsonConvert.DeserializeObject<StorageBlobCreatedEventData>(queuedEvent.Data.ToString());
-
-                //Get blob name from the blob url
-                var blobUrl = new Uri(createdBlobEvent.Url);                 
-                string[] urlParts = blobUrl.Segments;
-                string blobName = urlParts[urlParts.Length-1];
-
-                BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
-
-                Stream input = blob.OpenRead();
+                Stream input = _blobStream.Parse(myQueueItem, log);
 
                 if (input != null)
                 {
@@ -85,7 +78,8 @@ namespace Piipan.Etl.Func.BulkUpload
             }
             catch (Exception ex)
             {
-                log.LogError("No grid event raised");
+                log.LogError(ex.Message);
+                throw;
             }
 
         }

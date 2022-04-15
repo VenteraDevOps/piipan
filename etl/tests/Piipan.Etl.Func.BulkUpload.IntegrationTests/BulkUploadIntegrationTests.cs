@@ -24,7 +24,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
     {
         private ServiceProvider BuildServices()
         {
-            var services = new ServiceCollection();
+          var services = new ServiceCollection();
 
             services.AddLogging();
             SqlMapper.AddTypeHandler(new DateRangeListHandler());
@@ -44,6 +44,18 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
             services.RegisterParticipantsServices();
 
+            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
+            var logger = Mock.Of<ILogger>();
+
+            var blobStream = new Mock<IBlobClientStream>();
+                blobStream
+                    .Setup(m => m.Parse(It.IsAny<string>(), logger))
+                    .Returns(input);
+
+            services.AddTransient<IBlobClientStream>(b => {
+                return blobStream.Object;
+            });
+            
             return services.BuildServiceProvider();
         }
 
@@ -52,7 +64,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = BuildServices();
             return new BulkUpload(
                 services.GetService<IParticipantApi>(),
-                services.GetService<IParticipantStreamParser>()
+                services.GetService<IParticipantStreamParser>(),
+                services.GetService<IBlobClientStream>()
             );
         }
 
@@ -64,14 +77,13 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             ClearParticipants();
             var eventGridEvent = Mock.Of<EventGridEvent>();
             eventGridEvent.Data = new Object();
-            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
+            
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
 
             // act
             await function.Run(
-                eventGridEvent,
-                input,
+                "Event Grid Event String",
                 logger
             );
 
