@@ -46,7 +46,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 return factory.Object;
             });
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
-            services.RegisterParticipantsServices();
+
 
             var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
@@ -60,6 +60,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 return blobStream.Object;
             });
             
+            services.RegisterParticipantsServices();
+
             return services.BuildServiceProvider();
         }
 
