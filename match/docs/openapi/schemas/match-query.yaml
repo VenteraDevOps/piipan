@@ -89,7 +89,7 @@ MatchRequestExamples:
           case_id: "CaseNumber12345"
           participant_id: "ParticipantId12345"
           search_reason: "application"
-          vulnerable_individual: "yes"
+          vulnerable_individual: true
   Multiple:
     description: "A request with multiple persons"
     value:

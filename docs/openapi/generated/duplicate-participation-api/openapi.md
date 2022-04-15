@@ -50,7 +50,7 @@ Searches all state databases for any participant records that are an exact match
       "case_id": "CaseNumber12345",
       "participant_id": "ParticipantId12345",
       "search_reason": "application",
-      "vulnerable_individual": "yes"
+      "vulnerable_individual": true
     }
   ]
 }
