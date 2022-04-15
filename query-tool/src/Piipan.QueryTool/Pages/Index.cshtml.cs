@@ -57,7 +57,7 @@ namespace Piipan.QueryTool.Pages
                         }
                     };
 
-                    var response = await _matchApi.FindMatches(request, "eb");
+                    var response = await _matchApi.FindMatches(request, "ea");
 
                     QueryResult = response;
                     NoResults = QueryResult.Data.Results.Count == 0 ||
