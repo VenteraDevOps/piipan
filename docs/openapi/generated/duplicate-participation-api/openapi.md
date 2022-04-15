@@ -66,7 +66,7 @@ Searches all state databases for any participant records that are an exact match
 |» participant_id|body|string|false|Participant's state-specific identifier. Must not be social security number or any personal identifiable information.|
 |» case_id|body|string|false|Participant's state-specific case number|
 |» search_reason|body|string|true|The case action or other valid reason for performing the NAC search.  Valid options are 'application', 'recertification', 'new_household_member', or 'other'|
-|» vulnerable_individual|body|string|false|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
+|» vulnerable_individual|body|boolean|false|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|
 
 > Example responses
 
