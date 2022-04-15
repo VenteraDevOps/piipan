@@ -119,6 +119,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components.Demo", "c
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Components", "components\src\Piipan.Components\Piipan.Components.csproj", "{8DC9F512-C28F-4827-A18F-69741004A364}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Cryptography", "shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj", "{3EA99107-AA32-404D-A165-DBFF960E7F04}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Cryptography.Tests", "shared\tests\Piipan.Shared.Cryptography.Tests\Piipan.Shared.Cryptography.Tests.csproj", "{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API", "shared\src\Piipan.Shared.API\Piipan.Shared.API.csproj", "{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API.Tests", "shared\tests\Piipan.Shared.API.Tests\Piipan.Shared.API.Tests.csproj", "{1245270B-EB8C-4267-A325-8A649944937F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.ResolutionApi.Tests", "match\tests\Piipan.Match.Func.ResolutionApi.Tests\Piipan.Match.Func.ResolutionApi.Tests.csproj", "{E5540158-9A24-4370-9B1B-8327B72B4E51}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Match.Func.ResolutionApi.IntegrationTests", "match\tests\Piipan.Match.Func.ResolutionApi.IntegrationTests\Piipan.Match.Func.ResolutionApi.IntegrationTests.csproj", "{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -281,6 +292,30 @@ Global
 		{8DC9F512-C28F-4827-A18F-69741004A364}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DC9F512-C28F-4827-A18F-69741004A364}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DC9F512-C28F-4827-A18F-69741004A364}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EA99107-AA32-404D-A165-DBFF960E7F04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EA99107-AA32-404D-A165-DBFF960E7F04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EA99107-AA32-404D-A165-DBFF960E7F04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EA99107-AA32-404D-A165-DBFF960E7F04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1245270B-EB8C-4267-A325-8A649944937F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5540158-9A24-4370-9B1B-8327B72B4E51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -335,6 +370,12 @@ Global
 		{E098FC96-C47A-4699-81EA-150F36EC65B9} = {7A94C2C6-C587-4C3F-AFFF-CA3C1D6BF4DD}
 		{6A2E2A73-CF1F-49CA-AC9F-828DF6CE1E34} = {70704195-7073-4B52-92D9-80A69E08C62D}
 		{8DC9F512-C28F-4827-A18F-69741004A364} = {70704195-7073-4B52-92D9-80A69E08C62D}
+		{3EA99107-AA32-404D-A165-DBFF960E7F04} = {9D76C087-50BA-499A-BC9C-9029DF0DE7F5}
+		{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C} = {692D4B76-E6E3-4BCA-B731-89943ED3C2C8}
+		{FD9A9A1A-F060-43FF-9FCB-1BD61F910947} = {9D76C087-50BA-499A-BC9C-9029DF0DE7F5}
+		{1245270B-EB8C-4267-A325-8A649944937F} = {692D4B76-E6E3-4BCA-B731-89943ED3C2C8}
+		{E5540158-9A24-4370-9B1B-8327B72B4E51} = {0CBFFA5D-4CFF-4823-9C9F-6350C7B9CA18}
+		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430} = {0CBFFA5D-4CFF-4823-9C9F-6350C7B9CA18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B44BDF3-D32A-4F70-B573-1AD075EEF0EA}

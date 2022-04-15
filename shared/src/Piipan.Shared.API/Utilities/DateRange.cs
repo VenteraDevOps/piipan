@@ -1,7 +1,7 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace Piipan.Shared.Utilities
+namespace Piipan.Shared.API.Utilities
 {
     public class DateRange
     {

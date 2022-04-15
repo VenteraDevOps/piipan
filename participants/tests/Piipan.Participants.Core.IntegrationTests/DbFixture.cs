@@ -42,12 +42,12 @@ namespace Piipan.Participants.Core.IntegrationTests
         public void InsertUpload()
         {
             var factory = NpgsqlFactory.Instance;
-
+            
             using (var conn = factory.CreateConnection())
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now() at time zone 'utc', current_user)");
+                conn.Execute("INSERT INTO uploads(created_at, publisher,upload_identifier) VALUES(now() at time zone 'utc', current_user ,'test-etag')");
                 conn.Close();
             }
         }

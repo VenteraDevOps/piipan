@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Piipan.Shared.Helpers;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Match.Api.Serializers
 {

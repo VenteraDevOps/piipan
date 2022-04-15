@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Threading;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -9,7 +13,7 @@ using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests
@@ -53,6 +57,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
+            var blobProperties = Mock.Of<BlobClient>();
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
             var blobStream = Mock.Of<IBlobClientStream>();
             var logger = new Mock<ILogger>();
@@ -91,6 +96,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
+            var blobProperties = Mock.Of<BlobClient>();
             var participantStreamParser = new Mock<IParticipantStreamParser>();
             participantStreamParser
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
@@ -114,9 +120,16 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         public async void Run_ApiThrows()
         {
             // Arrange
+            var blobClient = new Mock<BlobClient>();
+            var responseMock = new Mock<Response>();
+            blobClient
+                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
+                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+             
+
             var participantApi = new Mock<IParticipantApi>();
             participantApi
-                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>()))
+                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>()))
                 .Throws(new Exception("the api broke"));
 
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
@@ -139,6 +152,11 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         [Fact]
         public async void Run_ParsedInputPassedToApi()
         {
+            var blobClient = new Mock<BlobClient>();
+            var responseMock = new Mock<Response>();
+            blobClient
+                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
+                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
             // Arrange
             var participants = new List<Participant>
             {
@@ -173,7 +191,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
-            participantApi.Verify(m => m.AddParticipants(participants), Times.Once);
+            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>()), Times.Once);
         }
     }
 }

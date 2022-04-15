@@ -1,17 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Pages;
+using Piipan.QueryTool.Tests.Builders;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Xunit;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Piipan.QueryTool.Tests
 {
@@ -50,7 +51,7 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+            var mockMatchApi = Mock.Of<IMatchResolutionApi>();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
                 mockClaimsProvider,
@@ -65,12 +66,12 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public void TestShortMatchId()
+        public async Task TestShortMatchId()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+            var mockMatchApi = Mock.Of<IMatchResolutionApi>();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
                 mockClaimsProvider,
@@ -80,19 +81,19 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m12345")).PageName;
+            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m12345")).PageName;
 
             // assert
             Assert.Equal("Error", result);
         }
 
         [Fact]
-        public void TestLongMatchId()
+        public async Task TestLongMatchId()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+            var mockMatchApi = Mock.Of<IMatchResolutionApi>();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
                 mockClaimsProvider,
@@ -102,7 +103,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m123456789")).PageName;
+            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m123456789")).PageName;
 
             // assert
             Assert.Equal("Error", result);
@@ -110,12 +111,12 @@ namespace Piipan.QueryTool.Tests
 
 
         [Fact]
-        public void TestInvalidCharactersOnMatchId()
+        public async Task TestInvalidCharactersOnMatchId()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+            var mockMatchApi = Mock.Of<IMatchResolutionApi>();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
                 mockClaimsProvider,
@@ -125,56 +126,76 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m1$23^45")).PageName;
+            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m1$23^45")).PageName;
 
             // assert
             Assert.Equal("Error", result);
         }
 
         [Fact]
-        public void TestValidMatchId()
+        public async Task TestValidMatchId()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+
+            var mockMatchApi = SetupMatchResolutionApi();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
                 mockClaimsProvider,
                 mockLdsDeidentifier,
-                mockMatchApi
+                mockMatchApi.Object
             );
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
             var caseid = "m123456";
-            pageModel.OnGet(caseid);
-            var result = pageModel.Match.MatchId;
+            var result = await pageModel.OnGet(caseid);
 
-            // assert
-            Assert.Equal(caseid, result);
+            // assert the match was set to the value returned by the match resolution API
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(caseid, pageModel.Match.Data.MatchId);
+            Assert.Equal("ea", pageModel.Match.Data.Initiator);
+            Assert.Equal(MatchRecordStatus.Open, pageModel.Match.Data.Status);
+            Assert.Empty(pageModel.Match.Data.Dispositions);
+            Assert.Empty(pageModel.Match.Data.Participants);
+            Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
         }
 
         [Fact]
-        public void TestValidMatchIdThatDoesNotExist()
+        public async Task TestValidMatchIdThatDoesNotExist()
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
+            var mockMatchApi = SetupMatchResolutionApi();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
                 mockClaimsProvider,
                 mockLdsDeidentifier,
-                mockMatchApi
+                mockMatchApi.Object
             );
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(pageModel.OnGet("m123457")).PageName;
+            var result = await pageModel.OnGet("m123457");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.IsType<RedirectToPageResult>(result);
+            Assert.Equal("Error", (result as RedirectToPageResult).PageName);
+        }
+
+        private Mock<IMatchResolutionApi> SetupMatchResolutionApi()
+        {
+            var apiReturnValue = MatchResApiResponseBuilder.Build();
+            var mockMatchApi = new Mock<IMatchResolutionApi>();
+            mockMatchApi
+                .Setup(n => n.GetMatch("m123456"))
+                .ReturnsAsync(apiReturnValue);
+            mockMatchApi
+                .Setup(n => n.GetMatch(It.IsNotIn("m123456")))
+                .ReturnsAsync((MatchResApiResponse)null);
+            return mockMatchApi;
         }
     }
 }

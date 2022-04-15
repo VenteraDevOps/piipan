@@ -37,6 +37,7 @@ Person:
   type: object
   required:
     - lds_hash
+    - search_reason
   properties:
     lds_hash:
       type: string
@@ -50,7 +51,10 @@ Person:
       description: "Participant's state-specific case number"
     search_reason:
       type: string
-      description: "User's reason for running match query. Must be either 'Application', 'Recertification', or 'New Household Member'"
+      description: "The case action or other valid reason for performing the NAC search.  Valid options are 'application', 'recertification', 'new_household_member', or 'other'"
+    vulnerable_individual:
+      type: boolean
+      description: "Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values."
 PersonWithPii:
   type: object
   required:
@@ -82,6 +86,10 @@ MatchRequestExamples:
     value:
       data:
         - lds_hash: "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458"
+          case_id: "CaseNumber12345"
+          participant_id: "ParticipantId12345"
+          search_reason: "application"
+          vulnerable_individual: true
   Multiple:
     description: "A request with multiple persons"
     value:

@@ -804,6 +804,31 @@
           "Newtonsoft.Json": "10.0.1"
         }
       },
+      "NodaTime": {
+        "type": "Transitive",
+        "resolved": "3.0.9",
+        "contentHash": "7KzJBkgSzLLyBXNYafDlnzlji3aB/8myvt5RJu5aaTFq6puVCq2WDJY9v9yDMg22+5or5IaKNItQ1jNA8nzQNA==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "4.7.1"
+        }
+      },
+      "Npgsql.NodaTime": {
+        "type": "Transitive",
+        "resolved": "6.0.3",
+        "contentHash": "AKGBaz2dSFkdsJ7eE0H6KVQGH/D+O+afOFQ7ML3XqWjNiiEspr20j64/eqyD0KL4IT4qKXzrSax1opzgjtYhDA==",
+        "dependencies": {
+          "NodaTime": "3.0.9",
+          "Npgsql": "6.0.3"
+        }
+      },
+      "PostgreSQLCopyHelper": {
+        "type": "Transitive",
+        "resolved": "2.8.0",
+        "contentHash": "AUABpBJg+stHcz92D3ZMSIRAeMm0vxCA8+7AHGRSuOnycfSquuA6wLaSNTs2wQ9JrzgcGblgo6dyIK5oyxt53w==",
+        "dependencies": {
+          "Npgsql": "4.1.1"
+        }
+      },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
         "resolved": "4.3.2",
@@ -2169,8 +2194,7 @@
         "type": "Project",
         "dependencies": {
           "Newtonsoft.Json": "13.0.1",
-          "Piipan.Participants.Api": "1.0.0",
-          "Piipan.Shared": "1.0.0"
+          "Piipan.Participants.Api": "1.0.0"
         }
       },
       "piipan.match.core": {
@@ -2190,7 +2214,7 @@
       "piipan.participants.api": {
         "type": "Project",
         "dependencies": {
-          "Piipan.Shared": "1.0.0"
+          "Piipan.Shared.API": "1.0.0"
         }
       },
       "piipan.participants.core": {
@@ -2199,8 +2223,10 @@
           "Dapper": "2.0.123",
           "Microsoft.Extensions.DependencyInjection": "3.1.23",
           "Microsoft.Extensions.Logging": "3.1.23",
+          "Npgsql.NodaTime": "6.0.3",
           "Piipan.Participants.Api": "1.0.0",
-          "Piipan.Shared": "1.0.0"
+          "Piipan.Shared": "1.0.0",
+          "PostgreSQLCopyHelper": "2.8.0"
         }
       },
       "piipan.shared": {
@@ -2217,6 +2243,12 @@
           "Microsoft.Extensions.Options": "3.1.23",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.3"
+        }
+      },
+      "piipan.shared.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
         }
       }
     }

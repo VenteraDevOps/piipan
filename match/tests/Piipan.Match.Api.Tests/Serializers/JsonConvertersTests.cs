@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Moq;
 using Newtonsoft.Json;
 using Piipan.Match.Api.Serializers;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Match.Api.Tests.Serializers
