@@ -178,7 +178,7 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var pageModel = SetupMatchModel();
 
-            pageModel.Query = new Client.Models.MatchSearchRequest
+            pageModel.Query = new MatchSearchRequest
             {
                 MatchId = matchId
             };
@@ -200,7 +200,7 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var pageModel = SetupMatchModel();
 
-            pageModel.Query = new Client.Models.MatchSearchRequest
+            pageModel.Query = new MatchSearchRequest
             {
                 MatchId = ValidMatchId
             };
@@ -221,7 +221,7 @@ namespace Piipan.QueryTool.Tests
         {
             var pageModel = SetupMatchModel();
 
-            pageModel.BindModel(new Client.Models.MatchSearchRequest
+            pageModel.BindModel(new MatchSearchRequest
             {
                 MatchId = "m333333"
             }, nameof(MatchModel.Query));
@@ -245,7 +245,7 @@ namespace Piipan.QueryTool.Tests
                 .ThrowsAsync(new System.Exception("Test Error"));
             var pageModel = SetupMatchModel(mockMatchApi);
 
-            pageModel.Query = new Client.Models.MatchSearchRequest
+            pageModel.Query = new MatchSearchRequest
             {
                 MatchId = ValidMatchId
             };

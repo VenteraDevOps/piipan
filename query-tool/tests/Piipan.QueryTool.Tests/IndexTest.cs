@@ -131,7 +131,7 @@ namespace Piipan.QueryTool.Tests
                     }
                 });
 
-            var requestPii = new Client.Models.PiiRecord
+            var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "987-65-4320",
@@ -184,7 +184,7 @@ namespace Piipan.QueryTool.Tests
                     }
                 });
 
-            var requestPii = new Client.Models.PiiRecord
+            var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
@@ -216,7 +216,7 @@ namespace Piipan.QueryTool.Tests
         public async void MatchCapturesApiError()
         {
             // arrange
-            var requestPii = new Client.Models.PiiRecord
+            var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
@@ -255,7 +255,7 @@ namespace Piipan.QueryTool.Tests
         public async Task InvalidDateFormat(string exceptionMessage, string expectedErrorMessage)
         {
             // Arrange
-            var requestPii = new Client.Models.PiiRecord
+            var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
