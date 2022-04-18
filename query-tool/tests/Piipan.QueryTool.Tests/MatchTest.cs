@@ -20,6 +20,7 @@ namespace Piipan.QueryTool.Tests
 {
     public class MatchPageTests
     {
+        private const string ValidMatchId = "m123456";
         public static IClaimsProvider claimsProviderMock(string email)
         {
             var claimsProviderMock = new Mock<IClaimsProvider>();
@@ -118,7 +119,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var caseid = "m123456";
+            var caseid = ValidMatchId;
             var result = await pageModel.OnGet(caseid);
 
             // assert the match was set to the value returned by the match resolution API
@@ -154,15 +155,15 @@ namespace Piipan.QueryTool.Tests
                 {
                     States = new string[] { "ea", "eb" },
                     Initiator = "ea",
-                    MatchId = "m123456"
+                    MatchId = ValidMatchId
                 }
             };
             var mockMatchApi = new Mock<IMatchResolutionApi>();
             mockMatchApi
-                .Setup(n => n.GetMatch("m123456"))
+                .Setup(n => n.GetMatch(ValidMatchId))
                 .ReturnsAsync(apiReturnValue);
             mockMatchApi
-                .Setup(n => n.GetMatch(It.IsNotIn("m123456")))
+                .Setup(n => n.GetMatch(It.IsNotIn(ValidMatchId)))
                 .ReturnsAsync((MatchResApiResponse)null);
             return mockMatchApi;
         }
@@ -201,7 +202,7 @@ namespace Piipan.QueryTool.Tests
 
             pageModel.Query = new Client.Models.MatchSearchRequest
             {
-                MatchId = "m123456"
+                MatchId = ValidMatchId
             };
             pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
 
@@ -240,13 +241,13 @@ namespace Piipan.QueryTool.Tests
         {
             var mockMatchApi = new Mock<IMatchResolutionApi>();
             mockMatchApi
-                .Setup(n => n.GetMatch("m123456"))
+                .Setup(n => n.GetMatch(ValidMatchId))
                 .ThrowsAsync(new System.Exception("Test Error"));
             var pageModel = SetupMatchModel(mockMatchApi);
 
             pageModel.Query = new Client.Models.MatchSearchRequest
             {
-                MatchId = "m123456"
+                MatchId = ValidMatchId
             };
             pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
 

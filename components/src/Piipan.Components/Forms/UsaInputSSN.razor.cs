@@ -13,7 +13,12 @@ namespace Piipan.Components.Forms
     public partial class UsaInputSSN
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
-        Timer timer = new Timer();
+
+        /// <summary>
+        /// This timer is used to hide the last SSN character typed after 1 second. This protects it as expected, but allows
+        /// the user to see what they're typing to validate it's correct.
+        /// </summary>
+        Timer ssnProtectionTimer = new Timer();
 
         protected override void OnInitialized()
         {
@@ -22,10 +27,10 @@ namespace Piipan.Components.Forms
                 InvisibleValue = string.Join("", CurrentValue.Select(x => x != '-' ? '*' : x));
             }
             base.OnInitialized();
-            timer.Interval = 1000;
-            timer.Elapsed += async (object sender, ElapsedEventArgs e) =>
+            ssnProtectionTimer.Interval = 1000;
+            ssnProtectionTimer.Elapsed += async (object sender, ElapsedEventArgs e) =>
             {
-                timer.Stop();
+                ssnProtectionTimer.Stop();
                 if (!visible)
                 {
                     InvisibleValue ??= "";
@@ -51,7 +56,7 @@ namespace Piipan.Components.Forms
             }
             if (!visible)
             {
-                timer.Stop();
+                ssnProtectionTimer.Stop();
                 var beginningStr = "";
                 var endStr = "";
                 var middleStr = "";
@@ -97,7 +102,7 @@ namespace Piipan.Components.Forms
                     }
                 }
                 Console.WriteLine("Starting Timer");
-                timer.Start();
+                ssnProtectionTimer.Start();
             }
             int hyphensRemovedBeforeCursor = value.Substring(0, cursorPosition).Count((c) => c == '-');
             char? lastChar = null;
