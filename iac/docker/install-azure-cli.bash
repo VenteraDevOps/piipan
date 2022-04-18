@@ -24,5 +24,5 @@ apt-get install python
 if [ "$AZURE_CLI_VERSION" = 0 ]; then
     apt-get install azure-cli
 else
-    apt-get install azure-cli="$AZURE_CLI_VERSION"~focal -V
+    apt-get install azure-cli="$AZURE_CLI_VERSION"~bullseye -V
 fi
