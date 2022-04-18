@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net6.0": {
+      "Microsoft.AspNetCore.Components.WebAssembly.Server": {
+        "type": "Direct",
+        "requested": "[6.0.4, )",
+        "resolved": "6.0.4",
+        "contentHash": "zlYQtZS4wrD0x03Xy3f0ZEuqRP2arHNJHYFgfUBGua0PtpnrI6EdoReORQm9GmyWISHa1MbEuE4Yurlwad5KNA=="
+      },
       "Microsoft.Extensions.Logging.AzureAppServices": {
         "type": "Direct",
         "requested": "[6.0.4, )",
@@ -68,6 +74,52 @@
           "Microsoft.AspNetCore.Metadata": "6.0.4",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.1",
           "Microsoft.Extensions.Options": "6.0.0"
+        }
+      },
+      "Microsoft.AspNetCore.Components": {
+        "type": "Transitive",
+        "resolved": "6.0.4",
+        "contentHash": "QX8RhqjKQEBmAIzgmKLVYcw1HUION9tWUz0bQTDeHj9F05/YfohR8YiSPlTK4mTDk6S8WTi70qxNuGTWvgO1PQ==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Authorization": "6.0.4",
+          "Microsoft.AspNetCore.Components.Analyzers": "6.0.4"
+        }
+      },
+      "Microsoft.AspNetCore.Components.Analyzers": {
+        "type": "Transitive",
+        "resolved": "6.0.4",
+        "contentHash": "xwzDR3aObo+Lhz3Ff7j9NQRukvklIeMlig2lANZ0VULSwXB0aW+W7xl7ssSe3xLDMpyhCjOTgcA/1zXIPdMTyg=="
+      },
+      "Microsoft.AspNetCore.Components.Forms": {
+        "type": "Transitive",
+        "resolved": "6.0.4",
+        "contentHash": "HDRfrmQYrkRwAWOYgQL6EXwNE7vU6+IcnVXet0lIbPqITbeZiPWCQ6SUEzFz806f/h4ozXaN4Bn3/Ce+RjuZxw==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.4"
+        }
+      },
+      "Microsoft.AspNetCore.Components.Web": {
+        "type": "Transitive",
+        "resolved": "6.0.4",
+        "contentHash": "w1IDipPk1gEvLX3HG8HBB1idcyyBJtnb6I/xygzWlYSenpOVSyyjvk8UC0a5TsbPgmjNy4jMtpXVkOFAOkQopw==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "6.0.4",
+          "Microsoft.AspNetCore.Components.Forms": "6.0.4",
+          "Microsoft.Extensions.DependencyInjection": "6.0.0",
+          "Microsoft.JSInterop": "6.0.4",
+          "System.IO.Pipelines": "6.0.2"
+        }
+      },
+      "Microsoft.AspNetCore.Components.WebAssembly": {
+        "type": "Transitive",
+        "resolved": "6.0.2",
+        "contentHash": "FM+ygVElZ6Eug5CNxYfmTSjXt/iU4EryMkNDtdCZwM9z6lPRUf2S3vfVJ79Io4Fzy05d+dnaw+6Zo3fz3s8s2w==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.Web": "6.0.2",
+          "Microsoft.Extensions.Configuration.Binder": "6.0.0",
+          "Microsoft.Extensions.Configuration.Json": "6.0.0",
+          "Microsoft.Extensions.Logging": "6.0.0",
+          "Microsoft.JSInterop.WebAssembly": "6.0.2"
         }
       },
       "Microsoft.AspNetCore.Http": {
@@ -472,6 +524,19 @@
           "System.Security.SecureString": "4.3.0",
           "System.Xml.XDocument": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
+        }
+      },
+      "Microsoft.JSInterop": {
+        "type": "Transitive",
+        "resolved": "6.0.4",
+        "contentHash": "ul/BI4XudxeR1JROdq0FnMTT1YAN74q2iGeeWAzabuYyFVHtxVa8j+cYE+0KphS0c0+JkSupKCQRjhZsDw5NUg=="
+      },
+      "Microsoft.JSInterop.WebAssembly": {
+        "type": "Transitive",
+        "resolved": "6.0.2",
+        "contentHash": "nQTIFfWEi25/yOVz/KMelUiUSltZAczXLh3yusk9g9w92+RxV5xrIJ651+1SaXOL2ywinWqvwZ6rT39ibAZ2QQ==",
+        "dependencies": {
+          "Microsoft.JSInterop": "6.0.2"
         }
       },
       "Microsoft.Net.Http.Headers": {
@@ -1014,6 +1079,11 @@
         "dependencies": {
           "System.Runtime": "4.3.0"
         }
+      },
+      "System.IO.Pipelines": {
+        "type": "Transitive",
+        "resolved": "6.0.2",
+        "contentHash": "cb5OfQjnz+zjpJJei+f3QYK7+wWZrDdNHf3DykO6QCacpNZ80tuNgq1DC2kqlrjfEu+cMUTvulxPIrCMbBkjqg=="
       },
       "System.Linq": {
         "type": "Transitive",
@@ -1709,6 +1779,12 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "piipan.components": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.Web": "6.0.4"
+        }
+      },
       "piipan.match.api": {
         "type": "Project",
         "dependencies": {
@@ -1731,6 +1807,14 @@
         "type": "Project",
         "dependencies": {
           "Piipan.Shared.API": "1.0.0"
+        }
+      },
+      "piipan.querytool.client": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.WebAssembly": "6.0.2",
+          "Piipan.Components": "1.0.0",
+          "Piipan.Match.Api": "1.0.0"
         }
       },
       "piipan.shared": {

@@ -5,10 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
+    <base href="/" />
     <link rel="stylesheet" href="~/css/styles.css" />
     <script src="~/js/uswds-init.min.js" asp-append-version="true"></script>
 </head>
-
+@{
+    var pageName = Context.Request.Path.ToString().Split('/').Last().ToLower();
+}
 <body>
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
     <div class="usa-overlay"></div>
@@ -37,8 +40,8 @@
                                 @if(!String.IsNullOrEmpty(Model.Email))
                                 {
                                     <li class="usa-nav__primary-item">
-                                        <button class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="nav-user">
-                                            <span>@Model.Email</span>
+                                        <button class="usa-accordion__button" aria-expanded="false" aria-controls="nav-user">
+                                            <span class="usa-button--unstyled">@Model.Email</span>
                                         </button>
                                         <ul id="nav-user" class="usa-nav__submenu" hidden>
                                             <li class="usa-nav__submenu-item">
@@ -53,18 +56,24 @@
                      <nav aria-label="Primary navigation" class="usa-nav-primary">
                         <div class="usa-nav__inner">
                             <button class="usa-nav__close">
-                                <img src="./images/close.svg" role="img" alt="Close">
+                                <img src="/images/close.svg" role="img" alt="Close">
                             </button>
 
                             <ul class="usa-nav__primary usa-accordion">
                                 <li class="usa-nav__primary-item">
-                                    <a href="./index" class="usa-nav__link">
-                                        <span>Search for SNAP Participants</span>
+                                @{
+                                    var linkTitle = "Search for SNAP Participants";
+                                }
+                                <a href="/" class="usa-nav__link @(pageName == "" || pageName == "index" ? "usa-current" : "")">
+                                        <span data-title="@linkTitle">@linkTitle</span>
                                     </a>
                                 </li>
                                 <li class="usa-nav__primary-item">
-                                    <a href="./match" class="usa-nav__link">
-                                        <span>Find a Match Record</span>
+                                    @{
+                                        linkTitle = "Find a Match Record";
+                                    }
+                                    <a href="/match" class="usa-nav__link @(pageName == "match" ? "usa-current" : "")">
+                                        <span data-title="@linkTitle">@linkTitle</span>
                                     </a>
                                 </li>
                             </ul>
@@ -80,7 +89,10 @@
             <partial name="_CUI" />
         </div>
     </div>
+    @Html.AntiForgeryToken()
     <script src="~/js/uswds.min.js" asp-append-version="true"></script>
+    <script src="/_framework/blazor.webassembly.js" asp-append-version="true"></script>
+    <script src="/customjs/utilities.js" asp-append-version="true"></script>
 </body>
 
 </html>

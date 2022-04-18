@@ -39,6 +39,7 @@ and pushes it down when main content is longer than screen height.
 
 .usa-navbar {
   display: flex !important;
+  overflow: visible !important;
 }
 
 .usa-nav {

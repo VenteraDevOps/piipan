@@ -1,0 +1,68 @@
+﻿@using Piipan.Match.Api.Models
+@using Piipan.Match.Api.Models.Resolution
+
+@inject NavigationManager NavigationManager
+
+
+@code {
+    [Parameter] public MatchSearchRequest Query { get; set; }
+    [Parameter] public ParameterBase<List<MatchResApiResponse>> QueryResult { get; set; }
+    [Parameter] public string Token { get; set; }
+    [Parameter] public List<ServerError> ServerErrors { get; set; }
+
+    private bool searching = false;
+    private bool showNoResultsAlert = true;
+    List<(string Property, string Error)> serverErrorList;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (ServerErrors?.Count > 0)
+        {
+            serverErrorList = new(ServerErrors.Select(n => (n.Property, n.Error)));
+        }
+    }
+    private Task SubmitForm(bool valid)
+    {
+        if (valid)
+        {
+            searching = true;
+        }
+        else
+        {
+            showNoResultsAlert = false;
+        }
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}
+
+<h1>Find a Match Record</h1>
+<p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
+@if (QueryResult?.Data?.Count == 0 && showNoResultsAlert)
+{
+    <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Info">
+        <p>This Match ID does not have a matching record in any other states.</p>
+    </UsaAlertBox>
+}
+@if (Query != null)
+{
+    <UsaForm Id="match-form" Model="Query" InitialErrors="serverErrorList" method="post" OnBeforeSubmit="SubmitForm">
+        <input type="hidden" name="__RequestVerificationToken" value="@Token" />
+        <legend class="usa-sr-only">match search criteria</legend>
+        <UsaFormGroup>
+            <LabelOverride>Match ID</LabelOverride>
+            <ChildContent>
+                <UsaInputText @bind-Value="Query.MatchId" maxlength="7" Width="118"  />
+            </ChildContent>
+        </UsaFormGroup>
+        <button class="usa-button" type="submit" id="match-form-search-btn" disabled="@searching">@(searching ? "Finding Match Record..." : "Find Match Record")</button>
+    </UsaForm>
+}
+@if (QueryResult?.Data?.Count > 0)
+{
+    <MatchResults QueryResult="QueryResult.Data" />
+}
+else {
+    <section class="border-top-1px border-base-light margin-top-6"></section>
+}

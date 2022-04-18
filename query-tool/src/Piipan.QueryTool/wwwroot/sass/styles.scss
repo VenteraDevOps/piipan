@@ -80,7 +80,11 @@
 @import "uswds-overrides/table";
 @import "uswds-overrides/nav";
 @import "uswds-overrides/alert";
+@import "uswds-overrides/forms";
+@import "uswds-overrides/grid";
+@import "uswds-overrides/typography";
 
 // -------------------------------------
 // custom styles
 @import "custom/agency";
+@import "custom/_component_styles";
