@@ -3,7 +3,7 @@
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Azure.EventGrid.Models;
+using Azure.Messaging.EventGrid;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
@@ -37,7 +37,7 @@ namespace Piipan.Metrics.Func.Collect
             try
             {
                 string state = ParseState(eventGridEvent);
-                DateTime uploadedAt = eventGridEvent.EventTime;
+                DateTime uploadedAt = eventGridEvent.EventTime.DateTime;
 
                 int nRows = await _participantUploadWriterApi.AddUpload(state, uploadedAt);
 

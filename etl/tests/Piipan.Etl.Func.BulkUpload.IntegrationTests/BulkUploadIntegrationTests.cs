@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Azure;
+using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Dapper;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -71,15 +71,14 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             blobClient
                 .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-            var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
+            var eventGridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(String.Empty));
             var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
 
             // act
             await function.Run(
-                eventGridEvent,
+                eventGridEvent.Object,
                 input, blobClient.Object,
                 logger
             );
