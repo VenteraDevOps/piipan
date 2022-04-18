@@ -65,7 +65,7 @@ jobs:
           command: find ./ -type f \( -name '*.bash' \) | xargs shellcheck -x -e SC2207
   test:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:3.1
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
       - image: postgres:11-alpine
         environment:
           POSTGRES_PASSWORD: securepass
@@ -161,7 +161,7 @@ jobs:
     environment:
       MSBUILD_PROPS: "-p:ContinuousIntegrationBuild=true"
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:3.1
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
     working_directory: /build
     steps:
       - checkout
@@ -220,7 +220,7 @@ jobs:
 
   frontend_tests_dashboard:
     docker:
-      - image: mcr.microsoft.com/dotnet/sdk:3.1
+      - image: mcr.microsoft.com/dotnet/sdk:6.0
     steps:
       - run_frontend_tests:
           directory: dashboard/src/Piipan.Dashboard

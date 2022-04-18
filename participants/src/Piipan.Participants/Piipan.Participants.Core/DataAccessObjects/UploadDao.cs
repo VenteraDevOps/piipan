@@ -22,22 +22,22 @@ namespace Piipan.Participants.Core.DataAccessObjects
             {
                 return await connection
                     .QuerySingleAsync<UploadDbo>(@"
-                    SELECT id, created_at, publisher
+                    SELECT id, created_at, publisher,upload_identifier
                     FROM uploads
                     ORDER BY id DESC
                     LIMIT 1");
             }
         }
 
-        public async Task<IUpload> AddUpload()
+        public async Task<IUpload> AddUpload(string uploadIdentifier)
         {
             using (var connection = await _dbConnectionFactory.Build() as DbConnection)
             {
                 await connection.OpenAsync();
-
+               
                 await connection.ExecuteAsync(@"
-                INSERT INTO uploads (created_at, publisher)
-                VALUES (now() at time zone 'utc', current_user)");
+                INSERT INTO uploads (created_at, publisher,upload_identifier)
+                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier)", new { uploadIdentifier = uploadIdentifier });
 
                 var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher

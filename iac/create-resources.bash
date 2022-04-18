@@ -487,7 +487,7 @@ main () {
       --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
       --tags Project="$PROJECT_TAG" "$PER_STATE_ETL_TAG" \
       --runtime dotnet \
-      --functions-version 3 \
+      --functions-version 4 \
       --os-type Windows \
       --name "$func_app" \
       --storage-account "$func_stor"

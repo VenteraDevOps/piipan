@@ -2,7 +2,7 @@
 #
 # Configures Microsoft Defender and assigns the CIS Microsoft Azure
 # Foundations Benchmark 1.3.0 to the subscription.
-# Assumes an Azure user withthe Global Administrator role has signed in with the Azure CLI.
+# Assumes an Azure user with the Global Administrator role has signed in with the Azure CLI.
 #
 # usage: configure-defender-and-policy.bash <azure-env>
 
@@ -37,7 +37,7 @@ main () {
 
   echo "Assigning ${CIS_POLICY_SET_DEFINITION_NAME} to Subscription ${SUBSCRIPTION_ID}"
   az policy assignment create \
-    --name "CIS Microsoft Azure Foundations Benchmark v1.3.0" \
+    --name "CIS Microsoft Azure Foundations Benchmark v1.3.0 - ${ENV}" \
     --location "${LOCATION}" \
     --policy-set-definition "${CIS_POLICY_SET_DEFINITION_NAME}" \
     --identity-scope "/subscriptions/${SUBSCRIPTION_ID}" \

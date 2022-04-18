@@ -164,7 +164,7 @@ namespace Piipan.Participants.Core.Tests.Services
             var participantDao = new Mock<IParticipantDao>();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
-                .Setup(m => m.AddUpload())
+                .Setup(m => m.AddUpload("test-etag"))
                 .ReturnsAsync(new UploadDbo
                 {
                     Id = uploadId,
@@ -181,12 +181,12 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger);
 
             // Act
-            await service.AddParticipants(participants);
+            await service.AddParticipants(participants, "test-etag");
 
             // Assert
             
             // we should add a new upload for this batch
-            uploadDao.Verify(m => m.AddUpload(), Times.Once);
+            uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
 
             // each participant added via the DAO should have the created upload ID
             participantDao

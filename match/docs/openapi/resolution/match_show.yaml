@@ -124,7 +124,7 @@ get:
                           description: "The state's determination of whether the match is invalid"
                           nullable: true
                           default: null
-                        protect_location:
+                        vulnerable_individual:
                           type: boolean
                           description: "The state's determination of whether states should protect the location of the individual during match resolution"
                           nullable: true

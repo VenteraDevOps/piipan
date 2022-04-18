@@ -1,17 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <TargetFramework>net6.0</TargetFramework>
+    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
     <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="3.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.23" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.0" />
     <PackageReference Include="Npgsql" Version="6.0.3" />
   </ItemGroup>
   <ItemGroup>

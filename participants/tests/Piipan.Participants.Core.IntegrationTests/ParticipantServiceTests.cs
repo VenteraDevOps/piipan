@@ -34,7 +34,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
                 
                 // Act
-                await service.AddParticipants(participants);
+                await service.AddParticipants(participants,"test-etag");
 
                 long lastUploadId = GetLastUploadId();
 
@@ -74,7 +74,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 try
                 {
                     // Act
-                    await service.AddParticipants(participants);
+                    await service.AddParticipants(participants, "test-etag");
                     throw new Exception("Test should have failed because of participant with null ldsHash value");
                 }
                 catch (Exception)
