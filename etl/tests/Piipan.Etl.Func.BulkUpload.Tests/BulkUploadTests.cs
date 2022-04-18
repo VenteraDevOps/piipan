@@ -4,9 +4,9 @@ using System.Data.Common;
 using System.IO;
 using System.Threading;
 using Azure;
+using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Models;
@@ -33,10 +33,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
         private EventGridEvent EventMock()
         {
-            var e = Mock.Of<EventGridEvent>();
+            var e = new Mock<EventGridEvent>("", "", "", new BinaryData(string.Empty));
             // Can't override Data in Setup, just use a real one
-            e.Data = new Object();
-            return e;
+            return e.Object;
         }
 
         private void VerifyLogError(Mock<ILogger> logger, String expected)

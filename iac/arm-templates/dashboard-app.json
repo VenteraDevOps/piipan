@@ -47,12 +47,12 @@
         "sku": "S1",
         "baseSiteConfig": {
             // .NET 3.1 Core uses "v4.0", .NET 5 uses "v5.0"
-            "netFrameworkVersion": "v4.0",
+            "netFrameworkVersion": "v6.0",
             "metadata": [
                 {
                     // .NET 3.1 Core uses "dotnetcore", .NET 5 uses "dotnet"
                     "name": "CURRENT_STACK",
-                    "value": "dotnetcore"
+                    "value": "dotnet"
                 }
             ],
             // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments

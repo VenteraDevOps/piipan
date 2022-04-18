@@ -7,12 +7,12 @@
 # azure-env is the name of the deployment environment (e.g., "tts/dev").
 # See iac/env for available environments.
 #
-# usage: test-apim-upload-api.bash <azure-env>
+# usage: test-apim-upload-api.bash <azure-env> <state>
 
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../../tools/common.bash || exit
 
-STATE="EA"
+STATE=$2
 STATE_LC=$(echo "$STATE" | tr '[:upper:]' '[:lower:]')
 SUBSCRIPTION_NAME="${STATE}-BulkUpload"
 DATA_RELPATH=../docs/csv/
@@ -33,7 +33,6 @@ main () {
   endpoint_uri="https://${serviceName}${apim_domain}${UPLOAD_API_PATH}"
   mgmt_domain=$(resource_manager_host_suffix)
   mgmt_uri="https://management${mgmt_domain}/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${MATCH_RESOURCE_GROUP}/providers/Microsoft.ApiManagement/service/${serviceName}/subscriptions/${SUBSCRIPTION_NAME}/listSecrets?api-version=2020-12-01"
-
   api_key=$(\
     az rest \
     --method POST \

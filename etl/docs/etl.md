@@ -43,8 +43,8 @@ func azure functionapp publish <function-app-name> --dotnet
 
 ## Ad-hoc testing
 
-In a development environment, the `test-apim-upload-api.bash` tool can be used to upload test CSV files to a storage account. The state, APIM subscription, and CSV file information can be controlled by adjusting the variables at the top of the script. Usage:
+In a development environment, the `test-apim-upload-api.bash` tool can be used to upload test CSV files to a storage account. APIM subscription, and CSV file information can be controlled by adjusting the variables at the top of the script.  Pass the environment and state to the script. Usage:
 
 ```
-./tools/test-apim-upload-api.bash tts/dev
+./tools/test-apim-upload-api.bash tts/dev EA
 ```

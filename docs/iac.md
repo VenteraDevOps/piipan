@@ -78,8 +78,8 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
 9. Time to test your infrastructure
     ```
     #Test ETL
-    ./etl/tools/test-apim-upload-api.bash tts/dev
-    
+    ./etl/tools/test-apim-upload-api.bash tts/dev ea
+    ./etl/tools/test-apim-upload-api.bash tts/dev eb
     #Test Match
     ./match/tools/test-apim-match-api.bash tts/dev
     
