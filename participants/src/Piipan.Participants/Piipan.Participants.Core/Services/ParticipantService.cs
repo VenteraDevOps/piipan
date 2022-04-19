@@ -1,14 +1,13 @@
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Transactions;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
-using System;
-using System.Transactions;
-using Dapper;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -37,7 +36,7 @@ namespace Piipan.Participants.Core.Services
             {
                 var upload = await _uploadDao.GetLatestUpload(state);
                 var participants = await _participantDao.GetParticipants(state, ldsHash, upload.Id);
-    
+
                 // Set the participant State before returning
                 return participants.Select(p => new ParticipantDto(p) { State = state });
             }
@@ -47,11 +46,16 @@ namespace Piipan.Participants.Core.Services
             }
         }
 
-        public async Task AddParticipants(IEnumerable<IParticipant> participants)
+        public async Task AddParticipants(IEnumerable<IParticipant> participants,string uploadIdentifier)
         {
-            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            // Large participant uploads can be long-running processes and require
+            // an increased time out duration to avoid System.TimeoutException
+            using (TransactionScope scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                TimeSpan.FromSeconds(600),
+                TransactionScopeAsyncFlowOption.Enabled))
             {
-                var upload = await _uploadDao.AddUpload();
+                var upload = await _uploadDao.AddUpload(uploadIdentifier);
 
                 var participantDbos = participants.Select(p => new ParticipantDbo(p)
                 {

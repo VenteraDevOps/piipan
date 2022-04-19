@@ -4,7 +4,7 @@ describe('query tool homepage', () => {
     // so we must tell it to visit our website with the `cy.visit()` command.
     // Since we want to visit the same URL at the start of all our tests,
     // we include it in our beforeEach function so that it runs before each test
-    cy.visit('https://localhost:5001')
+      cy.visit('https://localhost:5001');
   })
 
   it('collapses usa banner on page load', () => {
@@ -42,19 +42,18 @@ describe('query tool homepage', () => {
   });
 
   it('collapses user navigation on page load', () => {
-    cy.get('.usa-accordion__button.usa-nav__link')
+      cy.get('.usa-nav__primary.usa-accordion .usa-accordion__button')
       .should('have.attr', 'aria-expanded')
       .and('equal', 'false');
   });
 
   it('shows sign out button on click of user navigation', () => {
-    cy.get('.usa-accordion__button.usa-nav__link').click();
+      cy.get('.usa-nav__primary.usa-accordion .usa-accordion__button').click();
 
-    cy.get('.usa-accordion__button.usa-nav__link')
+      cy.get('.usa-nav__primary.usa-accordion .usa-accordion__button')
       .should('have.attr', 'aria-expanded')
       .and('equal', 'true');
-
-    cy.contains('Sign out').should('be.visible');
+      cy.get('#nav-user').contains('Sign out').should('be.visible');
   });
 
   it('contains a CUI banner', () => {

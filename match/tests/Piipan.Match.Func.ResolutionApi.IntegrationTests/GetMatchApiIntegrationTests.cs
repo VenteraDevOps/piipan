@@ -15,6 +15,7 @@ using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
 using Piipan.Match.Func.ResolutionApi.Models;
 using Newtonsoft.Json;
+using Piipan.Match.Api.Models.Resolution;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 {
@@ -150,7 +151,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 
             // Assert first request
             Assert.Equal(200, response.StatusCode);
-            var resBody = response.Value as ApiResponse;
+            var resBody = response.Value as MatchResApiResponse;
             Assert.False(resBody.Data.Dispositions[0].InvalidMatch);
 
             // Act again
@@ -165,7 +166,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var nextResponse = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as JsonResult;
 
             // Assert next request
-            var nextResBody = nextResponse.Value as ApiResponse;
+            var nextResBody = nextResponse.Value as MatchResApiResponse;
             Assert.Equal(200, nextResponse.StatusCode);
             // now this disposition's invalid flag should be true
             Assert.True(nextResBody.Data.Dispositions[0].InvalidMatch);

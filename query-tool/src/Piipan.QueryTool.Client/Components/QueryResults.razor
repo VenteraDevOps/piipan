@@ -1,0 +1,41 @@
+﻿@using Piipan.Match.Api.Models
+@using Piipan.QueryTool.Client.Helpers
+@using Piipan.QueryTool.Client.Models
+@inject IJSRuntime JSRuntime
+@code {
+    [Parameter] public OrchMatchResponseData QueryResult { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("piipan.utilities.scrollToElement", "query-results-area");
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
+
+<section class="border-top-1px border-base-light margin-top-6" id="query-results-area">
+    <h2>SNAP Participants Search Results</h2>
+    <p>This participant was found in another state. Select the Match ID for more information.</p>
+    @foreach (var result in QueryResult.Results)
+    {
+        <table class="usa-table">
+        <thead>
+            <tr>
+                <th scope="col">Match ID</th>
+                <th scope="col">Matching State</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in result.Matches)
+                {
+                    <tr>
+                        <td><a href="/match/@record.MatchId">@record.MatchId</a></td>
+                        <td>@(StateHelper.GetStateName(record.State))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>

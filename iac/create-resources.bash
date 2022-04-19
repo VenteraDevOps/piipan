@@ -414,6 +414,12 @@ main () {
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
 
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$MATCH_RES_FUNC_APP_NAME" \
+    --available-to-other-tenants false
+
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
   else
@@ -481,7 +487,7 @@ main () {
       --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
       --tags Project="$PROJECT_TAG" "$PER_STATE_ETL_TAG" \
       --runtime dotnet \
-      --functions-version 3 \
+      --functions-version 4 \
       --os-type Windows \
       --name "$func_app" \
       --storage-account "$func_stor"
@@ -617,6 +623,20 @@ main () {
       --query "[0].appId" \
       --output tsv)
 
+  match_res_api_uri=$(\
+    az functionapp show \
+      -g "$MATCH_RESOURCE_GROUP" \
+      -n "$MATCH_RES_FUNC_APP_NAME" \
+      --query defaultHostName \
+      -o tsv)
+  match_res_api_uri="https://${match_res_api_uri}/api/v1/"
+  match_res_api_app_id=$(\
+    az ad app list \
+      --display-name "${MATCH_RES_FUNC_APP_NAME}" \
+      --filter "displayName eq '${MATCH_RES_FUNC_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
+ 
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
@@ -629,6 +649,8 @@ main () {
       servicePlan="$APP_SERVICE_PLAN" \
       OrchApiUri="$orch_api_uri" \
       OrchApiAppId="$orch_api_app_id" \
+      MatchResApiUri="$match_res_api_uri" \
+      MatchResApiAppId="$match_res_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
@@ -654,11 +676,12 @@ main () {
   ./create-core-databases.bash "$azure_env"
 
   # API Management instances need to be created before configuring Easy Auth.
-  ./create-apim.bash "$azure_env" "$APIM_EMAIL"
+   ./create-apim.bash "$azure_env" "$APIM_EMAIL"
 
   # Configures App Service Authentication between:
   #   - PerStateMatchApi and OrchestratorApi
   #   - OrchestratorApi and QueryApp
+  #   - MatchResApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
   # Configure Microsoft Defender for Cloud and assign Azure CIS 1.3.0 benchmark

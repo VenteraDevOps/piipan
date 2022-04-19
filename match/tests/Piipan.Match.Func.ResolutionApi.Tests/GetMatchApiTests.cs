@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using Moq;
 using Moq.Protected;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
@@ -165,7 +166,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);
 
-            var resBody = response.Value as ApiResponse;
+            var resBody = response.Value as MatchResApiResponse;
             Assert.NotNull(resBody);
             Assert.Equal("open", resBody.Data.Status);
         }

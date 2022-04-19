@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Moq;
+using Npgsql;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
@@ -14,9 +13,10 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Validators;
 using Piipan.Shared.Database;
-using FluentValidation;
-using Moq;
-using Npgsql;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -87,8 +87,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             ClearMatchRecords();
             ClearMatchResEvents();
             // insert a match into the database
-            var matchId = "ABCDEF";
-            var match = new MatchRecordDbo() {
+            var matchId = "ABCDEFG";
+            var match = new MatchRecordDbo()
+            {
                 MatchId = matchId,
                 Initiator = "ec",
                 CreatedAt = DateTime.UtcNow,
@@ -118,8 +119,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             ClearMatchRecords();
             ClearMatchResEvents();
             // insert a match into the database
-            var matchId = "ABCDEF";
-            var match = new MatchRecordDbo() {
+            var matchId = "ABCDEFG";
+            var match = new MatchRecordDbo()
+            {
                 MatchId = matchId,
                 Initiator = "ea",
                 CreatedAt = DateTime.UtcNow,
@@ -131,7 +133,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             };
             Insert(match);
             // insert an event into the database
-            var matchResEvent = new MatchResEventDbo() {
+            var matchResEvent = new MatchResEventDbo()
+            {
                 MatchId = matchId,
                 Actor = "system",
                 Delta = "{ \"status\": \"closed\" }"
@@ -157,8 +160,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             ClearMatchRecords();
             ClearMatchResEvents();
             // insert a match into the database
-            var matchId = "ABCDEF";
-            var match = new MatchRecordDbo() {
+            var matchId = "ABCDEFG";
+            var match = new MatchRecordDbo()
+            {
                 MatchId = matchId,
                 Initiator = "ea",
                 CreatedAt = DateTime.UtcNow,
@@ -195,8 +199,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             ClearMatchRecords();
             ClearMatchResEvents();
             // insert a match into db
-            var matchId = "ABCDEF";
-            var match = new MatchRecordDbo() {
+            var matchId = "ABCDEFG";
+            var match = new MatchRecordDbo()
+            {
                 MatchId = matchId,
                 Initiator = "ea",
                 CreatedAt = DateTime.UtcNow,
@@ -208,7 +213,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             };
             Insert(match);
             // insert final disposition event into db
-            var matchResEvent = new MatchResEventDbo() {
+            var matchResEvent = new MatchResEventDbo()
+            {
                 MatchId = matchId,
                 Actor = "user",
                 ActorState = "eb",

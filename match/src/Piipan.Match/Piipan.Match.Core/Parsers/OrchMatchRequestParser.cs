@@ -67,12 +67,13 @@ namespace Piipan.Match.Core.Parsers
                         request.Data[i].SearchReason = request.Data[i].SearchReason.ToLower();
                         if (!Enum.IsDefined(typeof(ValidSearchReasons), request.Data[i].SearchReason))
                         {
-                            request.Data[i].SearchReason = ValidSearchReasons.other.ToString();
+                            var validValues = Enum.GetNames(typeof(ValidSearchReasons));
+                            string validOptionsString = string.Join(", ", validValues.Select(n => validValues.Last() == n ? $"or '{n}'" : $"'{n}'"));
+                            throw new Exception($"Submitted option for 'search_reason' is not valid. Valid options are {validOptionsString}.");
                         }
                     }
-                    
                 }
-                
+
                 return request;
             }
             catch (ValidationException ex)

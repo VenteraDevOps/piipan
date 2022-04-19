@@ -1,18 +1,15 @@
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Func.ResolutionApi.Models;
+using System;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Func.ResolutionApi
 {
@@ -39,7 +36,7 @@ namespace Piipan.Match.Func.ResolutionApi
 
         [FunctionName("GetMatch")]
         public async Task<IActionResult> GetMatch(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "matches/{matchId}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "matches/{matchId}")] HttpRequest req,
             string matchId,
             ILogger logger)
         {
@@ -50,7 +47,7 @@ namespace Piipan.Match.Func.ResolutionApi
                 var matchResEvents = _matchResEventDao.GetEvents(matchId);
                 await Task.WhenAll(match, matchResEvents);
                 var matchResRecord = _matchResAggregator.Build(match.Result, matchResEvents.Result);
-                var response = new ApiResponse() { Data = matchResRecord };
+                var response = new MatchResApiResponse() { Data = matchResRecord };
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
             catch (InvalidOperationException ex)

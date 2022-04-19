@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Piipan.Participants.Core.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Models

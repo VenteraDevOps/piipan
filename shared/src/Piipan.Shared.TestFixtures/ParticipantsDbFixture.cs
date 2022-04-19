@@ -74,7 +74,7 @@ namespace Piipan.Shared.TestFixtures
         private void ApplySchema()
         {
             string sqltext = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
-
+            
             using (var conn = Factory.CreateConnection())
             {
                 conn.ConnectionString = ConnectionString;
@@ -83,7 +83,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP TABLE IF EXISTS participants");
                 conn.Execute("DROP TABLE IF EXISTS uploads");
                 conn.Execute(sqltext);
-                conn.Execute("INSERT INTO uploads(created_at, publisher) VALUES(now() at time zone 'utc', current_user)");
+                conn.Execute("INSERT INTO uploads(created_at, publisher,upload_identifier) VALUES(now() at time zone 'utc', current_user,'test-etag')");
 
                 conn.Close();
             }

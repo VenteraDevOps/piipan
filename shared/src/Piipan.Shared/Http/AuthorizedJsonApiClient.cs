@@ -83,6 +83,29 @@ namespace Piipan.Shared.Http
             return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
+        public async Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path)
+        {
+            var requestMessage = await PrepareRequest(path, HttpMethod.Get);
+            var response = await Client().SendAsync(requestMessage);
+
+            try
+            {
+                response.EnsureSuccessStatusCode();
+
+                var responseContentJson = await response.Content.ReadAsStringAsync();
+
+                return (JsonConvert.DeserializeObject<TResponse>(responseContentJson), (int)response.StatusCode);
+            }
+            catch(HttpRequestException)
+            {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return (default, (int)response.StatusCode);
+                }
+                throw;
+            }
+        }
+
         private HttpClient Client()
         {
             var clientName = typeof(T).Name;

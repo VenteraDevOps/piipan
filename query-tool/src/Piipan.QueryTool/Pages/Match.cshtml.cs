@@ -1,13 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
-using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
+using Piipan.QueryTool.Client.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
+using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -16,66 +17,89 @@ namespace Piipan.QueryTool.Pages
 
         private readonly ILogger<MatchModel> _logger;
         private readonly ILdsDeidentifier _ldsDeidentifier;
-        private readonly IMatchApi _matchApi;
+        private readonly IMatchResolutionApi _matchResolutionApi;
 
-        public MatchData Match = new MatchData();
+        [BindProperty]
+        public MatchSearchRequest Query { get; set; } = new MatchSearchRequest();
 
-        List<MatchData> Matches = new List<MatchData>();
+        public MatchResApiResponse Match { get; set; } = null;
+        public List<MatchResApiResponse> AvailableMatches { get; set; } = null;
+        public List<ServerError> RequestErrors { get; private set; } = new();
 
         public MatchModel(ILogger<MatchModel> logger
                            , IClaimsProvider claimsProvider
                            , ILdsDeidentifier ldsDeidentifier
-                           , IMatchApi matchApi)
+                           , IMatchResolutionApi matchResolutionApi)
                            : base(claimsProvider)
 
         {
             _logger = logger;
             _ldsDeidentifier = ldsDeidentifier;
-            _matchApi = matchApi;
-
-            GetFakeData();
+            _matchResolutionApi = matchResolutionApi;
         }
 
-        // [HttpGet("{id}")]
-        public IActionResult OnGet(string id)
-        {   
-            
-            if(id != null) {
+        public async Task<IActionResult> OnGet([FromRoute] string id)
+        {
+            if (!string.IsNullOrWhiteSpace(id))
+            {
                 //Prevents malicious user input
                 //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                 Regex r = new Regex("^[a-zA-Z0-9]*$");
-                if (r.IsMatch(id)) {
-
-                    Match = Matches.Find(item => item.MatchId == id);
-
+                if (r.IsMatch(id))
+                {
                     //Match ID length = 7 characters
                     //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
-                    if(Match == null || id.Length != 7) {
+                    if (id.Length != 7)
+                    {
                         return RedirectToPage("Error", new { message = "MatchId not found" });
                     }
 
-                    return Page();
+                    Match = await _matchResolutionApi.GetMatch(id);
+                    if (Match == null)
+                    {
+                        return RedirectToPage("Error", new { message = "MatchId not found" });
+                    }
                 }
-                else {
+                else
+                {
                     return RedirectToPage("Error", new { message = "MatchId not valid" });
                 }
             }
-            else {
-                //TODO: Once we have the Match search, this should point to that page
-                return RedirectToPage("Error", new { message = "MatchId not valid" });
-            }
-
-
+            return Page();
         }
 
-        private void GetFakeData()
+        public async Task<IActionResult> OnPost()
         {
-            Matches.Add(new MatchData()
+            if (ModelState.IsValid)
             {
-                MatchId = "m123456",
-                Status = "Open"
-            });
+                try
+                {
+                    AvailableMatches = new List<MatchResApiResponse>();
+                    var match = await _matchResolutionApi.GetMatch(Query.MatchId);
+                    if (match != null)
+                    {
+                        AvailableMatches.Add(match);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogError(exception, exception.Message);
+                    RequestErrors.Add(new("", "There was an error running your search. Please try again."));
+                }
+            }
+            else
+            {
+                var keys = ModelState.Keys;
+                foreach (var key in keys)
+                {
+                    if (ModelState[key]?.Errors?.Count > 0)
+                    {
+                        var error = ModelState[key].Errors[0];
+                        RequestErrors.Add(new(key, error.ErrorMessage));
+                    }
+                }
+            }
+            return Page();
         }
-
     }
 }
