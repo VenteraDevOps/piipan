@@ -46,10 +46,11 @@ namespace Piipan.Participants.Core.Services
             }
         }
 
-        public async Task AddParticipants(IEnumerable<IParticipant> participants,string uploadIdentifier)
+        public async Task<BulkUploadResponse> AddParticipants(IEnumerable<IParticipant> participants,string uploadIdentifier)
         {
             // Large participant uploads can be long-running processes and require
             // an increased time out duration to avoid System.TimeoutException
+            var response = new BulkUploadResponse();
             using (TransactionScope scope = new TransactionScope(
                 TransactionScopeOption.Required,
                 TimeSpan.FromSeconds(600),
@@ -63,8 +64,10 @@ namespace Piipan.Participants.Core.Services
                 });
 
                 await _participantDao.AddParticipants(participantDbos);
+                response.Data.Results.UploadIdentifier =  uploadIdentifier;
                 scope.Complete();
             }
+            return response;
         }
 
         public async Task<IEnumerable<string>> GetStates()
