@@ -60,27 +60,30 @@ namespace Piipan.Etl.Func.BulkUpload
             [QueueTrigger("qupload", Connection = "BlobStorageConnectionString")] string myQueueItem,
             ILogger log)
         {
-            log.LogInformation("pepe");
             log.LogInformation(myQueueItem);
-
             try
             {
-                Stream input = _blobStream.Parse(myQueueItem, log);
 
-                if (input != null)
-                {
-                    var participants = _participantParser.Parse(input);
-                    // BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
-                    await _participantApi.AddParticipants(participants,  "blobProperties.ETag.ToString()");
-                }
-                else
-                {
-                    // Can get here if Function does not have
-                    // permission to access blob URL
-                    log.LogError("No input stream was provided");
-                }
-                
-     
+                    // var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+                    // var logger2 = loggerFactory.CreateLogger<BulkUpload>();
+                    var input =  _blobStream.Parse(myQueueItem, log);
+                    // logger2.LogInformation("->: " + _blobStream.Parse(myQueueItem, log));
+                    if (input != null)
+                    {
+                        var participants = _participantParser.Parse(input);
+                        // BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
+                        await _participantApi.AddParticipants(participants,  "blobProperties.ETag.ToString()");
+                        
+                        StreamReader reader = new StreamReader(input);
+                        string text = reader.ReadToEnd();
+          
+                    }
+                    else
+                    {
+                        // Can get here if Function does not have
+                        // permission to access blob URL
+                        log.LogError("No input stream was provided");
+                    }
             }
             catch (Exception ex)
             {

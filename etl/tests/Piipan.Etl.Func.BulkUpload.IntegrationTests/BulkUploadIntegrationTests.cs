@@ -47,19 +47,36 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             });
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
 
+            services.AddTransient<IBlobClientStream>(b => 
+            {
+                var factory = new Mock<IBlobClientStream>();
+                factory
+                        .Setup(m => m.Parse(
+                                        It.IsAny<string>(), //EventGridEvent string
+                                        Mock.Of<ILogger>()))
+                        .Returns(() => {
+                            return new MemoryStream(File.ReadAllBytes("example.csv"));
+                        });
+                return factory.Object;
+            });
 
-            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
 
             var blobStream = new Mock<IBlobClientStream>();
-                blobStream
-                    .Setup(m => m.Parse(It.IsAny<string>(), logger))
-                    .Returns(input);
+                blobStream.Setup(m=>m.Parse(
+                                        It.IsAny<string>(), //EventGridEvent string
+                                        logger  
+                )).Returns(new MemoryStream(File.ReadAllBytes("example.csv")));
 
-            services.AddTransient<IBlobClientStream>(b => {
-                return blobStream.Object;
-            });
-            
+            using ( Stream test = blobStream.Object.Parse("test",logger)) {
+
+                StreamReader reader2 = new StreamReader(test);
+                string text2 = reader2.ReadToEnd();
+                var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+                var logger2 = loggerFactory.CreateLogger<BulkUploadIntegrationTests>();
+                logger2.LogInformation("input2: " + text2);
+            }
+
             services.RegisterParticipantsServices();
 
             return services.BuildServiceProvider();
@@ -68,6 +85,27 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
         private BulkUpload BuildFunction()
         {
             var services = BuildServices();
+            
+            //create logger
+            // var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            // var logger2 = loggerFactory.CreateLogger<BulkUploadIntegrationTests>();
+
+            var obj = services.GetService<IBlobClientStream>();
+            var logge = Mock.Of<ILogger>();
+
+            using ( Stream test = obj.Parse("test", logge)) {
+
+                StreamReader reader2 = new StreamReader(test);
+                string text2 = reader2.ReadToEnd();
+                var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+                var logger2 = loggerFactory.CreateLogger<BulkUploadIntegrationTests>();
+                logger2.LogInformation("input2: " + text2);
+            }
+            
+            // StreamReader reader2 = new StreamReader(obj.Parse("test", logge));
+            // string text2 = reader2.ReadToEnd();
+            // logger2.LogInformation("->" + text2);
+
             return new BulkUpload(
                 services.GetService<IParticipantApi>(),
                 services.GetService<IParticipantStreamParser>(),
@@ -81,13 +119,6 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             // setup
             var services = BuildServices();
             ClearParticipants();
-            var blobClient = new Mock<BlobClient>();
-            var responseMock = new Mock<Response>();
-            blobClient
-                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
-                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-            var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
             
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
@@ -99,6 +130,10 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             );
 
             var records = QueryParticipants("SELECT * from participants;").ToList();
+
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            var logger2 = loggerFactory.CreateLogger<BulkUploadIntegrationTests>();
+            logger2.LogInformation("RECORDS: {0}", records.Count);
 
             // assert
             for (int i = 0; i < records.Count(); i++)

@@ -31,7 +31,11 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
 
-                return blob.OpenRead();
+                Stream returnStream = new System.IO.MemoryStream();
+
+                var response = blob.DownloadTo(returnStream);
+
+                return returnStream;
             }
             catch (System.Exception)
             {
