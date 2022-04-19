@@ -127,8 +127,9 @@ main () {
     siem_app_id=$(\
       az ad sp create-for-rbac \
         --name "$SIEM_RECEIVER" \
-        --role Reader \
-        --query objectId \
+        --role "Reader" \
+        --scopes "/subscriptions/${SUBSCRIPTION_ID}" \
+        --query "[0].objectId" \
         --output tsv)
 
     # Wait bit to avoid "InvalidPrincipalId" on app registration use below
