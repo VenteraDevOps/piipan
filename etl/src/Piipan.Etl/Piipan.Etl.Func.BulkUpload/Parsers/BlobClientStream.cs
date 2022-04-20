@@ -44,7 +44,30 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 log.LogError("Error parsing blob event");
                 throw;
             }
+        }
 
+        public BlobProperties BlobClientProperties(string input, ILogger log) {
+
+            try
+            {
+                //parse queue event
+                var queuedEvent = JsonConvert.DeserializeObject<EventGridEvent>(input);
+                var createdBlobEvent = JsonConvert.DeserializeObject<StorageBlobCreatedEventData>(queuedEvent.Data.ToString());
+
+                //Get blob name from the blob url
+                var blobUrl = new Uri(createdBlobEvent.Url);                 
+                string[] urlParts = blobUrl.Segments;
+                string blobName = urlParts[urlParts.Length-1];
+
+                BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
+
+                return blob.GetProperties();
+            }
+            catch (System.Exception)
+            {
+                log.LogError("Error parsing blob event");
+                throw;
+            }
         }
     }
 }

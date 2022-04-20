@@ -58,6 +58,12 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                         .Returns(() => {
                             return new MemoryStream(File.ReadAllBytes("example.csv"));
                         });
+                factory
+                    .Setup(m => m.BlobClientProperties(
+                                        It.IsAny<string>(),     //EventGridEvent string
+                                        It.IsAny<ILogger>()))
+                    .Returns(new BlobProperties());
+                        
                 return factory.Object;
             });
 

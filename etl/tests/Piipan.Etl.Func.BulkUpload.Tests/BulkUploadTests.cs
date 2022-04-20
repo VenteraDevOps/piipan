@@ -103,6 +103,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 blobStream
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
                     .Returns(ToStream("Returned data"));
+                blobStream
+                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
+                    .Returns(new BlobProperties());
 
             var function = new BulkUpload(participantApi, participantStreamParser.Object, blobStream.Object);
 
@@ -116,12 +119,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
             // Arrange
             var blobClient = new Mock<BlobClient>();
-            var responseMock = new Mock<Response>();
-            blobClient
-                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
-                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-             
-
+        
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>()))
@@ -135,6 +133,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 blobStream
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
                     .Returns(ToStream("Returned data"));
+                blobStream
+                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
+                    .Returns(new BlobProperties());
 
             var function = new BulkUpload(participantApi.Object, participantStreamParser, blobStream.Object);
 
@@ -179,6 +180,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 blobStream
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
                     .Returns(ToStream("Returned data"));
+                blobStream
+                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
+                    .Returns(new BlobProperties());
 
             var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobStream.Object);
 

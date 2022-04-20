@@ -60,12 +60,13 @@ namespace Piipan.Etl.Func.BulkUpload
             try
             {
                 var input =  _blobStream.Parse(myQueueItem, log);
+                var blobProperties = _blobStream.BlobClientProperties(myQueueItem, log);
 
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
                     // BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
-                    await _participantApi.AddParticipants(participants,  "blobProperties.ETag.ToString()");
+                    await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
                 }
                 else
                 {
