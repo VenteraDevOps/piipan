@@ -1,4 +1,5 @@
 ﻿@using Piipan.Components.Forms
+@using System.Threading
 @using static Piipan.Components.Forms.FormConstants
 @using static Piipan.Components.Shared.CommonConstants
 @inherits BaseTest<UsaInputSSN>
@@ -58,6 +59,20 @@
     }
 
     /// <summary>
+    /// SSN starts protected, but if it previously had a value we need to change it to a protected value
+    /// </summary>
+    [Fact]
+    public void Input_Protects_Value_When_Initialized()
+    {
+        // Arrange
+        model.NotRequiredField = "123-12-1234";
+        CreateTestComponent();
+
+        // Assert
+        Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
     /// Verify the label "for" attribute matches the input's ID
     /// </summary>
     [Fact]
@@ -106,7 +121,8 @@
     {
         // Arrange
         renderFragment = 
-            @<UsaInputSSN @bind-Value=model.RequiredField data-extra-param="test" />;
+    @<UsaInputSSN @bind-Value=model.RequiredField data-extra-param="test" />
+    ;
         CreateTestComponent();
 
         // Assert
@@ -288,7 +304,7 @@
         // Arrange
         CreateTestComponent();
         JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(6);
-        
+
         // Act
         inputElement!.Input("123-12-");
 
@@ -304,6 +320,7 @@
 
     /// <summary>
     /// Verify that the SSN is protected (looks like ***-**-****) if the visibility button is not clicked
+    /// This test simulates a paste, where many numbers are added at once. All should be protected
     /// </summary>
     [Fact]
     public void Input_Should_Appear_Invisible_If_Protected()
@@ -317,6 +334,93 @@
 
         // Assert
         Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
+    /// SSN is remembered in memory when it's protected visibly
+    /// </summary>
+    [Fact]
+    public void Input_Should_Remember_SSN_When_Protected()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        inputElement!.Input("1");
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(2);
+        inputElement!.Input("12");
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(3);
+        inputElement!.Input("*23");
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(4);
+        inputElement!.Input("**34");
+        form!.Find($".usa-button").Click(); // Click the view/hide button to view
+
+        // Assert
+        Assert.Equal("123-4", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
+    /// Verify that the SSN is shows the last character when only one character is typed
+    /// When pasting, none of the characters should be shown. This is covered in the Input_Should_Appear_Invisible_If_Protected test.
+    /// </summary>
+    [Fact]
+    public void Input_Should_Show_Last_Protected_Character_When_Only_One_Typed()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        inputElement!.Input("1");
+
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(2);
+        inputElement!.Input("12");
+
+        // Assert
+        Assert.Equal("*2", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
+    /// Verify that the SSN is shows the last character typed even when the character is in front
+    /// </summary>
+    [Fact]
+    public void Input_Should_Show_Last_Protected_Character_When_Only_One_Typed_Beginning()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        inputElement!.Input("2");
+
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        inputElement!.Input("12");
+
+        // Assert
+        Assert.Equal("1*", inputElement!.GetAttribute("value"));
+    }
+
+    /// <summary>
+    /// Verify that the SSN is protected (looks like ***-**-****) if the visibility button is not clicked
+    /// and the 1 second timer has elapsed
+    /// </summary>
+    [Fact]
+    public async Task Input_Should_Show__Only_Protected_Characters_After_Timer_Timout()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        inputElement!.Input("1");
+
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(2);
+        inputElement!.Input("12");
+        await Task.Delay(1100); // Wait a little longer than the timer and then verify
+
+        // Assert
+        Assert.Equal("**", inputElement!.GetAttribute("value"));
     }
 
     /// <summary>
@@ -356,6 +460,49 @@
         Assert.Equal("***-**-****", inputElement!.GetAttribute("value"));
     }
 
+    /// <summary>
+    /// Verify that the value remains when deleting a hyphen that isn't the last hyphen
+    /// </summary>
+    [Fact]
+    public void Input_Should_Rebind_When_Removing_Hyphen_That_Gets_Put_Back_In()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Act
+        form!.Find($".usa-button").Click(); // Click the view the SSN
+        inputElement!.Input("123-12-1234");
+        inputElement!.Input("123-121234");
+
+        // Assert
+        Assert.Equal("123-12-1234", inputElement!.GetAttribute("value"));
+        JSInterop.VerifyInvoke("piipan.utilities.setValue", 1);
+    }
+
+    /// <summary>
+    /// Verify that the SSN should be limited to 11 characters
+    /// </summary>
+    [Fact]
+    public void Input_Should_Be_Limited_To_11_Characters()
+    {
+        // Arrange
+        CreateTestComponent();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+
+        // Assert
+        Assert.Equal("11", inputElement!.GetAttribute("maxlength"));
+
+        // Act
+        form!.Find($".usa-button").Click(); // Click the view the SSN
+        // Try typing 10 characters. This simulates a paste
+        // After hyphens are added this would have 12 characters and the last should be removed
+        inputElement!.Input("1234567890");
+
+        // Assert
+        Assert.Equal("123-45-6789", inputElement!.GetAttribute("value"));
+    }
+
     #endregion Tests
 
     #region Helper Function
@@ -378,12 +525,13 @@
                         @renderFragment
                     }
                 </UsaFormGroup>
-            </UsaForm>
-        );
+        </UsaForm>
+    );
         form = componentFragment;
         Component = componentFragment.FindComponent<UsaInputSSN>();
         inputElement = componentFragment.Find($".{InputClass}");
         JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true);
+        JSInterop.SetupVoid("piipan.utilities.setValue", _ => true).SetVoidResult();
     }
 
     private void AssertHasNoErrors()
