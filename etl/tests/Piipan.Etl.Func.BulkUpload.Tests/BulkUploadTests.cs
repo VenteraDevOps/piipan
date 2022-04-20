@@ -31,12 +31,12 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             return stream;
         }
 
-        private EventGridEvent EventMock()
-        {
-            var e = new Mock<EventGridEvent>("", "", "", new BinaryData(string.Empty));
-            // Can't override Data in Setup, just use a real one
-            return e.Object;
-        }
+        // private EventGridEvent EventMock()
+        // {
+        //     var e = new Mock<EventGridEvent>("", "", "", new BinaryData(string.Empty));
+        //     // Can't override Data in Setup, just use a real one
+        //     return e.Object;
+        // }
 
         private void VerifyLogError(Mock<ILogger> logger, String expected)
         {
@@ -56,12 +56,32 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantApi = Mock.Of<IParticipantApi>();
             var blobProperties = Mock.Of<BlobClient>();
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
+            var blobStream = Mock.Of<IBlobClientStream>();
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi, participantStreamParser);
+            var function = new BulkUpload(participantApi, participantStreamParser, blobStream);
 
             // Act
-            await function.Run(EventMock(), null, blobProperties, logger.Object);
+            // await function.Run(null, blobProperties, logger.Object);
+            await function.Run(null, logger.Object);
 
+            // Assert
+            VerifyLogError(logger, "No input stream was provided");
+        }
+
+        [Fact]
+        public async void Run_EmptyQueue()
+        {
+            // Arrange
+            var participantApi = Mock.Of<IParticipantApi>();
+            var participantStreamParser = new Mock<IParticipantStreamParser>();
+            var blobStream = Mock.Of<IBlobClientStream>();
+            var logger = new Mock<ILogger>();
+
+            var function = new BulkUpload(participantApi, participantStreamParser.Object, blobStream);
+
+            // Act 
+            await function.Run("", logger.Object);
+            
             // Assert
             VerifyLogError(logger, "No input stream was provided");
         }
@@ -78,10 +98,16 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 .Throws(new Exception("the parser broke"));
 
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi, participantStreamParser.Object);
+
+           var blobStream = new Mock<IBlobClientStream>();
+                blobStream
+                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                    .Returns(ToStream("Returned data"));
+
+            var function = new BulkUpload(participantApi, participantStreamParser.Object, blobStream.Object);
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), ToStream("data"), blobProperties,logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run("Event Grid Event String", logger.Object));
             VerifyLogError(logger, "the parser broke");
         }
 
@@ -104,10 +130,17 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi.Object, participantStreamParser);
+
+            var blobStream = new Mock<IBlobClientStream>();
+                blobStream
+                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                    .Returns(ToStream("Returned data"));
+
+            var function = new BulkUpload(participantApi.Object, participantStreamParser, blobStream.Object);
 
             // Act / Assert
-            await Assert.ThrowsAsync<Exception>(() => function.Run(EventMock(), ToStream("data"), blobClient.Object, logger.Object));
+            await Assert.ThrowsAsync<Exception>(() => function.Run("Event Grid Event String", logger.Object));
+
             VerifyLogError(logger, "the api broke");
         }
 
@@ -141,10 +174,16 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var participantApi = new Mock<IParticipantApi>();
             var logger = new Mock<ILogger>();
-            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object);
+
+            var blobStream = new Mock<IBlobClientStream>();
+                blobStream
+                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                    .Returns(ToStream("Returned data"));
+
+            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobStream.Object);
 
             // Act
-            await function.Run(EventMock(), ToStream("data"), blobClient.Object, logger.Object);
+            await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
             participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>()), Times.Once);
