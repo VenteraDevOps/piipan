@@ -6,21 +6,17 @@ using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Linq;
-using Azure.Storage;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs.Specialized;
+
 
 namespace Piipan.Etl.Func.BulkUpload
 {
@@ -63,20 +59,16 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation(myQueueItem);
             try
             {
-
-                    // var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-                    // var logger2 = loggerFactory.CreateLogger<BulkUpload>();
                     var input =  _blobStream.Parse(myQueueItem, log);
-                    // logger2.LogInformation("->: " + _blobStream.Parse(myQueueItem, log));
+
                     if (input != null)
                     {
                         var participants = _participantParser.Parse(input);
-                        // BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
+
                         await _participantApi.AddParticipants(participants,  "blobProperties.ETag.ToString()");
                         
                         StreamReader reader = new StreamReader(input);
                         string text = reader.ReadToEnd();
-          
                     }
                     else
                     {
