@@ -120,9 +120,7 @@
     public void Input_Should_Be_Able_To_Take_Extra_Parameters()
     {
         // Arrange
-        renderFragment = 
-    @<UsaInputSSN @bind-Value=model.RequiredField data-extra-param="test" />
-    ;
+        renderFragment = @<UsaInputSSN @bind-Value=model.RequiredField data-extra-param="test" />;
         CreateTestComponent();
 
         // Assert
