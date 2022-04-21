@@ -134,6 +134,7 @@ jobs:
       - run:
           name: Upload Code Climate coverage report
           command: |
+            ./cc-test-reporter -d format-coverage ./components/tests/Piipan.Components.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.components.json
             ./cc-test-reporter -d format-coverage ./dashboard/tests/Piipan.Dashboard.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.dashboard.json
             ./cc-test-reporter -d format-coverage ./etl/tests/Piipan.Etl.Func.BulkUpload.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.etl.func.bulkupload.json
             ./cc-test-reporter -d format-coverage ./etl/tests/Piipan.Etl.Func.BulkUpload.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.etl.func.bulkupload.integration.json
