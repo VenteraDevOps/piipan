@@ -15,6 +15,8 @@ namespace Piipan.Components.Tests.Validation
         /// <param name="isValidExpected">Whether or not we expect this field to have an error after the value is entered</param>
         [Theory]
         [InlineData("Lynn", true)]
+        [InlineData("", true)]
+        [InlineData(null, true)]
         [InlineData("Garcia Sr.", true)]
         [InlineData("-&123", false)]
         [InlineData("García", false)]

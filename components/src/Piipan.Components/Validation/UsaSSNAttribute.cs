@@ -27,33 +27,27 @@ namespace Piipan.Components.Validation
             {
                 return true;
             }
-            // if we're here, our string should be ###-##-####.
-            try
+
+            // If we're here, our string will be ###-##-#### because we already checked it against the base Regex.
+            var areaNumber = int.Parse(stringValue[0..3]);
+            if (areaNumber == 0 || areaNumber == 666 || areaNumber >= 900)
             {
-                var areaNumber = int.Parse(stringValue[0..3]);
-                if (areaNumber == 0 || areaNumber == 666 || areaNumber >= 900)
-                {
-                    ErrorMessage = string.Format(ValidationConstants.SSNInvalidFirstThreeDigitsMessage, stringValue[0..3]);
-                    return false;
-                }
-                if (stringValue[4..6] == "00")
-                {
-                    ErrorMessage = ValidationConstants.SSNInvalidMiddleTwoDigitsMessage;
-                    return false;
-                }
-                if (stringValue[7..11] == "0000")
-                {
-                    ErrorMessage = ValidationConstants.SSNInvalidLastFourDigitsMessage;
-                    return false;
-                }
-            }
-            catch
-            {
-                ErrorMessage = ValidationConstants.InvalidMessage;
+                ErrorMessage = string.Format(ValidationConstants.SSNInvalidFirstThreeDigitsMessage, stringValue[0..3]);
                 return false;
             }
+            if (stringValue[4..6] == "00")
+            {
+                ErrorMessage = ValidationConstants.SSNInvalidMiddleTwoDigitsMessage;
+                return false;
+            }
+            if (stringValue[7..11] == "0000")
+            {
+                ErrorMessage = ValidationConstants.SSNInvalidLastFourDigitsMessage;
+                return false;
+            }
+
             return true;
-                
+
         }
     }
 }

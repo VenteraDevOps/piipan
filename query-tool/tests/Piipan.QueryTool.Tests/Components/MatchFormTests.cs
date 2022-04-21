@@ -1,7 +1,6 @@
 ﻿using Bunit;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
-using Piipan.Components.Tests;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Components;
 using Piipan.QueryTool.Client.Models;
@@ -13,7 +12,7 @@ using static Piipan.Components.Forms.FormConstants;
 
 namespace Piipan.QueryTool.Tests.Components
 {
-    public class MatchFormTests : BaseTest<MatchForm>
+    public class MatchFormTests : BaseComponentTest<MatchForm>
     {
         #region Tests
         IRenderedComponent<MatchForm> queryForm = null;
