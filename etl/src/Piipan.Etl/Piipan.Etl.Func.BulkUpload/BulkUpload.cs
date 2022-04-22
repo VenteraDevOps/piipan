@@ -56,13 +56,18 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation(myQueueItem);
             try
             {
-                var input =  _blobStream.Parse(myQueueItem, log);
-                var blobProperties = _blobStream.BlobClientProperties(myQueueItem, log);
+                var blobClient =  _blobStream.GetBlobClient(myQueueItem, log);
 
+                Stream input = new System.IO.MemoryStream();
+
+                //Blob content is downloaded (streamed) to the input variable
+                var downloadResponse = blob.DownloadTo(input);
+
+                var blobProperties = blob.GetProperties();
+            
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
-                    // BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
                     await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
                 }
                 else

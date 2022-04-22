@@ -12,5 +12,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
         Stream Parse(string input, ILogger log);
 
         BlobProperties BlobClientProperties(string input, ILogger log);
+
+        BlockBlobClient GetBlobClient(string input, ILogger log);
     }
 }
