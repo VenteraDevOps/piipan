@@ -1,20 +1,27 @@
-﻿@page
+﻿@page "{id?}"
+@using Microsoft.AspNetCore.Antiforgery
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Models
+@inject IAntiforgery antiforgery
 @model Piipan.QueryTool.Pages.MatchModel
 @{
     ViewData["Title"] = "NAC Participant Search";
 }
 
-<div class="grid-container">
-
-    <!-- Match header -->
-    <div class="grid-row">
-        <h3><span class="usa-tag bg-mint">@Model.Match.Status</span> Match ID: @Model.Match.MatchId</h3>
+@if (Model.Match != null)
+{
+    <div class="grid-container">
+        <component type="typeof(QueryTool.Client.Components.MatchDetail)" render-mode="WebAssembly"
+            param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)" />
     </div>
-    <!-- \match header -->
-
-    
-
+}
+else
+{
+    <div class="grid-container">
+        <component type="typeof(QueryTool.Client.Components.MatchForm)" render-mode="WebAssembly"
+            param-Query="Model.Query"
+            param-QueryResult="ParameterBase<List<MatchResApiResponse>>.FromObject(Model.AvailableMatches)" 
+            param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
+            param-ServerErrors="Model.RequestErrors" />
     </div>
-    <!-- \match content -->
-
-</div> 
+}

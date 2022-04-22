@@ -26,14 +26,14 @@ Base URLs:
 
 ```shell
 # You can also use wget
-curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
+curl -X PUT /bulk/{stateAbbr}/v2/upload_all_participants/{filename} \
   -H 'Content-Type: text/plain' \
   -H 'Content-Length: 6413' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
 
-`PUT /upload/{filename}`
+`PUT /upload_all_participants/{filename}`
 
 *Upload a CSV file of bulk participant data*
 
@@ -52,6 +52,52 @@ string
 |Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
 
 <h3 id="upload-a-file-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|File uploaded|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
+|411|[Length Required](https://tools.ietf.org/html/rfc7231#section-6.5.10)|Content-Length not provided|None|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+ApiKeyAuth
+</aside>
+
+## Upload a File (deprecated)
+
+<a id="opIdUpload a File (deprecated)"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
+  -H 'Content-Type: text/plain' \
+  -H 'Content-Length: 6413' \
+  -H 'Ocp-Apim-Subscription-Key: API_KEY'
+
+```
+
+`PUT /upload/{filename}`
+
+*Deprecated. This endpoint has been renamed to `upload_all_participants` and will be removed in a future version. Upload a CSV file of bulk participant data.*
+
+> Body parameter
+
+```
+string
+
+```
+
+<h3 id="upload-a-file-(deprecated)-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|filename|path|string|true|Name of file being uploaded|
+|Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
+
+<h3 id="upload-a-file-(deprecated)-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|

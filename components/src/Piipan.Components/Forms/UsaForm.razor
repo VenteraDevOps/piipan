@@ -4,8 +4,12 @@
 @code {
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public object Model { get; set; }
-    [Parameter] public Func<bool, Task> OnSubmit { get; set; }
-    [Parameter] public List<string> InitialErrors { get; set; }
+    [Parameter] public Func<bool, Task> OnBeforeSubmit { get; set; }
+    [Parameter] public Func<Task> OnSubmit { get; set; }
+    [Parameter] public List<(string Property, string Error)> InitialErrors { get; set; }
+
+    [Parameter] public string WrapperClass { get; set; } 
+
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
@@ -14,7 +18,7 @@
 }
 
 <CascadingValue Value="this">
-    @if (ShowAlertBox && HasErrors)
+    @if (showAlertBox && HasErrors)
     {
         <UsaAlertBox Header="Errors" id="@($"{Id}-alert")">
             <ul>
@@ -47,11 +51,12 @@
             </ul>
         </UsaAlertBox>
     }
-    
-    <EditForm id="@Id" EditContext="editContext" class="@FormClass" @attributes="AdditionalAttributes" novalidate>
-        <DataAnnotationsValidator />
-        <fieldset class="@FieldsetClass">
-            @ChildContent
-        </fieldset>
-    </EditForm>
+    <div class="@FormClass @WrapperClass">
+        <EditForm id="@Id" EditContext="editContext" @attributes="AdditionalAttributes" OnSubmit="OnSubmit" novalidate>
+            <DataAnnotationsValidator />
+            <fieldset class="@FieldsetClass">
+                @ChildContent
+            </fieldset>
+        </EditForm>
+    </div>
 </CascadingValue>

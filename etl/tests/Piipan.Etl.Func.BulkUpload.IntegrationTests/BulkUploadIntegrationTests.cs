@@ -4,8 +4,12 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using Azure;
+using Azure.Messaging.EventGrid;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Dapper;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -14,8 +18,8 @@ using Piipan.Participants.Api;
 using Piipan.Participants.Core;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Database;
-using Piipan.Shared.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
@@ -62,16 +66,20 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             // setup
             var services = BuildServices();
             ClearParticipants();
-            var eventGridEvent = Mock.Of<EventGridEvent>();
-            eventGridEvent.Data = new Object();
+            var blobClient = new Mock<BlobClient>();
+            var responseMock = new Mock<Response>();
+            blobClient
+                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
+                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+            var eventGridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(String.Empty));
             var input = new MemoryStream(File.ReadAllBytes("example.csv"));
             var logger = Mock.Of<ILogger>();
             var function = BuildFunction();
 
             // act
             await function.Run(
-                eventGridEvent,
-                input,
+                eventGridEvent.Object,
+                input, blobClient.Object,
                 logger
             );
 
@@ -88,7 +96,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             Assert.Equal(new DateRange(new DateTime(2021, 04, 01) , new DateTime(2021, 04, 15)), records.First().RecentBenefitIssuanceDates.First());
             Assert.Equal(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30)), records.First().RecentBenefitIssuanceDates.ElementAt(1));
             Assert.Equal(new DateRange(new DateTime(2021, 02, 01), new DateTime(2021, 02, 28)), records.First().RecentBenefitIssuanceDates.ElementAt(2));
-            Assert.True(records.First().ProtectLocation);
+            Assert.True(records.First().VulnerableIndividual);
         }
     }
 }

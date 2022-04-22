@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
+using NodaTime;
+using Npgsql;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
-using Piipan.Shared.Utilities;
+using PostgreSQLCopyHelper;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -39,7 +39,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                         case_id CaseId,
                         participant_closing_date ParticipantClosingDate,
                         recent_benefit_issuance_dates RecentBenefitIssuanceDates,
-                        protect_location ProtectLocation,
+                        vulnerable_individual VulnerableIndividual,
                         upload_id UploadId
                     FROM participants
                     WHERE lds_hash=@ldsHash
@@ -55,45 +55,37 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
         public async Task AddParticipants(IEnumerable<ParticipantDbo> participants)
         {
-            const string sql = @"
-                INSERT INTO participants
-                (
-                    lds_hash,
-                    upload_id,
-                    case_id,
-                    participant_id,
-                    participant_closing_date,
-                    recent_benefit_issuance_dates,
-                    protect_location
-                )
-                VALUES
-                (
-                    @LdsHash,
-                    @UploadId,
-                    @CaseId,
-                    @ParticipantId,
-                    @ParticipantClosingDate,
-                    @RecentBenefitIssuanceDates::daterange[],
-                    @ProtectLocation
-                )
-            ";
-
-            using (var connection = await _dbConnectionFactory.Build() as DbConnection)
+            using (var connection = await _dbConnectionFactory.Build() as NpgsqlConnection)
             {
-                // A performance optimization. Dapper will open/close around invidual
-                // calls if it is passed a closed connection. 
                 await connection.OpenAsync();
+
+                // Use NodaTime as a convenience to handle converting DateInterval[]
+                // to a valid daterange[] input format
+                connection.TypeMapper.UseNodaTime();
 
                 try
                 {
-                    foreach (var participant in participants)
-                    {
-                        _logger.LogDebug(
-                            $"Adding participant for upload {participant.UploadId} with LDS Hash: {participant.LdsHash}");
-                        await connection.ExecuteAsync(sql, participant);
-                    }
+                    var copyHelper = new PostgreSQLCopyHelper<ParticipantDbo>("participants")
+                        .MapText("lds_hash", p => p.LdsHash)
+                        .MapText("participant_id", p => p.ParticipantId)
+                        .MapText("case_id", p => p.CaseId)
+                        .MapInteger("upload_id", p => (int)p.UploadId)
+                        .MapDate("participant_closing_date", p => p.ParticipantClosingDate)
+                        .Map("recent_benefit_issuance_dates", p =>
+                            p.RecentBenefitIssuanceDates.Select(range =>
+                                new DateInterval(
+                                    LocalDate.FromDateTime(range.Start),
+                                    LocalDate.FromDateTime(range.End)
+                                )
+                            ).ToArray<DateInterval>()
+                        )
+                        .MapBoolean("vulnerable_individual", p => p.VulnerableIndividual);
+
+                    _logger.LogDebug("Bulk inserting participant upload");
+                    var result = await copyHelper.SaveAllAsync(connection, participants);
+                    _logger.LogDebug("Completed bulk insert of {0} participant records", result);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, ex.Message);
                     throw;

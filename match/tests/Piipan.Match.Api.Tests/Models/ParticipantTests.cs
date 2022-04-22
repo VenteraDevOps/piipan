@@ -11,7 +11,7 @@ namespace Piipan.Match.Api.Tests.Models
         {
             // Arrange
             var json = @"{participant_id: 'baz', case_id: 'foo', participant_closing_date: '2020-01-12', recent_benefit_issuance_dates: [{Start: '2021-04-01', End: '2021-04-16' }, { Start: '2021-03-01', End: '2021-03-31' }, { Start: '2021-02-01', End: '2021-03-01' } 
-], protect_location: true}";
+], vulnerable_individual: true}";
             var record = JsonConvert.DeserializeObject<ParticipantMatch>(json);
 
             string jsonRecord = record.ToJson();
@@ -27,7 +27,7 @@ namespace Piipan.Match.Api.Tests.Models
             Assert.Contains("\"end\": \"2021-04-16\"", jsonRecord);
             Assert.Contains("\"end\": \"2021-03-31\"", jsonRecord);
             Assert.Contains("\"end\": \"2021-03-01\"", jsonRecord);
-            Assert.Contains("\"protect_location\": true", jsonRecord);
+            Assert.Contains("\"vulnerable_individual\": true", jsonRecord);
         }
     }
 }

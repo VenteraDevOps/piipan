@@ -1,6 +1,3 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,14 +6,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
-using Piipan.Match.Api;
 using Piipan.Match.Client.Extensions;
 using Piipan.QueryTool.Binders;
-using Piipan.Shared.Authentication;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using Piipan.Shared.Logging;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Piipan.QueryTool
 {
@@ -37,7 +34,8 @@ namespace Piipan.QueryTool
         {
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
-            services.Configure<ForwardedHeadersOptions>(options => {
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
                 options.ForwardedHeaders =
                     ForwardedHeaders.XForwardedHost | ForwardedHeaders.XForwardedProto;
             });
@@ -51,6 +49,8 @@ namespace Piipan.QueryTool
                 options.ModelBinderProviders.Insert(0, new TrimModelBinderProvider());
             });
 
+            services.AddHttpClient();
+
             services.AddHsts(options =>
             {
                 options.Preload = true; //Sets the preload parameter of the Strict-Transport-Security header. Preload isn't part of the RFC HSTS specification, but is supported by web browsers to preload HSTS sites on fresh install. For more information, see https://hstspreload.org
@@ -59,7 +59,7 @@ namespace Piipan.QueryTool
             });
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
-            
+
             services.AddSingleton<INameNormalizer, NameNormalizer>();
             services.AddSingleton<IDobNormalizer, DobNormalizer>();
             services.AddSingleton<ISsnNormalizer, SsnNormalizer>();
@@ -72,13 +72,15 @@ namespace Piipan.QueryTool
             services.AddDistributedMemoryCache();
             services.AddSession();
 
-            services.AddAuthorizationCore(options => {
+            services.AddAuthorizationCore(options =>
+            {
                 options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
                     .GetSection(AuthorizationPolicyOptions.SectionName)
                     .Get<AuthorizationPolicyOptions>());
             });
 
             services.RegisterMatchClientServices(_env);
+            services.RegisterMatchResolutionClientServices(_env);
 
             if (_env.IsDevelopment())
             {
@@ -86,7 +88,8 @@ namespace Piipan.QueryTool
                 services.UseJsonFileToMockEasyAuth(mockFile);
             }
 
-            services.AddAntiforgery(options => {
+            services.AddAntiforgery(options =>
+            {
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
         }
@@ -107,6 +110,28 @@ namespace Piipan.QueryTool
             }
 
             app.UseHttpsRedirection();
+            app.UseBlazorFrameworkFiles();
+
+            //Perform middleware for custom 404 page
+            app.Use(async (context, next) =>
+            {
+                try
+                {
+                    await next();
+                    if (context.Response.StatusCode == 404 || context.Response.StatusCode == 500)
+                    {
+                        context.Request.Path = "/Error";
+                        context.Response.StatusCode = 200;
+                        await next();
+                    }
+                }
+                catch
+                {
+                    context.Request.Path = "/Error";
+                    context.Response.StatusCode = 200;
+                    await next();
+                }
+            });
             app.UseStaticFiles();
 
             app.UseAuthentication();
@@ -122,6 +147,8 @@ namespace Piipan.QueryTool
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
+                endpoints.MapFallbackToPage("/Error");
             });
 
             app.Use(async (context, next) =>

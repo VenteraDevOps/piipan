@@ -263,8 +263,11 @@ main () {
   # Name of application roles authorized to call match APIs
   ORCH_API_APP_ROLE='OrchestratorApi.Query'
   METRICS_API_APP_ROLE='Metrics.Read'
+  MATCH_RESOLUTION_API_APP_ROLE='MatchResolution.Query'
 
   orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
+
+  match_resolution_name=$(get_resources "$MATCH_RES_API_TAG" "$MATCH_RESOURCE_GROUP")
 
   query_tool_name=$(get_resources "$QUERY_APP_TAG" "$RESOURCE_GROUP")
 
@@ -312,6 +315,12 @@ main () {
     "$metrics_api_name" "$RESOURCE_GROUP" \
     "$METRICS_API_APP_ROLE" \
     "$dashboard_identity"
+
+  echo "Configure Easy Auth for MatchResolutionApi and QueryApp"
+  configure_easy_auth_pair \
+    "$match_resolution_name" "$MATCH_RESOURCE_GROUP" \
+    "$MATCH_RESOLUTION_API_APP_ROLE" \
+    "$query_tool_identity"
 
   script_completed
 }

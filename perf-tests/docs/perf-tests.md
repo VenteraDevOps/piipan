@@ -1,5 +1,5 @@
 ## Prerequisites
-- [.NET Core SDK 3.1](https://dotnet.microsoft.com/download)
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
 
 ## Summary
 

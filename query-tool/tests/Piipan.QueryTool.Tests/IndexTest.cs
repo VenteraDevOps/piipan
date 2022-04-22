@@ -1,16 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
+using Piipan.QueryTool.Client.Models;
 using Piipan.QueryTool.Pages;
+using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
-using Piipan.Shared.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -81,6 +82,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
+
             pageModel.OnGet();
 
             // assert
@@ -120,7 +122,7 @@ namespace Piipan.QueryTool.Tests
                                             new DateRange(new DateTime(2021, 6, 1),new DateTime(2021, 7, 1)),
                                             new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                                         },
-                                        ProtectLocation = false
+                                        VulnerableIndividual = false
                                     }
                                 }
                             }
@@ -131,7 +133,6 @@ namespace Piipan.QueryTool.Tests
 
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
                 LastName = "Farrington",
                 SocialSecurityNum = "987-65-4320",
                 DateOfBirth = new DateTime(1931, 10, 13)
@@ -185,7 +186,6 @@ namespace Piipan.QueryTool.Tests
 
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
@@ -218,8 +218,6 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
-                MiddleName = "Carri",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
@@ -244,8 +242,9 @@ namespace Piipan.QueryTool.Tests
             await pageModel.OnPostAsync();
 
             // assert
-            Assert.NotNull(pageModel.RequestError);
-            Assert.Equal("There was an error running your search. Please try again.", pageModel.RequestError);
+            Assert.NotNull(pageModel.RequestErrors);
+            Assert.Equal(new List<ServerError> {
+                new ServerError("", "There was an error running your search. Please try again.") }, pageModel.RequestErrors);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
@@ -258,8 +257,6 @@ namespace Piipan.QueryTool.Tests
             // Arrange
             var requestPii = new PiiRecord
             {
-                FirstName = "Theodore",
-                MiddleName = "Carri",
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
@@ -274,7 +271,7 @@ namespace Piipan.QueryTool.Tests
 
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
-                mockClaimsProvider,     
+                mockClaimsProvider,
                 mockLdsDeidentifier.Object,
                 mockMatchApi
             );
@@ -285,8 +282,9 @@ namespace Piipan.QueryTool.Tests
             await pageModel.OnPostAsync();
 
             // Assert
-            Assert.NotNull(pageModel.RequestError);
-            Assert.Equal(expectedErrorMessage, pageModel.RequestError);
+            Assert.NotNull(pageModel.RequestErrors);
+            Assert.Equal(new List<ServerError> {
+                new ServerError("", expectedErrorMessage) }, pageModel.RequestErrors);
         }
     }
 }

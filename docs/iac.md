@@ -2,9 +2,9 @@
 
 ## Prerequisites
 
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.30.0
-- [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download)
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.32.0
+- [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) >= 4.x
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
 - `psql` client for PostgreSQL – included in Azure Cloud Shell
 - [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during the build of ASP.NET Core web applications
@@ -78,8 +78,8 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
 9. Time to test your infrastructure
     ```
     #Test ETL
-    ./etl/tools/test-apim-upload-api.bash tts/dev
-    
+    ./etl/tools/test-apim-upload-api.bash tts/dev ea
+    ./etl/tools/test-apim-upload-api.bash tts/dev eb
     #Test Match
     ./match/tools/test-apim-match-api.bash tts/dev
     
@@ -110,6 +110,8 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
 | `OrchApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Orchestrator API's Azure Active Directory application object | Piipan.QueryTool |
+| `MatchResApiUri` | URI for the Match Resolution API endpoint. | Piipan.QueryTool |
+| `MatchResAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Match Resolution API's Azure Active Directory application object | Piipan.QueryTool |
 | `States` | Comma-separated list of the lower-case two letter abbreviations for each participating state. | Piipan.Match.Orchestrator |
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 | `MetricsApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Metrics API's Azure Active Directory application object | Piipan.Dashboard |

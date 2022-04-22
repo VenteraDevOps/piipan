@@ -3,6 +3,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1.38] - 2022-04-19
+
+### Changed
+- Updated codebase to .Net 6
+- Introduced Match Record Search page that utilizes Match Resolution API for retrieving match information
+- Updated Bulk Upload to utilize Postgres COPY for bulk inserting participant records
+- Renamed "Bulk Upload" API to just "Bulk" API
+- Changed protect_location to vulnerable_individual in Bulk Upload and Duplicate Participation APIs
+- Updated code to use inclusive bounding for both upper & lower bounds when setting db values
+- Increased storage (and IOPS) of participant records database
+- Adjusted database connection string settings to allow long-running database transactions
+### Added
+- Added ADR for using Postgres COPY functionality for bulk uploads
+- Added ADR for using Blazor Web Assembly
+- Added ADR for Blazor Component Library
+- New lightweight shared API project for common functionality used by Web apps 
+- New shared crytography library that uses Azure Key Vault keys for encrypting/decrypting strings
+- New pa11y tests for Query Tool app
+- Added search_reason as a required field for Duplicate Participation API requests
+- Added vulnerable_individual as an optional parameter to Duplicate Participation API
+- Duplicate Participation Api now returns match_url as a link that will contain match details
+- Introduced Npgsql.NodaTime plugin to handle setting the proper value for recent_benefit_issuance_dates field
+- Added functionality to Bulk Upload to generate & persist unique upload ids
+### Fixed
+- Fixed documentation for upload_all_participants endpoint
+- Fixed configure-defender-and-policy.bash script permissions to allow for execution on Unix based systems.
+
 ## [1.0.1.37] - 2022-04-05
 
 ### Changed

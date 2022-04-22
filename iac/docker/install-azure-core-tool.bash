@@ -13,4 +13,4 @@ sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubu
 apt-get update
 
 #step4
-apt-get install azure-functions-core-tools-3=3.0.3477-1
+apt-get install azure-functions-core-tools-4=4.0.3971-1

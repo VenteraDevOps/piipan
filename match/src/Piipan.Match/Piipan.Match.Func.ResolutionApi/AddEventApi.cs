@@ -48,7 +48,7 @@ namespace Piipan.Match.Func.ResolutionApi
 
             [FunctionName("AddEvent")]
             public async Task<IActionResult> AddEvent(
-                [HttpTrigger(AuthorizationLevel.Function, "patch", Route = "matches/{matchId}/disposition")] HttpRequest req,
+                [HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "matches/{matchId}/disposition")] HttpRequest req,
                 string matchId,
                 ILogger logger)
             {

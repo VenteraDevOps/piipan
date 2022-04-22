@@ -1,13 +1,9 @@
+using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Shared.API.Utilities;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using Piipan.Etl.Func.BulkUpload.Parsers;
 using Xunit;
-using Moq;
-using Piipan.Etl.Func.BulkUpload.Models;
-using Piipan.Shared.Utilities;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 {
@@ -21,7 +17,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             var writer = new StreamWriter(stream);
             if (isLegacy)
             {
-                writer.WriteLine("lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_issuance_dates,protect_location");
+                writer.WriteLine("lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_issuance_dates,vulnerable_individual");
             }
             else
             {
@@ -33,7 +29,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
                     }
                     else
                     {
-                        writer.WriteLine("lds_hash,case_id,participant_id,participant_closing_date,recent_benefit_issuance_dates,protect_location");
+                        writer.WriteLine("lds_hash,case_id,participant_id,participant_closing_date,recent_benefit_issuance_dates,vulnerable_individual");
                     }
                 }
             }
@@ -67,7 +63,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Single(records, r => r.ParticipantClosingDate == new DateTime(2020, 10, 10));
             DateRange dateRange = records.First().RecentBenefitIssuanceDates.First();
             Assert.Equal(dateRange, new DateRange(new DateTime(2021, 05, 01), new DateTime(2021, 05, 02)));
-            Assert.Single(records, r => r.ProtectLocation == true);
+            Assert.Single(records, r => r.VulnerableIndividual == true);
         }
 
         [Fact]
@@ -86,7 +82,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Single(records);
             Assert.Null(records.First().ParticipantClosingDate);
             Assert.Empty(records.First().RecentBenefitIssuanceDates);
-            Assert.Null(records.First().ProtectLocation);
+            Assert.Null(records.First().VulnerableIndividual);
         }
 
         [Theory]
@@ -172,7 +168,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Equal("CaseId", records.First().CaseId);
             Assert.Equal("ParticipantId", records.First().ParticipantId);
             Assert.Null(records.First().ParticipantClosingDate);
-            Assert.Null(records.First().ProtectLocation);
+            Assert.Null(records.First().VulnerableIndividual);
             Assert.Empty(records.First().RecentBenefitIssuanceDates);
         }
 
@@ -217,7 +213,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Equal("CaseId", records.First().CaseId);
             Assert.Equal("ParticipantId", records.First().ParticipantId);
             Assert.Null(records.First().ParticipantClosingDate);
-            Assert.Null(records.First().ProtectLocation);
+            Assert.Null(records.First().VulnerableIndividual);
             Assert.Empty(records.First().RecentBenefitIssuanceDates);
         }
         

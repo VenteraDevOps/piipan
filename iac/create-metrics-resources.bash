@@ -64,7 +64,7 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
     --runtime dotnet \
-    --functions-version 3 \
+    --functions-version 4 \
     --name "$METRICS_COLLECT_APP_NAME" \
     --storage-account "$COLLECT_STORAGE_NAME" \
     --assign-identity "[system]" \
@@ -190,7 +190,7 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
     --runtime dotnet \
-    --functions-version 3 \
+    --functions-version 4 \
     --name "$METRICS_API_APP_NAME" \
     --storage-account "$API_APP_STORAGE_NAME" \
     --assign-identity "[system]" \
@@ -315,7 +315,7 @@ main () {
       -g "$RESOURCE_GROUP" \
       --query id \
       -o tsv)
-  az functionapp vnet-integration add \
+  az webapp vnet-integration add \
     --name "$DASHBOARD_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$WEBAPP_SUBNET_NAME" \

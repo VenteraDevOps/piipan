@@ -15,6 +15,7 @@ using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
 using Piipan.Match.Func.ResolutionApi.Models;
 using Newtonsoft.Json;
+using Piipan.Match.Api.Models.Resolution;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 {
@@ -99,7 +100,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // insert into database
             var match = new MatchRecordDbo() {
                 CreatedAt = DateTime.UtcNow,
-                Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"ProtectLocation\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
+                Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
                 Hash = "foo",
                 HashType = "ldshash",
                 Initiator = "ea",
@@ -116,7 +117,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // Assert
             Assert.Equal(200, response.StatusCode);
             // Assert Participant Data
-            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"protect_location\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"protect_location\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
+            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
             Assert.Equal(expected, resString);
         }
         // When match res events are added, GetMatch response should update accordingly
@@ -150,7 +151,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 
             // Assert first request
             Assert.Equal(200, response.StatusCode);
-            var resBody = response.Value as ApiResponse;
+            var resBody = response.Value as MatchResApiResponse;
             Assert.False(resBody.Data.Dispositions[0].InvalidMatch);
 
             // Act again
@@ -165,7 +166,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var nextResponse = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as JsonResult;
 
             // Assert next request
-            var nextResBody = nextResponse.Value as ApiResponse;
+            var nextResBody = nextResponse.Value as MatchResApiResponse;
             Assert.Equal(200, nextResponse.StatusCode);
             // now this disposition's invalid flag should be true
             Assert.True(nextResBody.Data.Dispositions[0].InvalidMatch);

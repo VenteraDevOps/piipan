@@ -20,7 +20,7 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Match.Func.Api.Models;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests
@@ -38,7 +38,7 @@ namespace Piipan.Match.Func.Api.Tests
                   new DateRange(new DateTime(2021, 4, 30) , new DateTime(2021,5,1)),
                   new DateRange(new DateTime(2021, 3, 31) , new DateTime(2021,5,15))
                 },
-                ProtectLocation = true
+                VulnerableIndividual = true
             };
         }
 

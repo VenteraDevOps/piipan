@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Moq;
 using Piipan.Participants.Api.Models;
 using Piipan.QueryTool.Extensions;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 #nullable enable
@@ -104,16 +104,16 @@ namespace Piipan.QueryTool.Tests.Extensions
         [InlineData(null, "Yes")]
         [InlineData(true, "Yes")]
         [InlineData(false, "No")]
-        public void ProtectLocationDisplay(bool? protectLocation, string expected)
+        public void VulnerableIndividualDisplay(bool? VulnerableIndividual, string expected)
         {
             // Arrange
             var participant = new Mock<IParticipant>();
             participant
-                .Setup(m => m.ProtectLocation)
-                .Returns(protectLocation);
+                .Setup(m => m.VulnerableIndividual)
+                .Returns(VulnerableIndividual);
 
             // Act
-            var result = participant.Object.ProtectLocationDisplay();
+            var result = participant.Object.VulnerableIndividualDisplay();
 
             // Assert
             Assert.Equal(expected, result);

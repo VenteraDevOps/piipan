@@ -1,11 +1,11 @@
 using Piipan.Metrics.Func.Collect;
 using Xunit;
 using Moq;
-using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Piipan.Metrics.Api;
 using System;
 using System.Threading.Tasks;
+using Azure.Messaging.EventGrid;
 
 namespace Piipan.Metrics.Func.Collect.Tests
 {
@@ -13,10 +13,9 @@ namespace Piipan.Metrics.Func.Collect.Tests
     {
         private EventGridEvent MockEvent(string url, DateTime eventTime)
         {
-            var gridEvent = Mock.Of<EventGridEvent>();
-            gridEvent.Data = new { url = url };
-            gridEvent.EventTime = eventTime;
-            return gridEvent;
+            var gridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(new { url = url }));
+            gridEvent.Object.EventTime = eventTime;
+            return gridEvent.Object;
         }
 
         [Fact]

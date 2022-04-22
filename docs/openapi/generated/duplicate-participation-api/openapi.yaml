@@ -36,6 +36,7 @@ paths:
                     type: object
                     required:
                       - lds_hash
+                      - search_reason
                     properties:
                       lds_hash:
                         type: string
@@ -47,12 +48,22 @@ paths:
                       case_id:
                         type: string
                         description: Participant's state-specific case number
+                      search_reason:
+                        type: string
+                        description: 'The case action or other valid reason for performing the NAC search.  Valid options are ''application'', ''recertification'', ''new_household_member'', or ''other'''
+                      vulnerable_individual:
+                        type: boolean
+                        description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
             examples:
               Single person:
                 description: 'An example request to query a single person, with values for all fields'
                 value:
                   data:
                     - lds_hash: eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458
+                      case_id: CaseNumber12345
+                      participant_id: ParticipantId12345
+                      search_reason: application
+                      vulnerable_individual: true
               Multiple persons:
                 description: A request with multiple persons
                 value:
@@ -97,6 +108,7 @@ paths:
                                   - participant_id
                                   - case_id
                                   - match_id
+                                  - match_url
                                 properties:
                                   match_id:
                                     type: string
@@ -134,11 +146,14 @@ paths:
                                           format: date
                                           pattern: '^\d{4}-\d{2}-\d{2}$'
                                           description: end date for date range
-                                  protect_location:
+                                  vulnerable_individual:
                                     type: boolean
                                     nullable: true
                                     example: true
                                     description: Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.
+                                  match_url:
+                                    type: string
+                                    description: URL to visit to view details about this match.
                       errors:
                         type: array
                         description: 'Array of error objects corresponding to a person in the request. If a query for a single person fails, the failure data will display here. Note that a single person in a request could have multiple error items.'
@@ -200,7 +215,8 @@ paths:
                                   end: '2021-04-30'
                                 - start: '2021-03-01'
                                   end: '2021-03-31'
-                              protect_location: true
+                              vulnerable_individual: true
+                              match_url: 'https://nac.example/match/BCD2345'
                       errors: []
                 No matches:
                   description: A query for a single person returning no matches
@@ -229,13 +245,15 @@ paths:
                                   end: '2021-04-30'
                                 - start: '2021-03-01'
                                   end: '2021-03-31'
-                              protect_location: true
+                              vulnerable_individual: true
+                              match_url: 'https://nac.example/match/XYZ9876'
                             - match_id: 4567CDF
                               state: ec
                               case_id: string
                               participant_id: string
                               participant_closing_date: null
-                              protect_location: null
+                              vulnerable_individual: null
+                              match_url: 'https://nac.example/match/4567CDF'
                       errors: []
                 Multiple persons with matches:
                   description: A query for two persons returning one match for each person

@@ -1,13 +1,10 @@
+using Dapper;
+using Npgsql;
+using Piipan.Etl.Func.BulkUpload.Models;
+using Piipan.Participants.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Piipan.Etl.Func.BulkUpload.Models;
-using Npgsql;
-using Piipan.Participants.Api.Models;
-using Piipan.Shared.Utilities;
-using NpgsqlTypes;
-using System.Linq;
-using Dapper;
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
@@ -25,6 +22,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
         {
             ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
             Factory = NpgsqlFactory.Instance;
+
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
             Initialize();
             ApplySchema();
@@ -127,37 +126,16 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 
         public IEnumerable<IParticipant> QueryParticipants(string sql)
         {
-            var records = new List<IParticipant>();
+            IEnumerable<IParticipant> records;
 
             using (var conn = Factory.CreateConnection())
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-
-
-                using (var cmd = Factory.CreateCommand())
-                {
-
-                    cmd.Connection = conn;
-                    cmd.CommandText = sql;
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        var record = new Participant
-                        {
-                            LdsHash = reader[1].ToString(),
-                            CaseId = reader[3].ToString(),
-                            ParticipantId = reader[4].ToString(),
-                            ParticipantClosingDate = reader[5] is DBNull ? (DateTime?)null : Convert.ToDateTime(reader[5]),
-                            RecentBenefitIssuanceDates = reader[reader.GetOrdinal("recent_benefit_issuance_dates")] is DBNull ? new List<DateRange>() : ((NpgsqlRange<DateTime>[])reader[reader.GetOrdinal("recent_benefit_issuance_dates")]).Select(user => new DateRange() { Start = user.LowerBound, End = user.UpperBound }).ToList(),
-                            ProtectLocation = reader[reader.GetOrdinal("protect_location")] is DBNull ? (Boolean?)null : Convert.ToBoolean(reader[reader.GetOrdinal("protect_location")])
-                        };
-                        records.Add(record);
-                    }
-
-                    conn.Close();
-                }
+                records = conn.Query<Participant>(sql);
+                conn.Close();
             }
+
             return records;
         }
     }

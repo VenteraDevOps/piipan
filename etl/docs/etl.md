@@ -2,7 +2,7 @@
 
 ## Prerequisites
 - [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-- [.NET Core SDK 3.1](https://dotnet.microsoft.com/download)
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 
 ## Summary
@@ -43,8 +43,8 @@ func azure functionapp publish <function-app-name> --dotnet
 
 ## Ad-hoc testing
 
-In a development environment, the `test-apim-upload-api.bash` tool can be used to upload test CSV files to a storage account. The state, APIM subscription, and CSV file information can be controlled by adjusting the variables at the top of the script. Usage:
+In a development environment, the `test-apim-upload-api.bash` tool can be used to upload test CSV files to a storage account. APIM subscription, and CSV file information can be controlled by adjusting the variables at the top of the script.  Pass the environment and state to the script. Usage:
 
 ```
-./tools/test-apim-upload-api.bash tts/dev
+./tools/test-apim-upload-api.bash tts/dev EA
 ```

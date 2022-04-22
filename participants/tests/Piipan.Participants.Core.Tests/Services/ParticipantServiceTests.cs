@@ -8,7 +8,7 @@ using Moq;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Piipan.Shared.Utilities;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Participants.Core.Tests.Services
 {
@@ -27,7 +27,7 @@ namespace Piipan.Participants.Core.Tests.Services
                     ParticipantId = Guid.NewGuid().ToString(),
                     ParticipantClosingDate = DateTime.UtcNow.Date,
                     RecentBenefitIssuanceDates = new List<DateRange>(),
-                    ProtectLocation = (new Random()).Next(2) == 0,
+                    VulnerableIndividual = (new Random()).Next(2) == 0,
                     UploadId = (new Random()).Next()
                 });
             }
@@ -164,7 +164,7 @@ namespace Piipan.Participants.Core.Tests.Services
             var participantDao = new Mock<IParticipantDao>();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
-                .Setup(m => m.AddUpload())
+                .Setup(m => m.AddUpload("test-etag"))
                 .ReturnsAsync(new UploadDbo
                 {
                     Id = uploadId,
@@ -181,12 +181,12 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger);
 
             // Act
-            await service.AddParticipants(participants);
+            await service.AddParticipants(participants, "test-etag");
 
             // Assert
             
             // we should add a new upload for this batch
-            uploadDao.Verify(m => m.AddUpload(), Times.Once);
+            uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
 
             // each participant added via the DAO should have the created upload ID
             participantDao
