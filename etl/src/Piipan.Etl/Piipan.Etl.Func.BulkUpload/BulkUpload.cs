@@ -51,9 +51,6 @@ namespace Piipan.Etl.Func.BulkUpload
         [FunctionName("BulkUpload")]
         public async Task Run(
             [QueueTrigger("qupload", Connection = "BlobStorageConnectionString")] string myQueueItem,
-            // [EventGridTrigger] EventGridEvent eventGridEvent,
-            // [Blob("{data.url}", FileAccess.Read,Connection = "BlobStorageConnectionString")] Stream input,
-            // [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] BlobClient blobClient,
             ILogger log)
         {
             log.LogInformation(myQueueItem);

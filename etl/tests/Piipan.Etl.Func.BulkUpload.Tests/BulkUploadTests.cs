@@ -31,13 +31,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             return stream;
         }
 
-        // private EventGridEvent EventMock()
-        // {
-        //     var e = new Mock<EventGridEvent>("", "", "", new BinaryData(string.Empty));
-        //     // Can't override Data in Setup, just use a real one
-        //     return e.Object;
-        // }
-
         private void VerifyLogError(Mock<ILogger> logger, String expected)
         {
             logger.Verify(x => x.Log(
