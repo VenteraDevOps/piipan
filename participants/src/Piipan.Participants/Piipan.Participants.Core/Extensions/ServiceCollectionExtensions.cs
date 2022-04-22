@@ -9,6 +9,7 @@ namespace Piipan.Participants.Core.Extensions
     {
         public static void RegisterParticipantsServices(this IServiceCollection serviceCollection)
         {
+            serviceCollection.AddTransient<IParticipantBulkInsertHandler, ParticipantBulkInsertHandler>();
             serviceCollection.AddTransient<IParticipantDao, ParticipantDao>();
             serviceCollection.AddTransient<IUploadDao, UploadDao>();
             serviceCollection.AddTransient<IStateService, StateService>();

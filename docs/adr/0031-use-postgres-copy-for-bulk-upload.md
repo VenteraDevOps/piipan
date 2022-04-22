@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted / implemented
 
 ## Context
 
@@ -40,6 +40,7 @@ Alternative approaches that were also considered:
 - Using `COPY` functionality gives a significant performance boost over per-row inserts. Larger uploads required us to increase the Connection & Command KeepAlive & Timeout settings but testing demonstrated it was orders of magnitude faster (17s for 100k records vs 30minutes, a couple minutes for 1.5 million records). 
 - This solution does not directly address the issue with one bad record causing an entire upload to fail.
 - We are coupling our approach to PostgreSQL in a way that past decisions have attempted to avoid. Other database options like Azure SQL support similar bulk insert mechanisms, but our initial approach will be specific to PostgreSQL.
+    - Consequently, changing database systems will require a new implementation of the [IParticipantBulkInsertHandler](../../participants/src/Piipan.Participants/Piipan.Participants.Core/DataAccessObjects/IParticipantBulkInsertHandler.cs) interface. The new implementation would need to be [injected into applications](../../participants/src/Piipan.Participants/Piipan.Participants.Core/Extensions/ServiceCollectionExtensions.cs) in place of the [PostgreSQL-specific implementation](../../participants/src/Piipan.Participants/Piipan.Participants.Core/DataAccessObjects/ParticipantBulkInserHandler.cs).
 - This solution does not help with setting up future analysis streams. As a result, we are not confident this is a long term solution for bulk imports but it will allow the NAC to handle import sizes of 1.5 million records which are expected with the MVP rollout. We will revisit other options in the future.
 
 ## Resources

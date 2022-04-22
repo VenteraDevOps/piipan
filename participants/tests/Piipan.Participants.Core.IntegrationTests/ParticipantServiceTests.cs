@@ -12,7 +12,7 @@ namespace Piipan.Participants.Core.IntegrationTests
     public class ParticipantServiceTests : DbFixture
     {
         private ParticipantTestDataHelper helper = new ParticipantTestDataHelper();
-        
+
         [Theory]
         [InlineData(2)]
         public async void AddUploadAndParticipants(int nParticipants)
@@ -26,13 +26,15 @@ namespace Piipan.Participants.Core.IntegrationTests
 
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
                 var serviceLogger = Mock.Of<ILogger<ParticipantService>>();
-                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), logger);
+                var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
+                var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
+                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
                 var uploadDao = new UploadDao(helper.DbConnFactory(Factory, ConnectionString));
 
                 ParticipantService service = new ParticipantService(participantDao, uploadDao, null, serviceLogger);
 
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
-                
+
                 // Act
                 await service.AddParticipants(participants,"test-etag");
 
@@ -61,12 +63,14 @@ namespace Piipan.Participants.Core.IntegrationTests
 
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
                 var serviceLogger = Mock.Of<ILogger<ParticipantService>>();
-                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), logger);
+                var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
+                var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
+                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
                 var uploadDao = new UploadDao(helper.DbConnFactory(Factory, ConnectionString));
 
                 ParticipantService service = new ParticipantService(participantDao, uploadDao, null, serviceLogger);
 
-                var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());              
+                var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
                 participants.Last().LdsHash = null; //Cause the db commit to fail due to a null hash value
 
                 long lastUploadId = GetLastUploadId();
@@ -91,8 +95,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                         Assert.False(exists);
                     });
                 }
-                
-                
+
+
             }
         }
     }

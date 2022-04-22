@@ -28,7 +28,9 @@ namespace Piipan.Participants.Core.IntegrationTests
                 ClearParticipants();
 
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
-                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), logger);
+                var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
+                var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
 
                 // Act
@@ -74,7 +76,9 @@ namespace Piipan.Participants.Core.IntegrationTests
                 participants.ToList().ForEach(p => Insert(p));
 
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
-                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), logger);
+                var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
+                var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
 
                 // Act
                 var matches = await dao.GetParticipants("ea", randoms.First().LdsHash, randoms.First().UploadId);

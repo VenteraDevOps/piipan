@@ -117,6 +117,7 @@ namespace Piipan.QueryTool
             {
                 try
                 {
+                    context.Response.Headers.Add("X-Frame-Options", "DENY");
                     await next();
                     if (context.Response.StatusCode == 404 || context.Response.StatusCode == 500)
                     {
@@ -147,14 +148,7 @@ namespace Piipan.QueryTool
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/Error");
-            });
-
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Add("X-Frame-Options", "DENY");
-                await next();
             });
         }
     }
