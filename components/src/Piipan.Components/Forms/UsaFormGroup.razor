@@ -27,7 +27,17 @@
         }
         @if (HasErrors)
         {
-            <span class="@InputErrorMessageClass" id="@(InputElementId)-message">@ValidationMessages.First().Replace("@@@", Label)</span>
+            <span class="@InputErrorMessageClass" id="@(InputElementId)-message">
+                @foreach (var message in ValidationMessages)
+                {
+                    var splitMessages = message.Split('\n');
+                    @foreach (var splitMessage in splitMessages)
+                    {
+                        @splitMessage.Replace("@@@", Label)
+                        <br />
+                    }
+                }
+            </span>
         }
         @ChildContent
     </div>

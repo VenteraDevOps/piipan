@@ -26,27 +26,30 @@
                 {
                     foreach (var error in errorPair.Errors)
                     {
-                        var linkPart = error.IndexOf("@@@");
-                        @if (linkPart >= 0 && errorPair.FormGroup != null)
+                        var splitErrors = error.Split('\n');
+                        foreach (var splitError in splitErrors)
                         {
-                            <li>
-                                @if (linkPart > 0)
-                                {
-                                    @error.Substring(0, linkPart)
-                                }
-                                <button class="@ButtonClass @ButtonUnstyledClass"
-                                    @onclick="async () => { await FocusElement(errorPair.FormGroup.InputElementId); }">
-                                    @errorPair.FormGroup.Label
-                                </button>
-                                @error.Substring(linkPart + 3)
-                            </li>
-                        }
-                        else
-                        {
-                            <li>@error</li>    
+                            var linkPart = splitError.IndexOf("@@@");
+                            @if (linkPart >= 0 && errorPair.FormGroup != null)
+                            {
+                                <li>
+                                    @if (linkPart > 0)
+                                    {
+                                        @splitError.Substring(0, linkPart)
+                                    }
+                                    <button class="@ButtonClass @ButtonUnstyledClass"
+                                        @onclick="async () => { await FocusElement(errorPair.FormGroup.InputElementId); }">
+                                        @errorPair.FormGroup.Label
+                                    </button>
+                                    @splitError.Substring(linkPart + 3)
+                                </li>
+                            }
+                            else
+                            {
+                                <li>@splitError</li>    
+                            }
                         }
                     }
-                    
                 }
             </ul>
         </UsaAlertBox>

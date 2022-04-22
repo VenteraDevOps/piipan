@@ -46,7 +46,7 @@ namespace Piipan.Components.Tests.Validation
 
             // Assert
             Assert.False(result);
-            Assert.Equal(ValidationConstants.NormalizedNameTooShortMessage, attribute.ErrorMessage);
+            Assert.Equal(ValidationConstants.MustStartWithALetter, attribute.ErrorMessage);
         }
 
         /// <summary>

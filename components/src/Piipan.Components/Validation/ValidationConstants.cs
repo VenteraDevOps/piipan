@@ -40,7 +40,7 @@
         /// <summary>
         /// Used for names when validating they would have at least one character after normalization
         /// </summary>
-        public const string NormalizedNameTooShortMessage = "Normalized @@@ must be at least 1 character long.";
+        public const string MustStartWithALetter = "@@@ must start with a letter";
 
         /// <summary>
         /// Used for names when checking to see if it contains any non-ascii characters
