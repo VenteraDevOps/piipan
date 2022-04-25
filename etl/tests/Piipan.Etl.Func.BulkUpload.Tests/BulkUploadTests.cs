@@ -7,6 +7,7 @@ using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Models;
@@ -63,18 +64,19 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
         [Fact]
         public async void Run_EmptyQueue()
-        {
+         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
-            var participantStreamParser = new Mock<IParticipantStreamParser>();
+            var blobProperties = Mock.Of<BlobClient>();
+            var participantStreamParser = Mock.Of<IParticipantStreamParser>();
             var blobStream = Mock.Of<IBlobClientStream>();
             var logger = new Mock<ILogger>();
+            var function = new BulkUpload(participantApi, participantStreamParser, blobStream);
 
-            var function = new BulkUpload(participantApi, participantStreamParser.Object, blobStream);
-
-            // Act 
+            // Act
+            // await function.Run(null, blobProperties, logger.Object);
             await function.Run("", logger.Object);
-            
+
             // Assert
             VerifyLogError(logger, "No input stream was provided");
         }
@@ -85,6 +87,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
             var blobProperties = Mock.Of<BlobClient>();
+            var responseMock = new Mock<Response>();
             var participantStreamParser = new Mock<IParticipantStreamParser>();
             participantStreamParser
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
@@ -92,13 +95,23 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var logger = new Mock<ILogger>();
 
-           var blobStream = new Mock<IBlobClientStream>();
+            var blobItem = BlobsModelFactory.BlobItem("mocked.mocked.mocked.mocked");
+
+            var blobStream = new Mock<IBlobClientStream>();
                 blobStream
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
                     .Returns(ToStream("Returned data"));
                 blobStream
-                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
-                    .Returns(new BlobProperties());
+                    .Setup(m => m.GetBlobClient(It.IsAny<string>(), logger.Object))
+                    .Returns(()=>{
+                        var blockblobClient = new Mock<BlockBlobClient>();
+                        
+                        blockblobClient
+                            .Setup(m => m.GetProperties(null, CancellationToken.None))
+                            .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+                        return blockblobClient.Object;
+                    });
 
             var function = new BulkUpload(participantApi, participantStreamParser.Object, blobStream.Object);
 
@@ -112,7 +125,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
             // Arrange
             var blobClient = new Mock<BlobClient>();
-        
+            var responseMock = new Mock<Response>();
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>()))
@@ -127,8 +140,16 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
                     .Returns(ToStream("Returned data"));
                 blobStream
-                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
-                    .Returns(new BlobProperties());
+                    .Setup(m => m.GetBlobClient(It.IsAny<string>(), logger.Object))
+                    .Returns(()=>{
+                        var blockblobClient = new Mock<BlockBlobClient>();
+                        
+                        blockblobClient
+                            .Setup(m => m.GetProperties(null, CancellationToken.None))
+                            .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+                        return blockblobClient.Object;
+                    });
 
             var function = new BulkUpload(participantApi.Object, participantStreamParser, blobStream.Object);
 
@@ -146,6 +167,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             blobClient
                 .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
             // Arrange
             var participants = new List<Participant>
             {
@@ -174,8 +196,16 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
                     .Returns(ToStream("Returned data"));
                 blobStream
-                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
-                    .Returns(new BlobProperties());
+                    .Setup(m => m.GetBlobClient(It.IsAny<string>(), logger.Object))
+                    .Returns(()=>{
+                        var blockblobClient = new Mock<BlockBlobClient>();
+                        
+                        blockblobClient
+                            .Setup(m => m.GetProperties(null, CancellationToken.None))
+                            .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+                        return blockblobClient.Object;
+                    });
 
             var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobStream.Object);
 

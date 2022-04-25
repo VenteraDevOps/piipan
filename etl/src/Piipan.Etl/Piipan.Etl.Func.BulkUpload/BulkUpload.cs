@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
@@ -56,25 +57,30 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation(myQueueItem);
             try
             {
-                var blobClient =  _blobStream.GetBlobClient(myQueueItem, log);
-
-                Stream input = new System.IO.MemoryStream();
-
-                //Blob content is downloaded (streamed) to the input variable
-                var downloadResponse = blob.DownloadTo(input);
-
-                var blobProperties = blob.GetProperties();
-            
-                if (input != null)
-                {
-                    var participants = _participantParser.Parse(input);
-                    await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
-                }
-                else
-                {
-                    // Can get here if Function does not have
-                    // permission to access blob URL
+                if(myQueueItem == null || myQueueItem.Length == 0){
                     log.LogError("No input stream was provided");
+                }
+                else {
+                    BlockBlobClient blobClient =  _blobStream.GetBlobClient(myQueueItem, log);
+
+                    Stream input = new System.IO.MemoryStream();
+
+                    //Blob content is downloaded (streamed) to the input variable
+                    var downloadResponse = blobClient.DownloadTo(input);
+
+                    BlobProperties blobProperties = (BlobProperties) blobClient.GetProperties();
+
+                    if (input != null)
+                    {
+                        var participants = _participantParser.Parse(input);
+                        await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
+                    }
+                    else
+                    {
+                        // Can get here if Function does not have
+                        // permission to access blob URL
+                        log.LogError("No input stream was provided");
+                    }
                 }
             }
             catch (Exception ex)

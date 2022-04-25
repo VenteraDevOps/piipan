@@ -70,7 +70,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             }
         }
 
-        BlockBlobClient GetBlobClient(string input, ILogger log) {
+        public BlockBlobClient GetBlobClient(string input, ILogger log) {
 
             try
             {
