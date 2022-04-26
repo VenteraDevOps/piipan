@@ -221,13 +221,13 @@
                             ],
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
-                                "forwardingProtocol": "MatchRequest",
+                                "forwardingProtocol": "HttpsOnly",
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', parameters('frontDoorName'), concat('backend-pool-', uniqueString(parameters('frontDoorName'))))]"
                                 }
                             },
                             "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', parameters('frontDoorName'), 'StrictTransportSecurity')]"
+                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', parameters('frontDoorName'), 'SecurityHeaderRules')]"
                             },
                             "enabledState": "Enabled"
                         }
@@ -288,7 +288,7 @@
         {
             "type": "Microsoft.Network/frontdoors/rulesengines",
             "apiVersion": "2020-05-01",
-            "name": "[concat(parameters('frontDoorName'), '/StrictTransportSecurity')]",
+            "name": "[concat(parameters('frontDoorName'), '/SecurityHeaderRules')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
             ],
@@ -296,7 +296,7 @@
                 "resourceState": "Enabled",
                 "rules": [
                     {
-                        "name": "StrictTransportSecurity",
+                        "name": "AddSecurityHeaders",
                         "priority": 0,
                         "action": {
                             "requestHeaderActions": [],
@@ -305,6 +305,11 @@
                                     "headerActionType": "Overwrite",
                                     "headerName": "Strict-Transport-Security",
                                     "value": "max-age=31536000; includeSubDomains; preload"
+                                },
+                                {
+                                    "headerActionType": "Overwrite",
+                                    "headerName": "X-Frame-Options",
+                                    "value": "DENY"
                                 }
                             ]
                         },
