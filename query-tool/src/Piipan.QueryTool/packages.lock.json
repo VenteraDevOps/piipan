@@ -112,14 +112,14 @@
       },
       "Microsoft.AspNetCore.Components.WebAssembly": {
         "type": "Transitive",
-        "resolved": "6.0.2",
-        "contentHash": "FM+ygVElZ6Eug5CNxYfmTSjXt/iU4EryMkNDtdCZwM9z6lPRUf2S3vfVJ79Io4Fzy05d+dnaw+6Zo3fz3s8s2w==",
+        "resolved": "6.0.4",
+        "contentHash": "pR9MTi8MVzFMbdlO+6uA0gOOU/nA4V6pzUHDHn4vLf/cHLtTVkeX+ZC4GztrwQGQDnayVGMmExkZ6jd5Gp9B9g==",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.Web": "6.0.2",
+          "Microsoft.AspNetCore.Components.Web": "6.0.4",
           "Microsoft.Extensions.Configuration.Binder": "6.0.0",
           "Microsoft.Extensions.Configuration.Json": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
-          "Microsoft.JSInterop.WebAssembly": "6.0.2"
+          "Microsoft.JSInterop.WebAssembly": "6.0.4"
         }
       },
       "Microsoft.AspNetCore.Http": {
@@ -533,10 +533,10 @@
       },
       "Microsoft.JSInterop.WebAssembly": {
         "type": "Transitive",
-        "resolved": "6.0.2",
-        "contentHash": "nQTIFfWEi25/yOVz/KMelUiUSltZAczXLh3yusk9g9w92+RxV5xrIJ651+1SaXOL2ywinWqvwZ6rT39ibAZ2QQ==",
+        "resolved": "6.0.4",
+        "contentHash": "+EZnnpxDfHwFwxJY9IifDH4sXdh4uKvHjEeTkZT+vBr1YC4FCzempsEwmGFH5SGMZqz+VghbuVY1Dc1Jxtgycw==",
         "dependencies": {
-          "Microsoft.JSInterop": "6.0.2"
+          "Microsoft.JSInterop": "6.0.4"
         }
       },
       "Microsoft.Net.Http.Headers": {
@@ -649,8 +649,8 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "6.0.3",
-        "contentHash": "yt/3XFRhHsJ01a4+qHM9+0mtitQ3DY2wJLyGP9vtvZa1cB1nSAw762GJGdSX3Bbc7wZKzeo4dc4drD3yvQe7gA==",
+        "resolved": "6.0.4",
+        "contentHash": "SJMlOmFHr32oOzVXeHmarGaBKkhi0wHVN/rzuu2tUSJ4Qx2AkHCpr9R/DhLWwDiklqgzFU++9wkFyGJxbx/zzg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
@@ -1812,7 +1812,7 @@
       "piipan.querytool.client": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.WebAssembly": "6.0.2",
+          "Microsoft.AspNetCore.Components.WebAssembly": "6.0.4",
           "Piipan.Components": "1.0.0",
           "Piipan.Match.Api": "1.0.0"
         }
@@ -1830,7 +1830,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.3"
+          "Npgsql": "6.0.4"
         }
       },
       "piipan.shared.api": {
