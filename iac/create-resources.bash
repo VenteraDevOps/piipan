@@ -565,7 +565,7 @@ main () {
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
     #Queue Storage id
-    storageid=$(az storage account show --name ${stor_name} --resource-group ${RESOURCE_GROUP} --query id --output tsv)
+    storageid=$(az storage account show --name "${stor_name}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
     queueid="$storageid/queueservices/default/queues/upload"
 
     az eventgrid system-topic event-subscription create \
