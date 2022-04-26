@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
+using static Piipan.Components.Validation.ValidationConstants;
 
 namespace Piipan.QueryTool.Tests
 {
@@ -169,10 +170,10 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Theory]
-        [InlineData("123", "@@@ must be 7 characters")]
-        [InlineData("12345678", "@@@ must be 7 characters")]
-        [InlineData("m1$2345", "@@@ contains invalid characters")]
-        [InlineData("", "@@@ is required")]
+        [InlineData("123", $"{ValidationFieldPlaceholder} must be 7 characters")]
+        [InlineData("12345678", $"{ValidationFieldPlaceholder} must be 7 characters")]
+        [InlineData("m1$2345", $"{ValidationFieldPlaceholder} contains invalid characters")]
+        [InlineData("", $"{ValidationFieldPlaceholder} is required")]
         public async Task TestInvalidMatchId_Post(string matchId, string expectedError)
         {
             // arrange

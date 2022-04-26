@@ -9,10 +9,10 @@ namespace Piipan.Components.Demo.Models
     public class InputTextModel
     {
         [Display(Name = "Optional Field")]
-        public string? NotRequiredField { get; set; }
+        public string NotRequiredField { get; set; }
 
         [UsaRequired]
         [Display(Name = "Required Field")]
-        public string? RequiredField { get; set; }
+        public string RequiredField { get; set; }
     }
 }

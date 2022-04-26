@@ -1,5 +1,6 @@
 ﻿@using Piipan.Components.Alerts
 @using static Shared.CommonConstants
+@using static Piipan.Components.Validation.ValidationConstants
 @using static FormConstants
 @code {
     [Parameter] public RenderFragment ChildContent { get; set; }
@@ -29,7 +30,7 @@
                         var splitErrors = error.Split('\n');
                         foreach (var splitError in splitErrors)
                         {
-                            var linkPart = splitError.IndexOf("@@@");
+                            var linkPart = splitError.IndexOf(ValidationFieldPlaceholder);
                             @if (linkPart >= 0 && errorPair.FormGroup != null)
                             {
                                 <li>

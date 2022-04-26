@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-
+using static Piipan.Components.Validation.ValidationConstants;
 namespace Piipan.QueryTool.Client.Models
 {
     /// <summary>
@@ -20,7 +20,7 @@ namespace Piipan.QueryTool.Client.Models
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date),
             DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
-        [DateOfBirthRange("01/01/1900", ErrorMessage = "@@@ must be between 01-01-1900 and today's date")]
+        [DateOfBirthRange("01/01/1900", ErrorMessage = $"{ValidationFieldPlaceholder} must be between 01-01-1900 and today's date")]
         [JsonPropertyName("dob")]
         public DateTime? DateOfBirth { get; set; }
 

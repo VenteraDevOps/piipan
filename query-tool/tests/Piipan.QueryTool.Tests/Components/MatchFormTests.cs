@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
+using static Piipan.Components.Validation.ValidationConstants;
 
 namespace Piipan.QueryTool.Tests.Components
 {
@@ -158,7 +159,7 @@ namespace Piipan.QueryTool.Tests.Components
         public void Form_With_Server_Error_Should_Show_Errors()
         {
             // Arrange
-            InitialValues.ServerErrors = new List<ServerError> { new("Query.MatchId", "@@@ is required") };
+            InitialValues.ServerErrors = new List<ServerError> { new("Query.MatchId", $"{ValidationFieldPlaceholder} is required") };
             CreateTestComponent();
 
             var alertBox = queryForm.FindComponent<UsaAlertBox>();

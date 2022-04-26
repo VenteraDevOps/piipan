@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using Moq;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Participants.Api;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
@@ -244,7 +244,7 @@ namespace Piipan.Match.Core.Tests.Services
             Assert.Single(response.Data.Results, r => r.Index == 0);
 
             var matches = response.Data.Results.First().Matches;
-            Assert.Equal(0, matches.Count());
+            Assert.Empty(matches);
             Assert.Equal(0, matches.Count(m => m.ParticipantId == "p1"));
             Assert.Equal(0, matches.Count(m => m.ParticipantId == "p2"));
         }
@@ -283,7 +283,7 @@ namespace Piipan.Match.Core.Tests.Services
             var response = await service.FindMatches(request, "ea");
 
             participantApi.Verify(r => r.GetParticipants("ea", request.Data[0].LdsHash), Times.Never);
-            
+
         }
     }
 }
