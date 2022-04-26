@@ -15,6 +15,8 @@ namespace Piipan.Components.Tests.Validation
         /// <param name="isValidExpected">Whether or not we expect this field to have an error after the value is entered</param>
         [Theory]
         [InlineData("Lynn", true)]
+        [InlineData("", true)]
+        [InlineData(null, true)]
         [InlineData("Garcia Sr.", true)]
         [InlineData("-&123", false)]
         [InlineData("García", false)]
@@ -34,7 +36,7 @@ namespace Piipan.Components.Tests.Validation
         /// Validate that if an error occurs that the correct error message is returned
         /// </summary>
         [Fact]
-        public void CorrectErrorMessageForNormalizedNameTooShort()
+        public void CorrectErrorMessageForMustStartWithALetter()
         {
             // Arrange
             var attribute = new UsaNameAttribute();
@@ -44,7 +46,7 @@ namespace Piipan.Components.Tests.Validation
 
             // Assert
             Assert.False(result);
-            Assert.Equal(ValidationConstants.NormalizedNameTooShortMessage, attribute.ErrorMessage);
+            Assert.Equal(ValidationConstants.MustStartWithALetter, attribute.ErrorMessage);
         }
 
         /// <summary>

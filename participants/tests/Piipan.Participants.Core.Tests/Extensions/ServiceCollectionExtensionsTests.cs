@@ -27,6 +27,8 @@ namespace Piipan.Participants.Core.Tests.Extensions
             Assert.NotNull(provider.GetService<IParticipantDao>());
             Assert.NotNull(provider.GetService<IUploadDao>());
             Assert.NotNull(provider.GetService<IParticipantApi>());
+            Assert.NotNull(provider.GetService<IParticipantBulkInsertHandler>());
+
         }
     }
 }

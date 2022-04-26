@@ -1,5 +1,6 @@
 ﻿@using static FormConstants
 @using static Shared.CommonConstants
+@using static Piipan.Components.Validation.ValidationConstants
 @code {
     [CascadingParameter] public UsaForm Form { get; set; }
     [Parameter] public RenderFragment LabelOverride { get; set; }
@@ -27,7 +28,17 @@
         }
         @if (HasErrors)
         {
-            <span class="@InputErrorMessageClass" id="@(InputElementId)-message">@ValidationMessages.First().Replace("@@@", Label)</span>
+            <span class="@InputErrorMessageClass" id="@(InputElementId)-message">
+                @foreach (var message in ValidationMessages)
+                {
+                    var splitMessages = message.Split('\n');
+                    @foreach (var splitMessage in splitMessages)
+                    {
+                        @splitMessage.Replace(ValidationFieldPlaceholder, Label)
+                        <br />
+                    }
+                }
+            </span>
         }
         @ChildContent
     </div>

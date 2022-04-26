@@ -741,8 +741,8 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "6.0.3",
-        "contentHash": "yt/3XFRhHsJ01a4+qHM9+0mtitQ3DY2wJLyGP9vtvZa1cB1nSAw762GJGdSX3Bbc7wZKzeo4dc4drD3yvQe7gA==",
+        "resolved": "6.0.4",
+        "contentHash": "SJMlOmFHr32oOzVXeHmarGaBKkhi0wHVN/rzuu2tUSJ4Qx2AkHCpr9R/DhLWwDiklqgzFU++9wkFyGJxbx/zzg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
@@ -1918,7 +1918,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.3",
+          "Npgsql": "6.0.4",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0"
@@ -1943,7 +1943,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.3"
+          "Npgsql": "6.0.4"
         }
       },
       "piipan.shared.api": {
