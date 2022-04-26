@@ -449,10 +449,6 @@ main () {
     # Per-state database
     db_name=${abbr}
 
-    # Actual Function, under the Function App, that receives an event
-    # and does the work, name derived from classname in `etl` directory
-    func_name=BulkUpload
-
     # Per-state storage account for bulk upload;
     # matches name passed to blob-storage.json
     stor_name=${PREFIX}st${abbr}upload${ENV}
