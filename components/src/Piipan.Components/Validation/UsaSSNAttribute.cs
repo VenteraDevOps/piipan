@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Piipan.Components.Validation
 {
@@ -15,39 +16,39 @@ namespace Piipan.Components.Validation
 
         public override bool IsValid(object value)
         {
-            if (!base.IsValid(value))
-            {
-                ErrorMessage = ValidationConstants.SSNInvalidFormatMessage;
-                return false;
-            }
             var stringValue = value?.ToString();
-
             // If the SSN is required, we'll pick it up with a UsaRequired attribute. Don't flag it here
             if (string.IsNullOrEmpty(stringValue))
             {
                 return true;
             }
 
-            // If we're here, our string will be ###-##-#### because we already checked it against the base Regex.
-            var areaNumber = int.Parse(stringValue[0..3]);
-            if (areaNumber == 0 || areaNumber == 666 || areaNumber >= 900)
+            List<string> allErrors = new List<string>();
+            ErrorMessage = "";
+            if (!base.IsValid(value))
             {
-                ErrorMessage = string.Format(ValidationConstants.SSNInvalidFirstThreeDigitsMessage, stringValue[0..3]);
-                return false;
-            }
-            if (stringValue[4..6] == "00")
-            {
-                ErrorMessage = ValidationConstants.SSNInvalidMiddleTwoDigitsMessage;
-                return false;
-            }
-            if (stringValue[7..11] == "0000")
-            {
-                ErrorMessage = ValidationConstants.SSNInvalidLastFourDigitsMessage;
-                return false;
+                allErrors.Add(ValidationConstants.SSNInvalidFormatMessage);
             }
 
-            return true;
+            if (stringValue.Length >= 3 && int.TryParse(stringValue[0..3], out int areaNumber))
+            {
+                if (areaNumber == 0 || areaNumber == 666 || areaNumber >= 900)
+                {
+                    allErrors.Add(string.Format(ValidationConstants.SSNInvalidFirstThreeDigitsMessage, stringValue[0..3]));
+                }
+            }
+            if (stringValue.Length >= 6 && stringValue[4..6] == "00")
+            {
+                allErrors.Add(ValidationConstants.SSNInvalidMiddleTwoDigitsMessage);
+            }
+            if (stringValue.Length >= 11 && stringValue[7..11] == "0000")
+            {
+                allErrors.Add(ValidationConstants.SSNInvalidLastFourDigitsMessage);
+            }
 
+            ErrorMessage = string.Join('\n', allErrors);
+
+            return string.IsNullOrEmpty(ErrorMessage);
         }
     }
 }
