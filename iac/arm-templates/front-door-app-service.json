@@ -65,7 +65,8 @@
     "variables": {
         "location": "global", /* front-door location must be global */
         "wafLocation": "global" /* waf location must be global */,
-        "eventhubName": "[concat(parameters('prefix'), '-evh-monitoring-', parameters('env'))]"
+        "eventhubName": "[concat(parameters('prefix'), '-evh-monitoring-', parameters('env'))]",
+        "securityHeaderRulesName": "SecurityHeaderRules"
     },
     "resources": [
         {
@@ -227,13 +228,13 @@
                                 }
                             },
                             "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', parameters('frontDoorName'), 'SecurityHeaderRules')]"
+                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', parameters('frontDoorName'), variables('securityHeaderRulesName'))]"
                             },
                             "enabledState": "Enabled"
                         }
                     },
                     {
-                        "name": "HttpRedirect",
+                        "name": "httpRedirect",
                         "properties": {
                             "frontendEndpoints": [
                                 {
@@ -288,7 +289,7 @@
         {
             "type": "Microsoft.Network/frontdoors/rulesengines",
             "apiVersion": "2020-05-01",
-            "name": "[concat(parameters('frontDoorName'), '/SecurityHeaderRules')]",
+            "name": "[concat(parameters('frontDoorName'), '/', variables('securityHeaderRulesName'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
             ],
