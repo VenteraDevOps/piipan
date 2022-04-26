@@ -50,7 +50,7 @@ namespace Piipan.Etl.Func.BulkUpload
         /// </remarks>
         [FunctionName("BulkUpload")]
         public async Task Run(
-            [QueueTrigger("qupload", Connection = "BlobStorageConnectionString")] string myQueueItem,
+            [QueueTrigger("upload", Connection = "BlobStorageConnectionString")] string myQueueItem,
             ILogger log)
         {
             log.LogInformation(myQueueItem);
@@ -62,7 +62,6 @@ namespace Piipan.Etl.Func.BulkUpload
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
-                    // BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
                     await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
                 }
                 else

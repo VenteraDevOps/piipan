@@ -18,18 +18,26 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 {
     public class BlobClientStream : IBlobClientStream
     {
-        public Stream Parse(string input, ILogger log) {
 
+        private string GetBlobName(StorageBlobCreatedEventData blobEvent) {
+
+                //Get blob name from the blob url
+                var blobUrl = new Uri(blobEvent.Url);
+                BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobUrl);
+
+                var blobName = blobUriBuilder.BlobName;
+
+                return blobName;
+        }
+
+        public Stream Parse(string input, ILogger log) {
             try
             {
                 //parse queue event
-                var queuedEvent = JsonConvert.DeserializeObject<EventGridEvent>(input);
-                var createdBlobEvent = JsonConvert.DeserializeObject<StorageBlobCreatedEventData>(queuedEvent.Data.ToString());
+                var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
+                var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
 
-                //Get blob name from the blob url
-                var blobUrl = new Uri(createdBlobEvent.Url);                 
-                string[] urlParts = blobUrl.Segments;
-                string blobName = urlParts[urlParts.Length-1];
+                var blobName = GetBlobName(createdBlobEvent);
 
                 BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
 
@@ -54,10 +62,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 var queuedEvent = JsonConvert.DeserializeObject<EventGridEvent>(input);
                 var createdBlobEvent = JsonConvert.DeserializeObject<StorageBlobCreatedEventData>(queuedEvent.Data.ToString());
 
-                //Get blob name from the blob url
-                var blobUrl = new Uri(createdBlobEvent.Url);                 
-                string[] urlParts = blobUrl.Segments;
-                string blobName = urlParts[urlParts.Length-1];
+                var blobName = GetBlobName(createdBlobEvent);
 
                 BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
 

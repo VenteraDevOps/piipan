@@ -54,7 +54,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var function = new BulkUpload(participantApi, participantStreamParser, blobStream);
 
             // Act
-            // await function.Run(null, blobProperties, logger.Object);
             await function.Run(null, logger.Object);
 
             // Assert

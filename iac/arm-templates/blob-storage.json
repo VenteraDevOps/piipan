@@ -68,13 +68,8 @@
                 },
                 {
                     "type": "queueServices/queues",
-                    "apiVersion": "2019-06-01",
-                    "name": "[concat('default/q', variables('containerName'))]",
-                    "properties": {
-                        "metadata": {
-                            "test":"approved"
-                        }
-                    },
+                    "apiVersion": "2021-08-01",
+                    "name": "[concat('default/', variables('containerName'))]",
                     "dependsOn": [
                         "[variables('uniqueStorageName')]"
                     ]
