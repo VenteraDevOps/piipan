@@ -23,8 +23,6 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
         public virtual string GetBlobName(StorageBlobCreatedEventData blobEvent) {
 
-            try
-            {
                 //Get blob name from the blob url
                 var blobUrl = new Uri(blobEvent.Url);
                 BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobUrl);
@@ -32,13 +30,6 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 var blobName = blobUriBuilder.BlobName;
 
                 return blobName;
-            }
-            catch (System.Exception)
-            {
-                
-                throw;
-            }
-
         }
 
         public virtual BlockBlobClient GetBlob(string blobName) {                
@@ -68,10 +59,10 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 return returnStream;
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 log.LogError("Error parsing blob event");
-                throw;
+                throw ex;
             }
         }
 
@@ -91,10 +82,10 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 return response.Value;
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 log.LogError("Error parsing blob event");
-                throw;
+                throw ex;
             }
         }
     }
