@@ -95,6 +95,22 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
+        public async void BlobClientProperties_EmptyEventThrowsJsonError()
+        {
+            //Arrange
+            var logger = new Mock<ILogger>();
+
+            var blobClientStream = new BlobClientStream();
+
+            Action act = () => blobClientStream.BlobClientProperties("", logger.Object);
+            var ex = Assert.ThrowsAny<JsonException>(act);
+            
+            // Act // Assert
+            Assert.Equal("The input does not contain any JSON tokens.", ex.Message.ToString().Substring(0, 43));
+
+        }
+
+        [Fact]
         public void GetBlobName_TestReturnedName()
         {
 

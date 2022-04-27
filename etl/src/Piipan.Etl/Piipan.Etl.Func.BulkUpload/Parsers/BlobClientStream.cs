@@ -82,10 +82,10 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 return response.Value;
             }
-            catch (System.Exception ex)
+            catch (ArgumentException ex)
             {
                 log.LogError("Error parsing blob event");
-                throw ex;
+                throw new ArgumentException("test");
             }
         }
     }
