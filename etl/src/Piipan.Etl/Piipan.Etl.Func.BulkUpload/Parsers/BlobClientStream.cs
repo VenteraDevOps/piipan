@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Piipan.Participants.Api.Models;
 using Microsoft.Extensions.Logging;
+using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
 using Azure.Storage;
@@ -21,13 +23,23 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
         private string GetBlobName(StorageBlobCreatedEventData blobEvent) {
 
-                //Get blob name from the blob url
-                var blobUrl = new Uri(blobEvent.Url);
-                BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobUrl);
+            //Get blob name from the blob url
+            var blobUrl = new Uri(blobEvent.Url);
+            BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobUrl);
 
-                var blobName = blobUriBuilder.BlobName;
+            var blobName = blobUriBuilder.BlobName;
 
-                return blobName;
+            return blobName;
+        }
+
+        public virtual BlockBlobClient GetBlob(string blobName) {                
+
+            return new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
+        }
+
+        public virtual Response<BlobProperties> GetBlobProperties(BlockBlobClient blob) {                
+
+            return blob.GetProperties();
         }
 
         public Stream Parse(string input, ILogger log) {
@@ -39,7 +51,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 var blobName = GetBlobName(createdBlobEvent);
 
-                BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
+                BlockBlobClient blob = GetBlob(blobName);
 
                 Stream returnStream = new System.IO.MemoryStream();
 
@@ -59,14 +71,16 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             try
             {
                 //parse queue event
-                var queuedEvent = JsonConvert.DeserializeObject<EventGridEvent>(input);
-                var createdBlobEvent = JsonConvert.DeserializeObject<StorageBlobCreatedEventData>(queuedEvent.Data.ToString());
+                var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
+                var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
 
                 var blobName = GetBlobName(createdBlobEvent);
 
-                BlockBlobClient blob = new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
+                BlockBlobClient blob = GetBlob(blobName);
 
-                return blob.GetProperties();
+                var response = GetBlobProperties(blob);
+
+                return response.Value;
             }
             catch (System.Exception)
             {
