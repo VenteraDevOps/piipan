@@ -2,8 +2,11 @@ using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Shared.API.Utilities;
 using System;
 using System.IO;
+using System.Threading;
 using System.Linq;
 using Azure;
+using Azure.Messaging.EventGrid;
+using Azure.Messaging.EventGrid.SystemEvents;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -43,8 +46,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         public void BlobClientPropertiesTest()
         {
 
+            // Arrange
             var logger = new Mock<ILogger>();
-            // var blobClientStream = new BlobClientStream();
 
             var blobClient = new Mock<BlobClient>();
             var responseMock = new Mock<Response>();
@@ -63,6 +66,45 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
             //Assert
             Assert.Equal(blobProperties.GetType(), typeof(BlobProperties));
+
+        }
+
+        [Fact]
+        public void GetBlobNameTest()
+        {
+
+            // Arrange
+            var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(EventString));
+            var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
+            var blobClientStream = new BlobClientStream();
+
+            // Act
+            var blobName = blobClientStream.GetBlobName(createdBlobEvent);
+
+            //Assert
+            Assert.Equal("example333.csv", blobName);
+
+        }
+
+        [Fact]
+        public void GetBlobPropertiesTest()
+        {
+
+            // Arrange
+            var blobClientStream = new BlobClientStream();
+            var blob = Mock.Of<BlockBlobClient>();
+
+            var blobClient = new Mock<BlockBlobClient>();
+            var responseMock = new Mock<Response>();
+            blobClient
+                .Setup(m => m.GetProperties(null, CancellationToken.None))
+                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+            // Act
+            var response = blobClientStream.GetBlobProperties(blobClient.Object);
+
+            //Assert
+            Assert.Equal(typeof(BlobProperties), response.Value.GetType());
 
         }
 

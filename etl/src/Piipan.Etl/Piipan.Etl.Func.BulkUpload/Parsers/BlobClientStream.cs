@@ -21,15 +21,24 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
     public class BlobClientStream : IBlobClientStream
     {
 
-        private string GetBlobName(StorageBlobCreatedEventData blobEvent) {
+        public virtual string GetBlobName(StorageBlobCreatedEventData blobEvent) {
 
-            //Get blob name from the blob url
-            var blobUrl = new Uri(blobEvent.Url);
-            BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobUrl);
+            try
+            {
+                //Get blob name from the blob url
+                var blobUrl = new Uri(blobEvent.Url);
+                BlobUriBuilder blobUriBuilder = new BlobUriBuilder(blobUrl);
 
-            var blobName = blobUriBuilder.BlobName;
+                var blobName = blobUriBuilder.BlobName;
 
-            return blobName;
+                return blobName;
+            }
+            catch (System.Exception)
+            {
+                
+                throw;
+            }
+
         }
 
         public virtual BlockBlobClient GetBlob(string blobName) {                

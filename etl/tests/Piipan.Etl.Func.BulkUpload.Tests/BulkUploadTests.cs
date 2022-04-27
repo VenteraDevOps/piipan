@@ -140,12 +140,15 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         [Fact]
         public async void Run_ParsedInputPassedToApi()
         {
+
+            // Arrange
+            
             var blobClient = new Mock<BlobClient>();
             var responseMock = new Mock<Response>();
             blobClient
                 .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-            // Arrange
+            
             var participants = new List<Participant>
             {
                 new Participant
