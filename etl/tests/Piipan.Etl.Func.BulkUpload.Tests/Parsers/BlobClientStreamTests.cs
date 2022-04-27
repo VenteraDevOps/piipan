@@ -23,7 +23,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         private string EventString = "{\"topic\":\"/subscriptions/719bb99b-1a3b-4132-a0f6-1805a75dc30e/resourceGroups/rg-core-dev/providers/Microsoft.Storage/storageAccounts/ttssteauploaddev\",\"subject\":\"/blobServices/default/containers/upload/blobs/example333.csv\",\"eventType\":\"Microsoft.Storage.BlobCreated\",\"id\":\"0b6dcc46-401e-00eb-2f8b-5946db06a8ee\",\"data\":{\"api\":\"PutBlob\",\"requestId\":\"0b6dcc46-401e-00eb-2f8b-5946db000000\",\"eTag\":\"0x8DA27A31DCB5337\",\"contentType\":\"text/plain\",\"contentLength\":6592,\"blobType\":\"BlockBlob\",\"url\":\"https://ttssteauploaddev.blob.core.windows.net/upload/example333.csv\",\"sequencer\":\"00000000000000000000000000002A0D0000000001b0fc63\",\"storageDiagnostics\":{\"batchId\":\"ce49b6a6-f006-00f8-008b-598bff000000\"}},\"dataVersion\":\"\",\"metadataVersion\":\"1\",\"eventTime\":\"2022-04-26T16:37:55.9373378Z\"}";
 
         [Fact]
-        public void ParseEventReturnStream()
+        public void Parse_EventReturnStream()
         {
 
             var logger = new Mock<ILogger>();
@@ -43,7 +43,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
-        public void BlobClientPropertiesTest()
+        public void BlobClientProperties_TestReturnType()
         {
 
             // Arrange
@@ -70,7 +70,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
-        public void GetBlobNameTest()
+        public void GetBlobName_TestReturnedName()
         {
 
             // Arrange
@@ -86,8 +86,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
         }
 
+        
+
         [Fact]
-        public void GetBlobPropertiesTest()
+        public void GetBlobProperties_TestReturnType()
         {
 
             // Arrange
