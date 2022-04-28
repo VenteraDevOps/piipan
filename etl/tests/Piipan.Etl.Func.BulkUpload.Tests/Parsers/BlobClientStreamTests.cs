@@ -111,6 +111,22 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
+        public async void BlobClientProperties_InvalidStringEventThrowsJsonError()
+        {
+            //Arrange
+            var logger = new Mock<ILogger>();
+
+            var blobClientStream = new BlobClientStream();
+
+            Action act = () => blobClientStream.BlobClientProperties("123", logger.Object);
+            var ex = Assert.ThrowsAny<System.NullReferenceException>(act);
+            
+            // Act // Assert
+            Assert.Equal("Object reference not set to an instance of an object.", ex.Message.ToString().Substring(0, 53));
+
+        }
+
+        [Fact]
         public void GetBlobName_TestReturnedName()
         {
 

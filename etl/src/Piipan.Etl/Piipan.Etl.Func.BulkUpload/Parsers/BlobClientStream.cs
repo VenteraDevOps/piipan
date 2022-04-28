@@ -85,7 +85,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             catch (ArgumentException ex)
             {
                 log.LogError("Error parsing blob event");
-                throw new ArgumentException("test");
+                throw new ArgumentException();
             }
         }
     }
