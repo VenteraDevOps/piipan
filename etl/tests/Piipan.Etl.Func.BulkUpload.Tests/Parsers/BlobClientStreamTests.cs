@@ -62,8 +62,11 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
             var blobClientStream = new BlobClientStream();
 
-            // Act // Assert
-            Assert.ThrowsAny<JsonException>(() => blobClientStream.Parse("", logger.Object));
+            // Act 
+            Action act = () => blobClientStream.Parse("", logger.Object);
+            
+            // Assert
+            Assert.ThrowsAny<JsonException>(act);
         }
 
         [Fact]
@@ -101,10 +104,11 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
             var blobClientStream = new BlobClientStream();
 
+            // Act 
             Action act = () => blobClientStream.BlobClientProperties("", logger.Object);
-            var ex = Assert.ThrowsAny<JsonException>(act);
             
-            // Act // Assert
+            // Assert
+            var ex = Assert.ThrowsAny<JsonException>(act);
             Assert.Equal("The input does not contain any JSON tokens.", ex.Message.ToString().Substring(0, 43));
 
         }
@@ -114,13 +118,13 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         {
             //Arrange
             var logger = new Mock<ILogger>();
-
             var blobClientStream = new BlobClientStream();
-
-            Action act = () => blobClientStream.BlobClientProperties("123", logger.Object);
-            var ex = Assert.ThrowsAny<System.NullReferenceException>(act);
             
-            // Act // Assert
+            // Act 
+            Action act = () => blobClientStream.BlobClientProperties("123", logger.Object);
+            
+            // Assert
+            var ex = Assert.ThrowsAny<System.NullReferenceException>(act);
             Assert.Equal("Object reference not set to an instance of an object.", ex.Message.ToString().Substring(0, 53));
 
         }
@@ -142,7 +146,21 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
         }
 
-        
+        [Fact]
+        public void GetBlob_ThrowErrorConnectionString()
+        {
+
+            // Arrange
+            var blobClientStream = new BlobClientStream();
+
+            // Act
+            Action act = () => {var blob = blobClientStream.GetBlob("test");};
+            
+            // Assert
+            var ex = Assert.ThrowsAny<ArgumentNullException>(act);
+            Assert.Equal("Value cannot be null. (Parameter 'connectionString')", ex.Message.ToString().Substring(0, 52));
+
+        }
 
         [Fact]
         public void GetBlobProperties_TestReturnType()

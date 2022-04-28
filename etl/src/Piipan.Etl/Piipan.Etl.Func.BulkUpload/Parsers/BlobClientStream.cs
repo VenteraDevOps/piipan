@@ -20,7 +20,6 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 {
     public class BlobClientStream : IBlobClientStream
     {
-
         public virtual string GetBlobName(StorageBlobCreatedEventData blobEvent) {
 
                 //Get blob name from the blob url
@@ -80,8 +79,8 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 return response.Value;
             }
-            catch (ArgumentException ex) {
-                throw new ArgumentException();
+            catch (NullReferenceException ex) {
+                throw;
             }
         }
     }
