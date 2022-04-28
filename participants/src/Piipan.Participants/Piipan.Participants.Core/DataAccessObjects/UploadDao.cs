@@ -22,7 +22,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
             {
                 return await connection
                     .QuerySingleAsync<UploadDbo>(@"
-                    SELECT id, created_at, publisher,upload_identifier
+                    SELECT id, created_at, publisher,upload_identifier, status
                     FROM uploads
                     ORDER BY id DESC
                     LIMIT 1");
@@ -36,8 +36,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 await connection.OpenAsync();
                
                 await connection.ExecuteAsync(@"
-                INSERT INTO uploads (created_at, publisher,upload_identifier)
-                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier)", new { uploadIdentifier = uploadIdentifier });
+                INSERT INTO uploads (created_at, publisher,upload_identifier, status)
+                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, 'Uploading')", new { uploadIdentifier = uploadIdentifier });
 
                 var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
