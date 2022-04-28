@@ -36,52 +36,52 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             return new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
         }
 
-        public virtual Response<BlobProperties> GetBlobProperties(BlockBlobClient blob) {                
+        public virtual StorageBlobCreatedEventData ParseEvents(string input){
 
-            return blob.GetProperties();
+            //parse queue event
+            var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
+
+            return queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
         }
 
-        public Stream Parse(string input, ILogger log) {
+        public BlockBlobClient Parse(string input, ILogger log) {
             try
             {
-                //parse queue event
-                var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
-                var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
+                var createdBlobEvent = ParseEvents(input);
 
                 var blobName = GetBlobName(createdBlobEvent);
 
-                BlockBlobClient blob = GetBlob(blobName);
-
-                Stream returnStream = new System.IO.MemoryStream();
-
-                var response = blob.DownloadTo(returnStream);
-
-                return returnStream;
-            }
+                return GetBlob(blobName);
+            }   
             catch (System.Exception ex) {
                 throw ex;
             }
         }
 
-        public BlobProperties BlobClientProperties(string input, ILogger log) {
+        // public Response<BlobProperties> GetBlobProperties(BlockBlobClient blob) {                
 
-            try
-            {
-                //parse queue event
-                var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
-                var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
+        //     return blob.GetProperties();
+        // }
 
-                var blobName = GetBlobName(createdBlobEvent);
+        // public BlobProperties BlobClientProperties(string input, ILogger log) {
 
-                BlockBlobClient blob = GetBlob(blobName);
+        //     try
+        //     {
+        //         //parse queue event
+        //         var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
+        //         var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
 
-                var response = GetBlobProperties(blob);
+        //         var blobName = GetBlobName(createdBlobEvent);
 
-                return response.Value;
-            }
-            catch (NullReferenceException ex) {
-                throw;
-            }
-        }
+        //         BlockBlobClient blob = GetBlob(blobName);
+
+        //         var response = GetBlobProperties(blob);
+
+        //         return response.Value;
+        //     }
+        //     catch (NullReferenceException ex) {
+        //         throw;
+        //     }
+        // }
     }
 }

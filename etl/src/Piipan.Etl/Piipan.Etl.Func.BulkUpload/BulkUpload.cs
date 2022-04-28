@@ -56,13 +56,31 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation(myQueueItem);
             try
             {
-                var input =  _blobStream.Parse(myQueueItem, log);
-                var blobProperties = _blobStream.BlobClientProperties(myQueueItem, log);
+                var blockBlobClient =  _blobStream.Parse(myQueueItem, log);
+
+                Stream input = new System.IO.MemoryStream();
+
+                var response = blockBlobClient.DownloadTo(input);
+
+                var blobProperties = blockBlobClient.GetProperties().Value;
 
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
-                    await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
+                    await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString())
+                            .ContinueWith(
+                                antecedent =>
+                                {
+                                    if (antecedent.Status == TaskStatus.RanToCompletion)
+                                    {
+                                        blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
+                                    }
+                                    else if (antecedent.Status == TaskStatus.Faulted)
+                                    {
+                                        log.LogError("Error inserting participants, blob not deleted.");
+                                        blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
+                                    }
+                                });
                 }
                 else
                 {
