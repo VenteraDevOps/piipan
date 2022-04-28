@@ -45,7 +45,28 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                     });
                 return factory.Object;
             });
+
             services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
+
+            services.AddTransient<IBlobClientStream>(b => 
+            {
+                var factory = new Mock<IBlobClientStream>();
+                factory
+                        .Setup(m => m.Parse(
+                                        It.IsAny<string>(),     //EventGridEvent string
+                                        It.IsAny<ILogger>()))
+                        .Returns(() => {
+                            return new MemoryStream(File.ReadAllBytes("example.csv"));
+                        });
+                factory
+                    .Setup(m => m.BlobClientProperties(
+                                        It.IsAny<string>(),     //EventGridEvent string
+                                        It.IsAny<ILogger>()))
+                    .Returns(new BlobProperties());
+                        
+                return factory.Object;
+            });
+
             services.RegisterParticipantsServices();
 
             return services.BuildServiceProvider();
@@ -56,7 +77,8 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             var services = BuildServices();
             return new BulkUpload(
                 services.GetService<IParticipantApi>(),
-                services.GetService<IParticipantStreamParser>()
+                services.GetService<IParticipantStreamParser>(),
+                services.GetService<IBlobClientStream>()
             );
         }
 
@@ -66,21 +88,13 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             // setup
             var services = BuildServices();
             ClearParticipants();
-            var blobClient = new Mock<BlobClient>();
-            var responseMock = new Mock<Response>();
-            blobClient
-                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
-                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-            var eventGridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(String.Empty));
-            var input = new MemoryStream(File.ReadAllBytes("example.csv"));
-            var logger = Mock.Of<ILogger>();
+            
             var function = BuildFunction();
 
             // act
             await function.Run(
-                eventGridEvent.Object,
-                input, blobClient.Object,
-                logger
+                "Event Grid Event String",
+                Mock.Of<ILogger>()
             );
 
             var records = QueryParticipants("SELECT * from participants;").ToList();

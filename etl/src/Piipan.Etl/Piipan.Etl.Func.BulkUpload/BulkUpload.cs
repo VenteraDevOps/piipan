@@ -26,13 +26,16 @@ namespace Piipan.Etl.Func.BulkUpload
     {
         private readonly IParticipantApi _participantApi;
         private readonly IParticipantStreamParser _participantParser;
+        private readonly IBlobClientStream _blobStream;
 
         public BulkUpload(
             IParticipantApi participantApi,
-            IParticipantStreamParser participantParser)
+            IParticipantStreamParser participantParser,
+            IBlobClientStream blobStream)
         {
             _participantApi = participantApi;
             _participantParser = participantParser;
+            _blobStream = blobStream;
         }
 
         /// <summary>
@@ -47,18 +50,18 @@ namespace Piipan.Etl.Func.BulkUpload
         /// </remarks>
         [FunctionName("BulkUpload")]
         public async Task Run(
-            [EventGridTrigger] EventGridEvent eventGridEvent,
-            [Blob("{data.url}", FileAccess.Read,Connection = "BlobStorageConnectionString")] Stream input,
-            [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] BlobClient blobClient,
+            [QueueTrigger("upload", Connection = "BlobStorageConnectionString")] string myQueueItem,
             ILogger log)
         {
-            log.LogInformation(eventGridEvent.Data.ToString());
+            log.LogInformation(myQueueItem);
             try
             {
+                var input =  _blobStream.Parse(myQueueItem, log);
+                var blobProperties = _blobStream.BlobClientProperties(myQueueItem, log);
+
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
-                    BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
                     await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
                 }
                 else

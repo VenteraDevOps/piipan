@@ -36,6 +36,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             Assert.NotNull(provider.GetService<IDbConnectionFactory<ParticipantsDb>>());
             Assert.NotNull(provider.GetService<IParticipantApi>());
             Assert.NotNull(provider.GetService<IParticipantStreamParser>());
+            Assert.NotNull(provider.GetService<IBlobClientStream>());
         }
     }
 }
