@@ -111,6 +111,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             VerifyLogError(logger, "the parser broke");
         }
 
+
         [Fact]
         public async void Run_ApiThrows()
         {

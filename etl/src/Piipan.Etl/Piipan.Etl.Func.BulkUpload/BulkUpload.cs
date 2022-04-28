@@ -87,12 +87,6 @@ namespace Piipan.Etl.Func.BulkUpload
                                         }
                                     });
                     }
-                    else
-                    {
-                        // Can get here if Function does not have
-                        // permission to access blob URL
-                        log.LogError("No input stream was provided");
-                    }
                 }
             }
             catch (Exception ex)
