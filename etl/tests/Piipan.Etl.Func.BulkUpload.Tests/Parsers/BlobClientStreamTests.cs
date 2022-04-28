@@ -64,7 +64,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
             // Act // Assert
             Assert.ThrowsAny<JsonException>(() => blobClientStream.Parse("", logger.Object));
-            VerifyLogError(logger, "Error parsing blob event");
         }
 
         [Fact]
