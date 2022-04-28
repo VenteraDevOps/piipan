@@ -34,26 +34,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             ));
         }
 
-        // [Fact]
-        // public void Parse_EventReturnStream()
-        // {
-
-        //     //Arrange
-        //     var logger = new Mock<ILogger>();
-
-        //     var blobClientStream = new Mock<BlobClientStream>();
-        //         blobClientStream
-        //             .Setup(m => m.GetBlob(It.IsAny<string>()))
-        //             .Returns(new Mock<BlockBlobClient>().Object);
-
-        //     // Act
-        //     var streamValue = blobClientStream.Object.Parse(EventString, logger.Object);
-
-        //     //Assert
-        //     Assert.Equal(streamValue.GetType(), typeof(System.IO.MemoryStream));
-
-        // }
-
         [Fact]
         public async void Parse_EmptyEvent()
         {
@@ -68,66 +48,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             // Assert
             Assert.ThrowsAny<JsonException>(act);
         }
-
-        // [Fact]
-        // public void BlobClientProperties_TestReturnType()
-        // {
-
-        //     // Arrange
-        //     var logger = new Mock<ILogger>();
-
-        //     var blobClient = new Mock<BlobClient>();
-        //     var responseMock = new Mock<Response>();
-
-        //     var blobClientStream = new Mock<BlobClientStream>();
-        //         blobClientStream
-        //             .Setup(m => m.GetBlob(It.IsAny<string>()))
-        //             .Returns(new Mock<BlockBlobClient>().Object);
-        //         blobClientStream
-        //             .Setup(m => m.GetBlobProperties(It.IsAny<BlockBlobClient>()))
-        //             .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-
-
-        //     // Act
-        //     var blobProperties = blobClientStream.Object.BlobClientProperties(EventString, logger.Object);
-
-        //     //Assert
-        //     Assert.Equal(blobProperties.GetType(), typeof(BlobProperties));
-
-        // }
-
-        // [Fact]
-        // public async void BlobClientProperties_EmptyEventThrowsJsonError()
-        // {
-        //     //Arrange
-        //     var logger = new Mock<ILogger>();
-
-        //     var blobClientStream = new BlobClientStream();
-
-        //     // Act 
-        //     Action act = () => blobClientStream.BlobClientProperties("", logger.Object);
-            
-        //     // Assert
-        //     var ex = Assert.ThrowsAny<JsonException>(act);
-        //     Assert.Equal("The input does not contain any JSON tokens.", ex.Message.ToString().Substring(0, 43));
-
-        // }
-
-        // [Fact]
-        // public async void BlobClientProperties_InvalidStringEventThrowsJsonError()
-        // {
-        //     //Arrange
-        //     var logger = new Mock<ILogger>();
-        //     var blobClientStream = new BlobClientStream();
-            
-        //     // Act 
-        //     Action act = () => blobClientStream.BlobClientProperties("123", logger.Object);
-            
-        //     // Assert
-        //     var ex = Assert.ThrowsAny<System.NullReferenceException>(act);
-        //     Assert.Equal("Object reference not set to an instance of an object.", ex.Message.ToString().Substring(0, 53));
-
-        // }
 
         [Fact]
         public void GetBlobName_TestReturnedName()
@@ -161,30 +81,5 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Equal("Value cannot be null. (Parameter 'connectionString')", ex.Message.ToString().Substring(0, 52));
 
         }
-
-        // [Fact]
-        // public void GetBlobProperties_TestReturnType()
-        // {
-
-        //     // Arrange
-        //     var blobClientStream = new BlobClientStream();
-        //     var blob = Mock.Of<BlockBlobClient>();
-
-        //     var blobClient = new Mock<BlockBlobClient>();
-        //     var responseMock = new Mock<Response>();
-        //     blobClient
-        //         .Setup(m => m.GetProperties(null, CancellationToken.None))
-        //         .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-
-        //     // Act
-        //     var response = blobClientStream.GetBlobProperties(blobClient.Object);
-
-        //     //Assert
-        //     Assert.Equal(typeof(BlobProperties), response.Value.GetType());
-
-        // }
-
-      
-
     }
 }

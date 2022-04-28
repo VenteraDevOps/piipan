@@ -57,31 +57,5 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 throw ex;
             }
         }
-
-        // public Response<BlobProperties> GetBlobProperties(BlockBlobClient blob) {                
-
-        //     return blob.GetProperties();
-        // }
-
-        // public BlobProperties BlobClientProperties(string input, ILogger log) {
-
-        //     try
-        //     {
-        //         //parse queue event
-        //         var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
-        //         var createdBlobEvent = queuedEvent.Data.ToObjectFromJson<StorageBlobCreatedEventData>();
-
-        //         var blobName = GetBlobName(createdBlobEvent);
-
-        //         BlockBlobClient blob = GetBlob(blobName);
-
-        //         var response = GetBlobProperties(blob);
-
-        //         return response.Value;
-        //     }
-        //     catch (NullReferenceException ex) {
-        //         throw;
-        //     }
-        // }
     }
 }
