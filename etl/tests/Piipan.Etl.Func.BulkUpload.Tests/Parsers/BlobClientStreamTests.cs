@@ -42,15 +42,19 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             var logger = new Mock<ILogger>();
 
             var blobClientStream = new Mock<BlobClientStream>();
-                blobClientStream
-                    .Setup(m => m.GetBlob(It.IsAny<string>()))
-                    .Returns(new Mock<BlockBlobClient>().Object);
+            Mock<BlockBlobClient> blobClient = new Mock<BlockBlobClient>();
 
+            blobClient.Setup(x=>x.OpenRead(0, null, null, default)).Returns(new MemoryStream());
+
+            blobClientStream
+                .Setup(m => m.GetBlob(It.IsAny<string>()))
+                .Returns(blobClient.Object);
+            
             // Act
             var streamValue = blobClientStream.Object.Parse(EventString, logger.Object);
 
             //Assert
-            Assert.Equal(streamValue.GetType(), typeof(System.IO.MemoryStream));
+            Assert.Equal(streamValue.GetType(), typeof(MemoryStream));
 
         }
 

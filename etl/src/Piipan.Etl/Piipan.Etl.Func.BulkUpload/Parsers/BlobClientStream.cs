@@ -52,11 +52,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 BlockBlobClient blob = GetBlob(blobName);
 
-                Stream returnStream = new System.IO.MemoryStream();
-
-                var response = blob.DownloadTo(returnStream);
-
-                return returnStream;
+                return blob.OpenRead();
             }
             catch (System.Exception ex) {
                 throw ex;

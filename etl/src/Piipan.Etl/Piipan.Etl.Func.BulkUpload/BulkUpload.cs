@@ -41,8 +41,7 @@ namespace Piipan.Etl.Func.BulkUpload
         /// <summary>
         /// Entry point for the state-specific Azure Function instance
         /// </summary>
-        /// <param name="eventGridEvent">storage container blob creation event</param>
-        /// <param name="input">handle to CSV file uploaded to a state-specific container</param>
+        /// <param name="myQueueItem">storage queue item</param>
         /// <param name="log">handle to the function log</param>
         /// <remarks>
         /// The function is expected to be executing as a managed identity that has read access
