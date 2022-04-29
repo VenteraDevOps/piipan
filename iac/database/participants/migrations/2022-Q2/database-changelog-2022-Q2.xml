@@ -1,0 +1,76 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.6.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <changeSet author="bfoshay (generated)" id="1651107522180-1">
+        <createTable remarks="Bulk PII upload events" tableName="uploads">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="uploads_pkey"/>
+            </column>
+            <column name="created_at" remarks="Date/time the records were uploaded in bulk" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="publisher" remarks="User or service account that performed the upload" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="upload_identifier" remarks="Unique ID for uploads for status inquiries" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="bfoshay (generated)" id="1651107522180-2">
+        <createTable remarks="Program participant" tableName="participants">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="participants_pkey"/>
+            </column>
+            <column name="lds_hash" remarks="Participant's deidentified data as hex value" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="upload_id" type="INTEGER"/>
+            <column name="case_id" remarks="Participant's state-specific case identifier" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="participant_id" remarks="Participant's state-specific identifier" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="participant_closing_date" remarks="Date when the Participant's case will close. This will be the last date the participate is eligible to receive benefits." type="date"/>
+            <column name="recent_benefit_issuance_dates" remarks="Participant's recent benefit months issuances date ranges." type="DATERANGE[]"/>
+            <column name="vulnerable_individual" remarks="Participant's vulnerability status" type="BOOLEAN"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="bfoshay (generated)" id="1651107522180-3">
+        <createIndex indexName="participants_lds_hash_idx" tableName="participants">
+            <column name="lds_hash"/>
+            <column name="upload_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="bfoshay (generated)" id="1651107522180-4">
+        <createIndex indexName="participants_uniq_ids_idx" tableName="participants" unique="true">
+            <column name="case_id"/>
+            <column name="participant_id"/>
+            <column name="upload_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="bfoshay (generated)" id="1651107522180-5">
+        <addForeignKeyConstraint baseColumnNames="upload_id" baseTableName="participants" constraintName="participants_upload_id_fkey" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="uploads" referencedTableSchemaName="piipan" validate="true"/>
+    </changeSet>
+    <!-- <changeSet id="2" author="Bill Foshay" labels="example-label" context="example-context">
+        <comment>example-comment</comment>
+        <createTable tableName="company1">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address1" type="varchar(50)"/>
+            <column name="address2" type="varchar(50)"/>
+            <column name="city" type="varchar(30)"/>
+        </createTable>
+    </changeSet> -->
+    <changeSet id="3" author="Conner" labels="example-label" context="example-context">
+        <comment>1234</comment><!-- Nac-1234 ticket -->
+        <sqlFile relativeToChangelogFile="true" path="example-changeset.sql" splitStatements="false"/>
+        <rollback>
+            <sqlFile relativeToChangelogFile="true" path="example-rollback-changeset.sql" splitStatements="false"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
