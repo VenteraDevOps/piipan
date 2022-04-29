@@ -30,16 +30,18 @@ The reason we chose Liquibase
 ### Workflow
 
 * There will be a master changelog file at the top level or root of each Database's source control folder. Under each folder will be a series of quarterly folders each containing sql migrations created during that period. Each migration is a .sql file(s) and each sibling db-changelog.xml file will reference all of the scripts in that quarterly folder. The reason for the quarterly folders is to prevent the master-changelog.xml file from growing too large. It provides a means of breaking it up into a smaller series of dependent changelog files.
-* Scripts should be written with the goal of Evolutionary Database Design in mind
-* Scripts (and rollback scripts) should be idempotent if possible. This isn't always possible or in some cases not practical to go to the effort. But we should strive to.
-* Script file names should be of the format "mm_dd_{Script description}.sql". Naming should include a good description
-* The author should be specified. It should be the author's usda email address.
-* Scripts should be saved as a sql file in their appropriate Git folder.
-* The Liquibase changelog file should be updated with a changeset reference to the new script
-* Changeset Ids should be the same as the sql file name (without the .sql suffix). Liquibase advises that using the file name itself is more unique than a date based naming convention.
-* All Changesets should include a comment tag that contains the JIRA ticket number. Just the numeric value ONLY e.g. for Nac-123 you would just put <comment>123</comment>
-* Developer commits changes and pushes to Git. Prior to check-in each developer should run both their migration and rollback script through liquibase to verify they are valid, run successfully, and are idempotent. 
-* CICD runs migration against DEV databases upon successful PR merge.
+
+1. Scripts should 
+* Written with the goal of Evolutionary Database Design in mind
+* Should be idempotent if possible. This isn't always possible or in some cases not practical. But we should strive for idempotency.
+1. Name the file following a convention/format "mm_dd_{Script description}.sql". Naming should include a good description
+1. Specify the author. It should be the author's usda email address.
+1. Save the script as a sql file in the appropriate Git folder.
+1. Update the Liquibase changelog file swith a changeset reference to the new script
+1. Make the changeset Ids should be the same as the sql file name (without the .sql suffix). Liquibase advises that using the file name itself is more unique than a date based naming convention.
+1. Include a comment tag in the changeset that contains the JIRA ticket number. Just the numeric value ONLY e.g. for Nac-123 you would just put <comment>123</comment>
+1. Commit script and changelog updates to Git. Prior to check-in each developer should run both their migration and rollback script through liquibase to verify they are valid, run successfully, and are idempotent. 
+1. CICD runs migration against DEV databases upon successful PR merge.
 
 
 ## Consequences
