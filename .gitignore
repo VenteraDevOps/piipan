@@ -18,3 +18,4 @@
 iac/env/tts/eth.bash
 iac/env/tts/eth1.bash
 iac/env/tts/eth2.bash
+iac/database/participants/liquibase.properties
