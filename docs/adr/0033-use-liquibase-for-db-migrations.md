@@ -31,9 +31,9 @@ The reason we chose Liquibase
 
 * There will be a master changelog file at the top level or root of each Database's source control folder. Under each folder will be a series of quarterly folders each containing sql migrations created during that period. Each migration is a .sql file(s) and each sibling db-changelog.xml file will reference all of the scripts in that quarterly folder. The reason for the quarterly folders is to prevent the master-changelog.xml file from growing too large. It provides a means of breaking it up into a smaller series of dependent changelog files.
 
-1. Scripts should 
-* Written with the goal of Evolutionary Database Design in mind
-* Should be idempotent if possible. This isn't always possible or in some cases not practical. But we should strive for idempotency.
+1. Write sql migration script(s) 
+    1. Written with the goal of Evolutionary Database Design in mind
+    1. Should be idempotent if possible. This isn't always possible or in some cases not practical. But we should strive for idempotency.
 1. Name the file following a convention/format "mm_dd_{Script description}.sql". Naming should include a good description
 1. Specify the author. It should be the author's usda email address.
 1. Save the script as a sql file in the appropriate Git folder.
