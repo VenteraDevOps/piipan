@@ -75,40 +75,6 @@
     },
     "resources": [
         {
-            "type": "Microsoft.Network/frontdoors/rulesengines",
-            "apiVersion": "2020-05-01",
-            "name": "[concat(parameters('frontDoorName'), '/', parameters('rulesEngineName'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
-            ],
-            "properties": {
-                "resourceState": "Enabled",
-                "rules": [
-                    {
-                        "name": "AddSecurityHeaders",
-                        "priority": 0,
-                        "action": {
-                            "requestHeaderActions": [],
-                            "responseHeaderActions": [
-                                {
-                                    "headerActionType": "Overwrite",
-                                    "headerName": "Strict-Transport-Security",
-                                    "value": "max-age=31536000; includeSubDomains; preload"
-                                },
-                                {
-                                    "headerActionType": "Overwrite",
-                                    "headerName": "X-Frame-Options",
-                                    "value": "DENY"
-                                }
-                            ]
-                        },
-                        "matchConditions": [],
-                        "matchProcessingBehavior": "Continue"
-                    }
-                ]
-            }
-        },
-        {
             "apiVersion": "2019-03-01",
             "type": "Microsoft.Network/FrontDoorWebApplicationFirewallPolicies",
             "name": "[parameters('wafPolicyName')]",
@@ -318,6 +284,40 @@
                     {
                         "category": "FrontdoorWebApplicationFirewallLog",
                         "enabled": true
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/frontdoors/rulesengines",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(parameters('frontDoorName'), '/', parameters('rulesEngineName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
+            ],
+            "properties": {
+                "resourceState": "Enabled",
+                "rules": [
+                    {
+                        "name": "AddSecurityHeaders",
+                        "priority": 0,
+                        "action": {
+                            "requestHeaderActions": [],
+                            "responseHeaderActions": [
+                                {
+                                    "headerActionType": "Overwrite",
+                                    "headerName": "Strict-Transport-Security",
+                                    "value": "max-age=31536000; includeSubDomains; preload"
+                                },
+                                {
+                                    "headerActionType": "Overwrite",
+                                    "headerName": "X-Frame-Options",
+                                    "value": "DENY"
+                                }
+                            ]
+                        },
+                        "matchConditions": [],
+                        "matchProcessingBehavior": "Continue"
                     }
                 ]
             }
