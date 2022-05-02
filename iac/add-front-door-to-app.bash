@@ -44,7 +44,7 @@ main () {
       rulesEngineName="$rules_engine_name"
 
   echo 'Associate Routing Rule to Front Door Rule Engine'
-  az network front-door routing-rule update --front-door-name $front_door_name --name routingRule1 --resource-group $resource_group --rules-engine $rules_engine_name
+  az network front-door routing-rule update --front-door-name "$front_door_name" --name routingRule1 --resource-group "$resource_group" --rules-engine "$rules_engine_name"
 
   script_completed
 }
