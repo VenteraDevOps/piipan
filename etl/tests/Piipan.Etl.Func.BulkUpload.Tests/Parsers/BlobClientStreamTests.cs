@@ -50,6 +50,26 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
+        public async void Parse_Event()
+        {
+            //Arrange
+            var logger = new Mock<ILogger>();
+
+            BlockBlobClient blobClient = new BlockBlobClient(new Uri("http://www.contoso.com/blob"), null);
+            
+            var blobClientStream = new Mock<BlobClientStream>();
+                blobClientStream
+                        .Setup(x=>x.GetBlob(It.IsAny<String>()))
+                        .Returns(blobClient);
+
+            // Act 
+            BlockBlobClient blobResult = blobClientStream.Object.Parse(EventString, logger.Object);
+            
+            // Assert
+            Assert.Equal(typeof(BlockBlobClient), blobResult.GetType());
+        }
+
+        [Fact]
         public void GetBlobName_TestReturnedName()
         {
 
@@ -66,19 +86,35 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
         }
 
+        // [Fact]
+        // public void GetBlob_ThrowErrorConnectionString()
+        // {
+
+        //     // Arrange
+        //     var blobClientStream = new BlobClientStream();
+
+        //     // Act
+        //     Action act = () => {var blob = blobClientStream.GetBlob("test");};
+            
+        //     // Assert
+        //     var ex = Assert.ThrowsAny<ArgumentNullException>(act);
+        //     Assert.Equal("Value cannot be null. (Parameter 'connectionString')", ex.Message.ToString().Substring(0, 52));
+
+        // }
+
         [Fact]
-        public void GetBlob_ThrowErrorConnectionString()
+        public void GetBlob_TestBlob()
         {
 
             // Arrange
             var blobClientStream = new BlobClientStream();
+            Environment.SetEnvironmentVariable("BlobStorageConnectionString", "UseDevelopmentStorage=true");
 
             // Act
-            Action act = () => {var blob = blobClientStream.GetBlob("test");};
+            var blob = blobClientStream.GetBlob("test");
             
             // Assert
-            var ex = Assert.ThrowsAny<ArgumentNullException>(act);
-            Assert.Equal("Value cannot be null. (Parameter 'connectionString')", ex.Message.ToString().Substring(0, 52));
+            Assert.Equal(typeof(BlockBlobClient), blob.GetType());
 
         }
     }
