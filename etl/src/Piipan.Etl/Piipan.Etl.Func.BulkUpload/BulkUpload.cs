@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
@@ -79,12 +80,15 @@ namespace Piipan.Etl.Func.BulkUpload
                                         {
                                             blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
                                         }
-                                        else if (antecedent.Status == TaskStatus.Faulted)
+                                        else if (antecedent.Status == TaskStatus.Faulted
+                                                || antecedent.Status == TaskStatus.Canceled)
                                         {
                                             log.LogError("Error inserting participants, blob not deleted.");
                                             blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
                                         }
-                                    });
+                                    }
+                                )
+                                ;
                     }
                 }
             }

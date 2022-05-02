@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
@@ -121,7 +122,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>()))
-                .Throws(new Exception("the api broke"));
+                 .Throws(new Exception("the api broke"))
+                //.Returns(Task.FromException<System.Exception>(new Exception("the api broke")))           
+                ;
+                
 
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
