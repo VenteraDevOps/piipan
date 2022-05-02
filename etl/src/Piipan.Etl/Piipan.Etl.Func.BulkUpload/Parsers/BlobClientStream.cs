@@ -51,8 +51,10 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 var blobName = GetBlobName(createdBlobEvent);
 
-                return GetBlob(blobName);
-            }   
+                BlockBlobClient blob = GetBlob(blobName);
+
+                return blob;
+            }
             catch (System.Exception ex) {
                 throw ex;
             }
