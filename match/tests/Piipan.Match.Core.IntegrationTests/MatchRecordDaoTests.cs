@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Npgsql;
-using Piipan.Match.Api.Models;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Shared.Database;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.Match.Core.IntegrationTests
@@ -290,6 +289,41 @@ namespace Piipan.Match.Core.IntegrationTests
                 // Act
                 // Assert
                 Assert.ThrowsAsync<System.InvalidOperationException>(() => dao.GetRecordByMatchId(id));
+            }
+        }
+
+        [Fact]
+        public async Task GetMatchesList_ReturnsRecordsIfFound()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchRecordDao>>();
+                var dao = new MatchRecordDao(DbConnFactory(), logger);
+                var idService = new MatchIdService();
+                var records = Enumerable.Range(0, 2).Select(_ =>
+                    new MatchRecordDbo
+                    {
+                        MatchId = idService.GenerateId(),
+                        Hash = "foo",
+                        HashType = "ldshash",
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        Data = "{}"
+                    }).ToList();
+
+
+                ClearMatchRecords();
+                records.ForEach(r => Insert(r));
+
+                // Act
+                var results = await dao.GetMatchesList();
+
+                // Assert
+                Assert.Equal(records, results);
             }
         }
     }
