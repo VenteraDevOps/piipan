@@ -32,7 +32,6 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 return blobName;
         }
-
         public virtual BlockBlobClient GetBlob(string blobName, string connectionString = "BlobStorageConnectionString") {                
 
             return new BlockBlobClient(Environment.GetEnvironmentVariable(connectionString), "upload", blobName);
@@ -61,7 +60,6 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 throw ex;
             }
         }
-
         public Azure.Response<bool> DeleteBlobAfterProcessing(Task antecedent, BlockBlobClient blockBlobClient, ILogger log){
                 
                 if (antecedent.Status == TaskStatus.RanToCompletion)
