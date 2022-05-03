@@ -28,8 +28,8 @@
     </backend>
     <outbound>
         <base />
-		<set-body>
-        @{return new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", ""))).ToString();}
+	<set-body>
+            @{return new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", ""))).ToString();}
         </set-body>
     </outbound>
     <on-error>
