@@ -26,7 +26,7 @@
                 <tr>
                     <td><a href="/match/@result.MatchId">@result.MatchId</a></td>
                     <td>@(string.Join(", ", result.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state))))</td>
-                    <td>@(result.CreatedAt?.ToLocalTime().ToString("M/dd/yyyy h:mm:ss tt").ToUpper() + " " + timeZoneAbbreviation)</td>
+                    <td>@(result.CreatedAt?.ToLocalTime().ToString("M/d/yyyy h:mm:ss tt").ToUpper() + " " + timeZoneAbbreviation)</td>
                 </tr>
             }
             </tbody>
