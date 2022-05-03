@@ -60,13 +60,18 @@
             "metadata": {
                 "description": "Development environment indicator"
             }
+        },
+        "rulesEngineName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the rules engine to be created with Security Headers"
+            }
         }
     },
     "variables": {
         "location": "global", /* front-door location must be global */
         "wafLocation": "global" /* waf location must be global */,
-        "eventhubName": "[concat(parameters('prefix'), '-evh-monitoring-', parameters('env'))]",
-        "securityHeaderRulesName": "SecurityHeaderRules"
+        "eventhubName": "[concat(parameters('prefix'), '-evh-monitoring-', parameters('env'))]"
     },
     "resources": [
         {
@@ -81,41 +86,41 @@
                     "enabledState": "Enabled"
                 },
                 "customRules": {
-                    "rules":[
-                       {
-                          "action":"Block",
-                          "enabledState":"Enabled",
-                          "matchConditions":[
-                             {
-                                "matchValue":[
-                                   "~"
-                                ],
-                                "matchVariable":"RequestUri",
-                                "operator":"Contains"
-                             }
-                          ],
-                          "name":"denyShortPath",
-                          "priority":"100",
-                          "ruleType":"MatchRule"
-                       },
-                       {
-                          "action":"Block",
-                          "enabledState":"Enabled",
-                          "matchConditions":[
-                             {
-                                "matchValue":[
-                                   "POST"
-                                ],
-                                "matchVariable":"RequestMethod",
-                                "operator":"Equal"
-                             }
-                          ],
-                          "name":"rateLimitByRequestMethod",
-                          "priority":"200",
-                          "rateLimitDurationInMinutes":"5",
-                          "rateLimitThreshold":"10000",
-                          "ruleType":"RateLimitRule"
-                       }
+                    "rules": [
+                        {
+                            "action": "Block",
+                            "enabledState": "Enabled",
+                            "matchConditions": [
+                                {
+                                    "matchValue": [
+                                        "~"
+                                    ],
+                                    "matchVariable": "RequestUri",
+                                    "operator": "Contains"
+                                }
+                            ],
+                            "name": "denyShortPath",
+                            "priority": "100",
+                            "ruleType": "MatchRule"
+                        },
+                        {
+                            "action": "Block",
+                            "enabledState": "Enabled",
+                            "matchConditions": [
+                                {
+                                    "matchValue": [
+                                        "POST"
+                                    ],
+                                    "matchVariable": "RequestMethod",
+                                    "operator": "Equal"
+                                }
+                            ],
+                            "name": "rateLimitByRequestMethod",
+                            "priority": "200",
+                            "rateLimitDurationInMinutes": "5",
+                            "rateLimitThreshold": "10000",
+                            "ruleType": "RateLimitRule"
+                        }
                     ]
                 },
                 "managedRules": {
@@ -227,9 +232,6 @@
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', parameters('frontDoorName'), concat('backend-pool-', uniqueString(parameters('frontDoorName'))))]"
                                 }
                             },
-                            "rulesEngine": {
-                                "id": "[resourceId('Microsoft.Network/frontdoors/rulesengines', parameters('frontDoorName'), variables('securityHeaderRulesName'))]"
-                            },
                             "enabledState": "Enabled"
                         }
                     },
@@ -289,7 +291,7 @@
         {
             "type": "Microsoft.Network/frontdoors/rulesengines",
             "apiVersion": "2020-05-01",
-            "name": "[concat(parameters('frontDoorName'), '/', variables('securityHeaderRulesName'))]",
+            "name": "[concat(parameters('frontDoorName'), '/', parameters('rulesEngineName'))]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
             ],

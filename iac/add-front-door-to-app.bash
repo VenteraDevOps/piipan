@@ -25,6 +25,7 @@ main () {
   front_door_name=$3
   waf_name=$4
   app_address=$5
+  rules_engine_name="SecurityHeaderRules"
 
   suffix=$(front_door_host_suffix)
   az deployment group create \
@@ -39,7 +40,11 @@ main () {
       resourceTags="$RESOURCE_TAGS" \
       wafPolicyName="$waf_name" \
       prefix="$PREFIX" \
-      env="$ENV"
+      env="$ENV" \
+      rulesEngineName="$rules_engine_name"
+
+  echo 'Associate Routing Rule to Front Door Rule Engine'
+  az network front-door routing-rule update --front-door-name "$front_door_name" --name routingRule1 --resource-group "$resource_group" --rules-engine "$rules_engine_name"
 
   script_completed
 }
