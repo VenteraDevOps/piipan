@@ -60,7 +60,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             
             var blobClientStream = new Mock<BlobClientStream>();
                 blobClientStream
-                        .Setup(x=>x.GetBlob(It.IsAny<String>()))
+                        .Setup(x=>x.GetBlob(It.IsAny<String>(), It.IsAny<String>()))
                         .Returns(blobClient);
 
             // Act 
@@ -87,21 +87,21 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
         }
 
-        // [Fact]
-        // public void GetBlob_ThrowErrorConnectionString()
-        // {
+        [Fact]
+        public void GetBlob_ThrowErrorConnectionString()
+        {
 
-        //     // Arrange
-        //     var blobClientStream = new BlobClientStream();
+            // Arrange
+            var blobClientStream = new BlobClientStream();
 
-        //     // Act
-        //     Action act = () => {var blob = blobClientStream.GetBlob("test");};
+            // Act
+            Action act = () => {var blob = blobClientStream.GetBlob("test", "wrongConnectionString");};
             
-        //     // Assert
-        //     var ex = Assert.ThrowsAny<ArgumentNullException>(act);
-        //     Assert.Equal("Value cannot be null. (Parameter 'connectionString')", ex.Message.ToString().Substring(0, 52));
+            // Assert
+            var ex = Assert.ThrowsAny<ArgumentNullException>(act);
+            Assert.Equal("Value cannot be null.", ex.Message.ToString().Substring(0, 21));
 
-        // }
+        }
 
         [Fact]
         public void GetBlob_TestBlob()

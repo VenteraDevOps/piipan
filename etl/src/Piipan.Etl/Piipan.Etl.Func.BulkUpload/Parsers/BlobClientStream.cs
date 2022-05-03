@@ -33,9 +33,9 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 return blobName;
         }
 
-        public virtual BlockBlobClient GetBlob(string blobName) {                
+        public virtual BlockBlobClient GetBlob(string blobName, string connectionString = "BlobStorageConnectionString") {                
 
-            return new BlockBlobClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "upload", blobName);
+            return new BlockBlobClient(Environment.GetEnvironmentVariable(connectionString), "upload", blobName);
         }
 
         public virtual StorageBlobCreatedEventData ParseEvents(string input){
