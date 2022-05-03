@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Linq;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
@@ -115,6 +116,30 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             
             // Assert
             Assert.Equal(typeof(BlockBlobClient), blob.GetType());
+
+        }
+
+        [Fact]
+        public void DeleteBlobAfterProcessing_TestDeleteBlobTrue()
+        {
+
+            // Arrange
+            var logger = new Mock<ILogger>();
+            var blobClientStream = new BlobClientStream();
+            var responseMock = new Mock<Response>();
+
+            var blob = new Mock<BlockBlobClient>();
+
+                blob
+                    .Setup(x=>x.DeleteIfExists(It.IsAny<DeleteSnapshotsOption>(), It.IsAny<BlobRequestConditions>(), CancellationToken.None))
+                    .Returns(Response.FromValue<bool>(true, responseMock.Object));
+            
+            // Act
+            Task t = Task.Run(() => {return true;});
+            var response = blobClientStream.DeleteBlobAfterProcessing(t, blob.Object, logger.Object);
+            
+            // Assert
+            Assert.Equal(true, response);
 
         }
     }

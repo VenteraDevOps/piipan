@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading;
 using Piipan.Participants.Api.Models;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
@@ -58,6 +60,19 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             catch (System.Exception ex) {
                 throw ex;
             }
+        }
+
+        public Azure.Response<bool> DeleteBlobAfterProcessing(Task antecedent, BlockBlobClient blockBlobClient, ILogger log){
+                
+                if (antecedent.Status == TaskStatus.RanToCompletion)
+                {
+                    return blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
+                }
+                else 
+                {
+                    log.LogError("Error inserting participants, blob not deleted.");
+                    return blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
+                }             
         }
     }
 }

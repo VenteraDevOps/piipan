@@ -73,22 +73,7 @@ namespace Piipan.Etl.Func.BulkUpload
                     {
                         var participants = _participantParser.Parse(input);
                         await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString())
-                                .ContinueWith(
-                                    antecedent =>
-                                    {
-                                        if (antecedent.Status == TaskStatus.RanToCompletion)
-                                        {
-                                            blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
-                                        }
-                                        else if (antecedent.Status == TaskStatus.Faulted
-                                                || antecedent.Status == TaskStatus.Canceled)
-                                        {
-                                            log.LogError("Error inserting participants, blob not deleted.");
-                                            blockBlobClient.DeleteIfExists(DeleteSnapshotsOption.IncludeSnapshots);
-                                        }
-                                    }
-                                )
-                                ;
+                                .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log));
                     }
                 }
             }
