@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1.39] - 2022-05-03
+
+### Changed
+- Updated Bulk Upload Process to utilize a Storage Trigger rather than an Event Grid Trigger
+- Refactored Bulk Upload functionality to move PostgresSQL-specific functionality behind a interface 
+- Allow multiple errors for Last Name validation on Query Tool page
+
+### Added
+- Added default search_reason value to queries generated on Query Tool page
+- Added new UI Component Library tests
+- Added status to states' Upload table
+
+### Fixed
+- Fixed documentation for upload_all_participants endpoint
+- Enabled HSTS
+- Include X-Frame-Options header in response from Dashboard app
+
 ## [1.0.1.38] - 2022-04-19
 
 ### Changed
