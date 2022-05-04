@@ -32,7 +32,7 @@
 			@{
 			JArray jarrayObj = new JArray();
 			jarrayObj.Add(new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", "").ToString())));
-			return new JProperty("Data", jarrayObj).ToString();
+			return new JProperty("data", jarrayObj).ToString();
 			}
 		</set-body>
     </outbound>
