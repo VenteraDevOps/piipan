@@ -28,9 +28,13 @@
     </backend>
     <outbound>
         <base />
-	<set-body>
-            @{return new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", ""))).ToString();}
-        </set-body>
+		<set-body>
+			@{
+			JArray jarrayObj = new JArray();
+			jarrayObj.Add(new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", "").ToString())));
+			return new JProperty("Data", jarrayObj).ToString();
+			}
+		</set-body>
     </outbound>
     <on-error>
         <base />
