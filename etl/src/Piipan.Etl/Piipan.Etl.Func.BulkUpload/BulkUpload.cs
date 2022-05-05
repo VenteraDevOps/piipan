@@ -69,7 +69,7 @@ namespace Piipan.Etl.Func.BulkUpload
 
                     Stream input = await blockBlobClient.OpenReadAsync();
 
-                    log.LogInformation($"Input lenght: ${input.Length}");
+                    log.LogInformation($"Input lenght: {input.Length} Position: {input.Position}");
 
                     var blobProperties = blockBlobClient.GetProperties().Value;
 
