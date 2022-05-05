@@ -39,8 +39,8 @@ components:
           schema:
             $ref: '../openapi/uploadAllParticipants.yaml#/UploadResponse'
           examples:
-            Single match:
-              $ref: '../openapi/uploadAllParticipants.yaml#/UploadResponseExamples/Single'
+            Default:
+              $ref: '../openapi/uploadAllParticipants.yaml#/UploadResponseExamples/Default'
 UploadResponse:
   title: Upload response
   type: object
@@ -51,17 +51,15 @@ UploadResponse:
       description: The response payload. Either an errors or data property will be present in the response, but not both.
       required:
         - upload_id
-        - etag
       properties:
         upload_id:
           type: string
           description: "A unique upload_id for the successful upload."
           
 UploadResponseExamples:
-  Single:
+  Default:
     description: "An upload of a single CSV file of all the participants"
     value:
       data:
-         - index: 0
            upload_id: "0x8DA2EA86C4C2089"
         

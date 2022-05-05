@@ -38,12 +38,9 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload_all_participants/{filename} \
 
 ```json
 {
-  "data": [
-    {
-      "index": 0,
-      "upload_id": "0x8DA2EA86C4C2089"
-    }
-  ]
+  "data": {
+    "upload_id": "0x8DA2EA86C4C2089"
+  }
 }
 ```
 
