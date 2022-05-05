@@ -24,24 +24,23 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
+                    type: array
                     nullable: true
                     description: 'The response payload. Either an errors or data property will be present in the response, but not both.'
                     required:
                       - upload_id
+                      - etag
                     properties:
                       upload_id:
-                        type: array
-                        description: Array of upload results. A unique upload_id for the successful upload.
+                        type: string
+                        description: A unique upload_id for the successful upload.
               examples:
                 Single match:
                   description: An upload of a single CSV file of all the participants
                   value:
                     data:
-                      results:
-                        - index: 0
-                          upload_id:
-                            description: A string of the unique upload id for the successful upload
+                      - index: 0
+                        upload_id: '0x8DA2EA86C4C2089'
   '/upload/{filename}':
     description: A Deprecated endpoint.
     put:

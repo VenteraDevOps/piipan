@@ -38,16 +38,12 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload_all_participants/{filename} \
 
 ```json
 {
-  "data": {
-    "results": [
-      {
-        "index": 0,
-        "upload_id": {
-          "description": "A string of the unique upload id for the successful upload"
-        }
-      }
-    ]
-  }
+  "data": [
+    {
+      "index": 0,
+      "upload_id": "0x8DA2EA86C4C2089"
+    }
+  ]
 }
 ```
 
@@ -65,8 +61,8 @@ Status Code **201**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|object|false|none|The response payload. Either an errors or data property will be present in the response, but not both.|
-|»» upload_id|array|true|none|Array of upload results. A unique upload_id for the successful upload.|
+|» data|array|false|none|The response payload. Either an errors or data property will be present in the response, but not both.|
+|»» upload_id|string|true|none|A unique upload_id for the successful upload.|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
