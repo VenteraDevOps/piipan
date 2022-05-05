@@ -61,5 +61,5 @@ UploadResponseExamples:
     description: "An upload of a single CSV file of all the participants"
     value:
       data:
-           upload_id: "0x8DA2EA86C4C2089"
+        - upload_id: "0x8DA2EA86C4C2089"
         
