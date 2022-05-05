@@ -30,9 +30,7 @@
         <base />
 		<set-body>
 			@{
-			JArray jarrayObj = new JArray();
-			jarrayObj.Add(new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", "").ToString())));
-			return new JObject(new JProperty("data", jarrayObj)).ToString();
+			return new JObject(new JProperty("data", new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", "").ToString())))).ToString();
 			}
 		</set-body>
     </outbound>

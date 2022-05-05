@@ -24,9 +24,9 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: array
+                    type: object
                     nullable: true
-                    description: 'The response payload. Either an errors or data property will be present in the response, but not both.'
+                    description: The response payload. Will contain a data property with upload details.
                     required:
                       - upload_id
                     properties:
@@ -38,7 +38,7 @@ paths:
                   description: An upload of a single CSV file of all the participants
                   value:
                     data:
-                      - upload_id: '0x8DA2EA86C4C2089'
+                      upload_id: '0x8DA2EA86C4C2089'
   '/upload/{filename}':
     description: A Deprecated endpoint.
     put:

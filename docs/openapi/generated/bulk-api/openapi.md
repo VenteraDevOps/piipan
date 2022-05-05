@@ -38,11 +38,9 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload_all_participants/{filename} \
 
 ```json
 {
-  "data": [
-    {
-      "upload_id": "0x8DA2EA86C4C2089"
-    }
-  ]
+  "data": {
+    "upload_id": "0x8DA2EA86C4C2089"
+  }
 }
 ```
 
@@ -60,7 +58,7 @@ Status Code **201**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|array|false|none|The response payload. Either an errors or data property will be present in the response, but not both.|
+|» data|object|false|none|The response payload. Will contain a data property with upload details.|
 |»» upload_id|string|true|none|A unique upload_id for the successful upload.|
 
 <aside class="warning">
