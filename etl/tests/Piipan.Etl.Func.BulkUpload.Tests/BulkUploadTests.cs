@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
@@ -95,10 +96,20 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var responseMock = new Mock<Response>();
 
+            // Stream stream = new MemoryStream();
+            // Stream stream = new MemoryStream(File.ReadAllBytes("example.csv"));
+            Stream stream = new MemoryStream( Encoding.UTF8.GetBytes( "data data" ) );
+            Task<Stream> streamTask = new Task<Stream>(() => stream);
+            
+
             var blockBlobClient = new Mock<BlockBlobClient>();
             blockBlobClient
                 .Setup(m => m.GetProperties(null, CancellationToken.None))
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+            blockBlobClient
+                .Setup(m => m.OpenReadAsync(null, CancellationToken.None))
+                .Returns(streamTask);    
 
             var blobClientStream = new Mock<IBlobClientStream>();
                 blobClientStream
