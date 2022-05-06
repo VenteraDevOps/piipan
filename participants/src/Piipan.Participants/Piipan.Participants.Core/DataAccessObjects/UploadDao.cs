@@ -37,7 +37,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                
                 await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher,upload_identifier, status)
-                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, 'Complete')", new { uploadIdentifier = uploadIdentifier });
+                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, 'Uploading')", new { uploadIdentifier = uploadIdentifier });
 
                 var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
@@ -46,6 +46,21 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     LIMIT 1");
 
                 return upload;
+            }
+        }
+
+        public async Task<IUpload> UpdateUploadStatus(IUpload upload)
+        {
+            using (var connection = await _dbConnectionFactory.Build(null))
+            {
+                await connection
+                    .ExecuteAsync(@"
+                    Update uploads set status = 'Complete' where id=@uploadId", new { uploadId = upload.Id });
+
+                return await connection
+                    .QuerySingleAsync<UploadDbo>(@"
+                    SELECT id, created_at, publisher,upload_identifier, status
+                    FROM uploads where id=@uploadId", new { uploadId = upload.Id });
             }
         }
     }
