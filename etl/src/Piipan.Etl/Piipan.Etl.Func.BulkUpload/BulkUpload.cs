@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
@@ -55,19 +56,25 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation(myQueueItem);
             try
             {
-                var input =  _blobStream.Parse(myQueueItem, log);
-                var blobProperties = _blobStream.BlobClientProperties(myQueueItem, log);
-
-                if (input != null)
-                {
-                    var participants = _participantParser.Parse(input);
-                    await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
-                }
-                else
-                {
-                    // Can get here if Function does not have
-                    // permission to access blob URL
+                if(myQueueItem == null || myQueueItem.Length == 0){
+                    
                     log.LogError("No input stream was provided");
+                }
+                else {
+                    var blockBlobClient =  _blobStream.Parse(myQueueItem, log);
+
+                    Stream input = await blockBlobClient.OpenReadAsync();
+
+                    log.LogInformation($"Input lenght: {input.Length} Position: {input.Position}");
+
+                    var blobProperties = blockBlobClient.GetProperties().Value;
+
+                    if (input != null)
+                    {
+                        var participants = _participantParser.Parse(input);
+                        await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString())
+                                .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log));
+                    }
                 }
             }
             catch (Exception ex)

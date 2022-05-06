@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Linq;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
@@ -35,30 +36,6 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
-        public void Parse_EventReturnStream()
-        {
-
-            //Arrange
-            var logger = new Mock<ILogger>();
-
-            var blobClientStream = new Mock<BlobClientStream>();
-            Mock<BlockBlobClient> blobClient = new Mock<BlockBlobClient>();
-
-            blobClient.Setup(x=>x.OpenRead(0, null, null, default)).Returns(new MemoryStream());
-
-            blobClientStream
-                .Setup(m => m.GetBlob(It.IsAny<string>()))
-                .Returns(blobClient.Object);
-            
-            // Act
-            var streamValue = blobClientStream.Object.Parse(EventString, logger.Object);
-
-            //Assert
-            Assert.Equal(streamValue.GetType(), typeof(MemoryStream));
-
-        }
-
-        [Fact]
         public async void Parse_EmptyEvent()
         {
             //Arrange
@@ -74,63 +51,23 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Fact]
-        public void BlobClientProperties_TestReturnType()
+        public async void Parse_Event()
         {
-
-            // Arrange
+            //Arrange
             var logger = new Mock<ILogger>();
 
-            var blobClient = new Mock<BlobClient>();
-            var responseMock = new Mock<Response>();
-
+            BlockBlobClient blobClient = new BlockBlobClient(new Uri("http://www.contoso.com/blob"), null);
+            
             var blobClientStream = new Mock<BlobClientStream>();
                 blobClientStream
-                    .Setup(m => m.GetBlob(It.IsAny<string>()))
-                    .Returns(new Mock<BlockBlobClient>().Object);
-                blobClientStream
-                    .Setup(m => m.GetBlobProperties(It.IsAny<BlockBlobClient>()))
-                    .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
-
-
-            // Act
-            var blobProperties = blobClientStream.Object.BlobClientProperties(EventString, logger.Object);
-
-            //Assert
-            Assert.Equal(blobProperties.GetType(), typeof(BlobProperties));
-
-        }
-
-        [Fact]
-        public async void BlobClientProperties_EmptyEventThrowsJsonError()
-        {
-            //Arrange
-            var logger = new Mock<ILogger>();
-
-            var blobClientStream = new BlobClientStream();
+                        .Setup(x=>x.GetBlob(It.IsAny<String>(), It.IsAny<String>()))
+                        .Returns(blobClient);
 
             // Act 
-            Action act = () => blobClientStream.BlobClientProperties("", logger.Object);
+            BlockBlobClient blobResult = blobClientStream.Object.Parse(EventString, logger.Object);
             
             // Assert
-            var ex = Assert.ThrowsAny<JsonException>(act);
-            Assert.Equal("The input does not contain any JSON tokens.", ex.Message.ToString().Substring(0, 43));
-
-        }
-
-        [Fact]
-        public async void BlobClientProperties_InvalidStringEventThrowsJsonError()
-        {
-            //Arrange
-            var logger = new Mock<ILogger>();
-            var blobClientStream = new BlobClientStream();
-            
-            // Act 
-            Action act = () => blobClientStream.BlobClientProperties("123", logger.Object);
-            
-            // Assert
-            var ex = Assert.ThrowsAny<System.NullReferenceException>(act);
-            Assert.Equal("Object reference not set to an instance of an object.", ex.Message.ToString().Substring(0, 53));
-
+            Assert.Equal(typeof(BlockBlobClient), blobResult.GetType());
         }
 
         [Fact]
@@ -158,37 +95,79 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             var blobClientStream = new BlobClientStream();
 
             // Act
-            Action act = () => {var blob = blobClientStream.GetBlob("test");};
+            Action act = () => {var blob = blobClientStream.GetBlob("test", "wrongConnectionString");};
             
             // Assert
             var ex = Assert.ThrowsAny<ArgumentNullException>(act);
-            Assert.Equal("Value cannot be null. (Parameter 'connectionString')", ex.Message.ToString().Substring(0, 52));
+            Assert.Equal("Value cannot be null.", ex.Message.ToString().Substring(0, 21));
 
         }
 
         [Fact]
-        public void GetBlobProperties_TestReturnType()
+        public void GetBlob_TestBlob()
         {
 
             // Arrange
             var blobClientStream = new BlobClientStream();
-            var blob = Mock.Of<BlockBlobClient>();
-
-            var blobClient = new Mock<BlockBlobClient>();
-            var responseMock = new Mock<Response>();
-            blobClient
-                .Setup(m => m.GetProperties(null, CancellationToken.None))
-                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+            Environment.SetEnvironmentVariable("BlobStorageConnectionString", "UseDevelopmentStorage=true");
 
             // Act
-            var response = blobClientStream.GetBlobProperties(blobClient.Object);
-
-            //Assert
-            Assert.Equal(typeof(BlobProperties), response.Value.GetType());
+            var blob = blobClientStream.GetBlob("test");
+            
+            // Assert
+            Assert.Equal(typeof(BlockBlobClient), blob.GetType());
 
         }
 
-      
+        [Fact]
+        public void DeleteBlobAfterProcessing_TestDeleteBlobTrue()
+        {
 
+            // Arrange
+            var logger = new Mock<ILogger>();
+            var blobClientStream = new BlobClientStream();
+            var responseMock = new Mock<Response>();
+
+            var blob = new Mock<BlockBlobClient>();
+
+                blob
+                    .Setup(x=>x.DeleteIfExists(It.IsAny<DeleteSnapshotsOption>(), It.IsAny<BlobRequestConditions>(), CancellationToken.None))
+                    .Returns(Response.FromValue<bool>(true, responseMock.Object));
+            
+            // Act
+            Task t = Task.Run(() => {return true;});
+            var response = blobClientStream.DeleteBlobAfterProcessing(t, blob.Object, logger.Object);
+            
+            // Assert
+            Assert.Equal(true, response);
+
+        }
+    
+        [Fact]
+        public void DeleteBlobAfterProcessing_TestDeleteBlobFaultedTask()
+        {
+
+            // Arrange
+            var logger = new Mock<ILogger>();
+            var blobClientStream = new BlobClientStream();
+            var responseMock = new Mock<Response>();
+
+            var blob = new Mock<BlockBlobClient>();
+
+                blob
+                    .Setup(x=>x.DeleteIfExists(It.IsAny<DeleteSnapshotsOption>(), It.IsAny<BlobRequestConditions>(), CancellationToken.None))
+                    .Returns(Response.FromValue<bool>(false, responseMock.Object));
+                    
+            
+            // Act
+            Task t = Task.FromException<System.Exception>(new Exception());
+            var response = blobClientStream.DeleteBlobAfterProcessing(t, blob.Object, logger.Object);
+            
+            // Assert
+            Assert.Equal(false, response);
+            VerifyLogError(logger, "Error inserting participants, blob not deleted.");
+
+        }
+    
     }
 }

@@ -24,4 +24,9 @@
     <ProjectReference Include="..\..\src\Piipan.Etl\Piipan.Etl.Func.BulkUpload\Piipan.Etl.Func.BulkUpload.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\docs\csv\example.csv" Link="example.csv" CopyToOutputDirectory="PreserveNewest" />
+
+  </ItemGroup>
+
 </Project>
