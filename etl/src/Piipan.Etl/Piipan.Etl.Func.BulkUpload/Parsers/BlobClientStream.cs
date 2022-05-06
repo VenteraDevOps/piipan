@@ -37,7 +37,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             return new BlockBlobClient(Environment.GetEnvironmentVariable(connectionString), "upload", blobName);
         }
 
-        public virtual StorageBlobCreatedEventData ParseEvents(string input){
+        private StorageBlobCreatedEventData ParseEvents(string input){
 
             //parse queue event
             var queuedEvent = Azure.Messaging.EventGrid.EventGridEvent.Parse(BinaryData.FromString(input));
