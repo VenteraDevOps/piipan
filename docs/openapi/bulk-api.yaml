@@ -13,10 +13,14 @@ servers:
         description: Lowercase two-letter postal code abbreviation
 paths:
   '/upload_all_participants/{filename}':
-    $ref: '../../etl/docs/openapi/uploadAllParticipants.yaml'
+    put:
+      responses:
+        '201':
+          $ref: './../../etl/docs/openapi/uploadAllParticipants.yaml#/components/responses/201'
   '/upload/{filename}':
     $ref: '../../etl/docs/openapi/upload.yaml'
     description: 'A Deprecated endpoint.'
+    
 security:
   - ApiKeyAuth: []
 components:
