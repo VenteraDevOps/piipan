@@ -4,6 +4,7 @@ using Dapper;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
+using Piipan.Participants.Core.Enums;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -23,7 +24,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 return await connection
                     .QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher,upload_identifier, status
-                    FROM uploads
+                    FROM uploads where status='Complete'
                     ORDER BY id DESC
                     LIMIT 1");
             }
@@ -37,7 +38,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                
                 await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher,upload_identifier, status)
-                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, 'Uploading')", new { uploadIdentifier = uploadIdentifier });
+                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, @uploadStatus)", new { uploadIdentifier = uploadIdentifier , uploadStatus = UploadStatuses.Uploading.ToString()});
 
                 var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
@@ -49,13 +50,13 @@ namespace Piipan.Participants.Core.DataAccessObjects
             }
         }
 
-        public async Task<IUpload> UpdateUploadStatus(IUpload upload)
+        public async Task<IUpload> UpdateUploadStatus(IUpload upload, string newStatus)
         {
             using (var connection = await _dbConnectionFactory.Build(null))
             {
                 await connection
                     .ExecuteAsync(@"
-                    Update uploads set status = 'Complete' where id=@uploadId", new { uploadId = upload.Id });
+                    Update uploads set status = @status where id=@uploadId", new {status = newStatus, uploadId = upload.Id });
 
                 return await connection
                     .QuerySingleAsync<UploadDbo>(@"
