@@ -24,9 +24,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 return await connection
                     .QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher,upload_identifier, status
-                    FROM uploads where status='Complete'
+                    FROM uploads where status=@completeStatus
                     ORDER BY id DESC
-                    LIMIT 1");
+                    LIMIT 1", new { completeStatus = UploadStatuses.Complete.ToString() });
             }
         }
 
