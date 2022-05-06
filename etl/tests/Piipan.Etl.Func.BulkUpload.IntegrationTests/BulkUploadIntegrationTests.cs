@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
@@ -58,7 +59,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                                         It.IsAny<ILogger>()))
                         .Returns(() => {
                             var responseMock = new Mock<Response>();
-                            var stream = new MemoryStream(File.ReadAllBytes("example.csv"));
+                            Stream stream = new MemoryStream(File.ReadAllBytes("example.csv"));
                             var blockBlobClient = new Mock<BlockBlobClient>();
 
                                 blockBlobClient
@@ -73,6 +74,11 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                                         .Setup(m => m.DownloadTo(It.IsAny<Stream>()))
                                         .Callback((Stream target) => { stream.CopyTo(target);target.Position = 0; })
                                         .Returns(new Mock<Response>().Object);
+                                
+                                blockBlobClient
+                                        .Setup(m => m.OpenReadAsync(0, null, null, default))
+                                        .Returns(Task.FromResult(stream));
+                                        
 
                             return blockBlobClient.Object;
                         });

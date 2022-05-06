@@ -63,10 +63,6 @@ namespace Piipan.Etl.Func.BulkUpload
                 else {
                     var blockBlobClient =  _blobStream.Parse(myQueueItem, log);
 
-                    // Stream input = new System.IO.MemoryStream();
-
-                    // var response = blockBlobClient.DownloadTo(input);
-
                     Stream input = await blockBlobClient.OpenReadAsync();
 
                     log.LogInformation($"Input lenght: {input.Length} Position: {input.Position}");

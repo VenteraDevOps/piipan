@@ -95,21 +95,15 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var logger = new Mock<ILogger>();
 
             var responseMock = new Mock<Response>();
-
-            // Stream stream = new MemoryStream();
-            // Stream stream = new MemoryStream(File.ReadAllBytes("example.csv"));
-            Stream stream = new MemoryStream( Encoding.UTF8.GetBytes( "data data" ) );
-            Task<Stream> streamTask = new Task<Stream>(() => stream);
             
-
             var blockBlobClient = new Mock<BlockBlobClient>();
             blockBlobClient
                 .Setup(m => m.GetProperties(null, CancellationToken.None))
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
 
             blockBlobClient
-                .Setup(m => m.OpenReadAsync(null, CancellationToken.None))
-                .Returns(streamTask);    
+                    .Setup(m => m.OpenReadAsync(0, null, null, default))
+                    .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
 
             var blobClientStream = new Mock<IBlobClientStream>();
                 blobClientStream
@@ -147,6 +141,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                 .Setup(m => m.GetProperties(null, CancellationToken.None))
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
 
+            blockBlobClient
+                    .Setup(m => m.OpenReadAsync(0, null, null, default))
+                    .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
+
             var blobClientStream = new Mock<IBlobClientStream>();
                 blobClientStream
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
@@ -172,6 +170,10 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             blockBlobClient
                 .Setup(m => m.GetProperties(null, CancellationToken.None))
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+            blockBlobClient
+                    .Setup(m => m.OpenReadAsync(0, null, null, default))
+                    .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
             
             var participants = new List<Participant>
             {
