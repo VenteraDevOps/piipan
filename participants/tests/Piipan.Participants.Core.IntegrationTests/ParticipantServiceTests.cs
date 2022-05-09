@@ -84,7 +84,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 catch (Exception)
                 {
                     long expectedNewUploadId = ++lastUploadId;
-                    long actualLastUploadId = GetLastUploadId();
+                    long actualLastUploadId = GetLastSuccessfulUploadId();
                     Assert.NotEqual(expectedNewUploadId, actualLastUploadId);
 
                     // Assert
