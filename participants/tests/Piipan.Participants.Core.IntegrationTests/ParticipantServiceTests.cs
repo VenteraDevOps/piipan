@@ -84,7 +84,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 catch (Exception)
                 {
                     long expectedNewUploadId = ++lastUploadId;
-                    long actualLastUploadId = GetLastSuccessfulUploadId();
+                    long actualLastUploadId = GetLastUploadIdWithStatus("COMPLETE");
                     Assert.NotEqual(expectedNewUploadId, actualLastUploadId);
 
                     // Assert
@@ -95,7 +95,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                         Assert.False(exists);
                     });
 
-                    long lastFailedUploadId = GetLastFailedUploadId();
+                    long lastFailedUploadId = GetLastUploadIdWithStatus("FAILED");
 
                     Assert.Equal(expectedNewUploadId, lastFailedUploadId);
                 }

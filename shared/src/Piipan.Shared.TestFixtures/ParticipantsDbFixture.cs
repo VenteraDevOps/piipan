@@ -130,7 +130,7 @@ namespace Piipan.Shared.TestFixtures
             return result;
         }
 
-        public Int64 GetLastSuccessfulUploadId()
+        public Int64 GetLastUploadIdWithStatus(string status)
         {
             Int64 result = 0;
             var factory = NpgsqlFactory.Instance;
@@ -139,22 +139,7 @@ namespace Piipan.Shared.TestFixtures
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-                result = conn.ExecuteScalar<Int64>("SELECT MAX(id) FROM uploads WHERE status='COMPLETE'");
-                conn.Close();
-            }
-            return result;
-        }
-
-        public Int64 GetLastFailedUploadId()
-        {
-            Int64 result = 0;
-            var factory = NpgsqlFactory.Instance;
-
-            using (var conn = factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-                result = conn.ExecuteScalar<Int64>("SELECT MAX(id) FROM uploads WHERE status='FAILED'");
+                result = conn.ExecuteScalar<Int64>("SELECT MAX(id) FROM uploads WHERE status=@uploadStatus", new{ uploadStatus = status });
                 conn.Close();
             }
             return result;
