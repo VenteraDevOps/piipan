@@ -51,9 +51,6 @@ namespace Etl.BulkUpload.Performance.TestRunner
                     uploadResult.Wait();
                     Console.WriteLine($"Finish upload to Azure Storage - {DateTime.Now.ToLongTimeString()}");
                 }
-
-
-
             }
         }
 
@@ -98,31 +95,6 @@ namespace Etl.BulkUpload.Performance.TestRunner
             }
 
             csvwriter.Flush();
-
-        }
-
-        private static async Task PopulateMemoryStreamWithMockRecords(string headers, StreamWriter writer, long desiredParticipantCount)
-        {
-            writer.WriteLine(headers);
-
-            for (int i = 0; i < desiredParticipantCount; i++)
-            {
-                String record = createMockRecord("EA", i + 1);
-                writer.WriteLine(record);
-            }
-
-            await writer.FlushAsync();
-        }
-
-        private static String createMockRecord(String state, int recId)
-        {
-            StringBuilder record = new StringBuilder(200);
-            var padRecId = recId.ToString("00000000");
-            record.Append(createMockHash(128));
-            record.Append(",case-" + state + "-" + padRecId);
-            record.Append(",part-" + state + "-" + padRecId);
-            record.Append(",,2021-12 2021-11 2021-10,false");
-            return record.ToString();
 
         }
 
