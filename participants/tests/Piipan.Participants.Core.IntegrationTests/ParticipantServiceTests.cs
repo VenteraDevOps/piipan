@@ -94,6 +94,10 @@ namespace Piipan.Participants.Core.IntegrationTests
                         var exists = HasParticipant(p);
                         Assert.False(exists);
                     });
+
+                    long lastFailedUploadId = GetLastFailedUploadId();
+
+                    Assert.Equal(expectedNewUploadId, lastFailedUploadId);
                 }
 
 
