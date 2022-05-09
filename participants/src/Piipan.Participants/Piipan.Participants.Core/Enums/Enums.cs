@@ -8,6 +8,6 @@ namespace Piipan.Participants.Core.Enums
 {
     public enum UploadStatuses
     {
-        Complete, Uploading, Failed
+        COMPLETE, UPLOADING, FAILED
     }
 }

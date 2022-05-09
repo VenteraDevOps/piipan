@@ -26,7 +26,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     SELECT id, created_at, publisher,upload_identifier, status
                     FROM uploads where status=@completeStatus
                     ORDER BY id DESC
-                    LIMIT 1", new { completeStatus = UploadStatuses.Complete.ToString() });
+                    LIMIT 1", new { completeStatus = UploadStatuses.COMPLETE.ToString() });
             }
         }
 
@@ -38,7 +38,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
                
                 await connection.ExecuteAsync(@"
                 INSERT INTO uploads (created_at, publisher,upload_identifier, status)
-                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, @uploadStatus)", new { uploadIdentifier = uploadIdentifier , uploadStatus = UploadStatuses.Uploading.ToString()});
+                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, @uploadStatus)", new { uploadIdentifier = uploadIdentifier , uploadStatus = UploadStatuses.UPLOADING.ToString()});
 
                 var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher

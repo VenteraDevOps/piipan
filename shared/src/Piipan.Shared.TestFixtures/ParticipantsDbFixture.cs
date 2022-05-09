@@ -83,7 +83,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP TABLE IF EXISTS participants");
                 conn.Execute("DROP TABLE IF EXISTS uploads");
                 conn.Execute(sqltext);
-                conn.Execute("INSERT INTO uploads(created_at, publisher,upload_identifier, status) VALUES(now() at time zone 'utc', current_user,'test-etag', 'Complete')");
+                conn.Execute("INSERT INTO uploads(created_at, publisher,upload_identifier, status) VALUES(now() at time zone 'utc', current_user,'test-etag', 'COMPLETE')");
 
                 conn.Close();
             }
@@ -139,7 +139,7 @@ namespace Piipan.Shared.TestFixtures
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-                result = conn.ExecuteScalar<Int64>("SELECT MAX(id) FROM uploads WHERE status='Complete'");
+                result = conn.ExecuteScalar<Int64>("SELECT MAX(id) FROM uploads WHERE status='COMPLETE'");
                 conn.Close();
             }
             return result;

@@ -66,12 +66,12 @@ namespace Piipan.Participants.Core.Services
                     });
 
                     await _participantDao.AddParticipants(participantDbos);
-                    await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.Complete.ToString());
+                    await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.COMPLETE.ToString());
                     scope.Complete();
                 }
             }
             catch (Exception ex) {
-                await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.Failed.ToString());
+                await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.FAILED.ToString());
             }
         }
 
