@@ -8,6 +8,7 @@ using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
+using Piipan.Participants.Core.Enums;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -50,20 +51,28 @@ namespace Piipan.Participants.Core.Services
         {
             // Large participant uploads can be long-running processes and require
             // an increased time out duration to avoid System.TimeoutException
-            using (TransactionScope scope = new TransactionScope(
-                TransactionScopeOption.Required,
-                TimeSpan.FromSeconds(600),
-                TransactionScopeAsyncFlowOption.Enabled))
-            {
-                var upload = await _uploadDao.AddUpload(uploadIdentifier);
-
-                var participantDbos = participants.Select(p => new ParticipantDbo(p)
+            var upload = await _uploadDao.AddUpload(uploadIdentifier);
+            try {
+                using (TransactionScope scope = new TransactionScope(
+                    TransactionScopeOption.Required,
+                    TimeSpan.FromSeconds(600),
+                    TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    UploadId = upload.Id
-                });
 
-                await _participantDao.AddParticipants(participantDbos);
-                scope.Complete();
+
+                    var participantDbos = participants.Select(p => new ParticipantDbo(p)
+                    {
+                        UploadId = upload.Id
+                    });
+
+                    await _participantDao.AddParticipants(participantDbos);
+                    await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.COMPLETE.ToString());
+                    scope.Complete();
+                }
+            }
+            catch (Exception ex) {
+                _logger.LogError(ex, ex.Message);
+                await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.FAILED.ToString());
             }
         }
 
