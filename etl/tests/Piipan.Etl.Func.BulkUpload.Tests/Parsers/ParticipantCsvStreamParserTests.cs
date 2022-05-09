@@ -1,8 +1,14 @@
+using CsvHelper;
+using CsvHelper.Configuration;
+using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Shared.API.Utilities;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
@@ -64,6 +70,46 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             DateRange dateRange = records.First().RecentBenefitIssuanceDates.First();
             Assert.Equal(dateRange, new DateRange(new DateTime(2021, 05, 01), new DateTime(2021, 05, 02)));
             Assert.Single(records, r => r.VulnerableIndividual == true);
+        }
+
+        [Fact]
+        public void TestParticipantMapForCsvWriting()
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                TrimOptions = TrimOptions.Trim
+            };
+
+            StringWriter stringWriter = new StringWriter();
+            var csvwriter = new CsvWriter(stringWriter, config);
+            csvwriter.Context.RegisterClassMap<ParticipantMap>();
+
+            var state = "EA";
+                       
+            var p = new Participant();
+
+            var recId = 31;
+            var padRecId = recId.ToString("00000000");
+            p.LdsHash = "abc";
+
+            p.CaseId = $"case-{state}-{padRecId}";
+            p.ParticipantId = $"part-{state}-{padRecId}";
+            p.ParticipantClosingDate = DateTime.Now;
+
+            var dr1 = new DateRange(new DateTime(2021, 04, 01), new DateTime(2021, 04, 15));
+            var dr2 = new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30));
+            var dr3 = new DateRange(new DateTime(2021, 02, 01), new DateTime(2021, 02, 28));
+            p.RecentBenefitIssuanceDates = new List<DateRange>() { dr1, dr2, dr3 };
+            p.VulnerableIndividual = true;
+
+            csvwriter.WriteRecord(p);
+
+            csvwriter.Flush();
+
+            string expectedResult = "abc,case-EA-00000031,part-EA-00000031,2022-05-09,2021-04-01/2021-04-15 2021-03-01/2021-03-30 2021-02-01/2021-02-28,True";
+            var result = stringWriter.ToString();
+            Assert.Equal(expectedResult, result);
         }
 
         [Fact]
