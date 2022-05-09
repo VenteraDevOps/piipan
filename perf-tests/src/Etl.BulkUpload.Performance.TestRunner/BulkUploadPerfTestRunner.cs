@@ -1,8 +1,12 @@
-﻿using Azure.Core;
-using Azure.Identity;
-using Azure.Storage.Blobs;
-using Azure.Storage.Sas;
+﻿using Azure.Storage.Blobs;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Piipan.Etl.Func.BulkUpload.Models;
+using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Shared.API.Utilities;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,30 +33,72 @@ namespace Etl.BulkUpload.Performance.TestRunner
             {
                 using (var writer = new StreamWriter(ms))
                 {
-                    await PopulateMemoryStreamWithMockRecords(headers, writer, desiredParticipantCount);
+                    Console.WriteLine($"Begin populating Mock Records - {DateTime.Now.ToLongTimeString()}");
+                    await PopulateMemoryStreamWithMockRecords(writer, desiredParticipantCount);
+                    Console.WriteLine($"Finish populating Mock Records - {DateTime.Now.ToLongTimeString()}");
 
                     string connectionString = $"DefaultEndpointsProtocol=https;AccountName={_azureStorageAccountName};AccountKey={_azureStorageAccountKey};EndpointSuffix=core.windows.net";
                     var blobClient = new BlobContainerClient(connectionString, UPLOAD_CONTAINER_NAME);
-
-                    //string prefix = "venbgf";
-                    //string environment = "bill";
-                    //string state = "ea";
-                    //TokenCredential cred = new AzureCliCredential();
-                    //Uri uri = new Uri($"https://{prefix}st{state}upload{environment}.blob.core.windows.net/{UPLOAD_CONTAINER_NAME}");
-                    //var client = new BlobServiceClient(uri, new AzureCliCredential());
 
                     string datePostfix = DateTime.Now.ToString("MM-dd-yy_HH:mm:ss");
 
                     var blob = blobClient.GetBlobClient($"perfTestUpload-{datePostfix}.csv");
 
                     ms.Seek(0, SeekOrigin.Begin);
+
+                    Console.WriteLine($"Begin upload to Azure Storage - {DateTime.Now.ToLongTimeString()}");
                     Task uploadResult = blob.UploadAsync(ms);
                     uploadResult.Wait();
+                    Console.WriteLine($"Finish upload to Azure Storage - {DateTime.Now.ToLongTimeString()}");
                 }
 
 
 
             }
+        }
+
+
+        private static async Task PopulateMemoryStreamWithMockRecords(StreamWriter writer, long desiredParticipantCount)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                TrimOptions = TrimOptions.Trim
+            };
+
+            //StringWriter stringWriter = new StringWriter();
+            var csvwriter = new CsvWriter(writer, config);
+            csvwriter.Context.RegisterClassMap<ParticipantMap>();
+
+            csvwriter.WriteHeader<Participant>();
+            csvwriter.NextRecord();
+
+            var state = "EA";
+
+            for (int i = 0; i < desiredParticipantCount; i++)
+            {
+                var p = new Participant();
+
+                var recId = i + 1;
+                var padRecId = recId.ToString("00000000");
+                p.LdsHash = createMockHash(128);
+
+                p.CaseId = $"case-{state}-{padRecId}";
+                p.ParticipantId = $"part-{state}-{padRecId}";
+                p.ParticipantClosingDate = DateTime.Now;
+
+                var dr1 = new DateRange(new DateTime(2021, 04, 01), new DateTime(2021, 04, 15));
+                var dr2 = new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30));
+                var dr3 = new DateRange(new DateTime(2021, 02, 01), new DateTime(2021, 02, 28));
+                p.RecentBenefitIssuanceDates = new List<DateRange>() { dr1, dr2, dr3 };
+                p.VulnerableIndividual = true;
+
+                csvwriter.WriteRecord(p);
+                csvwriter.NextRecord();
+            }
+
+            csvwriter.Flush();
+
         }
 
         private static async Task PopulateMemoryStreamWithMockRecords(string headers, StreamWriter writer, long desiredParticipantCount)
