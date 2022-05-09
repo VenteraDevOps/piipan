@@ -71,6 +71,7 @@ namespace Piipan.Participants.Core.Services
                 }
             }
             catch (Exception ex) {
+                _logger.LogError(ex, ex.Message);
                 await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.FAILED.ToString());
             }
         }
