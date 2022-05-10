@@ -171,7 +171,7 @@ main () {
 
       # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
-  while IFS=, read -r abbr name disable_matches; do
+  while IFS=, read -r abbr name _; do
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       func_stor_name=${PREFIX}st${abbr}upload${ENV}
       echo "Creating storage for $name ($func_stor_name)"
@@ -231,7 +231,7 @@ main () {
     --object-id "$PG_AAD_ADMIN_OBJID"
 
   # Create managed identities to admin each state's database
-  while IFS=, read -r abbr name disable_matches; do
+  while IFS=, read -r abbr name _; do
       echo "Creating managed identity for $name ($abbr)"
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       identity=$(state_managed_id_name "$abbr" "$ENV")

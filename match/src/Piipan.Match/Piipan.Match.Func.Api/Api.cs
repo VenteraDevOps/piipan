@@ -12,6 +12,7 @@ using Piipan.Match.Core.Services;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Core;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -68,7 +69,7 @@ namespace Piipan.Match.Func.Api
                 string[] disabledStates = disabledMatchingStates?.Split(',') ?? new string[0];
 
                 // If we wanted to disable all states, perhaps we could check for if this array contains "all"?
-                if (disabledMatchingStates.Contains(initiatingState.ToLower()))
+                if (disabledStates.Contains(initiatingState.ToLower()))
                 {
                     return new JsonResult(new OrchMatchResponse()) { StatusCode = StatusCodes.Status200OK };
                 }
