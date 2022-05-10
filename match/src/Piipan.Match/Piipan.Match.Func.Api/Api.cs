@@ -66,6 +66,8 @@ namespace Piipan.Match.Func.Api
                 // If our initiating state is in the disabled states list, simply return that there were no matches.
                 string disabledMatchingStates = Environment.GetEnvironmentVariable("StatesToDisableMatches");
                 string[] disabledStates = disabledMatchingStates?.Split(',') ?? new string[0];
+
+                // If we wanted to disable all states, perhaps we could check for if this array contains "all"?
                 if (disabledMatchingStates.Contains(initiatingState.ToLower()))
                 {
                     return new JsonResult(new OrchMatchResponse()) { StatusCode = StatusCodes.Status200OK };
