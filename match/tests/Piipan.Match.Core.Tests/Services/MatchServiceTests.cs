@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Piipan.Match.Core.Enums;
 
 namespace Piipan.Match.Core.Tests.Services
 {
@@ -54,7 +55,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
@@ -86,7 +87,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
@@ -98,6 +99,74 @@ namespace Piipan.Match.Core.Tests.Services
             Assert.Empty(response.Data.Errors);
             Assert.Single(response.Data.Results);
             Assert.Single(response.Data.Results, r => r.Index == 0);
+        }
+
+        [Theory]
+        [InlineData("Application", ValidSearchReasons.application)]
+        [InlineData("Recertification", ValidSearchReasons.recertification)]
+        [InlineData("New_household_member", ValidSearchReasons.new_household_member)]
+        [InlineData("OTHER", ValidSearchReasons.other)]
+        public async Task ValidSearchReason(string searchReason, ValidSearchReasons expectedSearchReason)
+        {
+            // Arrange
+            var participantApi = Mock.Of<IParticipantApi>();
+
+            var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
+            requestPersonValidator
+                .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
+
+            var request = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>
+                {
+                    new RequestPerson { LdsHash = "", SearchReason = searchReason }
+                }
+            };
+
+            // Act
+            var response = await service.FindMatches(request, "ea");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Empty(response.Data.Errors);
+            Assert.Single(response.Data.Results);
+            Assert.Single(response.Data.Results, r => r.Index == 0);
+        }
+
+        [Theory]
+        [InlineData("ASDF")]
+        [InlineData("New household member")]
+        [InlineData("")]
+        public async Task InvalidSearchReason(string searchReason)
+        {
+            // Arrange
+            var participantApi = Mock.Of<IParticipantApi>();
+
+            var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
+            requestPersonValidator
+                .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            var service = new MatchService(participantApi, requestPersonValidator.Object);
+
+            var request = new OrchMatchRequest
+            {
+                Data = new List<RequestPerson>
+                {
+                    new RequestPerson { LdsHash = "", SearchReason = searchReason }
+                }
+            };
+
+            // Act
+            var response = await service.FindMatches(request, "ea");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.NotEmpty(response.Data.Errors);
+            Assert.Equal("Invalid Search Reason", response.Data.Errors[0].Code);
         }
 
         [Fact]
@@ -128,7 +197,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
@@ -164,7 +233,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
@@ -195,7 +264,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
@@ -230,7 +299,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
@@ -275,7 +344,7 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 Data = new List<RequestPerson>
                 {
-                    new RequestPerson { LdsHash = "" }
+                    new RequestPerson { LdsHash = "", SearchReason = "other" }
                 }
             };
 
