@@ -42,7 +42,7 @@ commands:
           background: true
       - run:
           name: wait for app to spin up
-          command: sleep 10s
+          command: sleep 30s
       - run:
           name: run pa11y
           working_directory: << parameters.directory >>
