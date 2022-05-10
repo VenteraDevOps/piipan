@@ -1,7 +1,7 @@
-EA,Echo Alpha
-EB,Echo Bravo
-EC,Echo Charlie
-IA,Iowa
-LA,Louisiana
-MA,Massachusetts
-MT,Montana
+EA,Echo Alpha,FALSE
+EB,Echo Bravo,FALSE
+EC,Echo Charlie,FALSE
+IA,Iowa,FALSE
+LA,Louisiana,FALSE
+MA,Massachusetts,FALSE
+MT,Montana,FALSE

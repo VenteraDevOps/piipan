@@ -114,7 +114,7 @@ main () {
       --query id \
       -o tsv)
 
-  # Create an Event Hub namespace and hub where resource logs will be streamed,
+        # Create an Event Hub namespace and hub where resource logs will be streamed,
   # as well as an application registration that can be used to read logs
   siem_app_id=$(\
     az ad sp list \
@@ -169,9 +169,9 @@ main () {
       eventHubName="$EVENT_HUB_NAME" \
       coreResourceGroup="$RESOURCE_GROUP"
 
-  # For each participating state, create a separate storage account.
+      # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
-  while IFS=, read -r abbr name ; do
+  while IFS=, read -r abbr name disable_matches; do
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       func_stor_name=${PREFIX}st${abbr}upload${ENV}
       echo "Creating storage for $name ($func_stor_name)"
@@ -231,7 +231,7 @@ main () {
     --object-id "$PG_AAD_ADMIN_OBJID"
 
   # Create managed identities to admin each state's database
-  while IFS=, read -r abbr name ; do
+  while IFS=, read -r abbr name disable_matches; do
       echo "Creating managed identity for $name ($abbr)"
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       identity=$(state_managed_id_name "$abbr" "$ENV")
@@ -303,13 +303,23 @@ main () {
       --namespace-name "$EVENT_HUB_NAME" \
       --query "[?name == 'RootManageSharedAccessKey'].id" \
       -o tsv)
-
+  
+  # Create the list of state abbreviations, and which states should be disabled from
+  # returning matches from the orchestrator API.
   state_abbrs=""
-  while IFS=, read -r abbr name ; do
+  state_disabled_matches=""
+  while IFS=$',\t\r\n' read -r abbr name disable_matches; do
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     state_abbrs+=",${abbr}"
+    [[ "$disable_matches" == "TRUE" ]] && echo "Equal" || echo "Not equal"
+    if [ "$disable_matches" = "TRUE" ]; then
+        state_disabled_matches+=",${abbr}"
+    fi
   done < states.csv
   state_abbrs=${state_abbrs:1}
+  if [[ -n "$state_disabled_matches" ]]; then
+    state_disabled_matches=${state_disabled_matches:1}
+  fi
 
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
@@ -335,7 +345,8 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
+      eventHubName="$EVENT_HUB_NAME" \
+      statesToDisableMatches="$state_disabled_matches"
 
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
@@ -380,7 +391,7 @@ main () {
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
-  # Create Match Resolution API Function App
+    # Create Match Resolution API Function App
   echo "Create Match Resolution API Function App"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME")
   az deployment group create \

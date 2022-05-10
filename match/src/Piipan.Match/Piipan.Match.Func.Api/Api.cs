@@ -1,7 +1,3 @@
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Dapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +11,10 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Core;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Func.Api
 {
@@ -63,6 +63,13 @@ namespace Piipan.Match.Func.Api
                 var response = await _matchApi.FindMatches(request, initiatingState);
                 response = await _matchEventService.ResolveMatches(request, response, initiatingState);
 
+                // If our initiating state is in the disabled states list, simply return that there were no matches.
+                string disabledMatchingStates = Environment.GetEnvironmentVariable("StatesToDisableMatches");
+                string[] disabledStates = disabledMatchingStates?.Split(',') ?? new string[0];
+                if (disabledMatchingStates.Contains(initiatingState.ToLower()))
+                {
+                    return new JsonResult(new OrchMatchResponse()) { StatusCode = StatusCodes.Status200OK };
+                }
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
             catch (StreamParserException ex)
