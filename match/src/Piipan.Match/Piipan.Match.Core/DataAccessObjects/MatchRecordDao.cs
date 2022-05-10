@@ -114,7 +114,7 @@ namespace Piipan.Match.Core.DataAccessObjects
             }
         }
 
-        public async Task<IEnumerable<IMatchRecord>> GetMatchesList()
+        public async Task<IEnumerable<IMatchRecord>> GetMatches()
         {
             const string sql = @"
                 SELECT

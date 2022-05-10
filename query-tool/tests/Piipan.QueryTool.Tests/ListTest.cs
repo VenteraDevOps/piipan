@@ -101,7 +101,7 @@ namespace Piipan.QueryTool.Tests
             };
             var mockMatchApi = new Mock<IMatchResolutionApi>();
             mockMatchApi
-                .Setup(n => n.GetMatchesList())
+                .Setup(n => n.GetMatches())
                 .ReturnsAsync(apiReturnValue);
             return mockMatchApi;
         }

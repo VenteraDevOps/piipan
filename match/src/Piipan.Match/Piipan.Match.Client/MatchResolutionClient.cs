@@ -37,9 +37,9 @@ namespace Piipan.Match.Client
         /// <summary>
         /// Sends a GET request to the /list endpoint using the API client's configured base URL.
         /// </summary>
-        public async Task<MatchResListApiResponse> GetMatchesList()
+        public async Task<MatchResListApiResponse> GetMatches()
         {
-            var (response, _) = await _apiClient.TryGetAsync<MatchResListApiResponse>($"list");
+            var (response, _) = await _apiClient.TryGetAsync<MatchResListApiResponse>($"matches");
             return response;
         }
     }

@@ -17,15 +17,15 @@ using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.Tests
 {
-    public class GetMatchListApiTests
+    public class GetMatchesApiTests
     {
 
-        static GetMatchesListApi Construct()
+        static GetMatchesApi Construct()
         {
             var matchRecordDao = new Mock<IMatchRecordDao>();
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
-            var api = new GetMatchesListApi(
+            var api = new GetMatchesApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object
@@ -46,7 +46,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
         }
 
         [Fact]
-        public async Task GetMatchesList_LogsRequest()
+        public async Task GetMatches_LogsRequest()
         {
             // Arrange
             var api = Construct();
@@ -60,7 +60,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var logger = new Mock<ILogger>();
 
             // Act
-            await api.GetMatchesList(mockRequest.Object, logger.Object);
+            await api.GetMatches(mockRequest.Object, logger.Object);
 
             // Assert
             logger.Verify(x => x.Log(
@@ -73,7 +73,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
         }
 
         [Fact]
-        public async Task GetMatchesList_Returns500IfExceptionOccurs()
+        public async Task GetMatches_Returns500IfExceptionOccurs()
         {
             // Arrange
             var mockRequest = MockGetRequest();
@@ -88,20 +88,20 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecord = new MatchRecordDbo();
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
-                .Setup(r => r.GetMatchesList())
+                .Setup(r => r.GetMatches())
                 .ThrowsAsync(new Exception("Some database error"));
 
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
 
-            var api = new GetMatchesListApi(
+            var api = new GetMatchesApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object
             );
 
             // Act
-            var response = await api.GetMatchesList(mockRequest.Object, logger.Object);
+            var response = await api.GetMatches(mockRequest.Object, logger.Object);
 
             // Assert
             var result = response as JsonResult;
@@ -115,7 +115,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
         }
 
         [Fact]
-        public async Task GetMatchesList_ReturnsEmptyListIfNotFound()
+        public async Task GetMatches_ReturnsEmptyListIfNotFound()
         {
             // Arrange
             var mockRequest = MockGetRequest();
@@ -130,20 +130,20 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecord = new MatchRecordDbo();
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
-                .Setup(r => r.GetMatchesList())
+                .Setup(r => r.GetMatches())
                 .ReturnsAsync(new List<IMatchRecord>());
 
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
 
-            var api = new GetMatchesListApi(
+            var api = new GetMatchesApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object
             );
 
             // Act
-            var response = await api.GetMatchesList(mockRequest.Object, logger.Object) as JsonResult;
+            var response = await api.GetMatches(mockRequest.Object, logger.Object) as JsonResult;
 
             //Assert
             Assert.NotNull(response);
@@ -155,7 +155,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
         }
 
         [Fact]
-        public async Task GetMatchesList_ReturnsIfFound()
+        public async Task GetMatches_ReturnsIfFound()
         {
             // Arrange
             var mockRequest = MockGetRequest();
@@ -170,7 +170,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             // Mock Dao response
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
-                .Setup(r => r.GetMatchesList())
+                .Setup(r => r.GetMatches())
                 .ReturnsAsync(new List<MatchRecordDbo>()
                 {
                     new MatchRecordDbo() { MatchId = "m123456" },
@@ -192,14 +192,14 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                     Status = "open"
                 });
 
-            var api = new GetMatchesListApi(
+            var api = new GetMatchesApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object
             );
 
             // Act
-            var response = await api.GetMatchesList(mockRequest.Object, logger.Object) as JsonResult;
+            var response = await api.GetMatches(mockRequest.Object, logger.Object) as JsonResult;
 
             //Assert
             Assert.NotNull(response);

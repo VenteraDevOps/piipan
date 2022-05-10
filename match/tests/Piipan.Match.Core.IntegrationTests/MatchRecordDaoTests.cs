@@ -293,7 +293,7 @@ namespace Piipan.Match.Core.IntegrationTests
         }
 
         [Fact]
-        public async Task GetMatchesList_ReturnsRecordsIfFound()
+        public async Task GetMatches_ReturnsRecordsIfFound()
         {
             using (var conn = Factory.CreateConnection())
             {
@@ -320,10 +320,32 @@ namespace Piipan.Match.Core.IntegrationTests
                 records.ForEach(r => Insert(r));
 
                 // Act
-                var results = await dao.GetMatchesList();
+                var results = await dao.GetMatches();
 
                 // Assert
                 Assert.Equal(records, results);
+            }
+        }
+
+        [Fact]
+        public async Task GetMatches_ReturnsNoRecordsIfNotFound()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchRecordDao>>();
+                var dao = new MatchRecordDao(DbConnFactory(), logger);
+
+                ClearMatchRecords();
+
+                // Act
+                var results = await dao.GetMatches();
+
+                // Assert
+                Assert.Empty(results);
             }
         }
     }

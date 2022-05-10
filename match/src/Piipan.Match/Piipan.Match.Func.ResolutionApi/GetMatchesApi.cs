@@ -6,10 +6,8 @@ using Microsoft.Extensions.Logging;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
-using Piipan.Match.Func.ResolutionApi.Models;
 using System;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Piipan.Match.Func.ResolutionApi
@@ -18,14 +16,14 @@ namespace Piipan.Match.Func.ResolutionApi
     /// <summary>
     /// Azure Function implementing Get Match endpoint for Match Resolution API
     /// </summary>
-    public class GetMatchesListApi
+    public class GetMatchesApi : BaseApi
     {
         private readonly IMatchRecordDao _matchRecordDao;
         private readonly IMatchResEventDao _matchResEventDao;
 
         private readonly IMatchResAggregator _matchResAggregator;
 
-        public GetMatchesListApi(
+        public GetMatchesApi(
             IMatchRecordDao matchRecordDao,
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator)
@@ -35,15 +33,15 @@ namespace Piipan.Match.Func.ResolutionApi
             _matchResAggregator = matchResAggregator;
         }
 
-        [FunctionName("GetMatchesList")]
-        public async Task<IActionResult> GetMatchesList(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "list")] HttpRequest req,
+        [FunctionName("GetMatches")]
+        public async Task<IActionResult> GetMatches(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "matches")] HttpRequest req,
             ILogger logger)
         {
             LogRequest(logger, req);
             try
             {
-                var matches = await _matchRecordDao.GetMatchesList();
+                var matches = await _matchRecordDao.GetMatches();
                 var matchResEvents = await _matchResEventDao.GetEventsByMatchIDs(matches.Select(n => n.MatchId));
                 var matchRecords = matches.Select(n => _matchResAggregator.Build(n, matchResEvents.Where(m => m.MatchId == n.MatchId)));
                 var response = new MatchResListApiResponse() { Data = matchRecords };
@@ -54,38 +52,6 @@ namespace Piipan.Match.Func.ResolutionApi
                 logger.LogInformation(ex.Message);
                 return InternalServerErrorResponse(ex);
             }
-        }
-
-        private void LogRequest(ILogger logger, HttpRequest request)
-        {
-            logger.LogInformation("Executing request from user {User}", request.HttpContext?.User.Identity.Name);
-
-            string subscription = request.Headers["Ocp-Apim-Subscription-Name"];
-            if (subscription != null)
-            {
-                logger.LogInformation("Using APIM subscription {Subscription}", subscription);
-            }
-
-            string username = request.Headers["From"];
-            if (username != null)
-            {
-                logger.LogInformation("on behalf of {Username}", username);
-            }
-        }
-
-        private ActionResult InternalServerErrorResponse(Exception ex)
-        {
-            var errResponse = new ApiErrorResponse();
-            errResponse.Errors.Add(new ApiHttpError()
-            {
-                Status = Convert.ToString((int)HttpStatusCode.InternalServerError),
-                Title = ex.GetType().Name,
-                Detail = ex.Message
-            });
-            return (ActionResult)new JsonResult(errResponse)
-            {
-                StatusCode = (int)HttpStatusCode.InternalServerError
-            };
         }
     }
 }

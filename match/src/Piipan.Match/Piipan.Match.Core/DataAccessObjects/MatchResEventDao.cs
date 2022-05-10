@@ -4,6 +4,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Piipan.Match.Core.DataAccessObjects
@@ -124,7 +125,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                     delta::jsonb
                 FROM match_res_events
                 WHERE
-                    match_id in (@MatchIds)
+                    match_id = ANY (@MatchIds)
                 ORDER BY
                 CASE
                     WHEN @SortByAsc = true THEN inserted_at
@@ -135,7 +136,7 @@ namespace Piipan.Match.Core.DataAccessObjects
                 ;";
             var parameters = new
             {
-                MatchIds = "'" + string.Join(',', matchIds) + "'",
+                MatchIds = matchIds.ToList(),
                 SortByAsc = sortByAsc
             };
 

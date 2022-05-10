@@ -320,6 +320,7 @@ namespace Piipan.Match.Core.IntegrationTests
 
                 // Assert
                 var results = await dao.GetEventsByMatchIDs(matchIds, false);
+                Assert.Equal(3, results.Count());
                 foreach (var result in results)
                 {
                     Assert.Contains(matchIds, id => result.MatchId == id);
@@ -328,6 +329,49 @@ namespace Piipan.Match.Core.IntegrationTests
                     Assert.Equal("{\"status\": \"open\"}", result.Delta);
                     Assert.True(new DateTime() < result.InsertedAt); // greater than default datetime (1/1/0001 12:00:00 AM)
                 }
+
+                conn.Close();
+            }
+        }
+
+        [Fact]
+        public async void GetEventsByMatchIDs_ReturnsEmptyListWhenNoRecords()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var logger = Mock.Of<ILogger<MatchResEventDao>>();
+                var matchLogger = Mock.Of<ILogger<MatchRecordDao>>();
+
+                var dao = new MatchResEventDao(DbConnFactory(), logger);
+                var matchRecordDao = new MatchRecordDao(DbConnFactory(), matchLogger);
+
+                var idService = new MatchIdService();
+                var matchIds = Enumerable.Range(0, 3).Select(_ => idService.GenerateId()).ToList();
+
+                var matches = matchIds.Select(id => new MatchRecordDbo
+                {
+                    MatchId = id,
+                    Hash = "foo",
+                    HashType = "ldshash",
+                    Initiator = "ea",
+                    States = new string[] { "ea", "eb" },
+                    Data = "{}"
+                });
+
+                // Act
+                // Add match records, but no events
+                foreach (var match in matches)
+                {
+                    await matchRecordDao.AddRecord(match);
+                }
+
+                // Assert
+                var results = await dao.GetEventsByMatchIDs(matchIds, false);
+                Assert.Empty(results);
 
                 conn.Close();
             }

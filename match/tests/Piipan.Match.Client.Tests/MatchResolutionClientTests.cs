@@ -42,7 +42,7 @@ namespace Piipan.Match.Client.Tests
         }
 
         [Fact]
-        public async Task GetMatchesList_ReturnsApiClientResponse()
+        public async Task GetMatches_ReturnsApiClientResponse()
         {
             // Arrange
             var expectedResponse = new MatchResListApiResponse
@@ -62,13 +62,13 @@ namespace Piipan.Match.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
             apiClient
-                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("list"))
+                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("matches"))
                 .ReturnsAsync((expectedResponse, 200));
 
             var client = new MatchResolutionClient(apiClient.Object);
 
             // Act
-            var response = await client.GetMatchesList();
+            var response = await client.GetMatches();
 
             // Assert
             Assert.Equal(expectedResponse, response);

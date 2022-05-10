@@ -30,7 +30,7 @@ namespace Piipan.QueryTool.Pages
 
         public async Task<IActionResult> OnGet()
         {
-            AvailableMatches = await _matchResolutionApi.GetMatchesList();
+            AvailableMatches = await _matchResolutionApi.GetMatches();
 
             return Page();
         }
