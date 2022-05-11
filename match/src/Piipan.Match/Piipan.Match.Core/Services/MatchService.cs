@@ -41,20 +41,6 @@ namespace Piipan.Match.Core.Services
             {
                 var person = request.Data[i];
                 var personValidation = await _requestPersonValidator.ValidateAsync(person);
-                //If given Search Reason is not in the list of valid reasons, add the
-                //error and continue with next request.Data
-                person.SearchReason = person.SearchReason.ToLower();
-                if (!Enum.IsDefined(typeof(ValidSearchReasons), person.SearchReason))
-                {
-                    response.Data.Errors.Add(
-                        new OrchMatchError
-                        {
-                            Index = i,
-                            Code = "Invalid Search Reason",
-                            Detail = "Search Reason: " + person.SearchReason.ToString()
-                        });
-                    continue;
-                }
                 if (personValidation.IsValid)
                 {
                     var result = await PersonMatch(request.Data[i], i, initiatingState);
