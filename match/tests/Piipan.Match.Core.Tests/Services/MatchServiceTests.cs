@@ -148,7 +148,10 @@ namespace Piipan.Match.Core.Tests.Services
             var requestPersonValidator = new Mock<IValidator<RequestPerson>>();
             requestPersonValidator
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new ValidationResult());
+                .ReturnsAsync(new ValidationResult(new List<ValidationFailure>
+                {
+                    new ValidationFailure("searchReason", "StringEnumValidator")
+                }));
 
             var service = new MatchService(participantApi, requestPersonValidator.Object);
 
@@ -166,7 +169,7 @@ namespace Piipan.Match.Core.Tests.Services
             // Assert
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data.Errors);
-            Assert.Equal("StringEnumValidator", response.Data.Errors[0].Code);
+            Assert.Equal("StringEnumValidator", response.Data.Errors[0].Detail);
         }
 
         [Fact]
