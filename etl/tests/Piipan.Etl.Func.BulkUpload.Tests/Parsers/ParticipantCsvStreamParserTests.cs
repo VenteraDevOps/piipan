@@ -95,7 +95,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
             p.CaseId = $"case-{state}-{padRecId}";
             p.ParticipantId = $"part-{state}-{padRecId}";
-            p.ParticipantClosingDate = DateTime.Now;
+            p.ParticipantClosingDate = new DateTime(2022, 05, 09);
 
             var dr1 = new DateRange(new DateTime(2021, 04, 01), new DateTime(2021, 04, 15));
             var dr2 = new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30));
