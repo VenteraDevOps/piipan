@@ -166,7 +166,7 @@ namespace Piipan.Match.Core.Tests.Services
             // Assert
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data.Errors);
-            Assert.Equal("Invalid Search Reason", response.Data.Errors[0].Code);
+            Assert.Equal("StringEnumValidator", response.Data.Errors[0].Code);
         }
 
         [Fact]
