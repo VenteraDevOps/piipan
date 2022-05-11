@@ -1,8 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Core.DataAccessObjects
 {
@@ -11,6 +10,11 @@ namespace Piipan.Match.Core.DataAccessObjects
         Task<int> AddEvent(MatchResEventDbo record);
         Task<IEnumerable<IMatchResEvent>> GetEvents(
             string matchId,
+            bool sortByAsc = true
+        );
+
+        Task<IEnumerable<IMatchResEvent>> GetEventsByMatchIDs(
+            IEnumerable<string> matchIds,
             bool sortByAsc = true
         );
     }

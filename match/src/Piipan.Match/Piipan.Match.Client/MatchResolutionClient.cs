@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Piipan.Match.Api;
-using Piipan.Match.Api.Models;
+﻿using Piipan.Match.Api;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Client
 {
@@ -34,6 +31,15 @@ namespace Piipan.Match.Client
         public async Task<MatchResApiResponse> GetMatch(string matchId)
         {
             var (response, _) = await _apiClient.TryGetAsync<MatchResApiResponse>($"matches/{matchId}");
+            return response;
+        }
+
+        /// <summary>
+        /// Sends a GET request to the /list endpoint using the API client's configured base URL.
+        /// </summary>
+        public async Task<MatchResListApiResponse> GetMatches()
+        {
+            var (response, _) = await _apiClient.TryGetAsync<MatchResListApiResponse>($"matches");
             return response;
         }
     }

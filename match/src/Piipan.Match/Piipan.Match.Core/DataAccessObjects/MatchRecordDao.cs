@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -7,6 +5,8 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Core.DataAccessObjects
 {
@@ -114,6 +114,26 @@ namespace Piipan.Match.Core.DataAccessObjects
             }
         }
 
+        public async Task<IEnumerable<IMatchRecord>> GetMatches()
+        {
+            const string sql = @"
+                SELECT
+                    match_id,
+                    created_at,
+                    initiator,
+                    states,
+                    hash,
+                    hash_type::text,
+                    input::jsonb,
+                    data::jsonb
+                FROM matches;";
+
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection.QueryAsync<MatchRecordDbo>(sql);
+            }
+        }
+
         /// <summary>
         /// Finds a Match Record by Match ID
         /// </summary>
@@ -141,7 +161,8 @@ namespace Piipan.Match.Core.DataAccessObjects
 
             using (var connection = await _dbConnectionFactory.Build())
             {
-                return await connection.QuerySingleAsync<MatchRecordDbo>(sql, new MatchRecordDbo {
+                return await connection.QuerySingleAsync<MatchRecordDbo>(sql, new MatchRecordDbo
+                {
                     MatchId = matchId
                 });
             }
