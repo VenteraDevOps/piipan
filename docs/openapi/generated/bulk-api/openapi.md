@@ -16,21 +16,41 @@ Base URLs:
 * API Key (ApiKeyAuth)
     - Parameter Name: **Ocp-Apim-Subscription-Key**, in: header. 
 
-<h1 id="bulk-api-default">Default</h1>
+<h1 id="bulk-api-upload">Upload</h1>
 
-## put__upload_all_participants_{filename}
+## Upload a File
+
+<a id="opIdUpload a File"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
 curl -X PUT /bulk/{stateAbbr}/v2/upload_all_participants/{filename} \
+  -H 'Content-Type: text/plain' \
   -H 'Accept: application/json' \
+  -H 'Content-Length: 6413' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
 
 `PUT /upload_all_participants/{filename}`
+
+*Upload a CSV file of bulk participant data*
+
+> Body parameter
+
+```
+string
+
+```
+
+<h3 id="upload-a-file-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|filename|path|string|true|Name of file being uploaded|
+|Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
 
 > Example responses
 
@@ -44,13 +64,15 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload_all_participants/{filename} \
 }
 ```
 
-<h3 id="put__upload_all_participants_{filename}-responses">Responses</h3>
+<h3 id="upload-a-file-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|File uploaded|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
+|411|[Length Required](https://tools.ietf.org/html/rfc7231#section-6.5.10)|Content-Length not provided|None|
 
-<h3 id="put__upload_all_participants_{filename}-responseschema">Response Schema</h3>
+<h3 id="upload-a-file-responseschema">Response Schema</h3>
 
 Status Code **201**
 
@@ -65,8 +87,6 @@ Status Code **201**
 To perform this operation, you must be authenticated by means of one of the following methods:
 ApiKeyAuth
 </aside>
-
-<h1 id="bulk-api-upload">Upload</h1>
 
 ## Upload a File (deprecated)
 

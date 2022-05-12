@@ -26,39 +26,29 @@ put:
   responses:
     '201':
       description: File uploaded
+      content:
+        application/json:
+          schema:
+            title: Upload response
+            type: object
+            properties:
+              data:
+                type: object
+                nullable: true
+                description: The response payload. Will contain a data property with upload details.
+                required:
+                  - upload_id
+                properties:
+                  upload_id:
+                    type: string
+                    description: "A unique upload_id for the successful upload."
+          examples:
+            Default:
+              description: "An upload of a single CSV file of all the participants"
+              value:
+                data:
+                  upload_id: "0x8DA2EA86C4C2089"
     '401':
       description: Access denied
     '411':
       description: Content-Length not provided
-components:
-  responses:
-    '201':
-      description: File uploaded
-      content:
-        application/json:
-          schema:
-            $ref: '../openapi/upload.yaml#/UploadResponse'
-          examples:
-            Default:
-              $ref: '../openapi/upload.yaml#/UploadResponseExamples/Default'
-UploadResponse:
-  title: Upload response
-  type: object
-  properties:
-    data:
-      type: object
-      nullable: true
-      description: The response payload. Will contain a data property with upload details.
-      required:
-        - upload_id
-      properties:
-        upload_id:
-          type: string
-          description: "A unique upload_id for the successful upload."
-          
-UploadResponseExamples:
-  Default:
-    description: "An upload of a single CSV file of all the participants"
-    value:
-      data:
-        upload_id: "0x8DA2EA86C4C2089"
