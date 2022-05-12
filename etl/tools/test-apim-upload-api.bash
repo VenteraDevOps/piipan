@@ -17,7 +17,7 @@ STATE_LC=$(echo "$STATE" | tr '[:upper:]' '[:lower:]')
 SUBSCRIPTION_NAME="${STATE}-BulkUpload"
 DATA_RELPATH=../docs/csv/
 DATA_BASENAME=example.csv
-UPLOAD_API_PATH="/bulk/${STATE_LC}/v2/upload/${DATA_BASENAME}"
+UPLOAD_API_PATH="/bulk/${STATE_LC}/v2/upload_all_participants/${DATA_BASENAME}"
 
 main () {
   # Load agency/subscription/deployment-specific settings
