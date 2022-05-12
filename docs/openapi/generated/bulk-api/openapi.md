@@ -80,6 +80,8 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
 
 `PUT /upload/{filename}`
 
+A Deprecated endpoint.
+
 > Example responses
 
 > An upload of a single CSV file of all the participants
@@ -96,7 +98,7 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|File uploaded|Inline|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|(Deprecated) File uploaded|Inline|
 
 <h3 id="put__upload_{filename}-responseschema">Response Schema</h3>
 
