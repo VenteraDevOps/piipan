@@ -98,7 +98,7 @@ A Deprecated endpoint.
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|(Deprecated) File uploaded|Inline|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|File uploaded|Inline|
 
 <h3 id="put__upload_{filename}-responseschema">Response Schema</h3>
 
