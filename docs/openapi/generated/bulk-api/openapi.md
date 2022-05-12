@@ -80,7 +80,7 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
 
 `PUT /upload/{filename}`
 
-A Deprecated endpoint.
+<b>A Deprecated endpoint.</b>
 
 > Example responses
 
