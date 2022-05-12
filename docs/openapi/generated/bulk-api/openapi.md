@@ -16,7 +16,7 @@ Base URLs:
 * API Key (ApiKeyAuth)
     - Parameter Name: **Ocp-Apim-Subscription-Key**, in: header. 
 
-<h1 id="bulk-api-upload">Upload</h1>
+<h1 id="bulk-api-bulk-upload">Bulk Upload</h1>
 
 ## Upload a File
 
