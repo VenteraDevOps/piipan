@@ -18,7 +18,10 @@ paths:
         '201':
           $ref: './../../etl/docs/openapi/uploadAllParticipants.yaml#/components/responses/201'
   '/upload/{filename}':
-    $ref: '../../etl/docs/openapi/upload.yaml'
+    put:
+      responses:
+        '201':
+          $ref: './../../etl/docs/openapi/upload.yaml#/components/responses/201'
     description: 'A Deprecated endpoint.'
     
 security:
