@@ -66,21 +66,41 @@ To perform this operation, you must be authenticated by means of one of the foll
 ApiKeyAuth
 </aside>
 
-## put__upload_{filename}
+<h1 id="bulk-api-upload">Upload</h1>
+
+## Upload a File (deprecated)
+
+<a id="opIdUpload a File (deprecated)"></a>
 
 > Code samples
 
 ```shell
 # You can also use wget
 curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
+  -H 'Content-Type: text/plain' \
   -H 'Accept: application/json' \
+  -H 'Content-Length: 6413' \
   -H 'Ocp-Apim-Subscription-Key: API_KEY'
 
 ```
 
 `PUT /upload/{filename}`
 
-<b>A Deprecated endpoint.</b>
+*Deprecated. This endpoint has been renamed to `upload_all_participants` and will be removed in a future version. Upload a CSV file of bulk participant data.*
+
+> Body parameter
+
+```
+string
+
+```
+
+<h3 id="upload-a-file-(deprecated)-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|filename|path|string|true|Name of file being uploaded|
+|Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
 
 > Example responses
 
@@ -94,13 +114,15 @@ curl -X PUT /bulk/{stateAbbr}/v2/upload/{filename} \
 }
 ```
 
-<h3 id="put__upload_{filename}-responses">Responses</h3>
+<h3 id="upload-a-file-(deprecated)-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|File uploaded|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
+|411|[Length Required](https://tools.ietf.org/html/rfc7231#section-6.5.10)|Content-Length not provided|None|
 
-<h3 id="put__upload_{filename}-responseschema">Response Schema</h3>
+<h3 id="upload-a-file-(deprecated)-responseschema">Response Schema</h3>
 
 Status Code **201**
 
