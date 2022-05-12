@@ -33,7 +33,7 @@ put:
 components:
   responses:
     '201':
-      description: (Deprecated) File uploaded
+      description: File uploaded
       content:
         application/json:
           schema:
