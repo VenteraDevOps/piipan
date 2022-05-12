@@ -14,7 +14,7 @@ servers:
 paths:
   '/upload_all_participants/{filename}':
     put:
-      operationId: Upload a File
+      operationId: upload_all_participants
       summary: Upload a CSV file of bulk participant data
       tags:
         - Bulk Upload
@@ -69,7 +69,7 @@ paths:
           description: Content-Length not provided
   '/upload/{filename}':
     put:
-      operationId: Upload a File (deprecated)
+      operationId: upload (deprecated)
       summary: Deprecated. This endpoint has been renamed to `upload_all_participants` and will be removed in a future version. Upload a CSV file of bulk participant data.
       tags:
         - Bulk Upload

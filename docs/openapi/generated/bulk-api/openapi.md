@@ -18,9 +18,9 @@ Base URLs:
 
 <h1 id="bulk-api-bulk-upload">Bulk Upload</h1>
 
-## Upload a File
+## upload_all_participants
 
-<a id="opIdUpload a File"></a>
+<a id="opIdupload_all_participants"></a>
 
 > Code samples
 
@@ -45,7 +45,7 @@ string
 
 ```
 
-<h3 id="upload-a-file-parameters">Parameters</h3>
+<h3 id="upload_all_participants-parameters">Parameters</h3>
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
@@ -64,7 +64,7 @@ string
 }
 ```
 
-<h3 id="upload-a-file-responses">Responses</h3>
+<h3 id="upload_all_participants-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -72,7 +72,7 @@ string
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
 |411|[Length Required](https://tools.ietf.org/html/rfc7231#section-6.5.10)|Content-Length not provided|None|
 
-<h3 id="upload-a-file-responseschema">Response Schema</h3>
+<h3 id="upload_all_participants-responseschema">Response Schema</h3>
 
 Status Code **201**
 
@@ -88,9 +88,9 @@ To perform this operation, you must be authenticated by means of one of the foll
 ApiKeyAuth
 </aside>
 
-## Upload a File (deprecated)
+## upload (deprecated)
 
-<a id="opIdUpload a File (deprecated)"></a>
+<a id="opIdupload (deprecated)"></a>
 
 > Code samples
 
@@ -115,7 +115,7 @@ string
 
 ```
 
-<h3 id="upload-a-file-(deprecated)-parameters">Parameters</h3>
+<h3 id="upload-(deprecated)-parameters">Parameters</h3>
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
@@ -134,7 +134,7 @@ string
 }
 ```
 
-<h3 id="upload-a-file-(deprecated)-responses">Responses</h3>
+<h3 id="upload-(deprecated)-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -142,7 +142,7 @@ string
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
 |411|[Length Required](https://tools.ietf.org/html/rfc7231#section-6.5.10)|Content-Length not provided|None|
 
-<h3 id="upload-a-file-(deprecated)-responseschema">Response Schema</h3>
+<h3 id="upload-(deprecated)-responseschema">Response Schema</h3>
 
 Status Code **201**
 
