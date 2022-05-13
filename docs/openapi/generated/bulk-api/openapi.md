@@ -2,8 +2,8 @@
 <h1 id="bulk-api">Bulk API v2.0.0</h1>
 
 The API for performing bulk uploads
-<h2>File Prep</h2>
-schema is a thing [link]
+<h2>File Preparation</h2>
+This API requires a file to be submitted with the appropriate schema. The details of that file's schema can be found at <a href='https://github.com/18F/piipan/blob/dev/etl/docs/csv/import-schema.json'>File schema</a>
 
 Base URLs:
 
