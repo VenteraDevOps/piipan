@@ -23,6 +23,7 @@ namespace Piipan.QueryTool
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(logging => logging.AddAzureWebAppDiagnostics())
+                .ConfigureLogging(logging => logging.AddEventSourceLogger())
                 .ConfigureServices(serviceCollection => serviceCollection
                     .Configure<AzureFileLoggerOptions>(options =>
                     {
