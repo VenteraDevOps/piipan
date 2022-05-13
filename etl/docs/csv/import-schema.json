@@ -12,7 +12,7 @@
       {
         "name": "case_id",
         "type": "string",
-        "description": "Participant's state-specific case identifier",
+        "description": "Participant's state-specific case identifier. Can be the same for multiple participants.",
         "constraints": {
           "required": true,
           "minLength": 1
@@ -21,7 +21,7 @@
       {
         "name": "participant_id",
         "type": "string",
-        "description": "Participant's state-specific identifier. Must not be social security number or any personal identifiable information. No rows in the same upload should have the same participant_id and case_id.",
+        "description": "Participant's state-specific identifier. Unique to the participant. Must not include social security number or other identifying information used outside of the benefits eligibility context.",
         "constraints": {
           "required": true
         }
@@ -29,7 +29,7 @@
       {
         "name": "participant_closing_date",
         "type": "date",
-        "description": "The final month when a participant will receive benefits. Leave this field blank if the participant will continue receiving benefits until the next recertification period."
+        "description": "Date when the participant's case will close. This will be the last date the participant is eligible to receive benefits. Leave this field blank if the participant will continue receiving benefits until the next recertification period."
       },
       {
         "name": "recent_benefit_issuance_dates",
