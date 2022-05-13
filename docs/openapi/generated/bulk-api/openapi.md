@@ -2,7 +2,8 @@
 <h1 id="bulk-api">Bulk API v2.0.0</h1>
 
 The API for performing bulk uploads
-<b>File Prep</b> schema is a thing [link]
+<h2>File Prep</h2>
+schema is a thing [link]
 
 Base URLs:
 
