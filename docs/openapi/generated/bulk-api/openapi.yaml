@@ -5,7 +5,7 @@ info:
   description: |
     The API for performing bulk uploads
     <h2>File Preparation</h2>
-    This API requires a file to be submitted with the appropriate schema. The details of that file's schema can be found at <a href='https://github.com/18F/piipan/blob/dev/etl/docs/csv/import-schema.json'>File schema</a>
+    This API requires a file to be submitted with the appropriate schema. The details of that file's schema can be found at <a href='../../../../etl/docs/csv/import-schema.json'>File schema</a>
 tags:
   - name: UploadAllParticipants
 servers:
