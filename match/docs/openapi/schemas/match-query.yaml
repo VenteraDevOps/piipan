@@ -47,7 +47,7 @@ Person:
       pattern: "^[0-9a-f]{128}$"
     participant_id:
       type: string
-      description: "Participant's state-specific identifier. Must not be social security number or any personal identifiable information."
+      description: "Participant's state-specific identifier. Unique to the participant. Must not include social security number or other identifying information used outside of the benefits eligibility context."
     case_id:
       type: string
       description: "Participant's state-specific case number"
