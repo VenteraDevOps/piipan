@@ -9,17 +9,17 @@
     public class IndexModel
     {
         [Display(Name = "Input Text")]
-        public string? InputTextField { get; set; }
+        public string InputTextField { get; set; }
 
         [Display(Name = "Input Text Area")]
-        public string? InputTextAreaField { get; set; }
+        public string InputTextAreaField { get; set; }
 
         [Display(Name = "Input Date")]
         public DateTime? InputDateField { get; set; }
 
         [UsaSSN]
         [Display(Name = "Input SSN")]
-        public string? InputSSNField { get; set; }
+        public string InputSSNField { get; set; }
     }
 
     private IndexModel indexModel = new IndexModel();

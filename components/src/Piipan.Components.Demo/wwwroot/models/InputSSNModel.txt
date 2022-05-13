@@ -10,11 +10,11 @@ namespace Piipan.Components.Demo.Models
     {
         [UsaSSN]
         [Display(Name = "Optional SSN")]
-        public string? OptionalSSN { get; set; }
+        public string OptionalSSN { get; set; }
 
         [UsaSSN]
         [UsaRequired]
         [Display(Name = "Required SSN")]
-        public string? RequiredSSN { get; set; }
+        public string RequiredSSN { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -36,7 +35,7 @@ namespace Piipan.Components.Forms
                     InvisibleValue ??= "";
                     InvisibleValue = string.Join("", InvisibleValue.Select(n => n != '-' ? '*' : n));
                     int cursorPosition = await JSRuntime.InvokeAsync<int>("piipan.utilities.getCursorPosition", ElementReference);
-                    await JSRuntime.InvokeVoidAsync("piipan.utilities.setValue", ElementReference, InvisibleValue);
+                    await InvokeAsync(StateHasChanged);
                     await JSRuntime.InvokeVoidAsync("piipan.utilities.setCursorPosition", ElementReference, cursorPosition);
                 }
             };
@@ -101,7 +100,6 @@ namespace Piipan.Components.Forms
                         value = beginningStr + middleStr + endStr;
                     }
                 }
-                Console.WriteLine("Starting Timer");
                 ssnProtectionTimer.Start();
             }
             int hyphensRemovedBeforeCursor = value.Substring(0, cursorPosition).Count((c) => c == '-');
@@ -148,6 +146,7 @@ namespace Piipan.Components.Forms
             if ((visible && CurrentValue == tempValue) || (!visible && InvisibleValue == invisibleValue))
             {
                 // Reset the value. Blazor won't rebind, but we need to refresh it anyway
+                // This happens when you try deleting a hyphen that's in the middle of the SSN and the above logic puts it back in.
                 await JSRuntime.InvokeVoidAsync("piipan.utilities.setValue", ElementReference, visible ? tempValue : invisibleValue);
             }
             CurrentValue = tempValue;

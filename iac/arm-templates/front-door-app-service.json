@@ -60,6 +60,12 @@
             "metadata": {
                 "description": "Development environment indicator"
             }
+        },
+        "rulesEngineName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the rules engine to be created with Security Headers"
+            }
         }
     },
     "variables": {
@@ -80,41 +86,41 @@
                     "enabledState": "Enabled"
                 },
                 "customRules": {
-                    "rules":[
-                       {
-                          "action":"Block",
-                          "enabledState":"Enabled",
-                          "matchConditions":[
-                             {
-                                "matchValue":[
-                                   "~"
-                                ],
-                                "matchVariable":"RequestUri",
-                                "operator":"Contains"
-                             }
-                          ],
-                          "name":"denyShortPath",
-                          "priority":"100",
-                          "ruleType":"MatchRule"
-                       },
-                       {
-                          "action":"Block",
-                          "enabledState":"Enabled",
-                          "matchConditions":[
-                             {
-                                "matchValue":[
-                                   "POST"
-                                ],
-                                "matchVariable":"RequestMethod",
-                                "operator":"Equal"
-                             }
-                          ],
-                          "name":"rateLimitByRequestMethod",
-                          "priority":"200",
-                          "rateLimitDurationInMinutes":"5",
-                          "rateLimitThreshold":"10000",
-                          "ruleType":"RateLimitRule"
-                       }
+                    "rules": [
+                        {
+                            "action": "Block",
+                            "enabledState": "Enabled",
+                            "matchConditions": [
+                                {
+                                    "matchValue": [
+                                        "~"
+                                    ],
+                                    "matchVariable": "RequestUri",
+                                    "operator": "Contains"
+                                }
+                            ],
+                            "name": "denyShortPath",
+                            "priority": "100",
+                            "ruleType": "MatchRule"
+                        },
+                        {
+                            "action": "Block",
+                            "enabledState": "Enabled",
+                            "matchConditions": [
+                                {
+                                    "matchValue": [
+                                        "POST"
+                                    ],
+                                    "matchVariable": "RequestMethod",
+                                    "operator": "Equal"
+                                }
+                            ],
+                            "name": "rateLimitByRequestMethod",
+                            "priority": "200",
+                            "rateLimitDurationInMinutes": "5",
+                            "rateLimitThreshold": "10000",
+                            "ruleType": "RateLimitRule"
+                        }
                     ]
                 },
                 "managedRules": {
@@ -214,7 +220,6 @@
                                 }
                             ],
                             "acceptedProtocols": [
-                                "Http",
                                 "Https"
                             ],
                             "patternsToMatch": [
@@ -222,10 +227,32 @@
                             ],
                             "routeConfiguration": {
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
-                                "forwardingProtocol": "MatchRequest",
+                                "forwardingProtocol": "HttpsOnly",
                                 "backendPool": {
                                     "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', parameters('frontDoorName'), concat('backend-pool-', uniqueString(parameters('frontDoorName'))))]"
                                 }
+                            },
+                            "enabledState": "Enabled"
+                        }
+                    },
+                    {
+                        "name": "httpRedirect",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', parameters('frontDoorName'), concat('azurefd-net-', uniqueString(parameters('frontDoorName'))))]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "routeConfiguration": {
+                                "redirectType": "PermanentRedirect",
+                                "redirectProtocol": "HttpsOnly",
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration"
                             },
                             "enabledState": "Enabled"
                         }
@@ -257,6 +284,40 @@
                     {
                         "category": "FrontdoorWebApplicationFirewallLog",
                         "enabled": true
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/frontdoors/rulesengines",
+            "apiVersion": "2020-05-01",
+            "name": "[concat(parameters('frontDoorName'), '/', parameters('rulesEngineName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
+            ],
+            "properties": {
+                "resourceState": "Enabled",
+                "rules": [
+                    {
+                        "name": "AddSecurityHeaders",
+                        "priority": 0,
+                        "action": {
+                            "requestHeaderActions": [],
+                            "responseHeaderActions": [
+                                {
+                                    "headerActionType": "Overwrite",
+                                    "headerName": "Strict-Transport-Security",
+                                    "value": "max-age=31536000; includeSubDomains; preload"
+                                },
+                                {
+                                    "headerActionType": "Overwrite",
+                                    "headerName": "X-Frame-Options",
+                                    "value": "DENY"
+                                }
+                            ]
+                        },
+                        "matchConditions": [],
+                        "matchProcessingBehavior": "Continue"
                     }
                 ]
             }

@@ -26,20 +26,22 @@ namespace Piipan.Etl.Func.BulkUpload
     {
         private readonly IParticipantApi _participantApi;
         private readonly IParticipantStreamParser _participantParser;
+        private readonly IBlobClientStream _blobStream;
 
         public BulkUpload(
             IParticipantApi participantApi,
-            IParticipantStreamParser participantParser)
+            IParticipantStreamParser participantParser,
+            IBlobClientStream blobStream)
         {
             _participantApi = participantApi;
             _participantParser = participantParser;
+            _blobStream = blobStream;
         }
 
         /// <summary>
         /// Entry point for the state-specific Azure Function instance
         /// </summary>
-        /// <param name="eventGridEvent">storage container blob creation event</param>
-        /// <param name="input">handle to CSV file uploaded to a state-specific container</param>
+        /// <param name="myQueueItem">storage queue item</param>
         /// <param name="log">handle to the function log</param>
         /// <remarks>
         /// The function is expected to be executing as a managed identity that has read access
@@ -47,18 +49,18 @@ namespace Piipan.Etl.Func.BulkUpload
         /// </remarks>
         [FunctionName("BulkUpload")]
         public async Task Run(
-            [EventGridTrigger] EventGridEvent eventGridEvent,
-            [Blob("{data.url}", FileAccess.Read,Connection = "BlobStorageConnectionString")] Stream input,
-            [Blob("{data.url}", FileAccess.Read, Connection = "BlobStorageConnectionString")] BlobClient blobClient,
+            [QueueTrigger("upload", Connection = "BlobStorageConnectionString")] string myQueueItem,
             ILogger log)
         {
-            log.LogInformation(eventGridEvent.Data.ToString());
+            log.LogInformation(myQueueItem);
             try
             {
+                var input =  _blobStream.Parse(myQueueItem, log);
+                var blobProperties = _blobStream.BlobClientProperties(myQueueItem, log);
+
                 if (input != null)
                 {
                     var participants = _participantParser.Parse(input);
-                    BlobProperties blobProperties = await blobClient.GetPropertiesAsync();
                     await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString());
                 }
                 else

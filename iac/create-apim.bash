@@ -109,6 +109,9 @@ main () {
 
   duppart_policy_xml=$(generate_policy apim-duppart-policy.xml "api://${orch_aad_client_id}")
 
+  uploadallparticipants_policy_path=$(dirname "$0")/apim-uploadallparticipants-policy.xml
+  uploadallparticipants_policy_xml=$(< "$uploadallparticipants_policy_path")
+
   upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
   upload_policy_xml=$(< "$upload_policy_path")
 
@@ -135,6 +138,7 @@ main () {
         publisherName="$PUBLISHER_NAME" \
         orchestratorUrl="$orch_api_url" \
         dupPartPolicyXml="$duppart_policy_xml" \
+        uploadAllParticipantsPolicyXml="$uploadallparticipants_policy_xml" \
         uploadStates="$state_abbrs" \
         uploadPolicyXml="$upload_policy_xml" \
         location="$LOCATION" \

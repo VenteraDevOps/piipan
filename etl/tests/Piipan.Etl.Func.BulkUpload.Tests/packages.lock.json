@@ -36,9 +36,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[6.0.3, )",
-        "resolved": "6.0.3",
-        "contentHash": "yt/3XFRhHsJ01a4+qHM9+0mtitQ3DY2wJLyGP9vtvZa1cB1nSAw762GJGdSX3Bbc7wZKzeo4dc4drD3yvQe7gA==",
+        "requested": "[6.0.4, )",
+        "resolved": "6.0.4",
+        "contentHash": "SJMlOmFHr32oOzVXeHmarGaBKkhi0wHVN/rzuu2tUSJ4Qx2AkHCpr9R/DhLWwDiklqgzFU++9wkFyGJxbx/zzg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
@@ -90,29 +90,30 @@
       },
       "Azure.Messaging.EventGrid": {
         "type": "Transitive",
-        "resolved": "4.8.1",
-        "contentHash": "nKQ4koesqFOYGW2/mkaRL7CpbpM1Bl/DvbfgsFLMKNdTeGiZUWcXA9+fLoRupmLtuQ+At9PuniyAtayzLLudWg==",
+        "resolved": "4.10.0",
+        "contentHash": "X3dh3Cek/7wFPUrBJ2KbnkJteGjWvKBoSBmD/uQm8reMIavCFTKhnl95F937eLn/2cSsm5l3oPHtYPFtDerA7Q==",
         "dependencies": {
-          "Azure.Core": "1.21.0",
+          "Azure.Core": "1.24.0",
           "System.Memory.Data": "1.0.2",
           "System.Text.Json": "4.7.2"
         }
       },
       "Azure.Storage.Blobs": {
         "type": "Transitive",
-        "resolved": "12.10.0",
-        "contentHash": "yaijs9DPfn34C/X4TX+0TAxANEhuKSrFE650gkF9g1pz/nQljv86zOOtDwNwD5UsAY5LyrOiCASGo2dhuIxvdg==",
+        "resolved": "12.11.0",
+        "contentHash": "50eRjIhY7Q1JN7kT2MSawDKCcwSb7uRZUkz00P/BLjSg47gm2hxUYsnJPyvzCHntYMbOWzrvaVQTwYwXabaR5Q==",
         "dependencies": {
-          "Azure.Storage.Common": "12.9.0",
-          "System.Text.Json": "4.6.0"
+          "Azure.Storage.Common": "12.10.0",
+          "System.Text.Json": "4.7.2"
         }
       },
       "Azure.Storage.Common": {
         "type": "Transitive",
-        "resolved": "12.9.0",
-        "contentHash": "GuoigTmzz9HrCGdcdu7LyjD4pDr2XPt72LlWWTDyno+nYrjyuNwpwRFBvK/brxJvQFRHofQcBskf8vOxVxnI8g==",
+        "resolved": "12.10.0",
+        "contentHash": "vYkHGzUkdZTace/cDPZLG+Mh/EoPqQuGxDIBOau9D+XWoDPmuUFGk325aXplkFE4JFGpSwoytNYzk/qBCaiHqg==",
         "dependencies": {
-          "Azure.Core": "1.19.0"
+          "Azure.Core": "1.22.0",
+          "System.IO.Hashing": "6.0.0"
         }
       },
       "Azure.Storage.Queues": {
@@ -380,10 +381,10 @@
       },
       "Microsoft.Azure.WebJobs": {
         "type": "Transitive",
-        "resolved": "3.0.30",
-        "contentHash": "vLtw5QMVdZ6XkgcNZrxYi2oiv5722nnsfqye+W0IQXmPFjKmBmmbKRC/SKK5Y1yBQ+1L8jVqT5CgcGhsVJlsig==",
+        "resolved": "3.0.32",
+        "contentHash": "uN8GsFqPFHHcSrwwj/+0tGe6F6cOwugqUiePPw7W3TL9YC594+Hw8GBK5S/fcDWXacqvRRGf9nDX8xP94/Yiyw==",
         "dependencies": {
-          "Microsoft.Azure.WebJobs.Core": "3.0.30",
+          "Microsoft.Azure.WebJobs.Core": "3.0.32",
           "Microsoft.Extensions.Configuration": "2.1.1",
           "Microsoft.Extensions.Configuration.Abstractions": "2.1.1",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "2.1.0",
@@ -399,8 +400,8 @@
       },
       "Microsoft.Azure.WebJobs.Core": {
         "type": "Transitive",
-        "resolved": "3.0.30",
-        "contentHash": "rWG80w/M8r5BalpYKLLcXHlp9p7klfIdM5Y1FlR2RTHelKCuZ5CeqooTXys2FTEbVqFSurdw0JPvmqoi2vibpg==",
+        "resolved": "3.0.32",
+        "contentHash": "pW5lyF0Tno1cC2VkmBLyv7E3o5ObDdbn3pfpUpKdksJo9ysCdQTpgc0Ib99wPHca6BgvoglicGbDYXuatanMfg==",
         "dependencies": {
           "System.ComponentModel.Annotations": "4.4.0",
           "System.Diagnostics.TraceSource": "4.3.0"
@@ -418,11 +419,11 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.EventGrid": {
         "type": "Transitive",
-        "resolved": "3.1.0",
-        "contentHash": "DoUJ6f0h3YUHbYYNwlJGRH7zMDLsPhuxbTz5g88zrh9DkUD71jtbdgGJOY1jMdTa0ijSpTuHJdFM8/+69ewFgQ==",
+        "resolved": "3.2.0",
+        "contentHash": "nbSJ39Dxvi6YSJOVWZJv5/880c+4OZxrsZmNYh5qg5zVDJ5myrLJm+WsQe4xflWmhX3YO6e6/A2Dru+dfNOacQ==",
         "dependencies": {
-          "Azure.Messaging.EventGrid": "4.8.1",
-          "Microsoft.Azure.WebJobs": "3.0.30"
+          "Azure.Messaging.EventGrid": "4.10.0",
+          "Microsoft.Azure.WebJobs": "3.0.32"
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.Http": {
@@ -926,11 +927,11 @@
       },
       "Npgsql.NodaTime": {
         "type": "Transitive",
-        "resolved": "6.0.3",
-        "contentHash": "AKGBaz2dSFkdsJ7eE0H6KVQGH/D+O+afOFQ7ML3XqWjNiiEspr20j64/eqyD0KL4IT4qKXzrSax1opzgjtYhDA==",
+        "resolved": "6.0.4",
+        "contentHash": "kk3DtqlIFupk9P6ccONJdUzATHrjkgfUQj0XVQhpTNzpof1jjFuiBSR1TSCNReSGulZ9Q8TQDby1WM3yEwnUgg==",
         "dependencies": {
           "NodaTime": "3.0.9",
-          "Npgsql": "6.0.3"
+          "Npgsql": "6.0.4"
         }
       },
       "NuGet.Frameworks": {
@@ -1386,6 +1387,11 @@
         "dependencies": {
           "System.Runtime": "4.3.0"
         }
+      },
+      "System.IO.Hashing": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "Rfm2jYCaUeGysFEZjDe7j1R4x6Z6BzumS/vUT5a1AA/AWJuGX71PoGB0RmpyX3VmrGqVnAwtfMn39OHR8Y/5+g=="
       },
       "System.Linq": {
         "type": "Transitive",
@@ -2155,15 +2161,17 @@
       "piipan.etl.func.bulkupload": {
         "type": "Project",
         "dependencies": {
+          "Azure.Messaging.EventGrid": "4.10.0",
+          "Azure.Storage.Blobs": "12.11.0",
           "CsvHelper": "27.2.1",
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
-          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.2.0",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "5.0.0",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.NET.Sdk.Functions": "4.1.0",
-          "Npgsql": "6.0.3",
+          "Npgsql": "6.0.4",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Participants.Core": "1.0.0",
           "Piipan.Shared": "1.0.0"
@@ -2181,7 +2189,7 @@
           "Dapper": "2.0.123",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
-          "Npgsql.NodaTime": "6.0.3",
+          "Npgsql.NodaTime": "6.0.4",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "PostgreSQLCopyHelper": "2.8.0"
@@ -2200,7 +2208,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.3"
+          "Npgsql": "6.0.4"
         }
       },
       "piipan.shared.api": {

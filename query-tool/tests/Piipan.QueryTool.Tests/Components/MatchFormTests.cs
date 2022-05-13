@@ -1,7 +1,6 @@
 ﻿using Bunit;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
-using Piipan.Components.Tests;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Components;
 using Piipan.QueryTool.Client.Models;
@@ -10,10 +9,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
+using static Piipan.Components.Validation.ValidationConstants;
 
 namespace Piipan.QueryTool.Tests.Components
 {
-    public class MatchFormTests : BaseTest<MatchForm>
+    public class MatchFormTests : BaseComponentTest<MatchForm>
     {
         #region Tests
         IRenderedComponent<MatchForm> queryForm = null;
@@ -159,7 +159,7 @@ namespace Piipan.QueryTool.Tests.Components
         public void Form_With_Server_Error_Should_Show_Errors()
         {
             // Arrange
-            InitialValues.ServerErrors = new List<ServerError> { new("Query.MatchId", "@@@ is required") };
+            InitialValues.ServerErrors = new List<ServerError> { new("Query.MatchId", $"{ValidationFieldPlaceholder} is required") };
             CreateTestComponent();
 
             var alertBox = queryForm.FindComponent<UsaAlertBox>();
