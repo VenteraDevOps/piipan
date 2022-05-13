@@ -9,5 +9,6 @@ namespace Piipan.Participants.Core.DataAccessObjects
     {
         Task<IEnumerable<ParticipantDbo>> GetParticipants(string state, string ldsHash, Int64 uploadId);
         Task AddParticipants(IEnumerable<ParticipantDbo> participants);
+        Task DeleteOldParticipantsExcept(string state, long uploadId);
     }
 }

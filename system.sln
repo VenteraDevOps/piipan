@@ -122,6 +122,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Cryptography", "shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj", "{3EA99107-AA32-404D-A165-DBFF960E7F04}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Cryptography.Tests", "shared\tests\Piipan.Shared.Cryptography.Tests\Piipan.Shared.Cryptography.Tests.csproj", "{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API", "shared\src\Piipan.Shared.API\Piipan.Shared.API.csproj", "{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API.Tests", "shared\tests\Piipan.Shared.API.Tests\Piipan.Shared.API.Tests.csproj", "{1245270B-EB8C-4267-A325-8A649944937F}"

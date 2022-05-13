@@ -56,12 +56,14 @@ namespace Piipan.Etl.Func.BulkUpload
             log.LogInformation(myQueueItem);
             try
             {
-                if(myQueueItem == null || myQueueItem.Length == 0){
-                    
+                if (myQueueItem == null || myQueueItem.Length == 0)
+                {
+
                     log.LogError("No input stream was provided");
                 }
-                else {
-                    var blockBlobClient =  _blobStream.Parse(myQueueItem, log);
+                else
+                {
+                    var blockBlobClient = _blobStream.Parse(myQueueItem, log);
 
                     Stream input = await blockBlobClient.OpenReadAsync();
 
@@ -72,8 +74,10 @@ namespace Piipan.Etl.Func.BulkUpload
                     if (input != null)
                     {
                         var participants = _participantParser.Parse(input);
-                        await _participantApi.AddParticipants(participants,  blobProperties.ETag.ToString())
-                                .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log));
+                        await _participantApi.AddParticipants(participants, blobProperties.ETag.ToString())
+                                .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log))
+                                .ContinueWith(t => _participantApi.DeleteOldParticpants());
+                       
                     }
                 }
             }

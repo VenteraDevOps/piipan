@@ -9,5 +9,6 @@ namespace Piipan.Participants.Api
         Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash);
         Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier);
         Task<IEnumerable<string>> GetStates();
+        Task DeleteOldParticpants(string state = null);
     }
 }

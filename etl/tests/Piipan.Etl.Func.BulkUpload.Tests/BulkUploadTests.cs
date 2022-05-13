@@ -209,6 +209,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             // Assert
             participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>()), Times.Once);
+            participantApi.Verify(m => m.DeleteOldParticpants(It.IsAny<string>()), Times.Once);
         }
     }
 }

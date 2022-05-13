@@ -70,5 +70,21 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 }
             }
         }
+        public async Task DeleteOldParticipantsExcept(string state,  Int64 uploadId)
+        {
+            using (var connection = await _dbConnectionFactory.Build(state))
+            {
+                await connection
+                    .QueryAsync<ParticipantDbo>(@"
+                    DELETE FROM participants
+                    WHERE  upload_id<>@uploadId",
+                        new
+                        {
+                            uploadId = uploadId
+                        }
+                    );
+            }
+        }
+
     }
 }

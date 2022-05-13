@@ -80,5 +80,18 @@ namespace Piipan.Participants.Core.Services
         {
             return await _stateService.GetStates();
         }
+        public async Task DeleteOldParticpants(string state = null)
+        {
+             
+            using (TransactionScope scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                TimeSpan.FromSeconds(600),
+                TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var upload = await _uploadDao.GetLatestUpload(state);
+                await _participantDao.DeleteOldParticipantsExcept(state,upload.Id);
+                scope.Complete();
+            }
+        }
     }
 }
