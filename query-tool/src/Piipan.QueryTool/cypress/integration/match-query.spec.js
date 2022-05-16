@@ -62,14 +62,25 @@ describe('query tool match query', () => {
     });
 
     it("shows results table on successful submission with a match", () => {
-        cy.get('#Query_MatchId').type("ABCDEFG").blur();
-        cy.get('form').submit();
+        cy.visit('/');
+        cy.get('#query-form-search-btn', { timeout: 10000 }).should('be.visible');
+        setValue('#Query_LastName', 'Farrington');
+        setValue('#Query_DateOfBirth', '1931-10-13');
+        setValue('#Query_SocialSecurityNum', '425-46-5417');
+        cy.get('#query-form-search-btn').click();
 
-        cy.contains('Match ID').should('be.visible');
-        cy.contains('Matching States').should('be.visible');
+        cy.get('#query-results-area tbody tr td a').invoke('text').then(matchId => {
+            cy.visit('/match');
+            cy.get('#match-form-search-btn', { timeout: 10000 }).should('be.visible');
+            cy.get('#Query_MatchId').type(matchId).blur();
+            cy.get('form').submit();
 
-        setupPa11yPost();
-        cy.pa11y(pa11yOptions);
+            cy.contains('Match ID').should('be.visible');
+            cy.contains('Matching States').should('be.visible');
+
+            setupPa11yPost();
+            cy.pa11y(pa11yOptions);
+        });
     });
 })
 
