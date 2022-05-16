@@ -1,62 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using Piipan.Match.Api;
-using Piipan.Match.Api.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
-using Piipan.Shared.Deidentification;
 using Xunit;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Piipan.QueryTool.Tests
 {
-    public class ErrorPageTests
+    public class ErrorPageTests : BasePageTest
     {
-        public static IClaimsProvider claimsProviderMock(string email)
-        {
-            var claimsProviderMock = new Mock<IClaimsProvider>();
-            claimsProviderMock
-                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
-                .Returns(email);
-            return claimsProviderMock.Object;
-        }
-
-        public static HttpContext contextMock()
-        {
-            var request = new Mock<HttpRequest>();
-
-            request
-                .Setup(m => m.Scheme)
-                .Returns("https");
-
-            request
-                .Setup(m => m.Host)
-                .Returns(new HostString("tts.test"));
-
-            var context = new Mock<HttpContext>();
-            context.Setup(m => m.Request).Returns(request.Object);
-
-            return context.Object;
-        }
-
         [Fact]
         public void TestBeforeOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
-            var pageModel = new ErrorModel(
-                new NullLogger<ErrorModel>(),
-                mockClaimsProvider,
-                mockLdsDeidentifier,
-                mockMatchApi
-            );
+            var mockClaimsProvider = claimsProviderMock();
+            var pageModel = new ErrorModel(mockClaimsProvider);
 
             // act
 
@@ -68,15 +25,8 @@ namespace Piipan.QueryTool.Tests
         public void TestMessageOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
-            var mockMatchApi = Mock.Of<IMatchApi>();
-            var pageModel = new ErrorModel(
-                new NullLogger<ErrorModel>(),
-                mockClaimsProvider,
-                mockLdsDeidentifier,
-                mockMatchApi
-            );
+            var mockClaimsProvider = claimsProviderMock();
+            var pageModel = new ErrorModel(mockClaimsProvider);
 
             // act
             string message = "test message";
@@ -85,6 +35,36 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal(message, pageModel.Message);
         }
 
-        
+        /// <summary>
+        /// The error page should be accessible no matter your role
+        /// </summary>
+        [Theory]
+        [InlineData(nameof(ErrorModel.OnGet), null, null, true)]
+        [InlineData(nameof(ErrorModel.OnGet), "IA", null, true)]
+        [InlineData(nameof(ErrorModel.OnGet), null, "Worker", true)]
+        [InlineData(nameof(ErrorModel.OnGet), "IA", "Worker", true)]
+        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        {
+            var mockClaimsProvider = claimsProviderMock(state: location, nacRole: role);
+
+            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
+
+            if (!isAuthorized)
+            {
+                Assert.Equal(403, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+                Assert.IsType<RedirectToPageResult>(pageHandlerExecutingContext.Result);
+            }
+            else
+            {
+                Assert.Equal(200, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+            }
+        }
+
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IClaimsProvider claimsProvider, string methodName)
+        {
+            var pageModel = new ErrorModel(claimsProvider);
+
+            return base.GetPageHandlerExecutingContext(pageModel, methodName);
+        }
     }
 }

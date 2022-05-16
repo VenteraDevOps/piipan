@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.Match.Api;
@@ -10,46 +11,20 @@ using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
 {
-    public class IndexPageTests
+    public class IndexPageTests : BasePageTest
     {
-        public static IClaimsProvider claimsProviderMock(string email)
-        {
-            var claimsProviderMock = new Mock<IClaimsProvider>();
-            claimsProviderMock
-                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
-                .Returns(email);
-            return claimsProviderMock.Object;
-        }
 
-        public static HttpContext contextMock()
-        {
-            var request = new Mock<HttpRequest>();
-
-            request
-                .Setup(m => m.Scheme)
-                .Returns("https");
-
-            request
-                .Setup(m => m.Host)
-                .Returns(new HostString("tts.test"));
-
-            var context = new Mock<HttpContext>();
-            context.Setup(m => m.Request).Returns(request.Object);
-
-            return context.Object;
-        }
 
         [Fact]
         public void TestBeforeOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockClaimsProvider = claimsProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var mockMatchApi = Mock.Of<IMatchApi>();
             var pageModel = new IndexModel(
@@ -70,7 +45,7 @@ namespace Piipan.QueryTool.Tests
         public void TestAfterOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockClaimsProvider = claimsProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var mockMatchApi = Mock.Of<IMatchApi>();
             var pageModel = new IndexModel(
@@ -138,7 +113,7 @@ namespace Piipan.QueryTool.Tests
                 DateOfBirth = new DateTime(1931, 10, 13)
             };
 
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockClaimsProvider = claimsProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
@@ -190,7 +165,7 @@ namespace Piipan.QueryTool.Tests
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockClaimsProvider = claimsProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var pageModel = new IndexModel(
                 new NullLogger<IndexModel>(),
@@ -222,7 +197,7 @@ namespace Piipan.QueryTool.Tests
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockClaimsProvider = claimsProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var mockMatchApi = new Mock<IMatchApi>();
             mockMatchApi
@@ -261,7 +236,7 @@ namespace Piipan.QueryTool.Tests
                 SocialSecurityNum = "000-00-0000",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockClaimsProvider = claimsProviderMock();
             var mockLdsDeidentifier = new Mock<ILdsDeidentifier>();
             mockLdsDeidentifier
                 .Setup(m => m.Run(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -285,6 +260,45 @@ namespace Piipan.QueryTool.Tests
             Assert.NotNull(pageModel.RequestErrors);
             Assert.Equal(new List<ServerError> {
                 new ServerError("", expectedErrorMessage) }, pageModel.RequestErrors);
+        }
+
+        [Theory]
+        [InlineData(nameof(IndexModel.OnGet), null, null, false)]
+        [InlineData(nameof(IndexModel.OnGet), "IA", null, false)]
+        [InlineData(nameof(IndexModel.OnGet), null, "Worker", false)]
+        [InlineData(nameof(IndexModel.OnGet), "IA", "Worker", true)]
+        [InlineData(nameof(IndexModel.OnPostAsync), null, null, false)]
+        [InlineData(nameof(IndexModel.OnPostAsync), "IA", null, false)]
+        [InlineData(nameof(IndexModel.OnPostAsync), null, "Worker", false)]
+        [InlineData(nameof(IndexModel.OnPostAsync), "IA", "Worker", true)]
+        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        {
+            var mockClaimsProvider = claimsProviderMock(state: location, nacRole: role);
+
+            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
+
+            if (!isAuthorized)
+            {
+                Assert.Equal(403, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+                Assert.IsType<RedirectToPageResult>(pageHandlerExecutingContext.Result);
+            }
+            else
+            {
+                Assert.Equal(200, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+            }
+        }
+
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IClaimsProvider claimsProvider, string methodName)
+        {
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var mockMatchApi = Mock.Of<IMatchApi>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                claimsProvider,
+                mockLdsDeidentifier,
+                mockMatchApi
+            );
+            return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }
