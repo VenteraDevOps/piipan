@@ -42,7 +42,7 @@ commands:
           background: true
       - run:
           name: wait for app to spin up
-          command: sleep 30s
+          command: sleep 10s
       - run:
           name: run cypress
           working_directory: << parameters.directory >>
