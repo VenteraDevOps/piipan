@@ -31,7 +31,7 @@ namespace Piipan.QueryTool.Tests
             // act
             pageModel.OnGet();
             // assert
-            Assert.Equal("You do not have sufficient NAC roles or a NAC Location associated with your account", pageModel.Message);
+            Assert.Equal("You do not have sufficient roles or a location associated with your account", pageModel.Message);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(NotAuthorizedModel.OnGet), "IA", "Worker", true)]
         public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
-            var mockClaimsProvider = claimsProviderMock(state: location, nacRole: role);
+            var mockClaimsProvider = claimsProviderMock(state: location, role: role);
 
             var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
 

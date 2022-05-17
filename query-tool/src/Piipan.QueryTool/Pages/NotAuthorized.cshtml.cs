@@ -12,10 +12,10 @@ namespace Piipan.QueryTool.Pages
         {
         }
 
-        [IgnoreNACAuthorization]
+        [IgnoreAuthorization]
         public void OnGet()
         {
-            Message = "You do not have sufficient NAC roles or a NAC Location associated with your account";
+            Message = "You do not have sufficient roles or a location associated with your account";
         }
     }
 }

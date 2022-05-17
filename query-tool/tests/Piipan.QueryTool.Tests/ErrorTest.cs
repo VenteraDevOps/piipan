@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging.Abstractions;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
 using Xunit;
@@ -13,7 +14,7 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock();
-            var pageModel = new ErrorModel(mockClaimsProvider);
+            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), mockClaimsProvider);
 
             // act
 
@@ -26,7 +27,7 @@ namespace Piipan.QueryTool.Tests
         {
             // arrange
             var mockClaimsProvider = claimsProviderMock();
-            var pageModel = new ErrorModel(mockClaimsProvider);
+            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), mockClaimsProvider);
 
             // act
             string message = "test message";
@@ -45,7 +46,7 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(ErrorModel.OnGet), "IA", "Worker", true)]
         public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
-            var mockClaimsProvider = claimsProviderMock(state: location, nacRole: role);
+            var mockClaimsProvider = claimsProviderMock(state: location, role: role);
 
             var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
 
@@ -62,7 +63,7 @@ namespace Piipan.QueryTool.Tests
 
         private PageHandlerExecutingContext GetPageHandlerExecutingContext(IClaimsProvider claimsProvider, string methodName)
         {
-            var pageModel = new ErrorModel(claimsProvider);
+            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), claimsProvider);
 
             return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }

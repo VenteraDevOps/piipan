@@ -29,22 +29,22 @@ namespace Piipan.Shared.Claims
         {
             foreach (var identity in claimsPrincipal.Identities)
             {
-                var stateClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.NACLocationPrefix));
+                var stateClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.LocationPrefix));
                 if (stateClaim != null)
                 {
-                    return stateClaim.Value.Substring(_options.NACLocationPrefix.Length);
+                    return stateClaim.Value.Substring(_options.LocationPrefix.Length);
                 }
             }
             return null;
         }
-        public string GetNACRole(ClaimsPrincipal claimsPrincipal)
+        public string GetRole(ClaimsPrincipal claimsPrincipal)
         {
             foreach (var identity in claimsPrincipal.Identities)
             {
-                var nacRoleClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.NACRolePrefix));
-                if (nacRoleClaim != null)
+                var roleClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.RolePrefix));
+                if (roleClaim != null)
                 {
-                    return nacRoleClaim.Value.Substring(_options.NACRolePrefix.Length);
+                    return roleClaim.Value.Substring(_options.RolePrefix.Length);
                 }
             }
             return null;

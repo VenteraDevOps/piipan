@@ -17,8 +17,8 @@ namespace Piipan.QueryTool.Pages
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
-            if ((string.IsNullOrEmpty(State) || string.IsNullOrEmpty(NACRole)) &&
-                (!context.HandlerMethod?.MethodInfo.CustomAttributes.Any(n => n.AttributeType == typeof(IgnoreNACAuthorizationAttribute)) ?? false))
+            if ((string.IsNullOrEmpty(State) || string.IsNullOrEmpty(Role)) &&
+                (!context.HandlerMethod?.MethodInfo.CustomAttributes.Any(n => n.AttributeType == typeof(IgnoreAuthorizationAttribute)) ?? false))
             {
                 context.HttpContext.Response.StatusCode = 403;
                 context.Result = RedirectToPage("/NotAuthorized");
@@ -35,9 +35,9 @@ namespace Piipan.QueryTool.Pages
             get { return _claimsProvider.GetState(User); }
         }
 
-        public string NACRole
+        public string Role
         {
-            get { return _claimsProvider.GetNACRole(User); }
+            get { return _claimsProvider.GetRole(User); }
         }
         public string BaseUrl
         {

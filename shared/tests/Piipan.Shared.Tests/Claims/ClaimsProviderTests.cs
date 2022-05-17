@@ -13,8 +13,8 @@ namespace Piipan.Shared.Claims.Tests
         {
             Email = "email_claim_type",
             Role = "app_role_claim_type",
-            NACLocationPrefix = "Location-",
-            NACRolePrefix = "Role-"
+            LocationPrefix = "Location-",
+            RolePrefix = "Role-"
         };
 
         [Fact]
@@ -175,10 +175,10 @@ namespace Piipan.Shared.Claims.Tests
         }
 
         /// <summary>
-        /// Verify we can grab the NAC role from the claim
+        /// Verify we can grab the role from the claim
         /// </summary>
         [Fact]
-        public void GetNACRole()
+        public void GetRole()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -191,17 +191,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var nacRole = claimsProvider.GetNACRole(claimsPrincipal);
+            var role = claimsProvider.GetRole(claimsPrincipal);
 
             // Assert
-            Assert.Equal("Worker", nacRole);
+            Assert.Equal("Worker", role);
         }
 
         /// <summary>
-        /// Verify if no role claim exists, we have no NAC Role
+        /// Verify if no role claim exists, we have no role
         /// </summary>
         [Fact]
-        public void GetNACRole_RoleClaimNotFound()
+        public void GetRole_RoleClaimNotFound()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -214,17 +214,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var nacRole = claimsProvider.GetNACRole(claimsPrincipal);
+            var role = claimsProvider.GetRole(claimsPrincipal);
 
             // Assert
-            Assert.Null(nacRole);
+            Assert.Null(role);
         }
 
         /// <summary>
-        /// Verify that if a role claim exists, but no NAC Role exists, we have no NAC Role
+        /// Verify that if a role claim exists, but no Role exists, we have no Role
         /// </summary>
         [Fact]
-        public void GetNACRole_RoleClaimFound_LocationNotFound()
+        public void GetRole_RoleClaimFound_LocationNotFound()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -237,17 +237,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var nacRole = claimsProvider.GetNACRole(claimsPrincipal);
+            var role = claimsProvider.GetRole(claimsPrincipal);
 
             // Assert
-            Assert.Null(nacRole);
+            Assert.Null(role);
         }
 
         /// <summary>
-        /// When multiple NAC Roles exist, we just use the first one
+        /// When multiple Roles exist, we just use the first one
         /// </summary>
         [Fact]
-        public void GetNACRoleWhenMultipleNACRolesExist()
+        public void GetRoleWhenMultipleRolesExist()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -261,17 +261,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var nacRole = claimsProvider.GetNACRole(claimsPrincipal);
+            var role = claimsProvider.GetRole(claimsPrincipal);
 
             // Assert
-            Assert.Equal("Worker", nacRole);
+            Assert.Equal("Worker", role);
         }
 
         /// <summary>
-        /// When multiple role claims exist, we should take the NAC Role from the one that starts with the NAC Role prefix
+        /// When multiple role claims exist, we should take the Role from the one that starts with the Role prefix
         /// </summary>
         [Fact]
-        public void GetNACRoleWhenMultipleRoleClaimsExist()
+        public void GetRoleWhenMultipleRoleClaimsExist()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -285,10 +285,10 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var nacRole = claimsProvider.GetNACRole(claimsPrincipal);
+            var role = claimsProvider.GetRole(claimsPrincipal);
 
             // Assert
-            Assert.Equal("Worker", nacRole);
+            Assert.Equal("Worker", role);
         }
     }
 }

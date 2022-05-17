@@ -2,7 +2,7 @@
 
 namespace Piipan.Shared.Authorization
 {
-    public class IgnoreNACAuthorizationAttribute : Attribute
+    public class IgnoreAuthorizationAttribute : Attribute
     {
 
     }

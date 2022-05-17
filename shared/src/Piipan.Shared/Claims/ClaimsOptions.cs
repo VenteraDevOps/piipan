@@ -5,7 +5,7 @@ namespace Piipan.Shared.Claims
         public const string SectionName = "Claims";
         public string Email { get; set; }
         public string Role { get; set; }
-        public string NACLocationPrefix { get; set; }
-        public string NACRolePrefix { get; set; }
+        public string LocationPrefix { get; set; }
+        public string RolePrefix { get; set; }
     }
 }

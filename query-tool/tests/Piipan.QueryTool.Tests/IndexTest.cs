@@ -273,7 +273,7 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(IndexModel.OnPostAsync), "IA", "Worker", true)]
         public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
-            var mockClaimsProvider = claimsProviderMock(state: location, nacRole: role);
+            var mockClaimsProvider = claimsProviderMock(state: location, role: role);
 
             var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
 

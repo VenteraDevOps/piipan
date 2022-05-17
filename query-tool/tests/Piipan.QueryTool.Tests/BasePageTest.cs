@@ -17,7 +17,7 @@ namespace Piipan.QueryTool.Tests
     public class BasePageTest
     {
         public static IClaimsProvider claimsProviderMock(string email = "noreply@tts.test",
-            string state = "IA", string nacRole = "Worker")
+            string state = "IA", string role = "Worker")
         {
             var claimsProviderMock = new Mock<IClaimsProvider>();
             claimsProviderMock
@@ -27,8 +27,8 @@ namespace Piipan.QueryTool.Tests
                 .Setup(c => c.GetState(It.IsAny<ClaimsPrincipal>()))
                 .Returns(state);
             claimsProviderMock
-                .Setup(c => c.GetNACRole(It.IsAny<ClaimsPrincipal>()))
-                .Returns(nacRole);
+                .Setup(c => c.GetRole(It.IsAny<ClaimsPrincipal>()))
+                .Returns(role);
             return claimsProviderMock.Object;
         }
 
