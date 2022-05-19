@@ -46,7 +46,7 @@ CLOUD_NAME_STR_KEY=CloudName
 
 # Name of the environment variable used to indicate the current state. This is
 # used in the bulk upload Azure Function.
-STATE_STR_KEY=CloudName
+STATE_STR_KEY=State
 
 # For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'
