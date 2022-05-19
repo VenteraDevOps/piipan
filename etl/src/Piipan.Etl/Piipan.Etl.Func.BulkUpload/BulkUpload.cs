@@ -1,20 +1,12 @@
 // Default URL for triggering event grid function in the local environment.
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Azure.Messaging.EventGrid;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Piipan.Etl.Func.BulkUpload
 {
@@ -74,10 +66,10 @@ namespace Piipan.Etl.Func.BulkUpload
                     if (input != null)
                     {
                         var participants = _participantParser.Parse(input);
-                        await _participantApi.AddParticipants(participants, blobProperties.ETag.ToString())
+                        await _participantApi.AddParticipants(participants, blobProperties.ETag.ToString(), blockBlobClient.Name)
                                 .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log))
                                 .ContinueWith(t => _participantApi.DeleteOldParticpants());
-                       
+
                     }
                 }
             }

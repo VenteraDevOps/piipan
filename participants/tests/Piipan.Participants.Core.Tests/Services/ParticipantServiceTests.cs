@@ -1,19 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
-using Moq;
-using Xunit;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using Piipan.Shared.API.Utilities;
+using Piipan.Shared.Deidentification;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Services
 {
     public class ParticipantServiceTests
     {
+        private IRedactionService _redactionService;
+        public ParticipantServiceTests()
+        {
+            _redactionService = Mock.Of<IRedactionService>();
+        }
+
         private IEnumerable<ParticipantDbo> RandomParticipants(int n)
         {
             var result = new List<ParticipantDbo>();
@@ -51,7 +58,7 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao
                 .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(participants);
-            
+
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
                 .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
@@ -65,9 +72,10 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
@@ -91,7 +99,7 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao
                 .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
-            
+
             var uploadId = (new Random()).Next();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
@@ -106,9 +114,10 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
@@ -128,7 +137,7 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao
                 .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
-            
+
             var uploadId = (new Random()).Next();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
@@ -138,9 +147,10 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
@@ -175,16 +185,17 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
-            await service.AddParticipants(participants, "test-etag");
+            await service.AddParticipants(participants, "test-etag", "test-file.csv");
 
             // Assert
-            
+
             // we should add a new upload for this batch
             uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
 
@@ -198,6 +209,58 @@ namespace Piipan.Participants.Core.Tests.Services
 
         }
 
+        /// <summary>
+        /// When Add Participants has an error, the error is logged with the value of the redaction service.
+        /// </summary>
+        [Fact]
+        public async void AddParticipants_LogsErrorWhenFailed()
+        {
+            // Arrange
+            var logger = new Mock<ILogger<ParticipantService>>();
+            var participants = RandomParticipants(10);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+            participantDao.Setup(n => n.AddParticipants(It.IsAny<IEnumerable<ParticipantDbo>>()))
+                                .ThrowsAsync(new Exception("Unhandled error!"));
+
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+            var redactionService = new Mock<IRedactionService>();
+            var redactionServiceReturnValue = "String after redaction service";
+            redactionService.Setup(n => n.Redact(It.IsAny<string>(), It.IsAny<IEnumerable<string>>())).Returns(redactionServiceReturnValue);
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                redactionService.Object,
+                logger.Object);
+
+            // Act
+            await service.AddParticipants(participants, "test-etag", "test-file.csv");
+
+            // Assert
+
+            // we should add a new upload for this batch
+            //redactionService.Verify(m => m.Redact("test-etag"), Times.Once);
+            logger.Verify(n => n.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString() == $"Error uploading participants: {redactionServiceReturnValue}"),
+                    It.IsAny<Exception>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
+                  Times.Once());
+        }
+
         [Fact]
         public async void GetStates_ReturnsDaoResult()
         {
@@ -205,16 +268,17 @@ namespace Piipan.Participants.Core.Tests.Services
             var logger = Mock.Of<ILogger<ParticipantService>>();
             var participantDao = Mock.Of<IParticipantDao>();
             var uploadDao = Mock.Of<IUploadDao>();
-            
+
             var stateService = new Mock<IStateService>();
             stateService
                 .Setup(m => m.GetStates())
-                .ReturnsAsync(new List<string>{ "ea", "eb", "ec" });
+                .ReturnsAsync(new List<string> { "ea", "eb", "ec" });
 
             var service = new ParticipantService(
-                participantDao, 
-                uploadDao, 
+                participantDao,
+                uploadDao,
                 stateService.Object,
+                _redactionService,
                 logger);
 
             // Act
@@ -256,10 +320,11 @@ namespace Piipan.Participants.Core.Tests.Services
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
-            await service.AddParticipants(participants, "test-etag");
+            await service.AddParticipants(participants, "test-etag", "test-file.csv");
 
             // Now Add another Upload 
             var uploadIdNew = (new Random()).Next();
@@ -272,13 +337,14 @@ namespace Piipan.Participants.Core.Tests.Services
                    CreatedAt = DateTime.UtcNow,
                    Publisher = "me",
                });
-           
+
             var serviceNew = new ParticipantService(
                participantDao.Object,
                uploadDaoNew.Object,
                stateService,
+               _redactionService,
                logger);
-            await serviceNew.AddParticipants(participants, "test-etag1");
+            await serviceNew.AddParticipants(participants, "test-etag1", "test-file1.csv");
 
             // Assert
 
@@ -301,6 +367,7 @@ namespace Piipan.Participants.Core.Tests.Services
              participantDao.Object,
              uploadDaoDelete.Object,
              stateService,
+             _redactionService,
              logger);
 
             await serviceDelete.DeleteOldParticpants();
