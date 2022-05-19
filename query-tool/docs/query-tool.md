@@ -54,6 +54,12 @@ Gulp will then watch for changes to the SCSS and compile them into the main CSS 
 
 [Instructions for updating Node dependencies](../../docs/node.md)
 
+## Authorization
+
+The app will restrict anyone with an appropriate role and location claim from accessing the app. For local development, you can change your role and location by editing the mock_user.json file. The location is defaulted to EA in the mock_user file, but simply update the location to "National" or a different location to have access to different states.
+
+Any users that are authenticated but not authorized to view the app will be redirected to a "Not Authenticated" page to let them know their role or location is not valid for the page.
+
 ## Testing
 
 Tests will be run on the continuous integration server, but

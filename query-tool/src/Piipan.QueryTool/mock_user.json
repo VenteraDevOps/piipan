@@ -25,7 +25,15 @@
       {
         "typ": "name",
         "val": "John Doe"
-      }
+      },
+        {
+            "typ": "role",
+            "val": "Location-EA"
+        },
+        {
+            "typ": "role",
+            "val": "Role-Worker"
+        }
     ]
   }
 ]
