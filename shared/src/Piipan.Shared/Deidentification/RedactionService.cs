@@ -12,6 +12,10 @@ namespace Piipan.Shared.Deidentification
         /// <returns></returns>
         public string Redact(string originalValue, IEnumerable<string> redactStrings)
         {
+            if (redactStrings == null)
+            {
+                return originalValue;
+            }
             var redactedString = originalValue;
             foreach (var redactString in redactStrings)
             {

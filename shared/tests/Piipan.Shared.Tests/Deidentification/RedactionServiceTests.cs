@@ -11,6 +11,7 @@ namespace Piipan.Shared.Tests.Deidentification
         /// <summary>
         /// When the list of items to redact is null, nothing is redacted and the original string is returned.
         /// </summary>
+        [Fact]
         public void RedactsNothingWhenNullList()
         {
             // Arrange
@@ -26,6 +27,7 @@ namespace Piipan.Shared.Tests.Deidentification
         /// <summary>
         /// When the list of items to redact is empty, nothing is redacted and the original string is returned.
         /// </summary>
+        [Fact]
         public void RedactsNothingWhenEmptyList()
         {
             // Arrange
@@ -42,6 +44,7 @@ namespace Piipan.Shared.Tests.Deidentification
         /// When the list of items doesn't have any strings in it that matches the input string,
         /// nothing is redacted and the original string is returned.
         /// </summary>
+        [Fact]
         public void RedactsNothingWhenNotFound()
         {
             // Arrange
@@ -57,6 +60,7 @@ namespace Piipan.Shared.Tests.Deidentification
         /// <summary>
         /// When the list of items has a string that matches a string in the input value, the original string is returned but with a redaction
         /// </summary>
+        [Fact]
         public void RedactsStringWhenFound()
         {
             // Arrange
@@ -73,6 +77,7 @@ namespace Piipan.Shared.Tests.Deidentification
         /// When the list of items has multiple strings that match strings in the input value, 
         /// the original string is returned but with all of the redactions
         /// </summary>
+        [Fact]
         public void RedactsMultipleStringsWhenFound()
         {
             // Arrange
@@ -89,6 +94,7 @@ namespace Piipan.Shared.Tests.Deidentification
         /// When the list of items has a string that matches a string in the input value, 
         /// the original string is returned but with a redaction even if the casing is not the same
         /// </summary>
+        [Fact]
         public void RedactsStringWhenCaseInsensitiveFound()
         {
             // Arrange
