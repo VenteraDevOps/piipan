@@ -25,6 +25,6 @@
     "uswds-gulp": "github:uswds/uswds-gulp"
   },
   "dependencies": {
-    "uswds": "^2.13.2"
+    "uswds": "^2.13.3"
   }
 }
