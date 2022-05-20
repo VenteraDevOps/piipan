@@ -1,5 +1,6 @@
 ﻿@page
 @model Piipan.Dashboard.Pages.ParticipantUploadsModel
+@using Piipan.Dashboard.Client.Models
 @using Piipan.Dashboard.Extensions
 
 @{
@@ -30,19 +31,9 @@
 
     @if (Model.ParticipantUploadResults.Any())
     {
-        <table class="usa-table">
-            <thead>
-                <th scope="col">State</th>
-                <th scope="col">Uploaded at</th>
-            </thead>
-            @foreach (var record in @Model.ParticipantUploadResults)
-            {
-                <tr>
-                    <td class="text-uppercase">@record.State</td>
-                    <td title="@record.FormattedUploadedAt()">@record.RelativeUploadedAt()</td>
-                </tr>
-            }
-        </table>
+        ParticipantUploadModel uploadSingle = new ParticipantUploadModel() { ParticipantUploadResults = Model.ParticipantUploadResults };
+        <component type="typeof(Dashboard.Client.Components.ParticipantUploads)" render-mode="WebAssembly"
+        param-Upload="uploadSingle" />
 
     }
     @if (!String.IsNullOrEmpty(Model.RequestError))
