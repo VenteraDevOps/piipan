@@ -19,7 +19,6 @@ describe('query tool match query', () => {
         cy.contains('Match ID').should('be.visible');
         cy.contains('Matching States').should('be.visible');
 
-        setupPa11yPost();
         cy.pa11y(pa11yOptions);
     });
 })

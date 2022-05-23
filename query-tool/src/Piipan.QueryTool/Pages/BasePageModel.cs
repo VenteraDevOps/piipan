@@ -1,28 +1,40 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Locations;
+using System;
 using System.Linq;
 
 namespace Piipan.QueryTool.Pages
 {
     public class BasePageModel : PageModel
     {
+        private const string NotAuthorizedPageName = "/NotAuthorized";
         private readonly IClaimsProvider _claimsProvider;
+        private readonly ILocationsProvider _locationsProvider;
 
-        public BasePageModel(IClaimsProvider claimsProvider)
+        public BasePageModel(IServiceProvider serviceProvider)
         {
-            _claimsProvider = claimsProvider;
+            _claimsProvider = serviceProvider.GetRequiredService<IClaimsProvider>();
+            _locationsProvider = serviceProvider.GetRequiredService<ILocationsProvider>();
         }
 
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
-            if ((string.IsNullOrEmpty(State) || string.IsNullOrEmpty(Role)) &&
+            if ((string.IsNullOrEmpty(Location) || string.IsNullOrEmpty(Role)) &&
                 (!context.HandlerMethod?.MethodInfo.CustomAttributes.Any(n => n.AttributeType == typeof(IgnoreAuthorizationAttribute)) ?? false))
             {
                 context.HttpContext.Response.StatusCode = 403;
-                context.Result = RedirectToPage("/NotAuthorized");
+                context.Result = RedirectToPage(NotAuthorizedPageName);
             }
+        }
+
+        protected IActionResult RedirectToUnauthorized()
+        {
+            return RedirectToPage(NotAuthorizedPageName);
         }
 
         public string Email
@@ -30,9 +42,14 @@ namespace Piipan.QueryTool.Pages
             get { return _claimsProvider.GetEmail(User); }
         }
 
-        public string State
+        public string Location
         {
-            get { return _claimsProvider.GetState(User); }
+            get { return _claimsProvider.GetLocation(User); }
+        }
+
+        public string[] States
+        {
+            get { return _locationsProvider.GetStates(Location); }
         }
 
         public string Role

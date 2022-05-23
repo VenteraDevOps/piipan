@@ -11,6 +11,7 @@ using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
+using Piipan.Shared.Locations;
 using Piipan.Shared.Logging;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -32,7 +33,9 @@ namespace Piipan.QueryTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<LocationOptions>(Configuration.GetSection(LocationOptions.SectionName));
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
+
 
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -59,6 +62,7 @@ namespace Piipan.QueryTool
             });
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
+            services.AddTransient<ILocationsProvider, LocationsProvider>();
 
             services.AddSingleton<INameNormalizer, NameNormalizer>();
             services.AddSingleton<IDobNormalizer, DobNormalizer>();

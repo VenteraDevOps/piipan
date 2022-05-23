@@ -1,13 +1,13 @@
-﻿using Bunit;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Bunit;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Client.Components;
 using Piipan.QueryTool.Client.Models;
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
 using static Piipan.Components.Validation.ValidationConstants;
@@ -24,7 +24,11 @@ namespace Piipan.QueryTool.Tests.Components
 
         public QueryFormTests()
         {
-            InitialValues.Query = model;
+            InitialValues.QueryFormData = new QueryFormModel
+            {
+                Query = model,
+                Location = "EA"
+            };
         }
 
         /// <summary>
@@ -37,11 +41,11 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Act
-            queryForm.Find("#Query_LastName").Change("Name");
-            queryForm.Find("#Query_DateOfBirth").Change("1997-01-01");
-            queryForm.Find("#Query_SocialSecurityNum").Input("550-01-6981");
-            queryForm.Find("#Query_ParticipantId").Change("123");
-            queryForm.Find("#Query_CaseId").Change("456");
+            queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
+            queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
+            queryForm.Find("#QueryFormData_Query_CaseId").Change("456");
 
             // Assert
             Assert.Equal("Name", model.LastName);
@@ -60,12 +64,9 @@ namespace Piipan.QueryTool.Tests.Components
             // Arrange
 
             // Add a result with no matches
-            InitialValues.QueryResult = new()
+            InitialValues.QueryFormData.QueryResult = new()
             {
-                Data = new()
-                {
-                    Results = new()
-                }
+                Results = new()
             };
             CreateTestComponent();
 
@@ -84,17 +85,14 @@ namespace Piipan.QueryTool.Tests.Components
             // Arrange
 
             // Add a result with no matches
-            InitialValues.QueryResult = new()
+            InitialValues.QueryFormData.QueryResult = new()
             {
-                Data = new()
+                Results = new()
                 {
-                    Results = new()
+                    new()
                     {
-                        new()
-                        {
-                            Index = 1,
-                            Matches = new List<ParticipantMatch>()
-                        }
+                        Index = 1,
+                        Matches = new List<ParticipantMatch>()
                     }
                 }
             };
@@ -115,22 +113,19 @@ namespace Piipan.QueryTool.Tests.Components
             // Arrange
 
             // Add a result with no matches
-            InitialValues.QueryResult = new()
+            InitialValues.QueryFormData.QueryResult = new()
             {
-                Data = new()
+                Results = new()
                 {
-                    Results = new()
+                    new()
                     {
-                        new()
+                        Index = 1,
+                        Matches = new List<ParticipantMatch>()
                         {
-                            Index = 1,
-                            Matches = new List<ParticipantMatch>()
+                            new ()
                             {
-                                new ()
-                                {
-                                    MatchId = "1234",
-                                    State = "ea"
-                                }
+                                MatchId = "1234",
+                                State = "ea"
                             }
                         }
                     }
@@ -159,9 +154,9 @@ namespace Piipan.QueryTool.Tests.Components
             Assert.False(searchButton.HasAttribute("disabled"));
 
             // Act
-            queryForm.Find("#Query_LastName").Change("Name");
-            queryForm.Find("#Query_DateOfBirth").Change("1997-01-01");
-            queryForm.Find("#Query_SocialSecurityNum").Input("550-01-6981");
+            queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
+            queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
             bool isFormValid = false;
             await form.InvokeAsync(async () =>
             {
@@ -210,13 +205,32 @@ namespace Piipan.QueryTool.Tests.Components
         }
 
         /// <summary>
+        /// Verify that when searching an invalid form that the button text does not change to "Searching..."
+        /// </summary>
+        [Fact]
+        public void Button_Should_Not_Be_Enabled_When_Location_Is_Not_A_State()
+        {
+            // Arrange
+            InitialValues.QueryFormData.Location = "National";
+            CreateTestComponent();
+            var searchButton = queryForm.Find("#query-form-search-btn");
+
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.True(searchButton.HasAttribute("disabled"));
+        }
+
+        /// <summary>
         /// Verify that when the server has an error we display it in an alert box on the screen
         /// </summary>
         [Fact]
         public void Form_With_Server_Error_Should_Show_Errors()
         {
             // Arrange
-            InitialValues.ServerErrors = new List<ServerError> { new("Query.LastName", $"{ValidationFieldPlaceholder} is required") };
+            InitialValues.QueryFormData.ServerErrors = new List<ServerError>
+            {
+                new("QueryFormData.Query.LastName", $"{ValidationFieldPlaceholder} is required")
+            };
             CreateTestComponent();
 
             var alertBox = queryForm.FindComponent<UsaAlertBox>();
@@ -307,10 +321,7 @@ namespace Piipan.QueryTool.Tests.Components
             JSInterop.Setup<bool>("piipan.utilities.doesElementHaveInvalidInput", _ => true).SetResult(invalidDateInput);
             var componentFragment = RenderComponent<QueryForm>((builder) =>
             {
-                builder.Add(n => n.Query, InitialValues.Query);
-                builder.Add(n => n.QueryResult, InitialValues.QueryResult);
-                builder.Add(n => n.ServerErrors, InitialValues.ServerErrors);
-                builder.Add(n => n.Token, InitialValues.Token);
+                builder.Add(n => n.QueryFormData, InitialValues.QueryFormData);
             });
             queryForm = componentFragment;
         }

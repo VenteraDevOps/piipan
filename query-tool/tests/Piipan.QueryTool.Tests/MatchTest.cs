@@ -9,7 +9,7 @@ using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
 using Piipan.QueryTool.Pages;
 using Piipan.QueryTool.Tests.Extensions;
-using Piipan.Shared.Claims;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -236,7 +236,7 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(MatchModel.OnPost), "IA", "Worker", true)]
         public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
-            var mockClaimsProvider = claimsProviderMock(state: location, role: role);
+            var mockClaimsProvider = serviceProviderMock(location: location, role: role);
 
             var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
 
@@ -251,22 +251,22 @@ namespace Piipan.QueryTool.Tests
             }
         }
 
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IClaimsProvider claimsProvider, string methodName)
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
         {
-            var pageModel = SetupMatchModel(mockClaimsProvider: claimsProvider);
+            var pageModel = SetupMatchModel(mockServiceProvider: serviceProvider);
 
             return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
 
-        private MatchModel SetupMatchModel(Mock<IMatchResolutionApi> mockMatchApi = null, IClaimsProvider mockClaimsProvider = null)
+        private MatchModel SetupMatchModel(Mock<IMatchResolutionApi> mockMatchApi = null, IServiceProvider mockServiceProvider = null)
         {
             // arrange
-            mockClaimsProvider ??= claimsProviderMock();
+            mockServiceProvider ??= serviceProviderMock();
             mockMatchApi ??= SetupMatchResolutionApi();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),
-                mockClaimsProvider,
-                mockMatchApi.Object
+                mockMatchApi.Object,
+                mockServiceProvider
             );
             return pageModel;
         }

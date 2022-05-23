@@ -11,27 +11,22 @@
 
 
 @code {
-    [Parameter] public PiiRecord Query { get; set; } = new();
+    [Parameter] public QueryFormModel QueryFormData { get; set; } = new();
 
-    /// <summary>
-    /// The search response that is collected after the user hits "Search" and an API call is made
-    /// </summary>
-    [Parameter] public ParameterBase<OrchMatchResponseData> QueryResult { get; set; }
-    [Parameter] public string Token { get; set; }
-    [Parameter] public List<ServerError> ServerErrors { get; set; }
-
-    private bool NoResults => QueryResult?.Data != null &&
-        (QueryResult?.Data.Results.Count == 0 || QueryResult?.Data.Results[0].Matches.Count() == 0);
+    private bool NoResults => QueryFormData.QueryResult != null &&
+        (QueryFormData.QueryResult.Results.Count == 0 || QueryFormData.QueryResult.Results[0].Matches.Count() == 0);
     private bool showNoResultsAlert = true;
     private bool searching = false;
+    private bool canPerformSearch = false;
     List<(string Property, string Error)> serverErrorList;
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        if (ServerErrors?.Count > 0)
+        if (QueryFormData.ServerErrors?.Count > 0)
         {
-            serverErrorList = new(ServerErrors.Select(n => (n.Property, n.Error)));
+            serverErrorList = new(QueryFormData.ServerErrors.Select(n => (n.Property, n.Error)));
         }
+        canPerformSearch = QueryFormData.Location?.Length == 2;
     }
     private Task SubmitForm(bool valid)
     {
@@ -56,35 +51,35 @@
         <p>This participant does not have a matching record in any other states.</p>
     </UsaAlertBox>
 }
-@if (Query != null)
+@if (QueryFormData.Query != null)
 {
-    <UsaForm Id="snap-participants-query-form" InitialErrors="serverErrorList" Model="Query" method="post" OnBeforeSubmit="SubmitForm">
-        <input type="hidden" name="__RequestVerificationToken" value="@Token" />
+    <UsaForm Id="snap-participants-query-form" InitialErrors="serverErrorList" Model="QueryFormData.Query" method="post" OnBeforeSubmit="SubmitForm">
+        <input type="hidden" name="__RequestVerificationToken" value="@QueryFormData.Token" />
         <legend class="usa-sr-only">participant information</legend>
         <UsaFormGroup>
-            <UsaInputText @bind-Value="Query.LastName" />
+            <UsaInputText @bind-Value="QueryFormData.Query.LastName" />
         </UsaFormGroup>
         <UsaFormGroup>
-            <UsaInputDate @bind-Value="Query.DateOfBirth" />
+            <UsaInputDate @bind-Value="QueryFormData.Query.DateOfBirth" />
         </UsaFormGroup>
         <UsaFormGroup>
             <HintContent>###-##-####</HintContent>
             <ChildContent>
-                <UsaInputSSN @bind-Value="Query.SocialSecurityNum" />
+                <UsaInputSSN @bind-Value="QueryFormData.Query.SocialSecurityNum" />
             </ChildContent>
         </UsaFormGroup>
         <UsaFormGroup>
-            <UsaInputText @bind-Value="Query.ParticipantId" Width="118" />
+            <UsaInputText @bind-Value="QueryFormData.Query.ParticipantId" Width="118" />
         </UsaFormGroup>
         <UsaFormGroup>
-            <UsaInputText @bind-Value="Query.CaseId" Width="143" />
+            <UsaInputText @bind-Value="QueryFormData.Query.CaseId" Width="143" />
         </UsaFormGroup>
-        <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@searching">@(searching ? "Searching..." : "Search")</button>
+        <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@(searching || !canPerformSearch)">@(searching ? "Searching..." : "Search")</button>
     </UsaForm>
 }
-@if (QueryResult?.Data?.Results?.Count > 0 && QueryResult.Data.Results[0].Matches?.Count() > 0)
+@if (QueryFormData.QueryResult?.Results?.Count > 0 && QueryFormData.QueryResult.Results[0].Matches?.Count() > 0)
 {
-    <QueryResults QueryResult="QueryResult.Data" />
+    <QueryResults QueryResult="QueryFormData.QueryResult" />
 }
 else {
     <section class="border-top-1px border-base-light margin-top-6"></section>

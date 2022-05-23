@@ -3,8 +3,9 @@ using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
-using Piipan.Shared.Claims;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Piipan.QueryTool.Pages
@@ -19,9 +20,9 @@ namespace Piipan.QueryTool.Pages
         public List<ServerError> RequestErrors { get; private set; } = new();
 
         public ListModel(ILogger<ListModel> logger
-                           , IClaimsProvider claimsProvider
-                           , IMatchResolutionApi matchResolutionApi)
-                           : base(claimsProvider)
+                           , IMatchResolutionApi matchResolutionApi
+                           , IServiceProvider serviceProvider)
+                          : base(serviceProvider)
 
         {
             _logger = logger;
@@ -30,6 +31,10 @@ namespace Piipan.QueryTool.Pages
 
         public async Task<IActionResult> OnGet()
         {
+            if (!States?.Contains("*") ?? true)
+            {
+                return RedirectToUnauthorized();
+            }
             AvailableMatches = await _matchResolutionApi.GetMatches();
 
             return Page();

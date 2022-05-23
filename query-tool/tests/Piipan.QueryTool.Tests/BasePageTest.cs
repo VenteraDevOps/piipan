@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
+using Piipan.Shared.Locations;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -16,20 +17,28 @@ namespace Piipan.QueryTool.Tests
 {
     public class BasePageTest
     {
-        public static IClaimsProvider claimsProviderMock(string email = "noreply@tts.test",
-            string state = "IA", string role = "Worker")
+        public static IServiceProvider serviceProviderMock(string email = "noreply@tts.test",
+            string location = "IA", string role = "Worker", string[] states = null)
         {
+            var serviceProviderMock = new Mock<IServiceProvider>();
+
             var claimsProviderMock = new Mock<IClaimsProvider>();
             claimsProviderMock
                 .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
                 .Returns(email);
             claimsProviderMock
-                .Setup(c => c.GetState(It.IsAny<ClaimsPrincipal>()))
-                .Returns(state);
+                .Setup(c => c.GetLocation(It.IsAny<ClaimsPrincipal>()))
+                .Returns(location);
             claimsProviderMock
                 .Setup(c => c.GetRole(It.IsAny<ClaimsPrincipal>()))
                 .Returns(role);
-            return claimsProviderMock.Object;
+
+            var locationProviderMock = new Mock<ILocationsProvider>();
+            locationProviderMock.Setup(c => c.GetStates(It.IsAny<string>())).Returns(states ?? new string[] { location });
+
+            serviceProviderMock.Setup(c => c.GetService(typeof(IClaimsProvider))).Returns(claimsProviderMock.Object);
+            serviceProviderMock.Setup(c => c.GetService(typeof(ILocationsProvider))).Returns(locationProviderMock.Object);
+            return serviceProviderMock.Object;
         }
 
         protected static HttpContext contextMock()

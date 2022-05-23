@@ -7,11 +7,11 @@
 @inject IAntiforgery antiforgery
 @{
     ViewData["Title"] = "NAC Participant Search";
+
+    Model.QueryFormData.Token = antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+    Model.QueryFormData.Location = Model.Location;
 }
 <section class="grid-container">
     <component type="typeof(QueryTool.Client.Components.QueryForm)" render-mode="WebAssembly"
-        param-Query="Model.Query"
-        param-QueryResult="ParameterBase<OrchMatchResponseData>.FromObject(Model.QueryResult?.Data)" 
-        param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
-        param-ServerErrors="Model.RequestErrors" />
+        param-QueryFormData="Model.QueryFormData" />
 </section>

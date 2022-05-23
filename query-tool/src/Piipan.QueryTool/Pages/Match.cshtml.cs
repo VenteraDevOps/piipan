@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
-using Piipan.Shared.Claims;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -25,9 +24,9 @@ namespace Piipan.QueryTool.Pages
         public List<ServerError> RequestErrors { get; private set; } = new();
 
         public MatchModel(ILogger<MatchModel> logger
-                           , IClaimsProvider claimsProvider
-                           , IMatchResolutionApi matchResolutionApi)
-                           : base(claimsProvider)
+                           , IMatchResolutionApi matchResolutionApi
+                           , IServiceProvider serviceProvider)
+                          : base(serviceProvider)
 
         {
             _logger = logger;

@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Piipan.Shared.Authorization;
-using Piipan.Shared.Claims;
+using System;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -7,15 +9,17 @@ namespace Piipan.QueryTool.Pages
     {
         public string Message = "";
 
-        public NotAuthorizedModel(IClaimsProvider claimsProvider)
-                          : base(claimsProvider)
+        public NotAuthorizedModel(IServiceProvider serviceProvider)
+                          : base(serviceProvider)
         {
         }
 
         [IgnoreAuthorization]
-        public void OnGet()
+        public IActionResult OnGet()
         {
-            Message = "You do not have sufficient roles or a location associated with your account";
+            Message = "You do not have a sufficient role or location to access this page";
+            return new PageResult { StatusCode = 403 };
+
         }
     }
 }

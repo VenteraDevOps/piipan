@@ -25,14 +25,14 @@ namespace Piipan.Shared.Claims
                 .Value;
         }
 
-        public string GetState(ClaimsPrincipal claimsPrincipal)
+        public string GetLocation(ClaimsPrincipal claimsPrincipal)
         {
             foreach (var identity in claimsPrincipal.Identities)
             {
-                var stateClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.LocationPrefix));
-                if (stateClaim != null)
+                var locationClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.LocationPrefix));
+                if (locationClaim != null)
                 {
-                    return stateClaim.Value.Substring(_options.LocationPrefix.Length);
+                    return locationClaim.Value.Substring(_options.LocationPrefix.Length);
                 }
             }
             return null;

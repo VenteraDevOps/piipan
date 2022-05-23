@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Piipan.QueryTool.Pages;
-using Piipan.Shared.Claims;
+using System;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -12,8 +12,8 @@ namespace Piipan.QueryTool.Tests
         public void TestBeforeOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock();
-            var pageModel = new NotAuthorizedModel(mockClaimsProvider);
+            var mockServiceProvider = serviceProviderMock();
+            var pageModel = new NotAuthorizedModel(mockServiceProvider);
 
             // act
 
@@ -25,13 +25,13 @@ namespace Piipan.QueryTool.Tests
         public void TestMessageOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock();
-            var pageModel = new NotAuthorizedModel(mockClaimsProvider);
+            var mockServiceProvider = serviceProviderMock();
+            var pageModel = new NotAuthorizedModel(mockServiceProvider);
 
             // act
             pageModel.OnGet();
             // assert
-            Assert.Equal("You do not have sufficient roles or a location associated with your account", pageModel.Message);
+            Assert.Equal("You do not have a sufficient role or location to access this page", pageModel.Message);
         }
 
         /// <summary>
@@ -44,9 +44,9 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(NotAuthorizedModel.OnGet), "IA", "Worker", true)]
         public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
-            var mockClaimsProvider = claimsProviderMock(state: location, role: role);
+            var mockServiceProvider = serviceProviderMock(location: location, role: role);
 
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
+            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
 
             if (!isAuthorized)
             {
@@ -59,9 +59,9 @@ namespace Piipan.QueryTool.Tests
             }
         }
 
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IClaimsProvider claimsProvider, string methodName)
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
         {
-            var pageModel = new NotAuthorizedModel(claimsProvider);
+            var pageModel = new NotAuthorizedModel(serviceProvider);
 
             return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
