@@ -205,7 +205,7 @@ namespace Piipan.QueryTool.Tests.Components
         }
 
         /// <summary>
-        /// Verify that when searching an invalid form that the button text does not change to "Searching..."
+        /// Verify that when you don't have a state location that the button is disabled
         /// </summary>
         [Fact]
         public void Button_Should_Not_Be_Enabled_When_Location_Is_Not_A_State()
