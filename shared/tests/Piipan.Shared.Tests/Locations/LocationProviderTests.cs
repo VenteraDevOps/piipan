@@ -70,7 +70,7 @@ namespace Piipan.Shared.Locations.Tests
             var states = locationProvider.GetStates(null);
 
             // Assert
-            Assert.Null(states);
+            Assert.Empty(states);
         }
     }
 }

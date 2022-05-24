@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace Piipan.Shared.Locations
@@ -19,7 +20,7 @@ namespace Piipan.Shared.Locations
             {
                 return new string[] { location };
             }
-            return stateArray;
+            return stateArray ?? Array.Empty<string>();
         }
     }
 }
