@@ -26,6 +26,8 @@
         {
             serverErrorList = new(QueryFormData.ServerErrors.Select(n => (n.Property, n.Error)));
         }
+
+        // Only locations with length 2, which are states, can perform a search.
         canPerformSearch = QueryFormData.Location?.Length == 2;
     }
     private Task SubmitForm(bool valid)

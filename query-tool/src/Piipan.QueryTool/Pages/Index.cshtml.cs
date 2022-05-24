@@ -28,10 +28,11 @@ namespace Piipan.QueryTool.Pages
         }
 
         [BindProperty]
-        public QueryFormModel QueryFormData { get; set; } = new QueryFormModel();
+        public QueryFormModel QueryFormData { get; } = new QueryFormModel();
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Only locations with length 2, which are states, can perform a search.
             if (Location.Length != 2 || States?.Length != 1)
             {
                 QueryFormData.ServerErrors.Add(new("", "Search performed with an invalid location"));

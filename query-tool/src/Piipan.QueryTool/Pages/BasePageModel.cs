@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -5,8 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
-using System;
-using System.Linq;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -28,7 +28,7 @@ namespace Piipan.QueryTool.Pages
                 (!context.HandlerMethod?.MethodInfo.CustomAttributes.Any(n => n.AttributeType == typeof(IgnoreAuthorizationAttribute)) ?? false))
             {
                 context.HttpContext.Response.StatusCode = 403;
-                context.Result = RedirectToPage(NotAuthorizedPageName);
+                context.Result = RedirectToUnauthorized();
             }
         }
 
