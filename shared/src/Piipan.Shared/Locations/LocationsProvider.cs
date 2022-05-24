@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using System.Linq;
+﻿using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace Piipan.Shared.Locations
 {

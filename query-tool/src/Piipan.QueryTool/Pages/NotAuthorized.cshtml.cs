@@ -1,7 +1,7 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Piipan.Shared.Authorization;
-using System;
 
 namespace Piipan.QueryTool.Pages
 {

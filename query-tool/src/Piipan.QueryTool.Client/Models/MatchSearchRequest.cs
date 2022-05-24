@@ -1,5 +1,5 @@
-﻿using Piipan.Components.Validation;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Piipan.Components.Validation;
 using static Piipan.Components.Validation.ValidationConstants;
 
 namespace Piipan.QueryTool.Client.Models

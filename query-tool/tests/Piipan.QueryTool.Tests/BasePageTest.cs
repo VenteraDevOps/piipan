@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -9,9 +12,6 @@ using Moq;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace Piipan.QueryTool.Tests
 {

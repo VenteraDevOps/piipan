@@ -1,8 +1,8 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging.Abstractions;
 using Piipan.QueryTool.Pages;
-using System;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests

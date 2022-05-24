@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Piipan.QueryTool.Pages;
-using System;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests

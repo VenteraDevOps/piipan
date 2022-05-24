@@ -1,6 +1,6 @@
+using System;
 using Microsoft.Extensions.Logging;
 using Piipan.Shared.Authorization;
-using System;
 
 namespace Piipan.QueryTool.Pages
 {

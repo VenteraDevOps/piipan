@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,8 +15,6 @@ using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using Piipan.Shared.Locations;
 using Piipan.Shared.Logging;
-using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Piipan.QueryTool
 {
