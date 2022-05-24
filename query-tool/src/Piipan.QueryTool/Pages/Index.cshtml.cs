@@ -28,7 +28,7 @@ namespace Piipan.QueryTool.Pages
         }
 
         [BindProperty]
-        public QueryFormModel QueryFormData { get; } = new QueryFormModel();
+        public QueryFormModel QueryFormData { get; set; } = new QueryFormModel();
 
         public async Task<IActionResult> OnPostAsync()
         {

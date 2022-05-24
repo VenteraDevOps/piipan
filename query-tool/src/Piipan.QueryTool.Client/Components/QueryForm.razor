@@ -22,6 +22,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        QueryFormData ??= new();
         if (QueryFormData.ServerErrors?.Count > 0)
         {
             serverErrorList = new(QueryFormData.ServerErrors.Select(n => (n.Property, n.Error)));

@@ -8,6 +8,7 @@
 @{
     ViewData["Title"] = "NAC Participant Search";
 
+    Model.QueryFormData ??= new();
     Model.QueryFormData.Token = antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
     Model.QueryFormData.Location = Model.Location;
 }
