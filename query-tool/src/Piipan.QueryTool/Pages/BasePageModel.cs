@@ -52,6 +52,8 @@ namespace Piipan.QueryTool.Pages
             get { return _locationsProvider.GetStates(Location); }
         }
 
+        public bool IsNationalOffice => States?.Contains("*") ?? false;
+
         public string Role
         {
             get { return _claimsProvider.GetRole(User); }

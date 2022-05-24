@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -31,7 +30,7 @@ namespace Piipan.QueryTool.Pages
 
         public async Task<IActionResult> OnGet()
         {
-            if (!States?.Contains("*") ?? true)
+            if (!IsNationalOffice)
             {
                 return RedirectToUnauthorized();
             }
