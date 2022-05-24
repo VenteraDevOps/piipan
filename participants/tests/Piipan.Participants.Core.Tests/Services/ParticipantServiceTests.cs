@@ -1,14 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Deidentification;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Services
@@ -192,7 +193,7 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger);
 
             // Act
-            await service.AddParticipants(participants, "test-etag", "test-file.csv");
+            await service.AddParticipants(participants, "test-etag", null);
 
             // Assert
 
@@ -213,15 +214,56 @@ namespace Piipan.Participants.Core.Tests.Services
         /// When Add Participants has an error, the error is logged with the value of the redaction service.
         /// </summary>
         [Fact]
-        public async void AddParticipants_LogsErrorWhenFailed()
+        public async Task AddParticipants_ThrowsExceptionWhenFailed()
         {
             // Arrange
             var logger = new Mock<ILogger<ParticipantService>>();
             var participants = RandomParticipants(10);
             var uploadId = (new Random()).Next();
             var participantDao = new Mock<IParticipantDao>();
+            var thrownException = new Exception("Unhandled error!");
             participantDao.Setup(n => n.AddParticipants(It.IsAny<IEnumerable<ParticipantDbo>>()))
-                                .ThrowsAsync(new Exception("Unhandled error!"));
+                                .ThrowsAsync(thrownException);
+            Exception foundException = null;
+
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+            var redactionService = new Mock<IRedactionService>();
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                redactionService.Object,
+                logger.Object);
+
+            // Act
+            await service.AddParticipants(participants, "test-etag", (ex) => foundException = ex);
+
+            // Assert
+            Assert.Equal(thrownException, foundException);
+        }
+
+        /// <summary>
+        /// When Add Participants has an error, the error is logged with the value of the redaction service.
+        /// </summary>
+        [Fact]
+        public void LogParticipantsUploadError_LogsRedactedError()
+        {
+            // Arrange
+            var logger = new Mock<ILogger<ParticipantService>>();
+            var participants = RandomParticipants(10);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
 
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
@@ -246,12 +288,11 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger.Object);
 
             // Act
-            await service.AddParticipants(participants, "test-etag", "test-file.csv");
+            service.LogParticipantsUploadError(
+                new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Dummy Exception"), "test.csv"),
+                participants);
 
             // Assert
-
-            // we should add a new upload for this batch
-            //redactionService.Verify(m => m.Redact("test-etag"), Times.Once);
             logger.Verify(n => n.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Error),
                     It.IsAny<EventId>(),
@@ -324,7 +365,7 @@ namespace Piipan.Participants.Core.Tests.Services
                 logger);
 
             // Act
-            await service.AddParticipants(participants, "test-etag", "test-file.csv");
+            await service.AddParticipants(participants, "test-etag", null);
 
             // Now Add another Upload 
             var uploadIdNew = (new Random()).Next();
@@ -344,7 +385,7 @@ namespace Piipan.Participants.Core.Tests.Services
                stateService,
                _redactionService,
                logger);
-            await serviceNew.AddParticipants(participants, "test-etag1", "test-file1.csv");
+            await serviceNew.AddParticipants(participants, "test-etag1", null);
 
             // Assert
 

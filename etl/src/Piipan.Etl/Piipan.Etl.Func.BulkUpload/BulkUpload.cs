@@ -1,12 +1,12 @@
 // Default URL for triggering event grid function in the local environment.
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Piipan.Etl.Func.BulkUpload
 {
@@ -57,7 +57,7 @@ namespace Piipan.Etl.Func.BulkUpload
                 {
                     var blockBlobClient = _blobStream.Parse(myQueueItem, log);
 
-                    Stream input = await blockBlobClient.OpenReadAsync();
+                    using Stream input = await blockBlobClient.OpenReadAsync();
 
                     log.LogInformation($"Input lenght: {input.Length} Position: {input.Position}");
 
@@ -65,8 +65,21 @@ namespace Piipan.Etl.Func.BulkUpload
 
                     if (input != null)
                     {
+
+
                         var participants = _participantParser.Parse(input);
-                        await _participantApi.AddParticipants(participants, blobProperties.ETag.ToString(), blockBlobClient.Name)
+                        DateTime startUploadTime = DateTime.UtcNow;
+                        await _participantApi.AddParticipants(participants, blobProperties.ETag.ToString(), (ex) =>
+                            {
+                                // reset the participants and input stream. If you only reset the input stream you start with the header row, 
+                                // and if you don't reset it you're missing participants that have already been read
+                                input.Seek(0, SeekOrigin.Begin);
+                                participants = _participantParser.Parse(input);
+
+                                _participantApi.LogParticipantsUploadError(
+                                    new(Environment.GetEnvironmentVariable("State"), startUploadTime, DateTime.UtcNow, ex, blockBlobClient.Name),
+                                    participants);
+                            })
                                 .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log))
                                 .ContinueWith(t => _participantApi.DeleteOldParticpants());
 

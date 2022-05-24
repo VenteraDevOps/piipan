@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Transactions;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
@@ -5,11 +10,6 @@ using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Enums;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Deidentification;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -51,13 +51,12 @@ namespace Piipan.Participants.Core.Services
             }
         }
 
-        public async Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier, string fileName)
+        public async Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier, Action<Exception> errorCallback)
         {
             DateTime uploadTime = DateTime.UtcNow;
             // Large participant uploads can be long-running processes and require
             // an increased time out duration to avoid System.TimeoutException
             var upload = await _uploadDao.AddUpload(uploadIdentifier);
-            var participantList = participants.ToList();
             try
             {
                 using (TransactionScope scope = new TransactionScope(
@@ -65,9 +64,7 @@ namespace Piipan.Participants.Core.Services
                     TimeSpan.FromSeconds(600),
                     TransactionScopeAsyncFlowOption.Enabled))
                 {
-
-
-                    var participantDbos = participantList.Select(p => new ParticipantDbo(p)
+                    var participantDbos = participants.Select(p => new ParticipantDbo(p)
                     {
                         UploadId = upload.Id
                     });
@@ -80,24 +77,26 @@ namespace Piipan.Participants.Core.Services
             catch (Exception ex)
             {
                 await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.FAILED.ToString());
-
-                // Log the redacted error string as an error.
-                List<string> redactedStrings = new List<string>();
-                foreach (var participant in participantList)
-                {
-                    redactedStrings.Add(participant.LdsHash);
-                    redactedStrings.Add(participant.ParticipantId);
-                    redactedStrings.Add(participant.CaseId);
-                }
-                string state = Environment.GetEnvironmentVariable("State");
-                var endTime = DateTime.UtcNow;
-                var uploadErrorDetails = new ParticipantUploadErrorDetails(state, uploadTime, endTime, ex, fileName);
-
-                // Since ParticipantUploadErrorDetails is a record, ToString outputs JSON
-                string uploadErrorString = uploadErrorDetails.ToString();
-                uploadErrorString = _redactionService.Redact(uploadErrorString, redactedStrings);
-                _logger.LogError($"Error uploading participants: {uploadErrorString}");
+                errorCallback?.Invoke(ex);
             }
+        }
+
+        public void LogParticipantsUploadError(ParticipantUploadErrorDetails errorDetails, IEnumerable<IParticipant> participants)
+        {
+            // Since ParticipantUploadErrorDetails is a record, ToString outputs JSON
+            string uploadErrorString = errorDetails.ToString();
+
+            string[] redactedStrings = new string[3];
+            // for each participant, redact out their information from the current error string
+            foreach (var participant in participants)
+            {
+                redactedStrings[0] = participant.LdsHash;
+                redactedStrings[1] = participant.ParticipantId;
+                redactedStrings[2] = participant.CaseId;
+                uploadErrorString = _redactionService.Redact(uploadErrorString, redactedStrings);
+            }
+
+            _logger.LogError($"Error uploading participants: {uploadErrorString}");
         }
 
         public async Task<IEnumerable<string>> GetStates()

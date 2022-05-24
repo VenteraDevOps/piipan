@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -9,11 +14,6 @@ using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.API.Utilities;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests
@@ -123,8 +123,13 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var participantApi = new Mock<IParticipantApi>();
             participantApi
-                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>(), It.IsAny<string>()))
-                 .Throws(new Exception("the api broke"));
+                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>(), It.IsAny<Action<Exception>>()))
+                .Callback<IEnumerable<IParticipant>, string, Action<Exception>>((participants, uploadIdentifier, errorCallback) =>
+                {
+                    Exception exception = new Exception("the api broke");
+                    errorCallback.Invoke(exception);
+                    throw exception;
+                });
 
 
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
@@ -153,6 +158,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             await Assert.ThrowsAsync<Exception>(() => function.Run("Event Grid Event String", logger.Object));
 
             VerifyLogError(logger, "the api broke");
+
+            // Verify the LogParticipantsUploadError gets called
+            participantApi.Verify(n => n.LogParticipantsUploadError(It.IsAny<ParticipantUploadErrorDetails>(), It.IsAny<IEnumerable<IParticipant>>()), Times.Once());
         }
 
         [Fact]
@@ -205,7 +213,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
-            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>(), It.IsAny<Action<Exception>>()), Times.Once);
             participantApi.Verify(m => m.DeleteOldParticpants(It.IsAny<string>()), Times.Once);
         }
     }

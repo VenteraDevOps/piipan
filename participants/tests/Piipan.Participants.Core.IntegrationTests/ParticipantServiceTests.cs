@@ -1,10 +1,10 @@
+using System;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared.Deidentification;
-using System;
-using System.Linq;
 using Xunit;
 
 namespace Piipan.Participants.Core.IntegrationTests
@@ -38,7 +38,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
 
                 // Act
-                await service.AddParticipants(participants, "test-etag", "test-file");
+                await service.AddParticipants(participants, "test-etag", null);
 
                 long lastUploadId = GetLastUploadId();
 
@@ -81,7 +81,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 try
                 {
                     // Act
-                    await service.AddParticipants(participants, "test-etag", "test-file");
+                    await service.AddParticipants(participants, "test-etag", null);
                     throw new Exception("Test should have failed because of participant with null ldsHash value");
                 }
                 catch (Exception)

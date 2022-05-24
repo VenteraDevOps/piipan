@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +7,6 @@ using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Database;
-using System;
 
 [assembly: FunctionsStartup(typeof(Piipan.Etl.Func.BulkUpload.Startup))]
 
