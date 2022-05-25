@@ -1,0 +1,99 @@
+﻿@using Piipan.Components.Alerts
+@using Piipan.Components.Enums
+@using System.Linq.Expressions
+@using Piipan.Dashboard.Client.Models
+@using Piipan.Dashboard.Client.Components
+@using Piipan.Dashboard.Tests
+@using Piipan.Metrics.Api
+@inherits BaseComponentTest<ParticipantUploads>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public UploadListTests() : base()
+    {
+        InitialValues = new ParticipantUploads()
+        {
+            Upload = new ParticipantUploadModel
+            {
+                ParticipantUploadResults = new List<ParticipantUpload>
+                {
+                    new ParticipantUpload
+                    {
+                        State = "ea",
+                        UploadedAt = new DateTime(2022, 1, 1)
+                    },
+                    new ParticipantUpload
+                    {
+                        State = "ea",
+                        UploadedAt = new DateTime(2022, 1, 1)
+                    }
+                } 
+            }
+        };
+    }
+    /// <summary>
+    /// Create a matches list component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        Component = Render<ParticipantUploads>(
+            @<ParticipantUploads Upload="InitialValues.Upload">
+            </ParticipantUploads>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are two items
+    /// </summary>
+    [Fact]
+    public void Matches_List_Should_Exist_And_Have_Correct_Markup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<section>
+                <table class="usa-table">
+                    <!--!-->
+                    <thead>
+                        <tr>
+                            <th scope="col">State</th>
+                            <th scope="col">Timestamp at Processing Start</th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td class="text-uppercase">ea</td>
+                        <!--!-->
+                        <td title="Local time of Upload">5/20/2022 1:52:03 PM EDT</td>
+                    </tr>
+                </table>
+            </section>
+        );
+    }
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are no items
+    /// </summary>
+    [Fact]
+    public void Matches_List_Should_Exist_And_Have_Correct_Markup_When_No_Items()
+    {
+        // Arrange
+        InitialValues.Upload.ParticipantUploadResults = null;
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<section>
+                <h1>All NAC Matches List</h1>
+                <p>No matches found.</p>
+            </section>
+        );
+    }
+
+    #endregion
+}
