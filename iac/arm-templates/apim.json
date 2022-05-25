@@ -32,6 +32,9 @@
         "dupPartPolicyXml": {
             "type": "String"
         },
+        "uploadAllParticipantsPolicyXml": {
+            "type": "String"
+        },
         "uploadStates": {
             "type": "String"
         },
@@ -278,7 +281,25 @@
                 "count": "[length(variables('uploadStatesList'))]"
             }
         },
-	{
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+            "apiVersion": "2020-06-01-preview",
+            "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload_all_participants/policy')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('uploadApiNames')[copyIndex()], 'put-upload_all_participants')]",
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
+            ],
+            "properties": {
+                "value": "[parameters('uploadAllParticipantsPolicyXml')]",
+                "format": "rawxml"
+            },
+            "copy": {
+                "name": "per-state-upload-ops",
+                "count": "[length(variables('uploadStatesList'))]"
+            }
+        },
+        {
             "type": "Microsoft.ApiManagement/service/apis/operations",
             "apiVersion": "2020-06-01-preview",
             "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload')]",

@@ -10,9 +10,9 @@
       },
       "FluentValidation": {
         "type": "Direct",
-        "requested": "[10.4.0, )",
-        "resolved": "10.4.0",
-        "contentHash": "rVI1b5L3pq3layrRKIo3N7AT3PWey8ocPZhf6zeHYf6LBBvnP1KzW3bm7KmeazOWW8m1KXMD+shfviIcKSgQ0g=="
+        "requested": "[11.0.1, )",
+        "resolved": "11.0.1",
+        "contentHash": "fcL5zF/glDwskUtpL0IfBupVWTChxOOvVs+dAA7Gme5NjIeJBiFKWq3eZV1O+AigucnBTr8SWG7wRRn+PgFnTw=="
       },
       "Microsoft.Azure.Cosmos.Table": {
         "type": "Direct",
@@ -78,9 +78,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[6.0.3, )",
-        "resolved": "6.0.3",
-        "contentHash": "yt/3XFRhHsJ01a4+qHM9+0mtitQ3DY2wJLyGP9vtvZa1cB1nSAw762GJGdSX3Bbc7wZKzeo4dc4drD3yvQe7gA==",
+        "requested": "[6.0.4, )",
+        "resolved": "6.0.4",
+        "contentHash": "SJMlOmFHr32oOzVXeHmarGaBKkhi0wHVN/rzuu2tUSJ4Qx2AkHCpr9R/DhLWwDiklqgzFU++9wkFyGJxbx/zzg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
@@ -144,10 +144,10 @@
       },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "ZufyK5u4rneCu7Xq9Dan4XggNANWgGpj4BvHhOof5tIZQgjWTU18oRlg5xtuBDHsfl03BwnxxWgNjN5TO59wEw==",
+        "resolved": "6.0.5",
+        "contentHash": "T3J4Z4xK/mmJlMv/j7Cs1PZjRLh1fGsvHay3RNBNooP0qhHCk3UnU+WgBvcGApZFnEfeyOEGZBHZv5gb1RrDLA==",
         "dependencies": {
-          "Microsoft.AspNetCore.Metadata": "6.0.4",
+          "Microsoft.AspNetCore.Metadata": "6.0.5",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.1",
           "Microsoft.Extensions.Options": "6.0.0"
         }
@@ -231,8 +231,8 @@
       },
       "Microsoft.AspNetCore.Metadata": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "/zyy+N/8155mbDqKCVrXLA4fNQYRbQe6jduA0WnZYMrSfLfrt0/QmQ+KaYGBir9w0xHrWtZ3LY8zAE1RLJYvYw=="
+        "resolved": "6.0.5",
+        "contentHash": "4VRJoJa/EbncxQTAzM6abqQUUbNrohg5MC1glZ1R1lzzXJM2CdXiRKvcpAfn3luAwPzkwJtHejuLgI6Osn0aDA=="
       },
       "Microsoft.AspNetCore.Mvc.Abstractions": {
         "type": "Transitive",
@@ -816,11 +816,11 @@
       },
       "Npgsql.NodaTime": {
         "type": "Transitive",
-        "resolved": "6.0.3",
-        "contentHash": "AKGBaz2dSFkdsJ7eE0H6KVQGH/D+O+afOFQ7ML3XqWjNiiEspr20j64/eqyD0KL4IT4qKXzrSax1opzgjtYhDA==",
+        "resolved": "6.0.4",
+        "contentHash": "kk3DtqlIFupk9P6ccONJdUzATHrjkgfUQj0XVQhpTNzpof1jjFuiBSR1TSCNReSGulZ9Q8TQDby1WM3yEwnUgg==",
         "dependencies": {
           "NodaTime": "3.0.9",
-          "Npgsql": "6.0.3"
+          "Npgsql": "6.0.4"
         }
       },
       "PostgreSQLCopyHelper": {
@@ -2208,11 +2208,11 @@
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.123",
-          "FluentValidation": "10.4.0",
+          "FluentValidation": "11.0.1",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.3",
+          "Npgsql": "6.0.4",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0"
@@ -2230,7 +2230,7 @@
           "Dapper": "2.0.123",
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
-          "Npgsql.NodaTime": "6.0.3",
+          "Npgsql.NodaTime": "6.0.4",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "PostgreSQLCopyHelper": "2.8.0"
@@ -2241,7 +2241,7 @@
         "dependencies": {
           "Azure.Core": "1.24.0",
           "Azure.Identity": "1.6.0",
-          "Microsoft.AspNetCore.Authorization": "6.0.4",
+          "Microsoft.AspNetCore.Authorization": "6.0.5",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
@@ -2249,7 +2249,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.3"
+          "Npgsql": "6.0.4"
         }
       },
       "piipan.shared.api": {

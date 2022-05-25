@@ -57,8 +57,8 @@ namespace Piipan.Shared.Deidentification.Tests
                     while ((line = reader.ReadLine()) != null)
                     {
                         var values = line.Split(',');
-                        List<string> names = new List<string>() { values[0], values[3], values[4] };
-                        string result = _ldsDeidentifier.Run(values[0], values[3], values[4]);
+                        List<string> names = new List<string>() { values[0], values[1], values[2] };
+                        string result = _ldsDeidentifier.Run(values[0], values[1], values[2]);
                     }
                 }
 
@@ -72,7 +72,7 @@ namespace Piipan.Shared.Deidentification.Tests
                     while ((pLine = pReader.ReadLine()) != null)
                     {
                         var pValues = pLine.Split(',');
-                        string result = _ldsDeidentifier.Run(pValues[0], pValues[3], pValues[4]);
+                        string result = _ldsDeidentifier.Run(pValues[0], pValues[1], pValues[2]);
                         string expected = reader.ReadLine().Split(',')[0];
                         Assert.Equal(expected, result);
                     }

@@ -316,9 +316,6 @@ main () {
   # restrictions for the function app and storage account are added
   # in a separate step to avoid deployment and publishing issues.
   db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$DATABASE_PLACEHOLDER" "$ORCHESTRATOR_FUNC_APP_NAME")
-  # Long-running bulk upload queries require some specific connection
-  # details that are not part of default connection string
-  db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$ORCHESTRATOR_FUNC_APP_NAME")
   az deployment group create \
     --name orch-api \
@@ -449,10 +446,6 @@ main () {
     # Per-state database
     db_name=${abbr}
 
-    # Actual Function, under the Function App, that receives an event
-    # and does the work, name derived from classname in `etl` directory
-    func_name=BulkUpload
-
     # Per-state storage account for bulk upload;
     # matches name passed to blob-storage.json
     stor_name=${PREFIX}st${abbr}upload${ENV}
@@ -539,6 +532,9 @@ main () {
     fi
 
     db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
+    # Long-running bulk upload queries require some specific connection
+    # details that are not part of the default connection string
+    db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
     blob_conn_str=$(blob_connection_string "$RESOURCE_GROUP" "$stor_name")
     az_serv_str=$(az_connection_string "$RESOURCE_GROUP" "$identity")
     az functionapp config appsettings set \
@@ -564,12 +560,16 @@ main () {
     # Create Function endpoint before setting up event subscription
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
 
+    #Queue Storage id
+    storageid=$(az storage account show --name "${stor_name}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
+    queueid="$storageid/queueservices/default/queues/upload"
+
     az eventgrid system-topic event-subscription create \
       --name "$sub_name" \
       --resource-group "$RESOURCE_GROUP" \
       --system-topic-name "$topic_name" \
-      --endpoint "${DEFAULT_PROVIDERS}/Microsoft.Web/sites/${func_app}/functions/${func_name}" \
-      --endpoint-type azurefunction \
+      --endpoint-type storagequeue \
+      --endpoint "$queueid" \
       --included-event-types Microsoft.Storage.BlobCreated \
       --subject-begins-with /blobServices/default/containers/upload/blobs/
 

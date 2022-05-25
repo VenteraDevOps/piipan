@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.Match.Client.Tests
@@ -37,6 +36,39 @@ namespace Piipan.Match.Client.Tests
 
             // Act
             var response = await client.GetMatch("m123456");
+
+            // Assert
+            Assert.Equal(expectedResponse, response);
+        }
+
+        [Fact]
+        public async Task GetMatches_ReturnsApiClientResponse()
+        {
+            // Arrange
+            var expectedResponse = new MatchResListApiResponse
+            {
+                Data = Enumerable.Range(0, 2).Select(index =>
+                    new MatchResRecord
+                    {
+                        Dispositions = new Disposition[] { Mock.Of<Disposition>() },
+                        Initiator = "ea",
+                        States = new string[] { "ea", "eb" },
+                        MatchId = new string(index.ToString()[0], 7),
+                        Participants = new Participant[] { Mock.Of<Participant>() },
+                        Status = MatchRecordStatus.Open
+                    }
+                )
+            };
+
+            var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
+            apiClient
+                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("matches"))
+                .ReturnsAsync((expectedResponse, 200));
+
+            var client = new MatchResolutionClient(apiClient.Object);
+
+            // Act
+            var response = await client.GetMatches();
 
             // Assert
             Assert.Equal(expectedResponse, response);

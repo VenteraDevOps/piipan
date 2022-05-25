@@ -29,11 +29,11 @@ namespace Etl.BulkUpload.Performance.TestRunner
             }
 
             BulkUploadPerfTestRunner testFileCreator = new BulkUploadPerfTestRunner(storageAccountName, storageAccountKey);
-            Console.WriteLine("Starting Test!");
+            Console.WriteLine($"Starting Test! - {DateTime.Now.ToLongTimeString()}");
 
             await testFileCreator.runTest(numberofParticipantsToUpload);
 
-            Console.WriteLine("Test Completed");
+            Console.WriteLine($"Test Completed - {DateTime.Now.ToLongTimeString()}");
         }
 
 

@@ -228,5 +228,97 @@ namespace Piipan.Participants.Core.Tests.Services
                 s => Assert.Equal("ec", s));
 
         }
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(50)]
+        public async void DeleteOldParticipants_AddedCoupleOfUploads(int nParticipants)
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<ParticipantService>>();
+            var participants = RandomParticipants(nParticipants);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                logger);
+
+            // Act
+            await service.AddParticipants(participants, "test-etag");
+
+            // Now Add another Upload 
+            var uploadIdNew = (new Random()).Next();
+            var uploadDaoNew = new Mock<IUploadDao>();
+            uploadDaoNew
+               .Setup(m => m.AddUpload("test-etag1"))
+               .ReturnsAsync(new UploadDbo
+               {
+                   Id = uploadIdNew,
+                   CreatedAt = DateTime.UtcNow,
+                   Publisher = "me",
+               });
+           
+            var serviceNew = new ParticipantService(
+               participantDao.Object,
+               uploadDaoNew.Object,
+               stateService,
+               logger);
+            await serviceNew.AddParticipants(participants, "test-etag1");
+
+            // Assert
+
+            // we should add a new upload for this batch
+            uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
+            uploadDaoNew.Verify(m => m.AddUpload("test-etag1"), Times.Once);
+
+            var uploadDaoDelete = new Mock<IUploadDao>();
+            uploadDaoDelete
+               .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
+               .ReturnsAsync(new UploadDbo
+               {
+                   Id = uploadIdNew,
+                   CreatedAt = DateTime.UtcNow,
+                   Publisher = "me",
+               });
+
+
+            var serviceDelete = new ParticipantService(
+             participantDao.Object,
+             uploadDaoDelete.Object,
+             stateService,
+             logger);
+
+            await serviceDelete.DeleteOldParticpants();
+
+            // each participant added via the DAO should have the created upload ID
+            participantDao
+                .Verify(m => m
+                    .AddParticipants(It.Is<IEnumerable<ParticipantDbo>>(participants =>
+                        participants.All(p => p.UploadId == uploadIdNew)
+                    ))
+                );
+            participantDao
+               .Verify(m => m
+                   .AddParticipants(It.Is<IEnumerable<ParticipantDbo>>(participants =>
+                       participants.All(p => p.UploadId != uploadId)
+                   ))
+               );
+        }
+
     }
 }

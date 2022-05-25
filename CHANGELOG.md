@@ -3,6 +3,46 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1.40] - 2022-05-17
+
+### Changed
+- Updated Bulk Upload API response to return a unqiue identifier for the upload "upload_id". Updated API documentation to describe this response
+- Updated Bulk Upload process to delete state's uploaded file from Azure Storage immediately upon processing completion
+- Updated Bulk Upload process to delete all participant records from prior uploads after a successful new upload
+- Updated Bulk Upload process to record upload statuses in the database and to record failed uploads
+- Refactored Bulk Upload performance testing tools to be more resilient to schema changes
+- Updated formatting and parameter descriptions in Duplicate Participation API and Bulk Upload API
+- Changed pa11y tests to to run through Cypress rather than CircleCI
+
+### Added
+- Added endpoint to Match Resolution API to get all existing matches
+- Added page to Query Tool web application to display all existing matches
+
+### Removed
+- Removed First & Middle names from sample plaintext-example.csv
+
+### Fixed
+- Fixed upload_all_participants endpoint
+- Fixed timeout settings in connection strings for Bulkd Upload & Orchestrator Functions
+- Fixed search reason validation in Duplicate Participation API responses to provide list of errors for each participant rather general failure response
+
+## [1.0.1.39] - 2022-05-03
+
+### Changed
+- Updated Bulk Upload Process to utilize a Storage Trigger rather than an Event Grid Trigger
+- Refactored Bulk Upload functionality to move PostgresSQL-specific functionality behind a interface 
+- Allow multiple errors for Last Name validation on Query Tool page
+
+### Added
+- Added default search_reason value to queries generated on Query Tool page
+- Added new UI Component Library tests
+- Added status to states' Upload table
+
+### Fixed
+- Fixed documentation for upload_all_participants endpoint
+- Enabled HSTS
+- Include X-Frame-Options header in response from Dashboard app
+
 ## [1.0.1.38] - 2022-04-19
 
 ### Changed

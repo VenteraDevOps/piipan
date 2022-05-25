@@ -7,9 +7,6 @@ The .NET ecosystem and the GitHub Dependabot have a few rough edges as far as up
 
 One consequence is that Dependabot PRs can not be directly used to update our dependencies. They can only merely alert us that we must manually run the process below.
 
-## .NET 3.1 compatibility
-Carefully consider newly available .NET 5 packages while [we are targeting .NET 3.1](./adr/0009-continue-to-use-net-core-3-1.md). We've found they are _not_ backwards compatible. Any packages with the `Microsoft` prefix should likely be left at the `3.1.x` version; e.g., `Microsoft.Extensions.Http`.
-
 ## Manual steps
 1. For each affected source/test tree (e.g., directory with a `.csproj`), run: 
 ```

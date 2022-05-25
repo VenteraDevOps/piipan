@@ -76,6 +76,14 @@
                                         <span data-title="@linkTitle">@linkTitle</span>
                                     </a>
                                 </li>
+                                <li class="usa-nav__primary-item">
+                                    @{
+                                        linkTitle = "List of NAC Matches";
+                                    }
+                                    <a href="/list" class="usa-nav__link @(pageName == "list" ? "usa-current" : "")">
+                                        <span data-title="@linkTitle">@linkTitle</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </nav>                   

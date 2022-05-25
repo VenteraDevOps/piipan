@@ -65,6 +65,14 @@
                     "dependsOn": [
                         "[variables('uniqueStorageName')]"
                     ]
+                },
+                {
+                    "type": "queueServices/queues",
+                    "apiVersion": "2021-08-01",
+                    "name": "[concat('default/', variables('containerName'))]",
+                    "dependsOn": [
+                        "[variables('uniqueStorageName')]"
+                    ]
                 }
             ]
         },

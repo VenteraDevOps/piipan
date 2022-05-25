@@ -36,7 +36,7 @@ namespace Piipan.Components.Tests.Validation
         /// Validate that if an error occurs that the correct error message is returned
         /// </summary>
         [Fact]
-        public void CorrectErrorMessageForNormalizedNameTooShort()
+        public void CorrectErrorMessageForMustStartWithALetter()
         {
             // Arrange
             var attribute = new UsaNameAttribute();
@@ -46,7 +46,7 @@ namespace Piipan.Components.Tests.Validation
 
             // Assert
             Assert.False(result);
-            Assert.Equal(ValidationConstants.NormalizedNameTooShortMessage, attribute.ErrorMessage);
+            Assert.Equal(ValidationConstants.MustStartWithALetter, attribute.ErrorMessage);
         }
 
         /// <summary>

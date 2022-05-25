@@ -1,5 +1,6 @@
 using Piipan.Match.Api.Models;
 using FluentValidation;
+using Piipan.Match.Core.Enums;
 
 namespace Piipan.Match.Core.Validators
 {
@@ -13,6 +14,7 @@ namespace Piipan.Match.Core.Validators
             const string HashRegex = "^[a-z0-9]{128}$";
 
             RuleFor(q => q.LdsHash).Matches(HashRegex);
+            RuleFor(x => x.SearchReason).IsEnumName(typeof(ValidSearchReasons));
         }
     }
 }

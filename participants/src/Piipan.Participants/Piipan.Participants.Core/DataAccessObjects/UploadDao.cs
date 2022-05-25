@@ -4,6 +4,7 @@ using Dapper;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Database;
+using Piipan.Participants.Core.Enums;
 
 namespace Piipan.Participants.Core.DataAccessObjects
 {
@@ -22,10 +23,10 @@ namespace Piipan.Participants.Core.DataAccessObjects
             {
                 return await connection
                     .QuerySingleAsync<UploadDbo>(@"
-                    SELECT id, created_at, publisher,upload_identifier
-                    FROM uploads
+                    SELECT id, created_at, publisher,upload_identifier, status
+                    FROM uploads where status=@completeStatus
                     ORDER BY id DESC
-                    LIMIT 1");
+                    LIMIT 1", new { completeStatus = UploadStatuses.COMPLETE.ToString() });
             }
         }
 
@@ -36,8 +37,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 await connection.OpenAsync();
                
                 await connection.ExecuteAsync(@"
-                INSERT INTO uploads (created_at, publisher,upload_identifier)
-                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier)", new { uploadIdentifier = uploadIdentifier });
+                INSERT INTO uploads (created_at, publisher,upload_identifier, status)
+                VALUES (now() at time zone 'utc', current_user,@uploadIdentifier, @uploadStatus)", new { uploadIdentifier = uploadIdentifier , uploadStatus = UploadStatuses.UPLOADING.ToString()});
 
                 var upload = await connection.QuerySingleAsync<UploadDbo>(@"
                     SELECT id, created_at, publisher
@@ -46,6 +47,21 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     LIMIT 1");
 
                 return upload;
+            }
+        }
+
+        public async Task<IUpload> UpdateUploadStatus(IUpload upload, string newStatus)
+        {
+            using (var connection = await _dbConnectionFactory.Build(null))
+            {
+                await connection
+                    .ExecuteAsync(@"
+                    Update uploads set status = @status where id=@uploadId", new {status = newStatus, uploadId = upload.Id });
+
+                return await connection
+                    .QuerySingleAsync<UploadDbo>(@"
+                    SELECT id, created_at, publisher,upload_identifier, status
+                    FROM uploads where id=@uploadId", new { uploadId = upload.Id });
             }
         }
     }

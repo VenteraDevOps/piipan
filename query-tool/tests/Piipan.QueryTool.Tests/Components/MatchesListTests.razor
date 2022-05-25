@@ -1,0 +1,112 @@
+﻿@using Piipan.Components.Alerts
+@using Piipan.Components.Enums
+@using System.Linq.Expressions
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Models
+@using static Piipan.Components.Alerts.AlertConstants
+@inherits BaseComponentTest<MatchesList>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public MatchesListTests() : base()
+    {
+        InitialValues = new MatchesList()
+        {
+            Matches = new ParameterBase<MatchResListApiResponse>
+            {
+                Data = new MatchResListApiResponse
+                {
+                    Data = new List<MatchResRecord>
+                    {
+                        new MatchResRecord
+                        {
+                            MatchId = "m123456",
+                            States = new string[] { "ea", "eb" },
+                            Initiator = "ea"
+                        },
+                        new MatchResRecord
+                        {
+                            MatchId = "m654321",
+                            States = new string[] { "ea", "eb" },
+                            Initiator = "ea"
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /// <summary>
+    /// Create a matches list component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        Component = Render<MatchesList>(
+            @<MatchesList Matches="InitialValues.Matches">
+            </MatchesList>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are two items
+    /// </summary>
+    [Fact]
+    public void Matches_List_Should_Exist_And_Have_Correct_Markup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<section>
+                <h1>All NAC Matches List</h1>
+                <table class="usa-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Match ID</th>
+                            <th scope="col">Matching States</th>
+                            <th scope="col">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="/match/m123456">m123456</a></td>
+                            <td>Echo Alpha, Echo Bravo</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><a href="/match/m654321">m654321</a></td>
+                            <td>Echo Alpha, Echo Bravo</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        );
+    }
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are no items
+    /// </summary>
+    [Fact]
+    public void Matches_List_Should_Exist_And_Have_Correct_Markup_When_No_Items()
+    {
+        // Arrange
+        InitialValues.Matches.Data.Data = null;
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<section>
+                <h1>All NAC Matches List</h1>
+                <p>No matches found.</p>
+            </section>
+        );
+    }
+
+    #endregion
+}
