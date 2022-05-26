@@ -1,49 +1,177 @@
-<!-- Generated via IaC -->
-
-<policies>
-    <inbound>
-        <base />
-        <authentication-managed-identity resource="{storageResourceId}" />
-
-        <!--
-            Required blob storage API headers
-            See: https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob#request-headers-all-blob-types
-        -->
-        <set-header name="Date" exists-action="override">
-            <value>@(System.DateTime.UtcNow.ToString("r"))</value>
-        </set-header>
-        <!-- See: https://docs.microsoft.com/en-us/rest/api/storageservices/previous-azure-storage-service-versions#available-versions -->
-        <set-header name="x-ms-version" exists-action="override">
-            <value>2020-04-08</value>
-        </set-header>
-        <set-header name="x-ms-blob-type" exists-action="override">
-            <value>BlockBlob</value>
-        </set-header>
-
-        <!-- APIM has used this header to authenticate the request, drop it as we forward the request to our internal endpoint, as it has no use for the client's private API key -->
-        <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
-        <set-header name="x-ms-encryption-key-sha256" exists-action="override">
-           <value>{{upload-payload-key-sha}}</value>
-        </set-header>
-        <set-header name="x-ms-encryption-algorithm" exists-action="override">
-           <value>AES256</value>
-        </set-header>
-        <set-header name="x-ms-encryption-key" exists-action="override">
-           <value>{{upload-payload-key}}</value>
-        </set-header>
-    </inbound>
-    <backend>
-        <base />
-    </backend>
-    <outbound>
-        <base />
-	<set-body>
-		@{
-		return new JObject(new JProperty("data", new JObject(new JProperty("upload_id", context.Response.Headers.GetValueOrDefault("ETag","").Replace("\"", "").ToString())))).ToString();
-		}
-	</set-body>
-    </outbound>
-    <on-error>
-        <base />
-    </on-error>
-</policies>
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiName": {
+            "type": "String"
+        },
+        "cloudName": {
+            "type": "String"
+        },
+        "env": {
+            "type": "String"
+        },
+        "prefix": {
+            "type": "String"
+        },
+        "uploadAllParticipantsPolicyXml": {
+           "type": "String"
+        },
+        "uploadStates": {
+            "type": "String"
+        },
+        "uploadPolicyXml": {
+            "type": "String"
+        }
+    },
+    "variables": {
+        "systemTypeTag": {
+            "SysType": "DupPartApi"
+        },
+        "apimUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.azure-api.us', '.azure-api.net')]",
+        "uploadUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.blob.core.usgovcloudapi.net/', '.blob.core.windows.net/')]",
+        "uploadDisplayName": "Bulk upload API",
+        "uploadSetName": "bulk",
+        "uploadStatesList": "[split(toLower(parameters('uploadStates')), ' ')]",
+        "copy": [
+            {
+                "name": "uploadApiNames",
+                "count": "[length(variables('uploadStatesList'))]",
+                "input": "[concat(variables('uploadSetName'), '-', variables('uploadStatesList')[copyIndex('uploadApiNames')])]"
+            },
+            // Generate storage account names based on naming convention: {prefix}st{state-abbr}upload{env}
+            {
+                "name": "uploadAccountNames",
+                "count": "[length(variables('uploadStatesList'))]",
+                "input": "[concat(parameters('prefix'), 'st', variables('uploadStatesList')[copyIndex('uploadAccountNames')], 'upload', parameters('env'))]"
+            }
+        ]
+    },
+    "resources": [
+      /* Bulk upload API(s) */
+      {
+          "type": "Microsoft.ApiManagement/service/apiVersionSets",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()])]",
+          "properties": {
+              "displayName": "[concat(toUpper(variables('uploadStatesList')[copyIndex()]), ' ', variables('uploadDisplayName'))]",
+              "versioningScheme": "Segment"
+          },
+          "copy": {
+              "name": "per-state-upload-api-vs",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()])]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "displayName": "[concat(toUpper(variables('uploadStatesList')[copyIndex()]), ' ', variables('uploadDisplayName'))]",
+              "subscriptionRequired": true,
+              "protocols": [
+                  "https"
+              ],
+              "path": "[concat(variables('uploadSetName'), '/', variables('uploadStatesList')[copyIndex()])]",
+              "apiVersion": "v2",
+              "apiVersionSetId": "[resourceId('Microsoft.ApiManagement/service/apiVersionSets', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]",
+              "serviceUrl": "[concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase'))]"
+          },
+          "copy": {
+              "name": "per-state-upload-apis",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/policies",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/policy')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "value": "[replace(parameters('uploadPolicyXml'), '{storageResourceId}', concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase')))]",
+              "format": "rawxml"
+          },
+          "copy": {
+              "name": "per-state-upload-policies",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/operations",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload_all_participants')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "displayName": "Upload bulk PII data",
+              "method": "PUT",
+              "urlTemplate": "/upload_all_participants/{filename}",
+              "description": "Upload a CSV file of bulk PII data",
+              "templateParameters": [
+                  {
+                      "name": "filename",
+                      "description": "User-provided CSV filename",
+                      "type": "string",
+                      "required": true
+                  }
+              ],
+              "responses": []
+          },
+          "copy": {
+              "name": "per-state-upload-ops",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload_all_participants/policy')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('uploadApiNames')[copyIndex()], 'put-upload_all_participants')]",
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "value": "[parameters('uploadAllParticipantsPolicyXml')]",
+              "format": "rawxml"
+          },
+          "copy": {
+              "name": "per-state-upload-ops",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/operations",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "displayName": "(Deprecated) Upload bulk PII data",
+              "method": "PUT",
+              "urlTemplate": "/upload/{filename}",
+              "description": "Upload a CSV file of bulk PII data",
+              "templateParameters": [
+                  {
+                      "name": "filename",
+                      "description": "User-provided CSV filename",
+                      "type": "string",
+                      "required": true
+                  }
+              ],
+              "responses": []
+          },
+          "copy": {
+              "name": "per-state-upload-ops",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      }
+    ],
+    "outputs": {}
+}
