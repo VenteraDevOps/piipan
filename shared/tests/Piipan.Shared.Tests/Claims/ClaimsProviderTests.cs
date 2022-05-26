@@ -61,7 +61,7 @@ namespace Piipan.Shared.Claims.Tests
         /// Verify we can grab the location from the roles claim
         /// </summary>
         [Fact]
-        public void GetState()
+        public void GetLocation()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -74,17 +74,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var state = claimsProvider.GetState(claimsPrincipal);
+            var location = claimsProvider.GetLocation(claimsPrincipal);
 
             // Assert
-            Assert.Equal("IA", state);
+            Assert.Equal("IA", location);
         }
 
         /// <summary>
         /// Verify that if the roles claim is not found, we do not grab a location
         /// </summary>
         [Fact]
-        public void GetState_RoleClaimNotFound()
+        public void GetLocation_RoleClaimNotFound()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -97,17 +97,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var state = claimsProvider.GetState(claimsPrincipal);
+            var location = claimsProvider.GetLocation(claimsPrincipal);
 
             // Assert
-            Assert.Null(state);
+            Assert.Null(location);
         }
 
         /// <summary>
         /// Verify that if a roles claim does exist, but a location value does not exist, we do not grab a location
         /// </summary>
         [Fact]
-        public void GetState_RoleClaimFound_LocationNotFound()
+        public void GetLocation_RoleClaimFound_LocationNotFound()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -120,17 +120,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var state = claimsProvider.GetState(claimsPrincipal);
+            var location = claimsProvider.GetLocation(claimsPrincipal);
 
             // Assert
-            Assert.Null(state);
+            Assert.Null(location);
         }
 
         /// <summary>
         /// When multiple locations exist, we just use the first one
         /// </summary>
         [Fact]
-        public void GetStateWhenMultipleLocationsExist()
+        public void GetLocationWhenMultipleLocationsExist()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -144,17 +144,17 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var state = claimsProvider.GetState(claimsPrincipal);
+            var location = claimsProvider.GetLocation(claimsPrincipal);
 
             // Assert
-            Assert.Equal("IA", state);
+            Assert.Equal("IA", location);
         }
 
         /// <summary>
-        /// When multiple role claims exist, we should take the state from the one that starts with the NAC Location prefix
+        /// When multiple role claims exist, we should take the location from the one that starts with the NAC Location prefix
         /// </summary>
         [Fact]
-        public void GetStateWhenMultipleRoleClaimsExist()
+        public void GetLocationWhenMultipleRoleClaimsExist()
         {
             // Arrange
             var logger = new Mock<ILogger<ClaimsProvider>>();
@@ -168,10 +168,10 @@ namespace Piipan.Shared.Claims.Tests
             }));
 
             // Act
-            var state = claimsProvider.GetState(claimsPrincipal);
+            var location = claimsProvider.GetLocation(claimsPrincipal);
 
             // Assert
-            Assert.Equal("IA", state);
+            Assert.Equal("IA", location);
         }
 
         /// <summary>

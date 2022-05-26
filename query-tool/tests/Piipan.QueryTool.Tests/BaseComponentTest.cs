@@ -1,7 +1,7 @@
-﻿using Bunit;
-using Microsoft.AspNetCore.Components;
-using System;
+﻿using System;
 using System.Linq.Expressions;
+using Bunit;
+using Microsoft.AspNetCore.Components;
 
 namespace Piipan.QueryTool.Tests
 {
