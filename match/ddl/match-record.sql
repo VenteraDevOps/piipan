@@ -51,20 +51,14 @@ CREATE TABLE IF NOT EXISTS state_info(
     state text UNIQUE NOT NULL,
     email text NOT NULL,
     phone text,
-    group text
+    nac_join_group text
 );
 
-COMMENT ON COLUMN state_info.group IS 'The group that the State joined NAC with ie: 1A'
-COMMENT ON COLUMN state_info.phone IS 'The phone number contact'
-COMMENT ON COLUMN state_info.email IS 'The email to contact that state'
+COMMENT ON COLUMN state_info.nac_join_group IS 'The group that the State joined NAC with ie: 1A';
+COMMENT ON COLUMN state_info.phone IS 'The phone number contact';
+COMMENT ON COLUMN state_info.email IS 'The email to contact that state';
 COMMENT ON COLUMN state_info.state IS 'State/territory';
 
-BEGIN
-   IF NOT EXISTS (SELECT * FROM state_info 
-                   WHERE id = '15')
-   BEGIN
-       INSERT INTO state_info(id, state, email, phone, group) VALUES ('15', 'IA', 'test@usda.gov', '1234567890', '1A')
-   END
-END
+INSERT INTO state_info(id, state, email, phone, nac_join_group) VALUES ('15', 'IA', 'test@usda.gov', '1234567890', '1A');
 
 COMMIT;
