@@ -545,6 +545,7 @@ main () {
         $AZ_SERV_STR_KEY="$az_serv_str" \
         $BLOB_CONN_STR_KEY="$blob_conn_str" \
         $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
+        $STATE_STR_KEY="$abbr" \
       --output none
 
     event_grid_system_topic_id=$(\
