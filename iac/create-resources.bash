@@ -224,7 +224,7 @@ main () {
   # The AD admin can't be specified in the PostgreSQL ARM template,
   # unlike in Azure SQL
   az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
-  PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
+  PG_AAD_ADMIN_OBJID=$(az ad group show --group "$PG_AAD_ADMIN" --query objectId --output tsv)
   az postgres server ad-admin create \
     --resource-group "$RESOURCE_GROUP" \
     --server "$PG_SERVER_NAME" \

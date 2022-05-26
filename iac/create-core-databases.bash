@@ -94,7 +94,7 @@ main () {
   db_config_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
   db_grant_readwrite "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
 
-  db_leave_aad $PG_AAD_ADMIN
+  db_leave_aad "$PG_AAD_ADMIN"
 
   echo "Secure database connection"
   ./remove-external-network.bash \
