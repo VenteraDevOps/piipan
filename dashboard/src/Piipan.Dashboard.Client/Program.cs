@@ -1,9 +1,15 @@
-using Microsoft.AspNetCore.Components.Web;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Piipan.Dashboard.Client;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
+[ExcludeFromCodeCoverage]
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-await builder.Build().RunAsync();
+        await builder.Build().RunAsync();
+    }
+}
