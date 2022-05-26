@@ -6,14 +6,11 @@ source "$(dirname "$0")"/../tools/common.bash || exit
 set_constants () {
   DB_ADMIN_NAME=piipanadmin
   SUPERUSER=$DB_ADMIN_NAME
-
+  PG_SECRET_NAME=core-pg-admin
   METRICS_DB_NAME=metrics
 
-  VAULT_NAME=$PREFIX-kv-core-$ENV
-  PG_SECRET_NAME=core-pg-admin
-
   # Name of Azure Active Directory admin for PostgreSQL server
-  PG_AAD_ADMIN=piipan-admins
+  PG_AAD_ADMIN=piipan-admins-${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
 }

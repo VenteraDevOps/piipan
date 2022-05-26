@@ -70,7 +70,7 @@
         },
         {
             "type": "Microsoft.EventHub/namespaces/providers/diagnosticSettings",
-            "apiVersion": "2017-05-01-preview",
+            "apiVersion": "2021-05-01-preview",
             "name": "[concat(variables('namespace'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces', variables('namespace'))]"

@@ -21,7 +21,7 @@ set_constants () {
   PG_SUPERUSER=postgres
 
   # Name of Azure Active Directory admin for PostgreSQL server
-  PG_AAD_ADMIN=piipan-admins
+  PG_AAD_ADMIN=piipan-admins-${ENV}
 
   # Name of PostgreSQL server
   PG_SERVER_NAME=$PREFIX-psql-participants-$ENV
@@ -75,10 +75,11 @@ main () {
   source "$(dirname "$0")"/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
   source "$(dirname "$0")"/iac-common.bash
-  verify_cloud
 
+  verify_cloud
   set_constants
 
+  echo "Creating Resource Groups"
   ./create-resource-groups.bash "$azure_env"
 
   # Virtual network is used to secure connections between
@@ -199,8 +200,9 @@ main () {
   printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
     --vault-name "$VAULT_NAME" \
     --name "$PG_SECRET_NAME" \
-    --file /dev/stdin \
-    --query id
+    --value "$PG_SECRET"
+    #--file /dev/stdin \
+    #--query id
 
   echo "Creating PostgreSQL server"
   az deployment group create \
@@ -229,6 +231,9 @@ main () {
     --server "$PG_SERVER_NAME" \
     --display-name "$PG_AAD_ADMIN" \
     --object-id "$PG_AAD_ADMIN_OBJID"
+
+  # Configure Payload Keys
+  ./configure-payload-keys.bash "$azure_env"
 
   # Create managed identities to admin each state's database
   while IFS=, read -r abbr name ; do
@@ -522,30 +527,54 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app")
 
+    stateManagedIdentity="${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}"
     if [ -z "$exists" ]; then
       # Conditionally execute otherwise we will get an error if it is already
       # assigned this managed identity
       az functionapp identity assign \
-        --resource-group "$RESOURCE_GROUP" \
-        --name "$func_app" \
-        --identities "${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}"
+        --resource-group "${RESOURCE_GROUP}" \
+        --name "${func_app}" \
+        --identities "${stateManagedIdentity}"
     fi
 
-    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
+    # Update function to use state managed identity when referencing key vault
+    echo "Configuring ${func_app} Key Vault Reference Identity"
+    az rest --method PATCH --uri "${func_id}?api-version=2021-01-01" --body "{'properties':{'keyVaultReferenceIdentity':'${stateManagedIdentity}'}}"
+
+    # Update Key Vault to allow function access
+    echo "Granting Key Vault access to ${func_app}"
+    stateManagedIdentityPrincipalId=$(\
+      az identity show \
+        --resource-group "${RESOURCE_GROUP}" \
+        --name "${identity}" \
+        --query principalId \
+        --output tsv)
+
+    az deployment group create \
+      --name "${VAULT_NAME}-access-policy-for-${func_app}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      --template-file ./arm-templates/key-vault-access-policy.json \
+      --parameters \
+        keyVaultName="${VAULT_NAME}" \
+        objectId="${stateManagedIdentityPrincipalId}" \
+        permissionsSecrets="['get', 'list']"
+
+    az_serv_str=$(az_connection_string "${RESOURCE_GROUP}" "${identity}")
+    blob_conn_str=$(blob_connection_string "${RESOURCE_GROUP}" "${stor_name}")
     # Long-running bulk upload queries require some specific connection
     # details that are not part of the default connection string
+    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
     db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
-    blob_conn_str=$(blob_connection_string "$RESOURCE_GROUP" "$stor_name")
-    az_serv_str=$(az_connection_string "$RESOURCE_GROUP" "$identity")
     az functionapp config appsettings set \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app" \
       --settings \
-        $DB_CONN_STR_KEY="$db_conn_str" \
-        $AZ_SERV_STR_KEY="$az_serv_str" \
-        $BLOB_CONN_STR_KEY="$blob_conn_str" \
-        $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
-      --output none
+        ${AZ_SERV_STR_KEY}="$az_serv_str" \
+        ${BLOB_CONN_STR_KEY}="$blob_conn_str" \
+        ${CLOUD_NAME_STR_KEY}="$CLOUD_NAME" \
+        ${DB_CONN_STR_KEY}="$db_conn_str" \
+        ${UPLOAD_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_KV})" \
+        ${UPLOAD_ENCRYPT_KEY_SHA}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_SHA_KV})" \
 
     event_grid_system_topic_id=$(\
       az eventgrid system-topic create \
@@ -637,7 +666,7 @@ main () {
       --filter "displayName eq '${MATCH_RES_FUNC_APP_NAME}'" \
       --query "[0].appId" \
       --output tsv)
- 
+
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
@@ -661,7 +690,7 @@ main () {
       frontDoorUri="$QUERY_TOOL_URL"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
-  az functionapp vnet-integration add \
+  az webapp vnet-integration add \
     --name "$QUERY_TOOL_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$WEBAPP_SUBNET_NAME" \
