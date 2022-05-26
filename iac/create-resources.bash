@@ -200,9 +200,8 @@ main () {
   printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
     --vault-name "$VAULT_NAME" \
     --name "$PG_SECRET_NAME" \
-    --value "$PG_SECRET"
-    #--file /dev/stdin \
-    #--query id
+    --file /dev/stdin \
+    --query id
 
   echo "Creating PostgreSQL server"
   az deployment group create \

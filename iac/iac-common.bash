@@ -112,7 +112,7 @@ OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 # Create a very long, (mostly) random password. Ensures all Azure character
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
-  head /dev/urandom | LC_ALL=C tr -dc "A-Za-z0-9" | head -c 64 ;
+  head /dev/urandom | LC_ALL=C tr -dc "A-Za-z0-9" | head -c 64 ; echo -n 'aA1!'
 }
 
 # Generate the ADO.NET connection string for corresponding database. Password
@@ -331,9 +331,8 @@ set_oidc_secret () {
   printf '%s' "$value" | az keyvault secret set \
     --vault-name "$VAULT_NAME" \
     --name "$secret_name" \
-    --value "$value"
-    #--file /dev/stdin \
-    #--query id > /dev/null
+    --file /dev/stdin \
+    --query id > /dev/null
 }
 
 # Given an App Service instance name, output the secret established for OIDC,
