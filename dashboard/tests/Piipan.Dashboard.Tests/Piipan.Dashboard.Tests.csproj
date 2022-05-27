@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\components\src\Piipan.Components\Piipan.Components.csproj" />
     <ProjectReference Include="..\..\src\Piipan.Dashboard\Piipan.Dashboard.csproj" />
   </ItemGroup>
 

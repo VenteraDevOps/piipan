@@ -12,10 +12,12 @@
 
                 DateTime localDateTime = record.UploadedAt.ToLocalTime();
                 string timeZoneAbbreviation = TimeZoneInfo.Local.IsDaylightSavingTime(localDateTime) ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName;
-                <tr>
-                    <td class="text-uppercase">@record.State</td>
-                    <td title="Local time of Upload">@localDateTime.ToString("M/d/yyyy h:mm:ss tt").ToUpper() @timeZoneAbbreviation</td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td class="text-uppercase">@record.State</td>
+                        <td title="Local time of Upload">@localDateTime.ToString("M/d/yyyy h:mm:ss tt").ToUpper() @timeZoneAbbreviation</td>
+                    </tr>
+                </tbody>
 
             }
         </table>
