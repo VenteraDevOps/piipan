@@ -568,12 +568,14 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app" \
       --settings \
-        ${AZ_SERV_STR_KEY}="$az_serv_str" \
-        ${BLOB_CONN_STR_KEY}="$blob_conn_str" \
-        ${CLOUD_NAME_STR_KEY}="$CLOUD_NAME" \
-        ${DB_CONN_STR_KEY}="$db_conn_str" \
+        ${AZ_SERV_STR_KEY}="${az_serv_str}" \
+        ${BLOB_CONN_STR_KEY}="${blob_conn_str}" \
+        ${CLOUD_NAME_STR_KEY}="${CLOUD_NAME}" \
+        ${DB_CONN_STR_KEY}="${db_conn_str}" \
+        ${STATE_STR_KEY}="${abbr}" \
         ${UPLOAD_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_KV})" \
         ${UPLOAD_ENCRYPT_KEY_SHA}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_SHA_KV})" \
+      --output none
 
     event_grid_system_topic_id=$(\
       az eventgrid system-topic create \

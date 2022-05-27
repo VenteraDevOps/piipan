@@ -56,6 +56,10 @@ UPLOAD_ENCRYPT_KEY_SHA=uploadPayloadKeySHA
 # Payload Encryption Key SHA - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
 
+# Name of the environment variable used to indicate the current state. This is
+# used in the bulk upload Azure Function.
+STATE_STR_KEY=State
+
 # For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'
 DATABASE_PLACEHOLDER='{database}'
