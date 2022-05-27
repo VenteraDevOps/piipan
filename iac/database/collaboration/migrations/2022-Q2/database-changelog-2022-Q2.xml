@@ -1,15 +1,12 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.6.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
-    <changeSet id="3" author="william.foshay@usda.gov" labels="per-state" context="db-initialization">
-        <comment>per-state</comment><!-- Nac-1234 ticket -->
-        <sqlFile relativeToChangelogFile="true" path="per-state.sql" splitStatements="true"/>
-        <!-- <rollback>
-            <sqlFile relativeToChangelogFile="true" path="example-rollback-changeset.sql" splitStatements="false"/>
-        </rollback> -->
-    </changeSet>
-    <changeSet id="4" author="william.foshay@usda.gov" labels="per-state-controls" context="db-initialization">
-        <comment>per-state-controls</comment><!-- Nac-1234 ticket -->
-        <sqlFile relativeToChangelogFile="true" path="per-state-controls.sql" splitStatements="true"/>
+    <changeSet id="3" author="william.foshay@usda.gov" labels="create-hash_type" context="dg-initialization">
+        <comment>create-hash_type</comment><!-- Nac-1234 ticket -->
+        <sqlFile relativeToChangelogFile="true" path="create-hash_type.sql" splitStatements="false"/>
+    </changeSet>    
+    <changeSet id="4" author="william.foshay@usda.gov" labels="match-record" context="dg-initialization">
+        <comment>match-record</comment><!-- Nac-1234 ticket -->
+        <sqlFile relativeToChangelogFile="true" path="match-record.sql" splitStatements="true"/>
         <!-- <rollback>
             <sqlFile relativeToChangelogFile="true" path="example-rollback-changeset.sql" splitStatements="false"/>
         </rollback> -->

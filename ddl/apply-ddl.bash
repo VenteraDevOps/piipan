@@ -50,7 +50,17 @@ main () {
     admin=${admin//-/_}
 
     echo "Applying DDL to database $db..."
-    apply_ddl "$db" "$owner" "$admin"
+    
+    # --username=$PGUSER --password=$PGPASSWORD --url=$PGHOST
+    liquibase --changeLogFile=../iac/database/participants/master-changelog.xml \
+    --username=$PGUSER \
+    --password=$PGPASSWORD \
+    --url=jdbc:postgresql://$PGHOST:5432/$db \
+    --liquibase-schema-name=piipan \
+    --headless=true update -Downer=$owner -Dadmin=$admin -Dreader=readonly -Dsuperuser=$SUPERUSER
+    #liquibase --changeLogFile=../iac/database/participants/master-changelog.xml --username=postgres@venwgf-psql-participants-bgf --password=1Sg2qIOvFawLOYJqieYPyL9BkUA9GQb9pAwNmeYqRAUbospNJTg1CaU2ZewJoThZaA1! --url=jdbc:postgresql://venwgf-psql-participants-bgf.postgres.database.azure.com:5432/ea --headless=true update
+    #liquibase --changeLogFile=../iac/database/participants/database-changelog.xml update
+    #apply_ddl "$db" "$owner" "$admin"
 
   done < ../iac/states.csv
 }
