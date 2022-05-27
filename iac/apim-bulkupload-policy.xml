@@ -22,6 +22,15 @@
 
         <!-- APIM has used this header to authenticate the request, drop it as we forward the request to our internal endpoint, as it has no use for the client's private API key -->
         <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+        <set-header name="x-ms-encryption-key-sha256" exists-action="override">
+            <value>{{upload-payload-key-sha}}</value>
+         </set-header>
+         <set-header name="x-ms-encryption-algorithm" exists-action="override">
+            <value>AES256</value>
+         </set-header>
+         <set-header name="x-ms-encryption-key" exists-action="override">
+            <value>{{upload-payload-key}}</value>
+         </set-header>
     </inbound>
     <backend>
         <base />
