@@ -49,16 +49,20 @@ COMMENT ON COLUMN match_res_events.delta IS 'json object representing data chang
 CREATE TABLE IF NOT EXISTS state_info(
     id text UNIQUE PRIMARY KEY,
     state text UNIQUE NOT NULL,
+    state_abbreviation text NOT NULL,
     email text NOT NULL,
-    phone text,
-    nac_join_group text
+    phone text
 );
 
-COMMENT ON COLUMN state_info.nac_join_group IS 'The group that the State joined NAC with ie: 1A';
+COMMENT ON COLUMN state_info.id IS 'Unique number for each state. Will be alphabetical - Alabama = 1, Alaska = 2 etc';
 COMMENT ON COLUMN state_info.phone IS 'The phone number contact';
 COMMENT ON COLUMN state_info.email IS 'The email to contact that state';
-COMMENT ON COLUMN state_info.state IS 'State/territory';
+COMMENT ON COLUMN state_info.state IS 'State/territory full name';
+COMMENT ON COLUMN state_info.state_abbreviation IS 'State/territorys two letter abbreviation';
 
-INSERT INTO state_info(id, state, email, phone, nac_join_group) VALUES ('15', 'IA', 'test@usda.gov', '1234567890', '1A');
+INSERT INTO state_info(id, state, state_abbreviation, email, phone) VALUES ('15', 'Iowa', 'IA', 'IA-test@usda.gov', '1234567890');
+INSERT INTO state_info(id, state, state_abbreviation, email, phone) VALUES ('18', 'Louisiana', 'LA', 'LA-test@usda.gov', '1234567890');
+INSERT INTO state_info(id, state, state_abbreviation, email, phone) VALUES ('21', 'Massachusetts', 'MA', 'MA-test@usda.gov', '1234567890');
+INSERT INTO state_info(id, state, state_abbreviation, email, phone) VALUES ('26', 'Montana', 'MT', 'MT-test@usda.gov', '1234567890');
 
 COMMIT;
