@@ -64,9 +64,9 @@ describe('query tool match query', () => {
     it("shows results table on successful submission with a match", () => {
         cy.visit('/');
         cy.get('#query-form-search-btn', { timeout: 10000 }).should('be.visible');
-        setValue('#Query_LastName', 'Farrington');
-        setValue('#Query_DateOfBirth', '1931-10-13');
-        setValue('#Query_SocialSecurityNum', '425-46-5417');
+        setValue('#QueryFormData_Query_LastName', 'Farrington');
+        setValue('#QueryFormData_Query_DateOfBirth', '1931-10-13');
+        setValue('#QueryFormData_Query_SocialSecurityNum', '425-46-5417');
         cy.get('#query-form-search-btn').click();
 
         cy.get('#query-results-area tbody tr td a').invoke('text').then(matchId => {

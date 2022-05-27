@@ -1,12 +1,12 @@
-﻿using Bunit;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Bunit;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Components;
 using Piipan.QueryTool.Client.Models;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
 using static Piipan.Components.Validation.ValidationConstants;

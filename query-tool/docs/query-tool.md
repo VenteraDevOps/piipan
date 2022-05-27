@@ -58,7 +58,9 @@ Gulp will then watch for changes to the SCSS and compile them into the main CSS 
 
 The app will restrict anyone with an appropriate role and location claim from accessing the app. For local development, you can change your role and location by editing the mock_user.json file. The location is defaulted to EA in the mock_user file, but simply update the location to "National" or a different location to have access to different states.
 
-Any users that are authenticated but not authorized to view the app will be redirected to a "Not Authenticated" page to let them know their role or location is not valid for the page.
+For the "Search for Snap Participants" screen, you need to have a user that has a location that is a state. By default, the mock_user.json file sets the user's location to EA, so you should have access to search on this page. For the "List of NAC Matches" screen, you need to have a user that has a location that is set to the national office. To do this, update the mock_user.json file to have "Location-National" instead of "Location-EA". Now you will be able to see the list of matches, but you will be unable to search for snap participants.
+
+Any users that are authenticated but not authorized to view the page will be redirected to a "Not Authenticated" page to let them know their role or location is not valid for the page.
 
 ## Testing
 
