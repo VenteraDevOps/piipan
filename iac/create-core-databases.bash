@@ -62,15 +62,21 @@ main () {
 
   echo "Creating $METRICS_DB_NAME database and applying DDL"
   db_init "$METRICS_DB_NAME" "$SUPERUSER"
-  db_apply_ddl "$METRICS_DB_NAME" ../metrics/ddl/metrics.sql
+  liquibase --changeLogFile=database/metrics/master-changelog.xml \
+      --username=$PGUSER \
+      --password=$PGPASSWORD \
+      --url=jdbc:postgresql://$PGHOST:5432/$METRICS_DB_NAME \
+      --headless=true update
+  #db_apply_ddl "$METRICS_DB_NAME" ../metrics/ddl/metrics.sql
 
   echo "Creating $COLLAB_DB_NAME database and applying DDL"
   db_init "$COLLAB_DB_NAME" "$SUPERUSER"
-  db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/match-record.sql
-  db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/state-info.sql
 
-  echo "Inserting state info data"
-  db_apply_ddl "$COLLAB_DB_NAME" ../match/dml/insert-state-info.sql
+  liquibase --changeLogFile=database/collaboration/master-changelog.xml \
+      --username=$PGUSER \
+      --password=$PGPASSWORD \
+      --url=jdbc:postgresql://$PGHOST:5432/$COLLAB_DB_NAME \
+      --headless=true update  
 
   db_config_aad "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
   db_use_aad "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
