@@ -367,6 +367,15 @@ namespace Piipan.Participants.Core.Tests.Services
                     It.IsAny<Exception>(),
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
                   Times.Once());
+
+            // Assert that we wrote an error log stating which row we failed to redact
+            logger.Verify(n => n.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString() == $"Error parsing participant at index 1"),
+                    It.IsAny<Exception>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
+                  Times.Once());
         }
 
         [Fact]

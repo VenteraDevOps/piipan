@@ -88,11 +88,13 @@ namespace Piipan.Participants.Core.Services
 
             string[] redactedStrings = new string[3];
 
+            int redactionIndex = 0;
             try
             {
                 // for each participant, redact out their information from the current error string
                 foreach (var participant in participants)
                 {
+                    redactionIndex++;
                     redactedStrings[0] = participant.LdsHash;
                     redactedStrings[1] = participant.ParticipantId;
                     redactedStrings[2] = participant.CaseId;
@@ -103,6 +105,7 @@ namespace Piipan.Participants.Core.Services
             {
                 // If it still errors in here, nothing we can do to redact it or any of the following records.
                 // But we need to continue on and redact everything else.
+                _logger.LogError($"Error parsing participant at index {redactionIndex}");
             }
 
             _logger.LogError($"Error uploading participants: {uploadErrorString}");
