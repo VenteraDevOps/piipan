@@ -101,7 +101,8 @@ namespace Piipan.Participants.Core.Services
             }
             catch
             {
-                // If it still errors in here, nothing we can do to redact it. But we need to continue on and redact everything else.
+                // If it still errors in here, nothing we can do to redact it or any of the following records.
+                // But we need to continue on and redact everything else.
             }
 
             _logger.LogError($"Error uploading participants: {uploadErrorString}");
