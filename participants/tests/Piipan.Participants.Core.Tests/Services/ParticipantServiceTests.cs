@@ -43,6 +43,27 @@ namespace Piipan.Participants.Core.Tests.Services
             return result;
         }
 
+        private IEnumerable<ParticipantDbo> RandomParticipantsWithError(int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (i == 1)
+                {
+                    throw new Exception("Some parsing exception");
+                }
+                yield return new ParticipantDbo
+                {
+                    LdsHash = Guid.NewGuid().ToString(),
+                    CaseId = Guid.NewGuid().ToString(),
+                    ParticipantId = Guid.NewGuid().ToString(),
+                    ParticipantClosingDate = DateTime.UtcNow.Date,
+                    RecentBenefitIssuanceDates = new List<DateRange>(),
+                    VulnerableIndividual = (new Random()).Next(2) == 0,
+                    UploadId = (new Random()).Next()
+                };
+            }
+        }
+
         [Theory]
         [InlineData(0)]
         [InlineData(1)]
@@ -262,6 +283,53 @@ namespace Piipan.Participants.Core.Tests.Services
             // Arrange
             var logger = new Mock<ILogger<ParticipantService>>();
             var participants = RandomParticipants(10);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+            var redactionService = new RedactionService();
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                redactionService,
+                logger.Object);
+
+            var uploadDetails = new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Exception with first participant: " + participants.First().LdsHash), "test.csv");
+
+            // Act
+            service.LogParticipantsUploadError(uploadDetails, participants);
+
+            // Assert
+            logger.Verify(n => n.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString() == $"Error uploading participants: {uploadDetails.ToString().Replace(participants.First().LdsHash, "REDACTED")}"),
+                    It.IsAny<Exception>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
+                  Times.Once());
+        }
+
+        /// <summary>
+        /// When Add Participants has an error, the error is logged with the value of the redaction service.
+        /// </summary>
+        [Fact]
+        public void LogParticipantsUploadError_LogsRedactedErrorEvenAfterException()
+        {
+            // Arrange
+            var logger = new Mock<ILogger<ParticipantService>>();
+            var participants = RandomParticipantsWithError(10);
             var uploadId = (new Random()).Next();
             var participantDao = new Mock<IParticipantDao>();
 
