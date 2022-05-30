@@ -1,3 +1,33 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using Moq;
+using Newtonsoft.Json;
+using Npgsql;
+using Piipan.Match.Api;
+using Piipan.Match.Api.Models;
+using Piipan.Match.Core.Builders;
+using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Match.Core.Extensions;
+using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
+using Piipan.Match.Core.Validators;
+using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Participants.Core.Extensions;
+using Piipan.Participants.Core.Models;
+using Piipan.Shared.API.Utilities;
+using Piipan.Shared.Database;
+using Xunit;
+
+
 namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
