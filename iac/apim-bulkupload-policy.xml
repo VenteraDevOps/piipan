@@ -22,6 +22,23 @@
 
         <!-- APIM has used this header to authenticate the request, drop it as we forward the request to our internal endpoint, as it has no use for the client's private API key -->
         <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+       
+        <!-- APIM populates this header with the Named Value reference to the upload-payload-key-sha secret in Azure Key Vault. 
+            It uses this header to tell Azure Storage the Encryption Key SHA to use to encrypt Bulk Upload payload files -->        
+        <set-header name="x-ms-encryption-key-sha256" exists-action="override">
+            <value>{{upload-payload-key-sha}}</value>
+         </set-header>
+
+         <!-- APIM uses this header to tell Azure Storage the Encryption Key Algorithm to use to encrypt Bulk Upload payload files -->
+         <set-header name="x-ms-encryption-algorithm" exists-action="override">
+            <value>AES256</value>
+         </set-header>
+
+         <!-- APIM populates this header with the Named Value reference to the upload-payload-key secret in Azure Key Vault. 
+            It uses this header to tell Azure Storage the Encryption Key to use to encrypt Bulk Upload payload files -->
+         <set-header name="x-ms-encryption-key" exists-action="override">
+            <value>{{upload-payload-key}}</value>
+         </set-header>
     </inbound>
     <backend>
         <base />
