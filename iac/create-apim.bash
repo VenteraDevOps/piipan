@@ -218,6 +218,8 @@ main () {
   tenant_id=$(az account show --query homeTenantId -o tsv)
   for account in "${upload_accounts[@]}"
   do
+    # \r sometimes gets added to the account. Remove it
+    account="${account/$'\r'/}"
     grant_blob "$apim_identity" "$account"
 
     echo "Allowing APIM to access $account"

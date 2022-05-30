@@ -34,6 +34,9 @@
         },
         "states": {
             "type": "String"
+        },
+        "statesToEnableMatches": {
+            "type": "String"
         }
     },
     "variables": {
@@ -146,6 +149,10 @@
                         {
                             "name": "States",
                             "value": "[parameters('states')]"
+                        },
+                        {
+                            "name": "EnabledStates",
+                            "value": "[parameters('statesToEnableMatches')]"
                         }
                     ]
                 }

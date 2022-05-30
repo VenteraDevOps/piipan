@@ -113,6 +113,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `MatchResApiUri` | URI for the Match Resolution API endpoint. | Piipan.QueryTool |
 | `MatchResAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Match Resolution API's Azure Active Directory application object | Piipan.QueryTool |
 | `States` | Comma-separated list of the lower-case two letter abbreviations for each participating state. | Piipan.Match.Orchestrator |
+| `EnabledStates` | Comma-separated list of the lower-case two letter abbreviations for each participating state that should return matches from the Match API. | Piipan.Match.Orchestrator |
 | `MetricsApiUri` | URI for the Metrics API endpoint. | Piipan.Dashboard |
 | `MetricsApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Metrics API's Azure Active Directory application object | Piipan.Dashboard |
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
@@ -142,7 +143,7 @@ az resource list  --tag SysType=PerStateMatchApi --query "[? resourceGroup == 'r
 ```
 
 ## Notes
-- `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory.
+- `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory. The third field notes whether the state is Enabled or Disabled for the Match API. If they are disabled, a match will still be created, but will not be returned to the user.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
 - If you forget to connect to a trusted network and `create-resources` fails, connect to the network, then re-run the script.
 - If you have recently deleted all the Piipan resource groups and are re-creating the infrastructure from scratch, you will need to explicitly purge resource types that are initially soft-deleted. Be sure to **perform these commands against the correct subscription/resource groups** as they will cause **irreversible data loss**.
