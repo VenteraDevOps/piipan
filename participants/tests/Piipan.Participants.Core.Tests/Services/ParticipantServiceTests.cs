@@ -323,6 +323,7 @@ namespace Piipan.Participants.Core.Tests.Services
 
         /// <summary>
         /// When Add Participants has an error, the error is logged with the value of the redaction service.
+        /// In the event that there's a parsing error, we should still attempt to redact the entries prior to the parsing error.
         /// </summary>
         [Fact]
         public void LogParticipantsUploadError_LogsRedactedErrorEvenAfterException()
