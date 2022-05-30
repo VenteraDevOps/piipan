@@ -44,6 +44,18 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 # so that application code can use the appropriate, cloud-specific domain
 CLOUD_NAME_STR_KEY=CloudName
 
+# Azure Key Vault naming is kebab-case
+# Azure Function enivornment vairable naming is camelCase
+# Thus, creating constants for both to avoid naming conflicts
+# Payload Encryption Key - Azure Function environment variable
+UPLOAD_ENCRYPT_KEY=uploadPayloadKey
+# Payload Encryption Key - Azure Key Vault secret
+UPLOAD_ENCRYPT_KEY_KV=upload-payload-key
+# Payload Encryption Key SHA - Azure Function environment variable
+UPLOAD_ENCRYPT_KEY_SHA=uploadPayloadKeySHA
+# Payload Encryption Key SHA - Azure Key Vault secret
+UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
+
 # Name of the environment variable used to indicate the current state. This is
 # used in the bulk upload Azure Function.
 STATE_STR_KEY=State
@@ -234,19 +246,19 @@ private_dns_zone () {
 
 # try_run()
 #
-# The function help with the robusness of the IaC code. 
-# In ocassions the original when run a command it can fail, because any kind of error. 
-# The wrapper function will try run the command to a max_tries of times. 
+# The function help with the robusness of the IaC code.
+# In ocassions the original when run a command it can fail, because any kind of error.
+# The wrapper function will try run the command to a max_tries of times.
 #
 # mycommand - command to be run
 # max_tries - max number of try, default value 3
 # directory - path where tje mycommand should be run
 #
-# usage:   try_run <mycommand> <max_tries> <directory> 
+# usage:   try_run <mycommand> <max_tries> <directory>
 #
 try_run () {
   mycommand=$1
-  max_tries="${2:-3}" 
+  max_tries="${2:-3}"
   directory="${3:-"./"}"
 
 
@@ -257,7 +269,7 @@ try_run () {
     for (( i=1; i<=max_tries; i++ ))
       do
         ERR=0
-        echo "Running: ${mycommand}"  
+        echo "Running: ${mycommand}"
         eval "$mycommand"
 
         if [ $ERR -eq 0 ];then
