@@ -36,7 +36,7 @@
                 </return-response>
             </otherwise>
         </choose>
-        <rate-limit calls="100" renewal-period="60" remaining-calls-variable-name="remainingCallsPerSubscription"/>
+        <rate-limit calls="1050" renewal-period="60" remaining-calls-variable-name="remainingCallsPerSubscription"/>
     </inbound>
     <backend>
         <base />

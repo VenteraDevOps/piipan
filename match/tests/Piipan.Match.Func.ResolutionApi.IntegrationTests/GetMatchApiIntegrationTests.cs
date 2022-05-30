@@ -1,21 +1,19 @@
-using System;
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Xunit;
 using Moq;
+using Newtonsoft.Json;
 using Npgsql;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
-using Piipan.Match.Func.ResolutionApi.Models;
-using Newtonsoft.Json;
-using Piipan.Match.Api.Models.Resolution;
+using System;
+using System.Collections.Generic;
+using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 {
@@ -96,10 +94,11 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var api = Construct();
             var mockRequest = MockGetRequest(matchId);
             var mockLogger = Mock.Of<ILogger>();
-
+            var matchCreateDate = DateTime.UtcNow;
             // insert into database
-            var match = new MatchRecordDbo() {
-                CreatedAt = DateTime.UtcNow,
+            var match = new MatchRecordDbo()
+            {
+                CreatedAt = matchCreateDate,
                 Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
                 Hash = "foo",
                 HashType = "ldshash",
@@ -112,13 +111,16 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 
             // Act
             var response = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as JsonResult;
+            var createdDate = (response.Value as MatchResApiResponse).Data.CreatedAt;
             string resString = JsonConvert.SerializeObject(response.Value);
 
             // Assert
             Assert.Equal(200, response.StatusCode);
             // Assert Participant Data
-            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
+            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"created_at\":" + JsonConvert.SerializeObject(createdDate) + ",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
             Assert.Equal(expected, resString);
+            // Assert the created date that is returned is nearly identical to the actual current time
+            Assert.True((createdDate - matchCreateDate).Value.TotalMinutes < 1);
         }
         // When match res events are added, GetMatch response should update accordingly
         [Fact]
@@ -135,7 +137,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var mockLogger = Mock.Of<ILogger>();
 
             // insert into database
-            var match = new MatchRecordDbo() {
+            var match = new MatchRecordDbo()
+            {
                 MatchId = matchId,
                 Initiator = "ea",
                 CreatedAt = DateTime.UtcNow,
@@ -156,7 +159,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
 
             // Act again
             // creating an "invalid match" match event results in newly pulled Match request having invalid_match = true
-            var mre = new MatchResEventDbo() {
+            var mre = new MatchResEventDbo()
+            {
                 MatchId = matchId,
                 ActorState = "ea",
                 Actor = "user",

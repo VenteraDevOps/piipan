@@ -1,11 +1,11 @@
-using Piipan.Shared.Claims;
+using System;
 
 namespace Piipan.QueryTool.Pages
 {
     public class SignedOutModel : BasePageModel
     {
-        public SignedOutModel(IClaimsProvider claimsProvider)
-            : base(claimsProvider)
+        public SignedOutModel(IServiceProvider serviceProvider)
+                          : base(serviceProvider)
         {
 
         }

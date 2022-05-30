@@ -70,5 +70,28 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 }
             }
         }
+        public async Task DeleteOldParticipantsExcept(string state,  Int64 uploadId)
+        {
+            using (var connection = await _dbConnectionFactory.Build(state))
+            {
+              
+
+                var recordCount = await connection
+                    .ExecuteAsync(@"
+                    DELETE FROM participants
+                    WHERE  upload_id<>@uploadId",
+                        new
+                        {
+                            uploadId = uploadId
+                        }
+                    );
+
+                if (String.IsNullOrEmpty(state))
+                    _logger.LogInformation("Event Type : Outdated participant cleanup; Cleanup Time: {0} ; Records deleted :{1} ", DateTime.Now.ToString(), recordCount.ToString());
+                else
+                    _logger.LogInformation("Event Type : Outdated participant cleanup; Cleanup Time: {0} ; Records deleted :{1} ; State : {2}", DateTime.Now.ToString(), recordCount.ToString(), state);
+            }
+        }
+
     }
 }

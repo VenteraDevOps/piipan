@@ -15,11 +15,11 @@
       },
       "Azure.Storage.Blobs": {
         "type": "Direct",
-        "requested": "[12.11.0, )",
-        "resolved": "12.11.0",
-        "contentHash": "50eRjIhY7Q1JN7kT2MSawDKCcwSb7uRZUkz00P/BLjSg47gm2hxUYsnJPyvzCHntYMbOWzrvaVQTwYwXabaR5Q==",
+        "requested": "[12.12.0, )",
+        "resolved": "12.12.0",
+        "contentHash": "DYirbNIkP2KeCz+/7AP9Un8GkrmSfHSSE+J0k4pyIlI5d8wVWndZj5Pp74rNsgjE/jDRdr3dIhJHPQwHE4ifAg==",
         "dependencies": {
-          "Azure.Storage.Common": "12.10.0",
+          "Azure.Storage.Common": "12.11.0",
           "System.Text.Json": "4.7.2"
         }
       },
@@ -61,12 +61,12 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.Storage": {
         "type": "Direct",
-        "requested": "[5.0.0, )",
-        "resolved": "5.0.0",
-        "contentHash": "nu/a8wnkP+dXY6obqRDPoNFcOTElwWQukuAyx5r6bnWi6ybauD2J15dS7sdMb1jHgHQ9LPxWJLLl6W9sYhua/w==",
+        "requested": "[5.0.1, )",
+        "resolved": "5.0.1",
+        "contentHash": "jqNnxGfH6ONw5jgGScZ90h2Xxwqkhi58+npXEcz4hz77YL4uurbNpCaVLBIv1MEn1cgD1oZaShy4aX7n5c1FaA==",
         "dependencies": {
-          "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": "5.0.0",
-          "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.0.0"
+          "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": "5.0.1",
+          "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.0.1"
         }
       },
       "Microsoft.Extensions.DependencyInjection": {
@@ -145,21 +145,21 @@
       },
       "Azure.Storage.Common": {
         "type": "Transitive",
-        "resolved": "12.10.0",
-        "contentHash": "vYkHGzUkdZTace/cDPZLG+Mh/EoPqQuGxDIBOau9D+XWoDPmuUFGk325aXplkFE4JFGpSwoytNYzk/qBCaiHqg==",
+        "resolved": "12.11.0",
+        "contentHash": "BPZ1JwYvehHGoTSXhXfAmwtFYejJghE6dkKvpZtPIL0DulzSIJdll9OZI+h5W+3wLYK0yn5hc1r6mvId0q4npA==",
         "dependencies": {
-          "Azure.Core": "1.22.0",
+          "Azure.Core": "1.24.0",
           "System.IO.Hashing": "6.0.0"
         }
       },
       "Azure.Storage.Queues": {
         "type": "Transitive",
-        "resolved": "12.8.0",
-        "contentHash": "YR60fGZHXfUDffSq0zG7RIk9M0LQsS0FNDyslmuP0YS+sOl93TKQXV1wYSROg64VrJoXfLAqP1jRIaeLEhQ/hw==",
+        "resolved": "12.10.0",
+        "contentHash": "RD+rDy2O763jJXpvaOd03I3NSIrGpjq5YPzVkPydXnhMIzvjrv3X6ogDl+QgZs1ssuRcqjCh0RBvaaW6tt2EYw==",
         "dependencies": {
-          "Azure.Storage.Common": "12.9.0",
+          "Azure.Storage.Common": "12.11.0",
           "System.Memory.Data": "1.0.2",
-          "System.Text.Json": "4.6.0"
+          "System.Text.Json": "4.7.2"
         }
       },
       "Dapper": {
@@ -198,10 +198,10 @@
       },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "ZufyK5u4rneCu7Xq9Dan4XggNANWgGpj4BvHhOof5tIZQgjWTU18oRlg5xtuBDHsfl03BwnxxWgNjN5TO59wEw==",
+        "resolved": "6.0.5",
+        "contentHash": "T3J4Z4xK/mmJlMv/j7Cs1PZjRLh1fGsvHay3RNBNooP0qhHCk3UnU+WgBvcGApZFnEfeyOEGZBHZv5gb1RrDLA==",
         "dependencies": {
-          "Microsoft.AspNetCore.Metadata": "6.0.4",
+          "Microsoft.AspNetCore.Metadata": "6.0.5",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.1",
           "Microsoft.Extensions.Options": "6.0.0"
         }
@@ -285,8 +285,8 @@
       },
       "Microsoft.AspNetCore.Metadata": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "/zyy+N/8155mbDqKCVrXLA4fNQYRbQe6jduA0WnZYMrSfLfrt0/QmQ+KaYGBir9w0xHrWtZ3LY8zAE1RLJYvYw=="
+        "resolved": "6.0.5",
+        "contentHash": "4VRJoJa/EbncxQTAzM6abqQUUbNrohg5MC1glZ1R1lzzXJM2CdXiRKvcpAfn3luAwPzkwJtHejuLgI6Osn0aDA=="
       },
       "Microsoft.AspNetCore.Mvc.Abstractions": {
         "type": "Transitive",
@@ -433,22 +433,22 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": {
         "type": "Transitive",
-        "resolved": "5.0.0",
-        "contentHash": "7zfLwrm2xqx2+NaYpFk3Jp4x56Rr/RHFyawaDbdlGmfK+8UDoCZMkwk65j0eg+bVtxNaorOojK5PfX39kUo9dQ==",
+        "resolved": "5.0.1",
+        "contentHash": "9oqnW3OXzTID8r804BQlb61hd4qXBcDrvnVWbcmNBOi5CoWXcgJlQn3HjXFZ/espSgEFdrt4GVruY8aRPjPLRg==",
         "dependencies": {
-          "Azure.Storage.Blobs": "12.10.0",
-          "Azure.Storage.Queues": "12.8.0",
-          "Microsoft.Azure.WebJobs": "3.0.30",
+          "Azure.Storage.Blobs": "12.12.0",
+          "Azure.Storage.Queues": "12.10.0",
+          "Microsoft.Azure.WebJobs": "3.0.32",
           "Microsoft.Extensions.Azure": "1.1.1"
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": {
         "type": "Transitive",
-        "resolved": "5.0.0",
-        "contentHash": "TvpZFiQ13W926FxpZxhbP2v1yJyy3tO1chBcJhvJmGE45Rox3sOb9ED36SJVMGEUVS2N/CiJuibrcb2HfPsKZg==",
+        "resolved": "5.0.1",
+        "contentHash": "NCNMBtMOdKreEriYYLhnL1BpYwn8x1bhYAMbB7qadEvyobFyQ4j0z877TDq6S03l0aZRi3WL9XhkeiubRxneZA==",
         "dependencies": {
-          "Azure.Storage.Queues": "12.8.0",
-          "Microsoft.Azure.WebJobs": "3.0.30",
+          "Azure.Storage.Queues": "12.10.0",
+          "Microsoft.Azure.WebJobs": "3.0.32",
           "Microsoft.Extensions.Azure": "1.1.1"
         }
       },
@@ -2052,7 +2052,7 @@
         "dependencies": {
           "Azure.Core": "1.24.0",
           "Azure.Identity": "1.6.0",
-          "Microsoft.AspNetCore.Authorization": "6.0.4",
+          "Microsoft.AspNetCore.Authorization": "6.0.5",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
           "Microsoft.Azure.Services.AppAuthentication": "1.6.2",

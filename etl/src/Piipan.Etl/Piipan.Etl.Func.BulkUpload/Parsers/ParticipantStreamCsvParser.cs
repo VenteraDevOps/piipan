@@ -44,7 +44,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 {
                     if (String.IsNullOrEmpty(field.Field)) return true;
 
-                    string[] formats = { "yyyy-MM-dd"};
+                    string[] formats = { "yyyy-MM-dd" };
                     DateTime dateValue;
                     var result = DateTime.TryParseExact(
                         field.Field,
@@ -55,7 +55,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                     if (!result) return false;
                     return true;
                 })
-                .TypeConverterOption.NullValues(string.Empty).Optional();
+                .TypeConverterOption.NullValues(string.Empty).TypeConverter<ToDatetimeConverter>().Optional();
 
             Map(m => m.RecentBenefitIssuanceDates)
                .Name("recent_benefit_issuance_dates")
@@ -94,21 +94,52 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
         }
     }
-   
+
     /// <summary>
     /// Converts list of month-only dates to last day of month when as DateTimes
     /// and to ISO 8601 year-months when as a string
     /// </summary>
-  	public class ToMonthEndArrayConverter : DefaultTypeConverter
-  	{
-      	public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
-      	{
-			if (text == "") return new List<DateTime>();
-			string[] allElements = text.Split(' ');
-			DateTime[] elementsAsDateTimes = allElements.Select(s => MonthEndDateTime.Parse(s)).ToArray();
-			return new List<DateTime>(elementsAsDateTimes);
-      	}
-  	}
+    public class ToMonthEndArrayConverter : DefaultTypeConverter
+    {
+        public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+        {
+            if (text == "") return new List<DateTime>();
+            string[] allElements = text.Split(' ');
+            DateTime[] elementsAsDateTimes = allElements.Select(s => MonthEndDateTime.Parse(s)).ToArray();
+            return new List<DateTime>(elementsAsDateTimes);
+        }
+    }
+
+    /// <summary>
+    /// Converts ISO 8601 year-months-date to DateTime
+    /// </summary>
+  	public class ToDatetimeConverter : DefaultTypeConverter
+    {
+        public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
+
+            string[] formats = { "yyyy-MM-dd" };
+            DateTime dateValue;
+            var result = DateTime.TryParseExact(
+                text,
+                formats,
+                new CultureInfo("en-US"),
+                DateTimeStyles.None,
+                out dateValue);
+            return dateValue;
+        }
+
+        public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+        {
+            DateTime dt = (DateTime)value;
+            return dt.ToString("yyyy-MM-dd");
+        }
+    }
+
     /// <summary>
     /// Converts to list of Date range - ISO 8601 year-months-date when as a string
     /// </summary>
@@ -119,12 +150,28 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             if (text == "") return new List<DateRange>();
             string[] allElements = text.Split(' ');
             List<DateRange> range = new List<DateRange>();
-            foreach ( string strRange in allElements)
+            foreach (string strRange in allElements)
             {
                 DateTime[] elementsAsDateTimes = strRange.Split('/').Select(s => DateTime.Parse(s)).ToArray();
                 range.Add(new DateRange(elementsAsDateTimes[0], elementsAsDateTimes[1]));
             }
             return range;
+        }
+
+        public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
+        {
+            List<string> rangesAsStrings = new List<string>();
+            List<DateRange> ranges = (List<DateRange>)value;
+            foreach (DateRange range in ranges)
+            {
+                string start = range.Start.ToString("yyyy-MM-dd");
+                string end = range.End.ToString("yyyy-MM-dd");
+                string rangeString = $"{start}/{end}";
+                rangesAsStrings.Add(rangeString);
+            }
+
+            var result = string.Join(" ", rangesAsStrings);
+            return result;
         }
     }
 

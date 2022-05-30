@@ -47,7 +47,7 @@ Several isolated NAC systems are being built for states to use:
 | Environment    | Purpose                                 | Status    | API hostname                           |
 |----------------|-----------------------------------------|-----------|----------------------------------------|
 | Testing        | For initial testing with synthetic data | Available | tts-apim-duppartapi-test.azure-api.net |
-| Pre-production | For testing with real data at scale     | Pending   | -                                      |
+| Pre-production | For testing with synthetic data at scale, coordinated with FNS     | Pending   | -                                      |
 | Production     | For production use with real data       | Pending   | -                                      |
 
 ## Usage notes

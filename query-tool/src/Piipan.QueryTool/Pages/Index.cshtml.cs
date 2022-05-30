@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Client.Models;
-using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -19,10 +17,10 @@ namespace Piipan.QueryTool.Pages
         private readonly IMatchApi _matchApi;
 
         public IndexModel(ILogger<IndexModel> logger,
-                          IClaimsProvider claimsProvider,
                           ILdsDeidentifier ldsDeidentifier,
-                          IMatchApi matchApi)
-                          : base(claimsProvider)
+                          IMatchApi matchApi,
+                          IServiceProvider serviceProvider)
+                          : base(serviceProvider)
         {
             _logger = logger;
             _ldsDeidentifier = ldsDeidentifier;
@@ -30,38 +28,44 @@ namespace Piipan.QueryTool.Pages
         }
 
         [BindProperty]
-        public PiiRecord Query { get; set; } = new PiiRecord();
-        public OrchMatchResponse QueryResult { get; private set; }
-        public List<ServerError> RequestErrors { get; } = new();
-        public bool NoResults = false;
+        public QueryFormModel QueryFormData { get; set; } = new QueryFormModel();
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (ModelState.IsValid)
+            // Only locations with length 2, which are states, can perform a search.
+            if (Location.Length != 2 || States?.Length != 1)
+            {
+                QueryFormData.ServerErrors.Add(new("", "Search performed with an invalid location"));
+            }
+            else if (ModelState.IsValid)
             {
                 try
                 {
                     _logger.LogInformation("Query form submitted");
 
                     string digest = _ldsDeidentifier.Run(
-                        Query.LastName,
-                        Query.DateOfBirth.Value.ToString("yyyy-MM-dd"),
-                        Query.SocialSecurityNum
+                        QueryFormData.Query.LastName,
+                        QueryFormData.Query.DateOfBirth.Value.ToString("yyyy-MM-dd"),
+                        QueryFormData.Query.SocialSecurityNum
                     );
 
                     var request = new OrchMatchRequest
                     {
                         Data = new List<RequestPerson>
                         {
-                            new RequestPerson { LdsHash = digest, CaseId = Query.CaseId, ParticipantId = Query.ParticipantId, SearchReason = "other" }
+                            new RequestPerson
+                            {
+                                LdsHash = digest,
+                                CaseId = QueryFormData.Query.CaseId,
+                                ParticipantId = QueryFormData.Query.ParticipantId,
+                                SearchReason = "other"
+                            }
                         }
                     };
 
-                    var response = await _matchApi.FindMatches(request, "ea");
+                    var response = await _matchApi.FindMatches(request, States[0].ToLower());
 
-                    QueryResult = response;
-                    NoResults = QueryResult.Data.Results.Count == 0 ||
-                        QueryResult.Data.Results[0].Matches.Count() == 0;
+                    QueryFormData.QueryResult = response?.Data;
 
                     Title = "NAC Query Results";
                 }
@@ -70,17 +74,17 @@ namespace Piipan.QueryTool.Pages
                     _logger.LogError(ex, ex.Message);
                     if (ex.Message.ToLower().Contains("gregorian"))
                     {
-                        RequestErrors.Add(new("", "Date of birth must be a real date."));
+                        QueryFormData.ServerErrors.Add(new("", "Date of birth must be a real date."));
                     }
                     else
                     {
-                        RequestErrors.Add(new("", ex.Message));
+                        QueryFormData.ServerErrors.Add(new("", ex.Message));
                     }
                 }
                 catch (Exception exception)
                 {
                     _logger.LogError(exception, exception.Message);
-                    RequestErrors.Add(new("", "There was an error running your search. Please try again."));
+                    QueryFormData.ServerErrors.Add(new("", "There was an error running your search. Please try again."));
                 }
             }
             else
@@ -91,7 +95,7 @@ namespace Piipan.QueryTool.Pages
                     if (ModelState[key]?.Errors?.Count > 0)
                     {
                         var error = ModelState[key].Errors[0];
-                        RequestErrors.Add(new(key, error.ErrorMessage));
+                        QueryFormData.ServerErrors.Add(new(key, error.ErrorMessage));
                     }
                 }
             }

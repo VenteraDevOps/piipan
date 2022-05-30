@@ -122,6 +122,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Cryptography", "shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj", "{3EA99107-AA32-404D-A165-DBFF960E7F04}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Cryptography.Tests", "shared\tests\Piipan.Shared.Cryptography.Tests\Piipan.Shared.Cryptography.Tests.csproj", "{A0E5F7F7-EB5D-4DCB-ADD1-B3FE5C8AB91C}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API", "shared\src\Piipan.Shared.API\Piipan.Shared.API.csproj", "{FD9A9A1A-F060-43FF-9FCB-1BD61F910947}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.API.Tests", "shared\tests\Piipan.Shared.API.Tests\Piipan.Shared.API.Tests.csproj", "{1245270B-EB8C-4267-A325-8A649944937F}"
@@ -136,6 +137,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Dashboard.Client", "dashboard\src\Piipan.Dashboard.Client\Piipan.Dashboard.Client.csproj", "{ED26A7F9-F963-4361-9F20-3A5D958A969C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -327,6 +330,10 @@ Global
 		{DEACAC3C-2361-4A67-9CE3-0425D06FB443}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEACAC3C-2361-4A67-9CE3-0425D06FB443}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEACAC3C-2361-4A67-9CE3-0425D06FB443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED26A7F9-F963-4361-9F20-3A5D958A969C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED26A7F9-F963-4361-9F20-3A5D958A969C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED26A7F9-F963-4361-9F20-3A5D958A969C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED26A7F9-F963-4361-9F20-3A5D958A969C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -388,6 +395,7 @@ Global
 		{E5540158-9A24-4370-9B1B-8327B72B4E51} = {0CBFFA5D-4CFF-4823-9C9F-6350C7B9CA18}
 		{478E6D1B-37E2-4FDE-A0B9-6A1B94E51430} = {0CBFFA5D-4CFF-4823-9C9F-6350C7B9CA18}
 		{DEACAC3C-2361-4A67-9CE3-0425D06FB443} = {8E4B8B42-9E2A-4385-910E-E0E902C5587C}
+		{ED26A7F9-F963-4361-9F20-3A5D958A969C} = {96AA5D94-8267-48CB-931B-5826911C34E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B44BDF3-D32A-4F70-B573-1AD075EEF0EA}

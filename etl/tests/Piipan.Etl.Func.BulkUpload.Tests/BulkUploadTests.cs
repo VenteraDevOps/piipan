@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
@@ -76,7 +73,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             // Act 
             await function.Run("", logger.Object);
-            
+
             // Assert
             VerifyLogError(logger, "No input stream was provided");
         }
@@ -95,7 +92,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var logger = new Mock<ILogger>();
 
             var responseMock = new Mock<Response>();
-            
+
             var blockBlobClient = new Mock<BlockBlobClient>();
             blockBlobClient
                 .Setup(m => m.GetProperties(null, CancellationToken.None))
@@ -106,9 +103,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                     .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
 
             var blobClientStream = new Mock<IBlobClientStream>();
-                blobClientStream
-                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
-                    .Returns(blockBlobClient.Object);
+            blobClientStream
+                .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                .Returns(blockBlobClient.Object);
 
             var function = new BulkUpload(participantApi, participantStreamParser.Object, blobClientStream.Object);
 
@@ -123,18 +120,23 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
             // Arrange
             var blobClient = new Mock<BlobClient>();
-        
+
             var participantApi = new Mock<IParticipantApi>();
             participantApi
-                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>()))
-                 .Throws(new Exception("the api broke"));
-                
+                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>(), It.IsAny<Action<Exception>>()))
+                .Callback<IEnumerable<IParticipant>, string, Action<Exception>>((participants, uploadIdentifier, errorCallback) =>
+                {
+                    Exception exception = new Exception("the api broke");
+                    errorCallback.Invoke(exception);
+                    throw exception;
+                });
+
 
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
             var logger = new Mock<ILogger>();
 
-             var responseMock = new Mock<Response>();
+            var responseMock = new Mock<Response>();
 
             var blockBlobClient = new Mock<BlockBlobClient>();
             blockBlobClient
@@ -146,9 +148,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
                     .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
 
             var blobClientStream = new Mock<IBlobClientStream>();
-                blobClientStream
-                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
-                    .Returns(blockBlobClient.Object);
+            blobClientStream
+                .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                .Returns(blockBlobClient.Object);
 
             var function = new BulkUpload(participantApi.Object, participantStreamParser, blobClientStream.Object);
 
@@ -156,6 +158,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             await Assert.ThrowsAsync<Exception>(() => function.Run("Event Grid Event String", logger.Object));
 
             VerifyLogError(logger, "the api broke");
+
+            // Verify the LogParticipantsUploadError gets called
+            participantApi.Verify(n => n.LogParticipantsUploadError(It.IsAny<ParticipantUploadErrorDetails>(), It.IsAny<IEnumerable<IParticipant>>()), Times.Once());
         }
 
         [Fact]
@@ -163,7 +168,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
         {
 
             // Arrange
-            
+
             var responseMock = new Mock<Response>();
 
             var blockBlobClient = new Mock<BlockBlobClient>();
@@ -174,7 +179,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             blockBlobClient
                     .Setup(m => m.OpenReadAsync(0, null, null, default))
                     .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
-            
+
             var participants = new List<Participant>
             {
                 new Participant
@@ -198,9 +203,9 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var logger = new Mock<ILogger>();
 
             var blobClientStream = new Mock<IBlobClientStream>();
-                blobClientStream
-                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
-                    .Returns(blockBlobClient.Object);
+            blobClientStream
+                .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                .Returns(blockBlobClient.Object);
 
             var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobClientStream.Object);
 
@@ -208,7 +213,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
-            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>()), Times.Once);
+            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>(), It.IsAny<Action<Exception>>()), Times.Once);
+            participantApi.Verify(m => m.DeleteOldParticpants(It.IsAny<string>()), Times.Once);
         }
     }
 }

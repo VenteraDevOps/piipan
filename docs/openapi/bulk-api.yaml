@@ -2,7 +2,8 @@ openapi: 3.0.0
 info:
   title: "Bulk API"
   version: 2.0.0
-  description: "The API for performing bulk uploads"
+  description: "The API for performing bulk uploads\n<h2>File Preparation</h2>\nThis API requires a file to be submitted with the appropriate schema. The details of that file's schema can be found at <a href='../../../../etl/docs/csv/import-schema.json'>File schema</a>\n"
+  
 tags:
   - name: "UploadAllParticipants"
 servers:
@@ -13,14 +14,9 @@ servers:
         description: Lowercase two-letter postal code abbreviation
 paths:
   '/upload_all_participants/{filename}':
-    put:
-      responses:
-        '201':
-          $ref: './../../etl/docs/openapi/uploadAllParticipants.yaml#/components/responses/201'
+    $ref: './../../etl/docs/openapi/uploadAllParticipants.yaml'
   '/upload/{filename}':
-    $ref: '../../etl/docs/openapi/upload.yaml'
-    description: 'A Deprecated endpoint.'
-    
+    $ref: './../../etl/docs/openapi/upload.yaml'
 security:
   - ApiKeyAuth: []
 components:
@@ -29,3 +25,4 @@ components:
       type: apiKey
       in: header
       name: Ocp-Apim-Subscription-Key
+    

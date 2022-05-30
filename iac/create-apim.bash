@@ -62,13 +62,24 @@ generate_policy () {
 grant_blob () {
   local assignee=$1
   local storage_account=$2
-  local DEFAULT_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+  local DEFAULT_PROVIDERS="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers"
 
-  az role assignment create \
-    --role "Storage Blob Data Contributor" \
-    --assignee "$assignee" \
-    --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}" \
-    --output none
+  #Only create the role assignment if it doesn't exist
+  assignment_id=$(\
+    az role assignment list \
+       --role "Storage Blob Data Contributor" \
+       --assignee "${assignee}" \
+       --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}" \
+       --query "[0].id" \
+       --output tsv)
+
+  if [ -z "${assignment_id}" ]; then
+    az role assignment create \
+      --role "Storage Blob Data Contributor" \
+      --assignee "${assignee}" \
+      --scope "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${storage_account}" \
+      --output none
+  fi
 }
 
 get_state_abbrs () {
@@ -138,9 +149,7 @@ main () {
         publisherName="$PUBLISHER_NAME" \
         orchestratorUrl="$orch_api_url" \
         dupPartPolicyXml="$duppart_policy_xml" \
-        uploadAllParticipantsPolicyXml="$uploadallparticipants_policy_xml" \
         uploadStates="$state_abbrs" \
-        uploadPolicyXml="$upload_policy_xml" \
         location="$LOCATION" \
         resourceTags="$RESOURCE_TAGS" \
         coreResourceGroup="$RESOURCE_GROUP" \
@@ -153,6 +162,55 @@ main () {
       --resource-group "$MATCH_RESOURCE_GROUP" \
       --query id \
       --output tsv)
+
+  # Update Key Vault to allow APIM access
+  echo "Granting Key Vault access to APIM"
+  az deployment group create \
+    --name "${VAULT_NAME}-access-policy-for-apim" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --template-file ./arm-templates/key-vault-access-policy.json \
+    --parameters \
+      keyVaultName="${VAULT_NAME}" \
+      objectId="${apim_identity}" \
+      permissionsSecrets="['get', 'list']"
+
+  # Create APIM Named Value
+  echo "Creating APIM Named Value for ${UPLOAD_ENCRYPT_KEY_KV}"
+  az deployment group create \
+   --name "named-value-${UPLOAD_ENCRYPT_KEY_KV}" \
+   --resource-group "${MATCH_RESOURCE_GROUP}" \
+   --template-file ./arm-templates/apim-named-value.json \
+   --parameters \
+     apimName="${APIM_NAME}" \
+     keyVaultName="${VAULT_NAME}" \
+     keyVaultResourceGroup="${RESOURCE_GROUP}" \
+     secretName="${UPLOAD_ENCRYPT_KEY_KV}"
+
+  # Create APIM Named Value
+  echo "Creating APIM Named Value for ${UPLOAD_ENCRYPT_KEY_SHA_KV}"
+  az deployment group create \
+  --name "named-value-${UPLOAD_ENCRYPT_KEY_SHA_KV}" \
+  --resource-group "${MATCH_RESOURCE_GROUP}" \
+  --template-file ./arm-templates/apim-named-value.json \
+  --parameters \
+    apimName="${APIM_NAME}" \
+    keyVaultName="${VAULT_NAME}" \
+    keyVaultResourceGroup="${RESOURCE_GROUP}" \
+    secretName="${UPLOAD_ENCRYPT_KEY_SHA_KV}"
+
+  echo "Creating APIM - Bulk Upload"
+  az deployment group create \
+    --name apim-dev \
+    --resource-group "$MATCH_RESOURCE_GROUP" \
+    --template-file ./arm-templates/apim-bulkupload.json \
+    --parameters \
+      apiName="${APIM_NAME}" \
+      cloudName="${CLOUD_NAME}" \
+      env="${ENV}" \
+      prefix="${PREFIX}" \
+      uploadAllParticipantsPolicyXml="${uploadallparticipants_policy_xml}" \
+      uploadStates="${state_abbrs}" \
+      uploadPolicyXml="${upload_policy_xml}"
 
   echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))

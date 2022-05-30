@@ -96,6 +96,7 @@ namespace Piipan.Dashboard
             }
 
             app.UseHttpsRedirection();
+            app.UseBlazorFrameworkFiles();
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("X-Frame-Options", "DENY");

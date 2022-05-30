@@ -1,19 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
-using Moq;
-using Xunit;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using Piipan.Shared.API.Utilities;
+using Piipan.Shared.Deidentification;
+using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Services
 {
     public class ParticipantServiceTests
     {
+        private IRedactionService _redactionService;
+        public ParticipantServiceTests()
+        {
+            _redactionService = Mock.Of<IRedactionService>();
+        }
+
         private IEnumerable<ParticipantDbo> RandomParticipants(int n)
         {
             var result = new List<ParticipantDbo>();
@@ -51,7 +59,7 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao
                 .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(participants);
-            
+
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
                 .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
@@ -65,9 +73,10 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
@@ -91,7 +100,7 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao
                 .Setup(m => m.GetParticipants(randomState, randomLdsHash, It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
-            
+
             var uploadId = (new Random()).Next();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
@@ -106,9 +115,10 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
@@ -128,7 +138,7 @@ namespace Piipan.Participants.Core.Tests.Services
             participantDao
                 .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Int64>()))
                 .ReturnsAsync(new List<ParticipantDbo>());
-            
+
             var uploadId = (new Random()).Next();
             var uploadDao = new Mock<IUploadDao>();
             uploadDao
@@ -138,9 +148,10 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
@@ -175,16 +186,17 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
 
             var service = new ParticipantService(
-                participantDao.Object, 
-                uploadDao.Object, 
+                participantDao.Object,
+                uploadDao.Object,
                 stateService,
+                _redactionService,
                 logger);
 
             // Act
-            await service.AddParticipants(participants, "test-etag");
+            await service.AddParticipants(participants, "test-etag", null);
 
             // Assert
-            
+
             // we should add a new upload for this batch
             uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
 
@@ -198,6 +210,98 @@ namespace Piipan.Participants.Core.Tests.Services
 
         }
 
+        /// <summary>
+        /// When Add Participants has an error, the error is logged with the value of the redaction service.
+        /// </summary>
+        [Fact]
+        public async Task AddParticipants_ThrowsExceptionWhenFailed()
+        {
+            // Arrange
+            var logger = new Mock<ILogger<ParticipantService>>();
+            var participants = RandomParticipants(10);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+            var thrownException = new Exception("Unhandled error!");
+            participantDao.Setup(n => n.AddParticipants(It.IsAny<IEnumerable<ParticipantDbo>>()))
+                                .ThrowsAsync(thrownException);
+            Exception foundException = null;
+
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+            var redactionService = new Mock<IRedactionService>();
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                redactionService.Object,
+                logger.Object);
+
+            // Act
+            await service.AddParticipants(participants, "test-etag", (ex) => foundException = ex);
+
+            // Assert
+            Assert.Equal(thrownException, foundException);
+        }
+
+        /// <summary>
+        /// When Add Participants has an error, the error is logged with the value of the redaction service.
+        /// </summary>
+        [Fact]
+        public void LogParticipantsUploadError_LogsRedactedError()
+        {
+            // Arrange
+            var logger = new Mock<ILogger<ParticipantService>>();
+            var participants = RandomParticipants(10);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+            var redactionService = new Mock<IRedactionService>();
+            var redactionServiceReturnValue = "String after redaction service";
+            redactionService.Setup(n => n.Redact(It.IsAny<string>(), It.IsAny<IEnumerable<string>>())).Returns(redactionServiceReturnValue);
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                redactionService.Object,
+                logger.Object);
+
+            // Act
+            service.LogParticipantsUploadError(
+                new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Dummy Exception"), "test.csv"),
+                participants);
+
+            // Assert
+            logger.Verify(n => n.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Error),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString() == $"Error uploading participants: {redactionServiceReturnValue}"),
+                    It.IsAny<Exception>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
+                  Times.Once());
+        }
+
         [Fact]
         public async void GetStates_ReturnsDaoResult()
         {
@@ -205,16 +309,17 @@ namespace Piipan.Participants.Core.Tests.Services
             var logger = Mock.Of<ILogger<ParticipantService>>();
             var participantDao = Mock.Of<IParticipantDao>();
             var uploadDao = Mock.Of<IUploadDao>();
-            
+
             var stateService = new Mock<IStateService>();
             stateService
                 .Setup(m => m.GetStates())
-                .ReturnsAsync(new List<string>{ "ea", "eb", "ec" });
+                .ReturnsAsync(new List<string> { "ea", "eb", "ec" });
 
             var service = new ParticipantService(
-                participantDao, 
-                uploadDao, 
+                participantDao,
+                uploadDao,
                 stateService.Object,
+                _redactionService,
                 logger);
 
             // Act
@@ -228,5 +333,100 @@ namespace Piipan.Participants.Core.Tests.Services
                 s => Assert.Equal("ec", s));
 
         }
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(50)]
+        public async void DeleteOldParticipants_AddedCoupleOfUploads(int nParticipants)
+        {
+            // Arrange
+            var logger = Mock.Of<ILogger<ParticipantService>>();
+            var participants = RandomParticipants(nParticipants);
+            var uploadId = (new Random()).Next();
+            var participantDao = new Mock<IParticipantDao>();
+            var uploadDao = new Mock<IUploadDao>();
+            uploadDao
+                .Setup(m => m.AddUpload("test-etag"))
+                .ReturnsAsync(new UploadDbo
+                {
+                    Id = uploadId,
+                    CreatedAt = DateTime.UtcNow,
+                    Publisher = "me"
+                });
+
+            var stateService = Mock.Of<IStateService>();
+
+            var service = new ParticipantService(
+                participantDao.Object,
+                uploadDao.Object,
+                stateService,
+                _redactionService,
+                logger);
+
+            // Act
+            await service.AddParticipants(participants, "test-etag", null);
+
+            // Now Add another Upload 
+            var uploadIdNew = (new Random()).Next();
+            var uploadDaoNew = new Mock<IUploadDao>();
+            uploadDaoNew
+               .Setup(m => m.AddUpload("test-etag1"))
+               .ReturnsAsync(new UploadDbo
+               {
+                   Id = uploadIdNew,
+                   CreatedAt = DateTime.UtcNow,
+                   Publisher = "me",
+               });
+
+            var serviceNew = new ParticipantService(
+               participantDao.Object,
+               uploadDaoNew.Object,
+               stateService,
+               _redactionService,
+               logger);
+            await serviceNew.AddParticipants(participants, "test-etag1", null);
+
+            // Assert
+
+            // we should add a new upload for this batch
+            uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
+            uploadDaoNew.Verify(m => m.AddUpload("test-etag1"), Times.Once);
+
+            var uploadDaoDelete = new Mock<IUploadDao>();
+            uploadDaoDelete
+               .Setup(m => m.GetLatestUpload(It.IsAny<string>()))
+               .ReturnsAsync(new UploadDbo
+               {
+                   Id = uploadIdNew,
+                   CreatedAt = DateTime.UtcNow,
+                   Publisher = "me",
+               });
+
+
+            var serviceDelete = new ParticipantService(
+             participantDao.Object,
+             uploadDaoDelete.Object,
+             stateService,
+             _redactionService,
+             logger);
+
+            await serviceDelete.DeleteOldParticpants();
+
+            // each participant added via the DAO should have the created upload ID
+            participantDao
+                .Verify(m => m
+                    .AddParticipants(It.Is<IEnumerable<ParticipantDbo>>(participants =>
+                        participants.All(p => p.UploadId == uploadIdNew)
+                    ))
+                );
+            participantDao
+               .Verify(m => m
+                   .AddParticipants(It.Is<IEnumerable<ParticipantDbo>>(participants =>
+                       participants.All(p => p.UploadId != uploadId)
+                   ))
+               );
+        }
+
     }
 }

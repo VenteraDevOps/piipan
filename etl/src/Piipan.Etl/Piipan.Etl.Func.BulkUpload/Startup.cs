@@ -29,7 +29,7 @@ namespace Piipan.Etl.Func.BulkUpload
             });
             builder.Services.AddTransient<IParticipantStreamParser, ParticipantCsvStreamParser>();
 
-            builder.Services.AddTransient<IBlobClientStream, BlobClientStream>(); 
+            builder.Services.AddTransient<IBlobClientStream, BlobClientStream>();
 
             builder.Services.RegisterParticipantsServices();
         }

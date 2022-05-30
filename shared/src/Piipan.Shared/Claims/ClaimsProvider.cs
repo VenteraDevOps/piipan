@@ -22,7 +22,32 @@ namespace Piipan.Shared.Claims
             return claimsPrincipal
                 .Claims
                 .SingleOrDefault(c => c.Type == _options.Email)?
-                .Value;        
+                .Value;
+        }
+
+        public string GetLocation(ClaimsPrincipal claimsPrincipal)
+        {
+            foreach (var identity in claimsPrincipal.Identities)
+            {
+                var locationClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.LocationPrefix));
+                if (locationClaim != null)
+                {
+                    return locationClaim.Value.Substring(_options.LocationPrefix.Length);
+                }
+            }
+            return null;
+        }
+        public string GetRole(ClaimsPrincipal claimsPrincipal)
+        {
+            foreach (var identity in claimsPrincipal.Identities)
+            {
+                var roleClaim = identity.Claims.FirstOrDefault(c => c.Type == _options.Role && c.Value.StartsWith(_options.RolePrefix));
+                if (roleClaim != null)
+                {
+                    return roleClaim.Value.Substring(_options.RolePrefix.Length);
+                }
+            }
+            return null;
         }
     }
 }
