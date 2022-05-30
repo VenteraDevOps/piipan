@@ -276,27 +276,25 @@ namespace Piipan.Participants.Core.Tests.Services
                 });
 
             var stateService = Mock.Of<IStateService>();
-            var redactionService = new Mock<IRedactionService>();
-            var redactionServiceReturnValue = "String after redaction service";
-            redactionService.Setup(n => n.Redact(It.IsAny<string>(), It.IsAny<IEnumerable<string>>())).Returns(redactionServiceReturnValue);
+            var redactionService = new RedactionService();
 
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
-                redactionService.Object,
+                redactionService,
                 logger.Object);
 
+            var uploadDetails = new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Exception with first participant: " + participants.First().LdsHash), "test.csv");
+
             // Act
-            service.LogParticipantsUploadError(
-                new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Dummy Exception"), "test.csv"),
-                participants);
+            service.LogParticipantsUploadError(uploadDetails, participants);
 
             // Assert
             logger.Verify(n => n.Log(
                     It.Is<LogLevel>(l => l == LogLevel.Error),
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString() == $"Error uploading participants: {redactionServiceReturnValue}"),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString() == $"Error uploading participants: {uploadDetails.ToString().Replace(participants.First().LdsHash, "REDACTED")}"),
                     It.IsAny<Exception>(),
                     (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()),
                   Times.Once());

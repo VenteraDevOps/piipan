@@ -87,13 +87,21 @@ namespace Piipan.Participants.Core.Services
             string uploadErrorString = errorDetails.ToString();
 
             string[] redactedStrings = new string[3];
-            // for each participant, redact out their information from the current error string
-            foreach (var participant in participants)
+
+            try
             {
-                redactedStrings[0] = participant.LdsHash;
-                redactedStrings[1] = participant.ParticipantId;
-                redactedStrings[2] = participant.CaseId;
-                uploadErrorString = _redactionService.Redact(uploadErrorString, redactedStrings);
+                // for each participant, redact out their information from the current error string
+                foreach (var participant in participants)
+                {
+                    redactedStrings[0] = participant.LdsHash;
+                    redactedStrings[1] = participant.ParticipantId;
+                    redactedStrings[2] = participant.CaseId;
+                    uploadErrorString = _redactionService.Redact(uploadErrorString, redactedStrings);
+                }
+            }
+            catch
+            {
+                // If it still errors in here, nothing we can do to redact it. But we need to continue on and redact everything else.
             }
 
             _logger.LogError($"Error uploading participants: {uploadErrorString}");
