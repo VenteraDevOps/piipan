@@ -1,9 +1,15 @@
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Dapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
@@ -11,11 +17,6 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Core;
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Piipan.Match.Func.Api
 {
@@ -27,15 +28,18 @@ namespace Piipan.Match.Func.Api
         private readonly IMatchApi _matchApi;
         private readonly IStreamParser<OrchMatchRequest> _requestParser;
         private readonly IMatchEventService _matchEventService;
+        private readonly IMemoryCache _memoryCache;
 
         public MatchApi(
             IMatchApi matchApi,
             IStreamParser<OrchMatchRequest> requestParser,
-            IMatchEventService matchEventService)
+            IMatchEventService matchEventService,
+            IMemoryCache memoryCache)
         {
             _matchApi = matchApi;
             _requestParser = requestParser;
             _matchEventService = matchEventService;
+            _memoryCache = memoryCache;
             SqlMapper.AddTypeHandler(new DateRangeListHandler());
             Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
@@ -64,15 +68,27 @@ namespace Piipan.Match.Func.Api
                 var response = await _matchApi.FindMatches(request, initiatingState);
                 response = await _matchEventService.ResolveMatches(request, response, initiatingState);
 
-                // If our initiating state is in the disabled states list, simply return that there were no matches.
-                string disabledMatchingStates = Environment.GetEnvironmentVariable("StatesToDisableMatches");
-                string[] disabledStates = disabledMatchingStates?.Split(',') ?? new string[0];
-
-                // If we wanted to disable all states, perhaps we could check for if this array contains "all"?
-                if (disabledStates.Contains(initiatingState.ToLower()))
+                // If our initiating state is in the enabled states list return the result, otherwise return nothing.
+                var enabledStatesList = _memoryCache.GetOrCreate("EnabledStates", (entry) =>
                 {
-                    return new JsonResult(new OrchMatchResponse()) { StatusCode = StatusCodes.Status200OK };
+                    string enabledStates = Environment.GetEnvironmentVariable("EnabledStates");
+                    return enabledStates?.Split(',') ?? new string[0];
+                });
+
+                // If our initiating state is not enabled, just return empty.
+                if (!enabledStatesList.Contains(initiatingState.ToLower()))
+                {
+                    return EmptyMatchResponse;
                 }
+
+                if (response?.Data?.Results?.Count > 0)
+                {
+                    foreach (var result in response.Data.Results)
+                    {
+                        result.Matches = result.Matches?.Where(match => match.State != null && enabledStatesList.Contains(match.State.ToLower())).ToList();
+                    }
+                }
+
                 return new JsonResult(response) { StatusCode = StatusCodes.Status200OK };
             }
             catch (StreamParserException ex)
@@ -92,6 +108,22 @@ namespace Piipan.Match.Func.Api
                 return InternalServerErrorResponse(ex);
             }
         }
+
+        private JsonResult EmptyMatchResponse => new JsonResult(
+            new OrchMatchResponse()
+            {
+                Data = new OrchMatchResponseData()
+                {
+                    Results = new System.Collections.Generic.List<OrchMatchResult>
+                    {
+                        new OrchMatchResult()
+                        {
+                            Matches = Enumerable.Empty<ParticipantMatch>()
+                        }
+                    }
+                }
+            })
+        { StatusCode = StatusCodes.Status200OK };
 
         private void LogRequest(ILogger logger, HttpRequest request)
         {

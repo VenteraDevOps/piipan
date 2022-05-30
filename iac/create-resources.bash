@@ -138,15 +138,15 @@ main () {
 
   # Create event hub and assign role to app registration
   az deployment group create \
-    --name monitoring \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file  ./arm-templates/event-hub-monitoring.json \
-    --parameters \
-      resourceTags="$RESOURCE_TAGS" \
-      location="$LOCATION" \
-      env="$ENV" \
-      prefix="$PREFIX" \
-      receiverId="$siem_app_id"
+   --name monitoring \
+   --resource-group "$RESOURCE_GROUP" \
+   --template-file  ./arm-templates/event-hub-monitoring.json \
+   --parameters \
+     resourceTags="$RESOURCE_TAGS" \
+     location="$LOCATION" \
+     env="$ENV" \
+     prefix="$PREFIX" \
+     receiverId="$siem_app_id"
 
   # Create a key vault which will store credentials for use in other templates
   az deployment group create \
@@ -307,19 +307,19 @@ main () {
   # Create the list of state abbreviations, and which states should be disabled from
   # returning matches from the orchestrator API.
   state_abbrs=""
-  state_disabled_matches=""
-  while IFS=$',\t\r\n' read -r abbr name disable_matches; do
+  state_enabled_matches=""
+  while IFS=$',\t\r\n' read -r abbr name enable_matches; do
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     state_abbrs+=",${abbr}"
-    [[ "$disable_matches" == "TRUE" ]] && echo "Equal" || echo "Not equal"
-    if [ "$disable_matches" = "TRUE" ]; then
-        state_disabled_matches+=",${abbr}"
+    if [ "$enable_matches" = $STATE_ENABLED_KEY ]; then
+        state_enabled_matches+=",${abbr}"
     fi
   done < states.csv
   state_abbrs=${state_abbrs:1}
-  if [[ -n "$state_disabled_matches" ]]; then
-    state_disabled_matches=${state_disabled_matches:1}
+  if [[ -n "$state_enabled_matches" ]]; then
+    state_enabled_matches=${state_enabled_matches:1}
   fi
+  echo "Enabled States: ${state_enabled_matches}"
 
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
@@ -346,11 +346,11 @@ main () {
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME" \
-      statesToDisableMatches="$state_disabled_matches"
+      statesToEnableMatches="$state_enabled_matches"
 
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
-
+  
   echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
   # Subnet ID is needed when vnet and storage are in different resource groups
   func_subnet_id=$(\
@@ -390,7 +390,7 @@ main () {
     --available-to-other-tenants false
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
-
+  
     # Create Match Resolution API Function App
   echo "Create Match Resolution API Function App"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME")

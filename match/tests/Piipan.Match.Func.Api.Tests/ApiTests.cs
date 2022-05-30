@@ -9,6 +9,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -109,7 +110,7 @@ namespace Piipan.Match.Func.Api.Tests
             return JsonConvert.SerializeObject(data);
         }
 
-        static Mock<HttpRequest> MockRequest(string jsonBody)
+        static Mock<HttpRequest> MockRequest(string jsonBody, string initiatingState = "ea")
         {
             var ms = new MemoryStream();
             var sw = new StreamWriter(ms);
@@ -125,11 +126,20 @@ namespace Piipan.Match.Func.Api.Tests
             var headers = new HeaderDictionary(new Dictionary<String, StringValues>
             {
                 { "From", "foobar"},
-                { "X-Initiating-State", "ea"}
+                { "X-Initiating-State", initiatingState}
             }) as IHeaderDictionary;
             mockRequest.Setup(x => x.Headers).Returns(headers);
 
             return mockRequest;
+        }
+
+        static Mock<IMemoryCache> MockMemoryCache()
+        {
+            var mockMemoryCache = new Mock<IMemoryCache>();
+            object states = new string[] { "ea", "eb" };
+            mockMemoryCache.Setup(n => n.TryGetValue("EnabledStates", out states))
+                .Returns(true);
+            return mockMemoryCache;
         }
 
         static HttpResponseMessage MockResponse(System.Net.HttpStatusCode statusCode, string body)
@@ -165,11 +175,11 @@ namespace Piipan.Match.Func.Api.Tests
                 Mock.Of<ILogger<OrchMatchRequestParser>>()
             );
             var matchEventService = new Mock<IMatchEventService>();
-
             var api = new MatchApi(
                 matchService.Object,
                 requestParser,
-                matchEventService.Object);
+                matchEventService.Object,
+                MockMemoryCache().Object);
 
             return api;
         }
@@ -186,7 +196,8 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService.Object,
                 requestParser,
-                matchEventService.Object);
+                matchEventService.Object,
+                MockMemoryCache().Object);
 
             return api;
         }
@@ -204,7 +215,6 @@ namespace Piipan.Match.Func.Api.Tests
             var logger = Mock.Of<ILogger>();
             var matchEventService = Mock.Of<IMatchEventService>();
             var mockRequest = MockRequest("");
-
             requestParser
                 .Setup(m => m.Parse(It.IsAny<Stream>()))
                 .ThrowsAsync(new StreamParserException("failed to parse"));
@@ -212,7 +222,8 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService,
                 requestParser.Object,
-                matchEventService);
+                matchEventService,
+                MockMemoryCache().Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -248,7 +259,8 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService,
                 requestParser.Object,
-                matchEventService);
+                matchEventService,
+                MockMemoryCache().Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -279,7 +291,8 @@ namespace Piipan.Match.Func.Api.Tests
             var api = new MatchApi(
                 matchService,
                 requestParser.Object,
-                matchEventService);
+                matchEventService,
+                MockMemoryCache().Object);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -366,7 +379,7 @@ namespace Piipan.Match.Func.Api.Tests
                         new OrchMatchResult
                         {
                             Index = 0,
-                            Matches = new ParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf" } }
+                            Matches = new ParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf", State = "ea" } }
                         }
                     },
                     Errors = new List<OrchMatchError>
@@ -393,13 +406,13 @@ namespace Piipan.Match.Func.Api.Tests
             matchEventService
                 .Setup(r => r.ResolveMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<OrchMatchResponse>(), It.IsAny<string>()))
                 .ReturnsAsync(response);
-
             var mockRequest = MockRequest("");
 
             var api = new MatchApi(
                 matchService.Object,
                 requestParser.Object,
-                matchEventService.Object);
+                matchEventService.Object,
+                MockMemoryCache().Object);
 
             // Act
             var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;
@@ -411,6 +424,145 @@ namespace Piipan.Match.Func.Api.Tests
             var matchResponse = apiResponse.Value as OrchMatchResponse;
             Assert.NotNull(matchResponse);
             Assert.Equal(response, matchResponse);
+            Assert.NotEmpty(response.Data.Results[0].Matches);
+        }
+
+        [Fact]
+        public async Task ReturnsNothingWhenInitiatingStateDisabled()
+        {
+            // Arrange
+            var response = new OrchMatchResponse
+            {
+                Data = new OrchMatchResponseData
+                {
+                    Results = new List<OrchMatchResult>
+                    {
+                        new OrchMatchResult
+                        {
+                            Index = 0,
+                            Matches = new ParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf", State = "ea" } }
+                        }
+                    },
+                    Errors = new List<OrchMatchError>
+                    {
+                        new OrchMatchError
+                        {
+                            Index = 1,
+                            Code = "code",
+                            Title = "title",
+                            Detail = "detail"
+                        }
+                    }
+                }
+            };
+            var responseWithoutMatches = new OrchMatchResponse
+            {
+                Data = new OrchMatchResponseData
+                {
+                    Results = new List<OrchMatchResult>
+                    {
+                        new OrchMatchResult
+                        {
+                            Index = 0,
+                            Matches = new ParticipantMatch[0]
+                        }
+                    }
+                }
+            };
+
+            var matchService = new Mock<IMatchApi>();
+            matchService
+                .Setup(m => m.FindMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<string>()))
+                .ReturnsAsync(response);
+
+            var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
+            var logger = Mock.Of<ILogger>();
+            var matchEventService = new Mock<IMatchEventService>();
+            matchEventService
+                .Setup(r => r.ResolveMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<OrchMatchResponse>(), It.IsAny<string>()))
+                .ReturnsAsync(response);
+            var mockRequest = MockRequest("", "ec");
+
+            var api = new MatchApi(
+                matchService.Object,
+                requestParser.Object,
+                matchEventService.Object,
+                MockMemoryCache().Object);
+
+            // Act
+            var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;
+
+            // Assert
+            Assert.NotNull(apiResponse);
+            Assert.Equal(200, apiResponse.StatusCode);
+
+            var matchResponse = apiResponse.Value as OrchMatchResponse;
+            Assert.NotNull(matchResponse);
+            Assert.Empty(matchResponse.Data.Results[0].Matches);
+        }
+
+        [Fact]
+        public async Task ReturnsNothingWhenMatchingStateDisabled()
+        {
+            // Arrange
+            var response = new OrchMatchResponse
+            {
+                Data = new OrchMatchResponseData
+                {
+                    Results = new List<OrchMatchResult>
+                    {
+                        new OrchMatchResult
+                        {
+                            Index = 0,
+                            Matches = new ParticipantMatch[] { new ParticipantMatch { LdsHash = "asdf", State = "ec" } }
+                        }
+                    }
+                }
+            };
+            var responseWithoutMatches = new OrchMatchResponse
+            {
+                Data = new OrchMatchResponseData
+                {
+                    Results = new List<OrchMatchResult>
+                    {
+                        new OrchMatchResult
+                        {
+                            Index = 0,
+                            Matches = new ParticipantMatch[0]
+                        }
+                    }
+                }
+            };
+
+            var matchService = new Mock<IMatchApi>();
+            matchService
+                .Setup(m => m.FindMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<string>()))
+                .ReturnsAsync(response);
+
+            var requestParser = new Mock<IStreamParser<OrchMatchRequest>>();
+            var logger = Mock.Of<ILogger>();
+            var matchEventService = new Mock<IMatchEventService>();
+            matchEventService
+                .Setup(r => r.ResolveMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<OrchMatchResponse>(), It.IsAny<string>()))
+                .ReturnsAsync(response);
+            var mockRequest = MockRequest("", "ec");
+
+            var api = new MatchApi(
+                matchService.Object,
+                requestParser.Object,
+                matchEventService.Object,
+                MockMemoryCache().Object);
+
+            // Act
+            var apiResponse = (await api.Find(mockRequest.Object, logger)) as JsonResult;
+
+            // Assert
+            Assert.NotNull(apiResponse);
+            Assert.Equal(200, apiResponse.StatusCode);
+
+            var matchResponse = apiResponse.Value as OrchMatchResponse;
+            Assert.NotNull(matchResponse);
+            Assert.Empty(matchResponse.Data.Results[0].Matches);
         }
     }
 }

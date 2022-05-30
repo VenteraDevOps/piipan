@@ -5,6 +5,7 @@ using System.Linq;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -31,7 +32,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 {
     public class ApiIntegrationTests : DbFixture
     {
-        private const string InitiatingState = "eb";
+        private string InitiatingState = "eb";
 
         static ParticipantDbo FullRecord()
         {
@@ -62,7 +63,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             return JsonConvert.SerializeObject(data);
         }
 
-        static Mock<HttpRequest> MockRequest(string jsonBody)
+        Mock<HttpRequest> MockRequest(string jsonBody)
         {
             var ms = new MemoryStream();
             var sw = new StreamWriter(ms);
@@ -101,6 +102,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             services.AddTransient<IMatchResEventDao, MatchResEventDao>();
             services.AddTransient<IMatchResAggregator, MatchResAggregator>();
+            services.AddSingleton<IMemoryCache, MemoryCache>();
 
             services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(s =>
             {
@@ -123,7 +125,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var api = new MatchApi(
                 provider.GetService<IMatchApi>(),
                 provider.GetService<IStreamParser<OrchMatchRequest>>(),
-                provider.GetService<IMatchEventService>()
+                provider.GetService<IMatchEventService>(),
+                provider.GetService<IMemoryCache>()
             );
 
             return api;
@@ -175,6 +178,29 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var api = Construct();
 
             ClearParticipants();
+
+            // Act
+            var response = await api.Find(mockRequest.Object, logger);
+            var result = response as JsonResult;
+            var resultObject = result.Value as OrchMatchResponse;
+
+            // Assert
+            Assert.Empty(resultObject.Data.Results[0].Matches);
+        }
+
+        [Fact]
+        public async void ApiReturnsEmptyMatchesArrayWhenStateDisabled()
+        {
+            // Arrange
+            var record = FullRecord();
+            var logger = Mock.Of<ILogger>();
+            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
+            InitiatingState = "ec"; // set to a state that is disabled
+            var mockRequest = MockRequest(JsonBody(body));
+            var api = Construct();
+
+            ClearParticipants();
+            Insert(record);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
