@@ -71,7 +71,7 @@ namespace Piipan.Match.Func.Api
                 // If our initiating state is in the enabled states list return the result, otherwise return nothing.
                 var enabledStatesList = _memoryCache.GetOrCreate("EnabledStates", (entry) =>
                 {
-                    string enabledStates = Environment.GetEnvironmentVariable("EnabledStates");
+                    string enabledStates = Environment.GetEnvironmentVariable("EnabledStates")?.ToLower();
                     return enabledStates?.Split(',') ?? new string[0];
                 });
 

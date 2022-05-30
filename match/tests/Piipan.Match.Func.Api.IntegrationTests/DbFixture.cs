@@ -1,5 +1,5 @@
 using System;
-using System.Threading;
+using System.Collections.Generic;
 using Dapper;
 using Npgsql;
 using Piipan.Match.Core.Models;
@@ -41,6 +41,32 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             }
 
             return record;
+        }
+
+        public IEnumerable<MatchRecordDbo> GetMatches()
+        {
+            IEnumerable<MatchRecordDbo> records;
+
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = CollabConnectionString;
+                conn.Open();
+
+                records = conn.Query<MatchRecordDbo>(
+                    @"SELECT
+                        match_id,
+                        initiator,
+                        states,
+                        hash,
+                        hash_type::text,
+                        input::jsonb,
+                        data::jsonb
+                    FROM matches");
+
+                conn.Close();
+            }
+
+            return records;
         }
 
         public void Insert(ParticipantDbo record)

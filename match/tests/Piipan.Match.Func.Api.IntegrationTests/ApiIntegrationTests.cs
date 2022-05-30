@@ -91,7 +91,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         static MatchApi Construct()
         {
             Environment.SetEnvironmentVariable("States", "ea");
-            Environment.SetEnvironmentVariable("EnabledStates", "ea,eb");
+
+            // Mixing cases to verify the enabled states can be used no matter their casing.
+            Environment.SetEnvironmentVariable("EnabledStates", "ea,EB");
 
             var services = new ServiceCollection();
             services.AddLogging();
@@ -203,6 +205,10 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             ClearParticipants();
             Insert(record);
 
+            // Assert database is empty prior to the call
+            var matchesBefore = GetMatches();
+            Assert.Empty(matchesBefore);
+
             // Act
             var response = await api.Find(mockRequest.Object, logger);
             var result = response as JsonResult;
@@ -210,6 +216,10 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             // Assert
             Assert.Empty(resultObject.Data.Results[0].Matches);
+
+            // Assert a match was actually created even though we got an empty array back
+            var matchesAfter = GetMatches();
+            Assert.NotEmpty(matchesAfter);
         }
 
         [Fact]

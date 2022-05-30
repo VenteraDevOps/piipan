@@ -545,7 +545,7 @@ namespace Piipan.Match.Func.Api.Tests
             matchEventService
                 .Setup(r => r.ResolveMatches(It.IsAny<OrchMatchRequest>(), It.IsAny<OrchMatchResponse>(), It.IsAny<string>()))
                 .ReturnsAsync(response);
-            var mockRequest = MockRequest("", "ec");
+            var mockRequest = MockRequest("", "ea");
 
             var api = new MatchApi(
                 matchService.Object,
