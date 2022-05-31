@@ -97,8 +97,8 @@
       },
       "FluentValidation": {
         "type": "Transitive",
-        "resolved": "11.0.1",
-        "contentHash": "fcL5zF/glDwskUtpL0IfBupVWTChxOOvVs+dAA7Gme5NjIeJBiFKWq3eZV1O+AigucnBTr8SWG7wRRn+PgFnTw=="
+        "resolved": "11.0.2",
+        "contentHash": "ik/xogKqBmZWIURMXNEbugJlKka6iV9a4qckmKDp7sHSwIfgkZ/ewzCuAeUTkFdVZujfDW6mCLMjrrR6GG4xLQ=="
       },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
@@ -1625,7 +1625,7 @@
         "type": "Project",
         "dependencies": {
           "Dapper": "2.0.123",
-          "FluentValidation": "11.0.1",
+          "FluentValidation": "11.0.2",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",

@@ -1,27 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using Piipan.Participants.Api.Models;
 using Microsoft.Extensions.Logging;
-using System.Threading;
 using System.Threading.Tasks;
-using Azure;
-using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
-using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Linq;
-
 
 namespace Piipan.Etl.Func.BulkUpload.Parsers
 {
     public class BlobClientStream : IBlobClientStream
     {
+        private const string CUSTOMER_KEY_FUNC_VARIABLE_NAME = "uploadPayloadKey";
+
         public virtual string GetBlobName(StorageBlobCreatedEventData blobEvent) {
 
                 //Get blob name from the blob url
@@ -32,9 +22,12 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                 return blobName;
         }
-        public virtual BlockBlobClient GetBlob(string blobName, string connectionString = "BlobStorageConnectionString") {                
 
-            return new BlockBlobClient(Environment.GetEnvironmentVariable(connectionString), "upload", blobName);
+        public virtual BlockBlobClient GetBlob(string blobName, string connectionString = "BlobStorageConnectionString") {
+            string uploadEncryptionKey = Environment.GetEnvironmentVariable(CUSTOMER_KEY_FUNC_VARIABLE_NAME);
+            string storageConnectionString = Environment.GetEnvironmentVariable(connectionString);
+            BlobClientOptions blobClientOptions = new BlobClientOptions() { CustomerProvidedKey = new CustomerProvidedKey(uploadEncryptionKey) };
+            return new BlockBlobClient(storageConnectionString, "upload", blobName, blobClientOptions);
         }
 
         private StorageBlobCreatedEventData ParseEvents(string input){

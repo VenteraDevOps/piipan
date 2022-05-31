@@ -250,7 +250,7 @@
         },
         {
             /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-            "apiVersion": "2017-05-01-preview",
+            "apiVersion": "2021-05-01-preview",
             "type": "Microsoft.Network/frontdoors/providers/diagnosticSettings",
             "name": "[concat(parameters('frontDoorName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
             "dependsOn": [
