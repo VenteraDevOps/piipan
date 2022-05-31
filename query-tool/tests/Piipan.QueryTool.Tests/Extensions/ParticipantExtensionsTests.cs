@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using Moq;
 using Piipan.Participants.Api.Models;
 using Piipan.QueryTool.Extensions;
 using Piipan.Shared.API.Utilities;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 #nullable enable

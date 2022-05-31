@@ -1,8 +1,8 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging.Abstractions;
 using Piipan.QueryTool.Pages;
-using Piipan.Shared.Claims;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
@@ -13,8 +13,8 @@ namespace Piipan.QueryTool.Tests
         public void TestBeforeOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock();
-            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), mockClaimsProvider);
+            var mockServiceProvider = serviceProviderMock();
+            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), mockServiceProvider);
 
             // act
 
@@ -26,8 +26,8 @@ namespace Piipan.QueryTool.Tests
         public void TestMessageOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock();
-            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), mockClaimsProvider);
+            var mockServiceProvider = serviceProviderMock();
+            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), mockServiceProvider);
 
             // act
             string message = "test message";
@@ -46,9 +46,9 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(ErrorModel.OnGet), "IA", "Worker", true)]
         public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
-            var mockClaimsProvider = claimsProviderMock(state: location, role: role);
+            var mockServiceProvider = serviceProviderMock(location: location, role: role);
 
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
+            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
 
             if (!isAuthorized)
             {
@@ -61,9 +61,9 @@ namespace Piipan.QueryTool.Tests
             }
         }
 
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IClaimsProvider claimsProvider, string methodName)
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
         {
-            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), claimsProvider);
+            var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), serviceProvider);
 
             return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }

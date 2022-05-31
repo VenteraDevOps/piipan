@@ -1,6 +1,6 @@
+using System;
 using Microsoft.Extensions.Logging;
 using Piipan.Shared.Authorization;
-using Piipan.Shared.Claims;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -10,8 +10,8 @@ namespace Piipan.QueryTool.Pages
         public string Message = "";
 
         public ErrorModel(ILogger<ErrorModel> logger,
-            IClaimsProvider claimsProvider)
-                          : base(claimsProvider)
+            IServiceProvider serviceProvider)
+                          : base(serviceProvider)
         {
             _logger = logger;
         }
