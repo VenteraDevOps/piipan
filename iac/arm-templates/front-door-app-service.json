@@ -93,22 +93,6 @@
                             "matchConditions": [
                                 {
                                     "matchValue": [
-                                        "~"
-                                    ],
-                                    "matchVariable": "RequestUri",
-                                    "operator": "Contains"
-                                }
-                            ],
-                            "name": "denyShortPath",
-                            "priority": "100",
-                            "ruleType": "MatchRule"
-                        },
-                        {
-                            "action": "Block",
-                            "enabledState": "Enabled",
-                            "matchConditions": [
-                                {
-                                    "matchValue": [
                                         "POST"
                                     ],
                                     "matchVariable": "RequestMethod",
@@ -116,7 +100,7 @@
                                 }
                             ],
                             "name": "rateLimitByRequestMethod",
-                            "priority": "200",
+                            "priority": "100",
                             "rateLimitDurationInMinutes": "5",
                             "rateLimitThreshold": "10000",
                             "ruleType": "RateLimitRule"

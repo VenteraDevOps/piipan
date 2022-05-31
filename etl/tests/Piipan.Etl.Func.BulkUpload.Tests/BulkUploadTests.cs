@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Models;
@@ -91,20 +94,29 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var logger = new Mock<ILogger>();
 
-           var blobStream = new Mock<IBlobClientStream>();
-                blobStream
-                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
-                    .Returns(ToStream("Returned data"));
-                blobStream
-                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
-                    .Returns(new BlobProperties());
+            var responseMock = new Mock<Response>();
+            
+            var blockBlobClient = new Mock<BlockBlobClient>();
+            blockBlobClient
+                .Setup(m => m.GetProperties(null, CancellationToken.None))
+                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
 
-            var function = new BulkUpload(participantApi, participantStreamParser.Object, blobStream.Object);
+            blockBlobClient
+                    .Setup(m => m.OpenReadAsync(0, null, null, default))
+                    .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
+
+            var blobClientStream = new Mock<IBlobClientStream>();
+                blobClientStream
+                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                    .Returns(blockBlobClient.Object);
+
+            var function = new BulkUpload(participantApi, participantStreamParser.Object, blobClientStream.Object);
 
             // Act / Assert
             await Assert.ThrowsAsync<Exception>(() => function.Run("Event Grid Event String", logger.Object));
             VerifyLogError(logger, "the parser broke");
         }
+
 
         [Fact]
         public async void Run_ApiThrows()
@@ -115,21 +127,30 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantApi = new Mock<IParticipantApi>();
             participantApi
                 .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>()))
-                .Throws(new Exception("the api broke"));
+                 .Throws(new Exception("the api broke"));
+                
 
             var participantStreamParser = Mock.Of<IParticipantStreamParser>();
 
             var logger = new Mock<ILogger>();
 
-            var blobStream = new Mock<IBlobClientStream>();
-                blobStream
-                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
-                    .Returns(ToStream("Returned data"));
-                blobStream
-                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
-                    .Returns(new BlobProperties());
+             var responseMock = new Mock<Response>();
 
-            var function = new BulkUpload(participantApi.Object, participantStreamParser, blobStream.Object);
+            var blockBlobClient = new Mock<BlockBlobClient>();
+            blockBlobClient
+                .Setup(m => m.GetProperties(null, CancellationToken.None))
+                .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+            blockBlobClient
+                    .Setup(m => m.OpenReadAsync(0, null, null, default))
+                    .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
+
+            var blobClientStream = new Mock<IBlobClientStream>();
+                blobClientStream
+                    .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
+                    .Returns(blockBlobClient.Object);
+
+            var function = new BulkUpload(participantApi.Object, participantStreamParser, blobClientStream.Object);
 
             // Act / Assert
             await Assert.ThrowsAsync<Exception>(() => function.Run("Event Grid Event String", logger.Object));
@@ -143,11 +164,16 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             // Arrange
             
-            var blobClient = new Mock<BlobClient>();
             var responseMock = new Mock<Response>();
-            blobClient
-                .Setup(m => m.GetPropertiesAsync(null, CancellationToken.None).Result)
+
+            var blockBlobClient = new Mock<BlockBlobClient>();
+            blockBlobClient
+                .Setup(m => m.GetProperties(null, CancellationToken.None))
                 .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+            blockBlobClient
+                    .Setup(m => m.OpenReadAsync(0, null, null, default))
+                    .Returns(Task.FromResult(new MemoryStream(File.ReadAllBytes("example.csv")) as Stream));
             
             var participants = new List<Participant>
             {
@@ -171,21 +197,19 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             var participantApi = new Mock<IParticipantApi>();
             var logger = new Mock<ILogger>();
 
-            var blobStream = new Mock<IBlobClientStream>();
-                blobStream
+            var blobClientStream = new Mock<IBlobClientStream>();
+                blobClientStream
                     .Setup(m => m.Parse(It.IsAny<string>(), logger.Object))
-                    .Returns(ToStream("Returned data"));
-                blobStream
-                    .Setup(m => m.BlobClientProperties(It.IsAny<string>(), logger.Object))
-                    .Returns(new BlobProperties());
+                    .Returns(blockBlobClient.Object);
 
-            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobStream.Object);
+            var function = new BulkUpload(participantApi.Object, participantStreamParser.Object, blobClientStream.Object);
 
             // Act
             await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
             participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>()), Times.Once);
+            participantApi.Verify(m => m.DeleteOldParticpants(It.IsAny<string>()), Times.Once);
         }
     }
 }

@@ -12,8 +12,8 @@ namespace Piipan.QueryTool.Pages
             _claimsProvider = claimsProvider;
         }
 
-        public string Email 
-        { 
+        public string Email
+        {
             get { return _claimsProvider.GetEmail(User); }
         }
         public string BaseUrl
@@ -21,4 +21,4 @@ namespace Piipan.QueryTool.Pages
             get { return $"{Request.Scheme}://{Request.Host}"; }
         }
     }
-} 
+}

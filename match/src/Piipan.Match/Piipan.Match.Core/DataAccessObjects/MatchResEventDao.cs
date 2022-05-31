@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using Piipan.Match.Api.Models;
-using Piipan.Match.Core.Exceptions;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Core.DataAccessObjects
 {
@@ -94,8 +92,51 @@ namespace Piipan.Match.Core.DataAccessObjects
                     WHEN @SortByAsc = false THEN inserted_at
                 END DESC
                 ;";
-            var parameters = new {
+            var parameters = new
+            {
                 MatchId = matchId,
+                SortByAsc = sortByAsc
+            };
+
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection.QueryAsync<MatchResEventDbo>(sql, parameters);
+            }
+        }
+
+        /// <summary>
+        /// Finds all match resolution events related to any of the specified match IDs
+        /// </summary>
+        /// <param name="matchIds">The list of match ID</param>
+        /// <param name="sortByAsc">Boolean indicating ascending sort order, defaults to true. Argument of false is descending order</param>
+        /// <returns>Task of IEnumerable of IMatchResEvents</returns>
+        public async Task<IEnumerable<IMatchResEvent>> GetEventsByMatchIDs(
+            IEnumerable<string> matchIds,
+            bool sortByAsc = true
+        )
+        {
+            const string sql = @"
+                SELECT
+                    id,
+                    match_id,
+                    inserted_at,
+                    actor,
+                    actor_state,
+                    delta::jsonb
+                FROM match_res_events
+                WHERE
+                    match_id = ANY (@MatchIds)
+                ORDER BY
+                CASE
+                    WHEN @SortByAsc = true THEN inserted_at
+                END ASC,
+                CASE
+                    WHEN @SortByAsc = false THEN inserted_at
+                END DESC
+                ;";
+            var parameters = new
+            {
+                MatchIds = matchIds.ToList(),
                 SortByAsc = sortByAsc
             };
 

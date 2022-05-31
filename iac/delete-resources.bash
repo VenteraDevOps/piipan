@@ -34,8 +34,8 @@ main () {
   read -p "Proceed with bulk delete? (Yes or No) " -r
   if [[ $REPLY =~ ^[yY]es$ ]]; then
 
-    purge "$RESOURCE_GROUP"
     purge "$MATCH_RESOURCE_GROUP"
+    purge "$RESOURCE_GROUP"
 
   else
     exit 1

@@ -5,6 +5,8 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
 using Piipan.Participants.Api;
+using Piipan.Match.Core.Enums;
+using System;
 
 namespace Piipan.Match.Core.Services
 {
@@ -37,6 +39,7 @@ namespace Piipan.Match.Core.Services
             var response = new OrchMatchResponse();
             for (int i = 0; i < request.Data.Count; i++)
             {
+                request.Data[i].SearchReason = request.Data[i].SearchReason.ToString().ToLower();
                 var person = request.Data[i];
                 var personValidation = await _requestPersonValidator.ValidateAsync(person);
                 if (personValidation.IsValid)

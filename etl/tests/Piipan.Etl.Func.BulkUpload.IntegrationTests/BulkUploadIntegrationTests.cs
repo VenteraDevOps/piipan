@@ -5,10 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Messaging.EventGrid;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -56,13 +58,31 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                                         It.IsAny<string>(),     //EventGridEvent string
                                         It.IsAny<ILogger>()))
                         .Returns(() => {
-                            return new MemoryStream(File.ReadAllBytes("example.csv"));
+                            var responseMock = new Mock<Response>();
+                            Stream stream = new MemoryStream(File.ReadAllBytes("example.csv"));
+                            var blockBlobClient = new Mock<BlockBlobClient>();
+
+                                blockBlobClient
+                                    .Setup(m => m.GetProperties(null, CancellationToken.None))
+                                    .Returns(Response.FromValue<BlobProperties>(new BlobProperties(), responseMock.Object));
+
+                                blockBlobClient
+                                    .Setup(m => m.DeleteIfExists(It.IsAny<DeleteSnapshotsOption>(),It.IsAny<BlobRequestConditions>(),CancellationToken.None))
+                                    .Returns(new Mock<Response<bool>>().Object);
+                                    
+                                blockBlobClient
+                                        .Setup(m => m.DownloadTo(It.IsAny<Stream>()))
+                                        .Callback((Stream target) => { stream.CopyTo(target);target.Position = 0; })
+                                        .Returns(new Mock<Response>().Object);
+                                
+                                blockBlobClient
+                                        .Setup(m => m.OpenReadAsync(0, null, null, default))
+                                        .Returns(Task.FromResult(stream));
+                                        
+
+                            return blockBlobClient.Object;
                         });
-                factory
-                    .Setup(m => m.BlobClientProperties(
-                                        It.IsAny<string>(),     //EventGridEvent string
-                                        It.IsAny<ILogger>()))
-                    .Returns(new BlobProperties());
+
                         
                 return factory.Object;
             });

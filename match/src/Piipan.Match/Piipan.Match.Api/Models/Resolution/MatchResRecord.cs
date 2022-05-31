@@ -14,6 +14,8 @@ namespace Piipan.Match.Api.Models.Resolution
         public string Initiator { get; set; }
         [JsonProperty("match_id")]
         public string MatchId { get; set; }
+        [JsonProperty("created_at")]
+        public DateTime? CreatedAt { get; set; }
         [JsonProperty("participants")]
         public Participant[] Participants { get; set; } = Array.Empty<Participant>();
         [JsonProperty("states")]

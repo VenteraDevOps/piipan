@@ -28,6 +28,7 @@ namespace Piipan.Match.Core.Builders
             aggregate.Participants = CollectParticipantData(match);
             aggregate.MatchId = match.MatchId;
             aggregate.States = match.States;
+            aggregate.CreatedAt = match.CreatedAt;
             aggregate.Initiator = match.Initiator;
             return aggregate;
         }
@@ -54,7 +55,8 @@ namespace Piipan.Match.Core.Builders
         {
             return match_res_events
                 .Select(mre => JObject.Parse(mre.Delta))
-                .Aggregate(JObject.Parse(@"{}"), (acc, x) => {
+                .Aggregate(JObject.Parse(@"{}"), (acc, x) =>
+                {
                     acc.Merge(x, new JsonMergeSettings
                     {
                         MergeArrayHandling = MergeArrayHandling.Union

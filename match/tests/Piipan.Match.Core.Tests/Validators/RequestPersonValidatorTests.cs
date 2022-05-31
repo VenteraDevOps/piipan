@@ -33,5 +33,16 @@ namespace Piipan.Match.Core.Tests.Validators
             var result = Validator().TestValidate(model);
             result.ShouldHaveValidationErrorFor(person => person.LdsHash);
         }
+
+        [Fact]
+        public void ReturnsErrorWhenSearchReasonMalformed()
+        {
+            var model = new RequestPerson()
+            {
+                SearchReason = "Foo"
+            };
+            var result = Validator().TestValidate(model);
+            result.ShouldHaveValidationErrorFor(person => person.SearchReason);
+        }
     }
 }
