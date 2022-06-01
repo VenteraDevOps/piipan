@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @using Piipan.Components.Alerts
 @using Piipan.Components.Validation
+@using Piipan.Components.Tag
 @using static Piipan.Components.Layout.LayoutConstants
 @using static Piipan.Components.Shared.CommonConstants
 @inject NavigationManager navManager
@@ -25,7 +26,7 @@
     private IndexModel indexModel = new IndexModel();
 }
 
-<UsaForm Model=indexModel style="max-width: 100%;">
+<UsaForm Model=indexModel WrapperClass="full-width">
     <UsaCardGroup>
         <UsaCard Header="Accordion">
             <BodyContent>
@@ -83,6 +84,13 @@
                 </UsaFormGroup>
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-text-area"))" class="@ButtonClass">View Input Text Area</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Tag">
+            <BodyContent>
+                <p>A tag draws attention to new or categorized content elements.</p>
+                <UsaTag>Some Tag</UsaTag>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/tag"))" class="@ButtonClass">View Tag</button></FooterContent>
         </UsaCard>
     </UsaCardGroup>
 </UsaForm>

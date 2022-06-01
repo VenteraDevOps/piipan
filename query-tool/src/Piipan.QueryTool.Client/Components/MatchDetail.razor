@@ -1,15 +1,25 @@
 ﻿@using Newtonsoft.Json
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Models
+@using Piipan.Components.Tag
 
 @code {
     [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
+
+    private TagTheme StatusTheme()
+    {
+        return Match.Data.Data.Status.ToLower() switch
+        {
+            "open" => TagTheme.Green,
+            _ => TagTheme.Gray
+        };
+    }
 }
 <div class="grid-container">
 
     <!-- Match header -->
     <div class="grid-row">
-        <h3><span class="usa-tag bg-mint">@Match.Data.Data.Status</span> Match ID: @Match.Data.Data.MatchId</h3>
+        <h1><UsaTag Theme="StatusTheme()">@Match.Data.Data.Status</UsaTag><span>Match ID: @Match.Data.Data.MatchId</span></h1>
     </div>
     <!-- \match header -->
 
