@@ -62,22 +62,22 @@ COMMENT ON COLUMN state_info.state IS 'State/territory full name';
 COMMENT ON COLUMN state_info.state_abbreviation IS 'State/territorys two letter abbreviation';
 COMMENT ON COLUMN state_info.region IS 'The region the specified state belongs to';
 
-INSERT INTO state_info(id, state, state_abbreviation, email, phone)
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
 select * from (select '15' as id, 'Iowa' as state, 'IA' as state_abbreviation, 'IA-test@usda.gov' as email, '1234567890' as phone, 'MWRO' AS region) as temp
 WHERE NOT EXISTS 
 (select id from state_info where id = '15') limit 1;
 
-INSERT INTO state_info(id, state, state_abbreviation, email, phone)
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
 select * from (select '18' as id, 'Louisiana' as state, 'LA' as state_abbreviation, 'LA-test@usda.gov' as email, '1234567890' as phone, 'SWRO' AS region) as temp
 WHERE NOT EXISTS 
 (select id from state_info where id = '18') limit 1;
 
-INSERT INTO state_info(id, state, state_abbreviation, email, phone)
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
 select * from (select '21' as id, 'Massachusetts' as state, 'MA' as state_abbreviation, 'MA-test@usda.gov' as email, '1234567890' as phone, 'NERO' AS region) as temp
 WHERE NOT EXISTS 
 (select id from state_info where id = '21') limit 1;
 
-INSERT INTO state_info(id, state, state_abbreviation, email, phone)
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
 select * from (select '26' as id, 'Montana' as state, 'MT' as state_abbreviation, 'MT-test@usda.gov' as email, '1234567890' as phone, 'MPRO' AS region) as temp
 WHERE NOT EXISTS 
 (select id from state_info where id = '26') limit 1;
