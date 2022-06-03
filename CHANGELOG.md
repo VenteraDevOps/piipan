@@ -3,6 +3,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2022-05-31
+
+### Changed
+- Converted Dashboard application to a Blazor web app. Changed upload times to display in user's local time.
+
+### Added
+- Added payload encryption for Bulk Uploads.
+- Added ability to disable match responses for certain states.
+- Added basic role & location based authorization to the Query Tool app.
+- Restricted Query Tool search page to only allow searches to be performed by users with state claims. 
+- Restricted access to the match listing page to only those users with national office claims.
+- Added logging (and PII redaction) for failed participant uploads
+- Added storage for state phone and email addresses.
+
+### Fixed
+- Removed peer dependencies from package-lock file that was causing npm install to break when building a project.
+- Removed end-to-end pa11y tests temporarily until we provide nightly builds with the ability to perform full end-to-end testing.
+
+
 ## [1.0.1.40] - 2022-05-17
 
 ### Changed
