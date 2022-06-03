@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Piipan.Match.Core.Builders
 {
@@ -44,7 +44,16 @@ namespace Piipan.Match.Core.Builders
             {
                 var mreFiltered = match_res_events.Where(mre => mre.ActorState == stateAbbr);
                 string jsonString = MergeEvents(mreFiltered);
+
                 var stateObj = JsonConvert.DeserializeObject<Disposition>(jsonString);
+
+                // Grab the vulnerable individual status from the original match if it hasn't been updated by an event
+                var originalMatchDisposition = JsonConvert.DeserializeObject<Disposition>(match.Initiator == stateAbbr ? match.Input : match.Data);
+                if (stateObj.VulnerableIndividual == null && (match.Initiator == stateAbbr || originalMatchDisposition.State == stateAbbr))
+                {
+                    stateObj.VulnerableIndividual = originalMatchDisposition.VulnerableIndividual;
+                }
+
                 stateObj.State = stateAbbr;
                 collect.Add(stateObj);
             }

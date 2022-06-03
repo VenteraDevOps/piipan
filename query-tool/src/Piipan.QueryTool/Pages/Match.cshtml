@@ -11,7 +11,7 @@
 @if (Model.Match != null)
 {
     <div class="grid-container">
-        <component type="typeof(QueryTool.Client.Components.MatchDetail)" render-mode="WebAssembly"
+        <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetail)" render-mode="WebAssembly"
             param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)" />
     </div>
 }
