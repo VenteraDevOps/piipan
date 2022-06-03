@@ -1,0 +1,23 @@
+﻿@using Piipan.Match.Api.Models.Resolution
+@using static Piipan.QueryTool.Client.Helpers.ValueToDisplayHelper
+@using Piipan.QueryTool.Client.Helpers
+@code {
+    [Parameter] public Participant Participant { get; set; }
+    [Parameter] public bool InitiatingState { get; set; }
+
+    RenderFragment header =>
+        @<h5>@StateHelper.GetStateName(Participant.State) <span>(@(InitiatingState ? "Initiating" : "Matching") State)</span></h5>
+    ;
+
+    Dictionary<string, object> StateValues { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        StateValues.Add("Case Number", Participant.CaseId);
+        StateValues.Add("Participant ID", Participant.ParticipantId);
+        StateValues.Add("Participant Closing Date", Participant.ParticipantClosingDate);
+        StateValues.Add("Recent Benefits Issuance Dates", Participant.RecentBenefitIssuanceDates);
+    }
+}
+
+<StateInformation StateInfo="StateValues" Header="header" />

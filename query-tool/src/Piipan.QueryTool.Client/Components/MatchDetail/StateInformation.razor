@@ -1,0 +1,20 @@
+﻿@using Piipan.Match.Api.Models.Resolution
+@using static Piipan.QueryTool.Client.Helpers.ValueToDisplayHelper
+@using Piipan.QueryTool.Client.Helpers
+@code {
+    [Parameter] public Dictionary<string, object> StateInfo { get; set; }
+    [Parameter] public RenderFragment Header { get; set; }
+}
+
+<div>
+    @Header
+    <dl>
+        @foreach (var info in StateInfo)
+        {
+            <div>
+                <dt>@(info.Key):</dt>
+                <dd>@GetDisplayValue(info.Value)</dd>
+            </div>
+        }
+    </dl>
+</div>

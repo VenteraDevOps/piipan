@@ -1,0 +1,37 @@
+﻿h1 {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    grid-gap: 1rem;
+    gap: 1rem;
+}
+
+.two-state-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+    gap: 1rem;
+}
+
+@media (max-width: 40rem) {
+    .two-state-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+::deep h5 {
+    color: #045881;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.75rem;
+    margin: 0;
+    margin-bottom: 1px;
+}
+
+::deep h5 span {
+    font-weight: 400;
+}
+
+::deep .usa-prose li {
+    max-width: 46rem;
+}
