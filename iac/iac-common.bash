@@ -14,9 +14,6 @@ DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
 
-# Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
-
 # The default Azure subscription
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
@@ -118,6 +115,20 @@ OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 ### END Constants
 
 ### Functions
+# Return the object ID for the currently logged in account.
+# Supports both users and service principals.
+current_user_objid () {
+  type=$(az account show --query user.type --output tsv)
+
+  if [ "${type}" = "servicePrincipal" ]; then
+    app_id=$(az account show --query user.name --output tsv)
+    CURRENT_USER_OBJID=$(az ad sp show --id "${app_id}" --query id --output tsv)
+  else
+    CURRENT_USER_OBJID=$(az ad signed-in-user show --query id --output tsv)
+  fi
+}
+current_user_objid
+
 # Create a very long, (mostly) random password. Ensures all Azure character
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
@@ -342,6 +353,7 @@ set_oidc_secret () {
     --name "$secret_name" \
     --file /dev/stdin \
     --query id > /dev/null
+    #--value "$value"
 }
 
 # Given an App Service instance name, output the secret established for OIDC,

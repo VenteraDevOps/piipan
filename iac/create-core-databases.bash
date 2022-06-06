@@ -39,6 +39,7 @@ main () {
     --name "$PG_SECRET_NAME" \
     --file /dev/stdin \
     --query id
+    #--value "$PG_SECRET" \
 
   echo "Creating core database server"
   az deployment group create \
