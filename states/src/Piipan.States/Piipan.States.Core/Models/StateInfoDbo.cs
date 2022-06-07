@@ -9,7 +9,7 @@ namespace Piipan.States.Core.Models
 {
     public class StateInfoDbo : IState
     {
-        public string? Id { get; set; }
+        public string Id { get; set; }
         public string State { get; set; }
         public string StateAbbreviation { get; set; }
         public string Email { get; set; }
