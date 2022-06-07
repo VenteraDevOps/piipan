@@ -23,7 +23,7 @@ namespace Piipan.Shared.TestFixtures
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
-            //ApplySchema();
+            ApplySchema();
         }
 
         /// <summary>
@@ -63,8 +63,8 @@ namespace Piipan.Shared.TestFixtures
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
-                conn.Execute("TRUNCATE TABLE participants");
-                conn.Execute("TRUNCATE TABLE uploads");
+                conn.Execute("DROP TABLE IF EXISTS participants");
+                conn.Execute("DROP TABLE IF EXISTS uploads");
 
                 conn.Close();
             }
