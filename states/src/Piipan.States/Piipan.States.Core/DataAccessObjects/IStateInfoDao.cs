@@ -11,5 +11,6 @@ namespace Piipan.States.Core.DataAccessObjects
     {
         Task<IState> GetStateByName(string state);
         Task<IState> GetStateById(string id);
+        Task<IEnumerable<IState>> GetStates();
     }
 }

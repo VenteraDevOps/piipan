@@ -48,6 +48,20 @@ namespace Piipan.States.Core.Integration.Tests
             }
         }
 
+        public void InsertStates()
+        {
+            var factory = NpgsqlFactory.Instance;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('99', 'test' ,'TT', 'test@test.com', '5551234', 'TEST')");
+                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('100', 'test2' ,'TS', 'test2@test2.com', '9999999', 'TWO')");
+                conn.Close();
+            }
+        }
+
         public bool HasState(StateInfoDbo state)
         {
             var result = false;

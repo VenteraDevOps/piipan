@@ -44,5 +44,16 @@ namespace Piipan.States.Core.DataAccessObjects
                     LIMIT 1", new { state = state });
             }
         }
+
+        public async Task<IEnumerable<IState>> GetStates()
+        {
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                return await connection
+                    .QueryAsync<StateInfoDbo>(@"
+                    SELECT id, state, state_abbreviation, email, phone, region
+	                FROM state_info ORDER BY id ASC");
+            }
+        }
     }
 }

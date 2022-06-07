@@ -15,5 +15,27 @@ namespace Piipan.States.Core.Models
         public string Email { get; set; }
         public string? Phone { get; set; }
         public string Region { get; set; }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            StateInfoDbo p = obj as StateInfoDbo;
+            if (p == null)
+            {
+                return false;
+            }
+
+            return
+                Id == p.Id &&
+                State == p.State &&
+                StateAbbreviation == p.StateAbbreviation &&
+                Email == p.Email &&
+                Phone == p.Phone &&
+                Region == p.Region;
+        }
     }
 }

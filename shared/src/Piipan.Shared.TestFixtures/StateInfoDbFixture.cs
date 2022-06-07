@@ -97,6 +97,21 @@ namespace Piipan.Shared.TestFixtures
             return result;
         }
 
+        public string GetFirstStateId()
+        {
+            string result = "";
+            var factory = NpgsqlFactory.Instance;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                result = conn.ExecuteScalar<string>("SELECT id from state_info order by id ASC limit 1");
+                conn.Close();
+            }
+            return result;
+        }
+
         public string GetLastStateName()
         {
             string result = "";

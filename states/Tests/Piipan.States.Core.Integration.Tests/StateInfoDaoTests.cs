@@ -9,6 +9,7 @@ using Npgsql;
 using Piipan.States.Core.DataAccessObjects;
 using Piipan.Shared.Database;
 using Xunit;
+using Piipan.States.Api.Models;
 
 namespace Piipan.States.Core.Integration.Tests
 {
@@ -73,6 +74,36 @@ namespace Piipan.States.Core.Integration.Tests
 
                 // Assert
                 Assert.Equal(expected, result.Id);
+            }
+        }
+
+        [Fact]
+        public async void GetStatesTest()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                InsertStates();
+
+                string[] expected = { "", "" };
+                expected[0] = GetFirstStateId();
+                expected[1] = GetLastStateId();
+                var count = 0;
+
+                var dao = new StateInfoDao(DbConnFactory());
+
+                // Act
+                var result = await dao.GetStates();
+
+                // Assert
+                foreach (IState state in result)
+                {
+                    Assert.Equal(expected[count], state.Id);
+                    count++;
+                }
             }
         }
     }
