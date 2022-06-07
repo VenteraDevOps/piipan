@@ -26,7 +26,7 @@ namespace Piipan.States.Core.DataAccessObjects
                 return await connection
                     .QuerySingleAsync<StateInfoDbo>(@"
                     SELECT id, state, state_abbreviation, email, phone, region
-	                FROM state_info WHERE id =@id;
+	                FROM state_info WHERE id =@id
                     ORDER BY id DESC
                     LIMIT 1", new { id = id });
             }
@@ -39,7 +39,7 @@ namespace Piipan.States.Core.DataAccessObjects
                 return await connection
                     .QuerySingleAsync<StateInfoDbo>(@"
                     SELECT id, state, state_abbreviation, email, phone, region
-	                FROM state_info WHERE state =@state;
+	                FROM state_info WHERE state =@state
                     ORDER BY id DESC
                     LIMIT 1", new { state = state });
             }

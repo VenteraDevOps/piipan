@@ -46,10 +46,10 @@ namespace Piipan.States.Core.Integration.Tests
                 var dao = new StateInfoDao(DbConnFactory());
 
                 // Act
-                var result = await dao.GetStateByName("Montana");
+                var result = await dao.GetStateByName("test");
 
                 // Assert
-                Assert.Equal(expected, result.Id);
+                Assert.Equal(expected, result.State);
             }
         }
 
@@ -69,10 +69,10 @@ namespace Piipan.States.Core.Integration.Tests
                 var dao = new StateInfoDao(DbConnFactory());
 
                 // Act
-                var result = await dao.GetStateById("26");
+                var result = await dao.GetStateById("99");
 
                 // Assert
-                Assert.Equal(expected, result.State);
+                Assert.Equal(expected, result.Id);
             }
         }
     }

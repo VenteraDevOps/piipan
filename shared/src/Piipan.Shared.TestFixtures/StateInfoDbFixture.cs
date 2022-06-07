@@ -12,7 +12,8 @@ namespace Piipan.Shared.TestFixtures
 
         public StateInfoDbFixture()
         {
-            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            ConnectionString = "Server=cc-psql-core-cjc.postgres.database.azure.com;Database=collaboration;Port=5432;User Id=piipanadmin@cc-psql-core-cjc;Password=qEAqNcaRG6yCaXbmna6HHY2OUWZn6aKEhSkyfGeH8i03AYNBhhY1R9Wha81c7e48aA1!;";
+            //ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
@@ -56,7 +57,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
-                conn.Execute("TRUNCATE TABLE IF EXISTS state_info");
+                conn.Execute("TRUNCATE TABLE state_info");
 
                 conn.Close();
             }
