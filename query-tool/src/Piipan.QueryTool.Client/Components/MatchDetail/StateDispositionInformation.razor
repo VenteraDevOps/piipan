@@ -9,15 +9,15 @@
         @<h5>@StateHelper.GetStateName(Disposition.State) <span>(@(InitiatingState ? "Initiating" : "Matching") State)</span></h5>
     ;
 
-    Dictionary<string, object> StateValues { get; set; } = new();
+    List<DisplayInfo> StateValues { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        StateValues.Add("Vulnerable Individual", Disposition.VulnerableIndividual);
-        StateValues.Add("Invalid Match", Disposition.InvalidMatch);
-        StateValues.Add("Initial Action Taken", Disposition.InitialActionTaken);
-        StateValues.Add("Initial Action Date", Disposition.InitialActionAt);
-        StateValues.Add("Final Disposition Taken", Disposition.FinalDisposition);
+        StateValues.Add(new("Vulnerable Individual", Disposition.VulnerableIndividual));
+        StateValues.Add(new("Invalid Match", Disposition.InvalidMatch));
+        StateValues.Add(new("Initial Action Taken", Disposition.InitialActionTaken));
+        StateValues.Add(new("Initial Action Date", Disposition.InitialActionAt));
+        StateValues.Add(new("Final Disposition Taken", Disposition.FinalDisposition));
 
         if (!string.IsNullOrWhiteSpace(Disposition.FinalDisposition))
         {
@@ -27,7 +27,7 @@
                 "Benefits Terminated" => "Benefits End Date",
                 _ => "Final Disposition Date"
             };
-            StateValues.Add(finalDispositionDateDisplay, Disposition.FinalDispositionDate);
+            StateValues.Add(new(finalDispositionDateDisplay, Disposition.FinalDispositionDate));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -62,7 +63,7 @@ namespace Piipan.QueryTool.Tests
             return context.Object;
         }
 
-        protected PageHandlerExecutingContext GetPageHandlerExecutingContext<T>(T pageModel, string methodName) where T : BasePageModel
+        protected async Task<PageHandlerExecutingContext> GetPageHandlerExecutingContext<T>(T pageModel, string methodName) where T : BasePageModel
         {
             pageModel.PageContext.HttpContext = contextMock();
 
@@ -80,7 +81,15 @@ namespace Piipan.QueryTool.Tests
                new Dictionary<string, object>(),
                model.Object);
 
-            pageModel.OnPageHandlerExecuting(pageHandlerExecutingContext);
+            var pageHandlerExecutedContext = new PageHandlerExecutedContext(
+               pageContext,
+               Array.Empty<IFilterMetadata>(),
+               new HandlerMethodDescriptor() { MethodInfo = typeof(T).GetMethod(methodName) },
+               model.Object);
+
+            PageHandlerExecutionDelegate pageHandlerExecutionDelegate = () => Task.FromResult(pageHandlerExecutedContext);
+
+            await pageModel.OnPageHandlerExecutionAsync(pageHandlerExecutingContext, pageHandlerExecutionDelegate);
 
             return pageHandlerExecutingContext;
 

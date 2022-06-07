@@ -302,11 +302,11 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(IndexModel.OnPostAsync), "IA", null, false)]
         [InlineData(nameof(IndexModel.OnPostAsync), null, "Worker", false)]
         [InlineData(nameof(IndexModel.OnPostAsync), "IA", "Worker", true)]
-        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        public async Task IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
             var mockServiceProvider = serviceProviderMock(location: location, role: role);
 
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
+            var pageHandlerExecutingContext = await GetPageHandlerExecutingContext(mockServiceProvider, method);
 
             if (!isAuthorized)
             {
@@ -319,7 +319,7 @@ namespace Piipan.QueryTool.Tests
             }
         }
 
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
+        private async Task<PageHandlerExecutingContext> GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
         {
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var mockMatchApi = Mock.Of<IMatchApi>();
@@ -329,7 +329,7 @@ namespace Piipan.QueryTool.Tests
                 mockMatchApi,
                 serviceProvider
             );
-            return base.GetPageHandlerExecutingContext(pageModel, methodName);
+            return await base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }

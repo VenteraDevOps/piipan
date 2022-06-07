@@ -1,0 +1,355 @@
+﻿@using Piipan.Components.Alerts
+@using Piipan.Components.Enums
+@using System.Linq.Expressions
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.MatchDetail
+@using Piipan.QueryTool.Client.Models
+@using Match.Api.Models
+@using Piipan.Shared.API.Utilities
+@using static Piipan.Components.Tag.TagConstants
+@inherits BaseComponentTest<MatchDetail>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public MatchDetailTests() : base()
+    {
+        InitialValues = new Piipan.QueryTool.Client.Components.MatchDetail.MatchDetail()
+        {
+            Match = new ParameterBase<MatchResApiResponse>
+            {
+                Data = new MatchResApiResponse
+                {
+                    Data = new MatchResRecord
+                    {
+                        Status = "open",
+                        MatchId = "M123456",
+                        Dispositions = new Disposition[]
+                        {
+                            new Disposition
+                            {
+                                State = "ea",
+                                FinalDisposition = "Benefits Approved",
+                                FinalDispositionDate = DateTime.Parse("02/02/2022"),
+                                VulnerableIndividual = false,
+                                InvalidMatch = false,
+                                InitialActionAt = DateTime.Parse("01/01/2022"),
+                                InitialActionTaken = "Notice Sent"
+                            },
+                            new Disposition
+                            {
+                                State = "eb",
+                                FinalDisposition = "Benefits Terminated",
+                                FinalDispositionDate = DateTime.Parse("02/02/2021"),
+                                VulnerableIndividual = false,
+                                InvalidMatch = false,
+                                InitialActionAt = DateTime.Parse("01/01/2021"),
+                                InitialActionTaken = "Notice Sent"
+                            }
+                        },
+                        Participants = new Participant[]
+                        {
+                            new Participant
+                            {
+                                State = "ea",
+                                CaseId = "c123",
+                                ParticipantId = "p123",
+                                RecentBenefitIssuanceDates = new List<DateRange>
+                                {
+                                    new DateRange
+                                    {
+                                        Start = DateTime.Parse("01/01/2022"),
+                                        End = DateTime.Parse("02/02/2022")
+                                    },
+                                    new DateRange
+                                    {
+                                        Start = DateTime.Parse("03/03/2022"),
+                                        End = DateTime.Parse("04/04/2022")
+                                    }
+                                }
+                            },
+                            new Participant
+                            {
+                                State = "eb",
+                                CaseId = "c456",
+                                ParticipantId = "p456",
+                                ParticipantClosingDate = DateTime.Parse("01/01/2021"),
+                                RecentBenefitIssuanceDates = new List<DateRange>
+                                {
+                                    new DateRange
+                                    {
+                                        Start = DateTime.Parse("01/01/2021"),
+                                        End = DateTime.Parse("02/02/2021")
+                                    },
+                                    new DateRange
+                                    {
+                                        Start = DateTime.Parse("03/03/2021"),
+                                        End = DateTime.Parse("04/04/2021")
+                                    }
+                                }
+                            }
+                        },
+                        States = new string[] { "ea", "eb" },
+                        Initiator = "ea"
+                    }
+                }
+            },
+            StateInfo = new ParameterBase<StateInfoResponse>
+            {
+                Data = new StateInfoResponse
+                {
+                    Results = new List<StateInfoResponseData>
+                    {
+                        new StateInfoResponseData
+                        {
+                            State = "Echo Alpha",
+                            StateAbbreviation = "ea",
+                            Email = "ea-test@usda.gov",
+                            Phone = "123-456-7890"
+                        },
+                        new StateInfoResponseData
+                        {
+                            State = "Echo Bravo",
+                            StateAbbreviation = "eb",
+                            Email = "eb-test@usda.gov",
+                            Phone = "123-456-7890"
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /// <summary>
+    /// Create a matches list component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        Component = Render<MatchDetail>(
+            @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo">
+            </MatchDetail>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the match detail page
+    /// </summary>
+    [Fact]
+    public void Match_Detail_Should_Exist_And_Have_Correct_Markup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="grid-container">
+                <div class="grid-row">
+                    <h1>
+                        <span class="@TagClass @TagBorderRoundClass @TagThemeGreenClass">open</span>
+                        <span>Match ID: M123456</span>
+                    </h1>
+                </div>
+                <div style="max-width: 860px">
+                    <div class="usa-accordion" aria-multiselectable="false">
+                        <h4 class="usa-accordion__heading">
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore>SNAP Participant Information</button>
+                        </h4>
+                        <div id:ignore class="usa-accordion__content usa-prose">
+                            <ul>
+                                <li>Use your state’s Case Number and Participant ID to identify the individual involved</li>
+                                <li>Use the other state’s Case Number and Participant ID to commuinicate about the individual without exposing more sensitive PII, such as Name, Date of Birth, or Social Security Number</li>
+                            </ul>
+                            <div class="two-state-grid">
+                                <div>
+                                    <h5>Echo Alpha <span>(Initiating State)</span></h5>
+                                    <dl>
+                                        <div>
+                                            <dt>Case Number:</dt>
+                                            <dd>c123</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Participant ID:</dt>
+                                            <dd>p123</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Participant Closing Date:</dt>
+                                            <dd>N/A</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Recent Benefits Issuance Dates:</dt>
+                                            <dd>01/01/2022 - 02/02/2022
+                                            03/03/2022 - 04/04/2022</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                                <div>
+                                    <h5>Echo Bravo <span>(Matching State)</span></h5>
+                                    <dl>
+                                        <div>
+                                            <dt>Case Number:</dt>
+                                            <dd>c456</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Participant ID:</dt>
+                                            <dd>p456</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Participant Closing Date:</dt>
+                                            <dd>01/01/2021</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Recent Benefits Issuance Dates:</dt>
+                                            <dd>01/01/2021 - 02/02/2021
+                                            03/03/2021 - 04/04/2021</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usa-accordion" aria-multiselectable="false">
+                        <h4 class="usa-accordion__heading">
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore>Match Information</button>
+                        </h4>
+                        <div id:ignore class="usa-accordion__content usa-prose">
+                            <p>Each state's most recent updates are displayed below.</p>
+                            <div class="two-state-grid">
+                                <div>
+                                    <h5>Echo Alpha <span>(Initiating State)</span></h5>
+                                    <dl>
+                                        <div>
+                                            <dt>Vulnerable Individual:</dt>
+                                            <dd>No</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Invalid Match:</dt>
+                                            <dd>No</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Initial Action Taken:</dt>
+                                            <dd>Notice Sent</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Initial Action Date:</dt>
+                                            <dd>01/01/2022</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Final Disposition Taken:</dt>
+                                            <dd>Benefits Approved</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Benefits Start Date:</dt>
+                                            <dd>02/02/2022</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                                <div>
+                                    <h5>Echo Bravo <span>(Matching State)</span></h5>
+                                    <dl>
+                                        <div>
+                                            <dt>Vulnerable Individual:</dt>
+                                            <dd>No</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Invalid Match:</dt>
+                                            <dd>No</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Initial Action Taken:</dt>
+                                            <dd>Notice Sent</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Initial Action Date:</dt>
+                                            <dd>01/01/2021</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Final Disposition Taken:</dt>
+                                            <dd>Benefits Terminated</dd>
+                                        </div>
+                                        <div>
+                                            <dt>Benefits End Date:</dt>
+                                            <dd>02/02/2021</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="usa-accordion" aria-multiselectable="false">
+                        <h4 class="usa-accordion__heading">
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore>State Agency Contact Information</button>
+                        </h4>
+                        <div id:ignore class="usa-accordion__content usa-prose">
+                            <ul>
+                                <li>Use this information if you need to contact the other state in regards to this match</li>
+                                <li>Do not exchange PII about the participant by email; use their state’s Participant ID</li>
+                            </ul>
+                            <div class="two-state-grid">
+                                <div>
+                                    <h5>Echo Alpha <span>(Initiating State)</span></h5>
+                                    <dl>
+                                        <div>
+                                            <dt>Email Address:</dt>
+                                            <dd><a href="mailto:ea-test@usda.gov">ea-test@usda.gov</a></dd>
+                                        </div>
+                                        <div>
+                                            <dt>Phone Number:</dt>
+                                            <dd>123-456-7890</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                                <div>
+                                    <h5>Echo Bravo <span>(Matching State)</span></h5>
+                                    <dl>
+                                        <div>
+                                            <dt>Email Address:</dt>
+                                            <dd><a href="mailto:eb-test@usda.gov">eb-test@usda.gov</a></dd>
+                                        </div>
+                                        <div>
+                                            <dt>Phone Number:</dt>
+                                            <dd>123-456-7890</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    /// <summary>
+    /// Verify the match detail status tag is green when the status is open
+    /// </summary>
+    [Fact]
+    public void Match_Detail_Status_Tag_Should_Be_Green_When_Open()
+    {
+        // Arrange
+        CreateTestComponent();
+        var tag = Component!.Find($".{TagClass}");
+
+        // Assert
+        Assert.True(tag.ClassList.Contains(TagThemeGreenClass));
+    }
+
+    /// <summary>
+    /// Verify the match detail status tag is gray when the status is closed
+    /// </summary>
+    [Fact]
+    public void Match_Detail_Status_Tag_Should_Be_Gray_When_Closed()
+    {
+        // Arrange
+        InitialValues.Match.Data.Data.Status = "closed";
+        CreateTestComponent();
+        var tag = Component!.Find($".{TagClass}");
+
+        // Assert
+        Assert.True(tag.ClassList.Contains(TagThemeGrayClass));
+    }
+
+    #endregion
+}

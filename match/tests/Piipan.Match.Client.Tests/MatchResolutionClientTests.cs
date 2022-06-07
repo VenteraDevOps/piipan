@@ -73,48 +73,5 @@ namespace Piipan.Match.Client.Tests
             // Assert
             Assert.Equal(expectedResponse, response);
         }
-
-        [Fact]
-        public async Task GetStates_ReturnsApiClientResponse()
-        {
-            // Arrange
-            var expectedResponse = new StateInfoResponse
-            {
-                Results = new System.Collections.Generic.List<StateInfoResponseData>
-                {
-                    new StateInfoResponseData
-                    {
-                        State = "Echo Alpha",
-                        StateAbbreviation = "ea",
-                        Region = "ABCD",
-                        Phone = "1234567890",
-                        Email = "EA-test@usda.gov",
-                        Id = 15
-                    },
-                    new StateInfoResponseData
-                    {
-                        State = "Echo Bravo",
-                        StateAbbreviation = "eb",
-                        Region = "ABCD",
-                        Phone = "1234567890",
-                        Email = "MT-test@usda.gov",
-                        Id = 26
-                    }
-                }
-            };
-
-            var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
-            apiClient
-                .Setup(m => m.TryGetAsync<StateInfoResponse>("states"))
-                .ReturnsAsync((expectedResponse, 200));
-
-            var client = new MatchResolutionClient(apiClient.Object);
-
-            // Act
-            var response = await client.GetStates();
-
-            // Assert
-            Assert.Equal(expectedResponse, response);
-        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Piipan.Match.Api;
-using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
 
@@ -41,41 +40,6 @@ namespace Piipan.Match.Client
         public async Task<MatchResListApiResponse> GetMatches()
         {
             var (response, _) = await _apiClient.TryGetAsync<MatchResListApiResponse>($"matches");
-            return response;
-        }
-
-        /// <summary>
-        /// Sends a GET request to the /states endpoint using the API client's configured base URL.
-        /// </summary>
-        public async Task<StateInfoResponse> GetStates()
-        {
-            // TODO: Call API
-            // var (response, _) = await _apiClient.TryGetAsync<StateInfoResponse>($"states");
-
-            var response = new StateInfoResponse
-            {
-                Results = new System.Collections.Generic.List<StateInfoResponseData>
-                {
-                    new StateInfoResponseData
-                    {
-                        State = "Iowa",
-                        StateAbbreviation = "ia",
-                        Region = "MWRO",
-                        Phone = "1234567890",
-                        Email = "IA-test@usda.gov",
-                        Id = 15
-                    },
-                    new StateInfoResponseData
-                    {
-                        State = "Montana",
-                        StateAbbreviation = "mt",
-                        Region = "MPRO",
-                        Phone = "1234567890",
-                        Email = "MT-test@usda.gov",
-                        Id = 26
-                    }
-                }
-            };
             return response;
         }
     }

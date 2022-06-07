@@ -112,11 +112,11 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(ListModel.OnGet), "IA", null, false)]
         [InlineData(nameof(ListModel.OnGet), null, "Worker", false)]
         [InlineData(nameof(ListModel.OnGet), "IA", "Worker", true)]
-        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        public async Task IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
             var mockServiceProvider = serviceProviderMock(location: location, role: role);
 
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
+            var pageHandlerExecutingContext = await GetPageHandlerExecutingContext(mockServiceProvider, method);
 
             if (!isAuthorized)
             {
@@ -129,7 +129,7 @@ namespace Piipan.QueryTool.Tests
             }
         }
 
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider mockServiceProvider, string methodName)
+        private async Task<PageHandlerExecutingContext> GetPageHandlerExecutingContext(IServiceProvider mockServiceProvider, string methodName)
         {
             var mockMatchApi = Mock.Of<IMatchResolutionApi>();
             var pageModel = new ListModel(
@@ -138,7 +138,7 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
 
-            return base.GetPageHandlerExecutingContext(pageModel, methodName);
+            return await base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }

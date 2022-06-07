@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using Piipan.Match.Api.Models;
-using Piipan.QueryTool.Services;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
@@ -18,18 +17,40 @@ namespace Piipan.QueryTool.Pages
         private const string NotAuthorizedPageName = "/NotAuthorized";
         private readonly IClaimsProvider _claimsProvider;
         private readonly ILocationsProvider _locationsProvider;
-        private readonly IStateInfoService _stateInfoService;
 
         public BasePageModel(IServiceProvider serviceProvider)
         {
             _claimsProvider = serviceProvider.GetRequiredService<IClaimsProvider>();
             _locationsProvider = serviceProvider.GetRequiredService<ILocationsProvider>();
-            _stateInfoService = serviceProvider.GetRequiredService<IStateInfoService>();
         }
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
-            StateInfo = await _stateInfoService.GetStateInfoAsync();
+            // TODO: Pull the state information from the States API
+            StateInfo = new StateInfoResponse
+            {
+                Results = new System.Collections.Generic.List<StateInfoResponseData>
+                {
+                    new StateInfoResponseData
+                    {
+                        State = "Iowa",
+                        StateAbbreviation = "ia",
+                        Region = "MWRO",
+                        Phone = "1234567890",
+                        Email = "IA-test@usda.gov",
+                        Id = 15
+                    },
+                    new StateInfoResponseData
+                    {
+                        State = "Montana",
+                        StateAbbreviation = "mt",
+                        Region = "MPRO",
+                        Phone = "1234567890",
+                        Email = "MT-test@usda.gov",
+                        Id = 26
+                    }
+                }
+            };
             if ((string.IsNullOrEmpty(Location) || string.IsNullOrEmpty(Role)) &&
                 (!context.HandlerMethod?.MethodInfo.CustomAttributes.Any(n => n.AttributeType == typeof(IgnoreAuthorizationAttribute)) ?? false))
             {

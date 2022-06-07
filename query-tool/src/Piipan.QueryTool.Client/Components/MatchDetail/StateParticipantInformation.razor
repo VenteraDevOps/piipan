@@ -9,14 +9,14 @@
         @<h5>@StateHelper.GetStateName(Participant.State) <span>(@(InitiatingState ? "Initiating" : "Matching") State)</span></h5>
     ;
 
-    Dictionary<string, object> StateValues { get; set; } = new();
+    List<DisplayInfo> StateValues { get; set; } = new();
 
     protected override void OnInitialized()
     {
-        StateValues.Add("Case Number", Participant.CaseId);
-        StateValues.Add("Participant ID", Participant.ParticipantId);
-        StateValues.Add("Participant Closing Date", Participant.ParticipantClosingDate);
-        StateValues.Add("Recent Benefits Issuance Dates", Participant.RecentBenefitIssuanceDates);
+        StateValues.Add(new("Case Number", Participant.CaseId));
+        StateValues.Add(new("Participant ID", Participant.ParticipantId));
+        StateValues.Add(new("Participant Closing Date", InitiatingState ? "N/A" : Participant.ParticipantClosingDate));
+        StateValues.Add(new("Recent Benefits Issuance Dates", Participant.RecentBenefitIssuanceDates));
     }
 }
 

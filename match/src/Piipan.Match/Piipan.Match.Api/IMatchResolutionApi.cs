@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 
 namespace Piipan.Match.Api
@@ -8,7 +7,5 @@ namespace Piipan.Match.Api
     {
         Task<MatchResApiResponse> GetMatch(string matchId);
         Task<MatchResListApiResponse> GetMatches();
-
-        Task<StateInfoResponse> GetStates();
     }
 }

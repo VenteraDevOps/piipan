@@ -2,8 +2,9 @@
 @using static Piipan.QueryTool.Client.Helpers.ValueToDisplayHelper
 @using Piipan.QueryTool.Client.Helpers
 @code {
-    [Parameter] public Dictionary<string, object> StateInfo { get; set; }
+    [Parameter] public List<DisplayInfo> StateInfo { get; set; }
     [Parameter] public RenderFragment Header { get; set; }
+
 }
 
 <div>
@@ -11,9 +12,17 @@
     <dl>
         @foreach (var info in StateInfo)
         {
+            var displayValue = GetDisplayValue(info.Value);
+            RenderFragment format = @<text>@displayValue</text>;
+
+            if (info.Value != null && info.DisplayType == DisplayInfoType.Email)
+            {
+                format = @<a href="mailto:@(displayValue)">@displayValue</a>;
+            }
+
             <div>
-                <dt>@(info.Key):</dt>
-                <dd>@GetDisplayValue(info.Value)</dd>
+                <dt>@(info.Label):</dt>
+                <dd>@format</dd>
             </div>
         }
     </dl>

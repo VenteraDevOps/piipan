@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -44,11 +45,11 @@ namespace Piipan.QueryTool.Tests
         [InlineData(nameof(ErrorModel.OnGet), "IA", null, true)]
         [InlineData(nameof(ErrorModel.OnGet), null, "Worker", true)]
         [InlineData(nameof(ErrorModel.OnGet), "IA", "Worker", true)]
-        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        public async Task IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
         {
             var mockServiceProvider = serviceProviderMock(location: location, role: role);
 
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
+            var pageHandlerExecutingContext = await GetPageHandlerExecutingContext(mockServiceProvider, method);
 
             if (!isAuthorized)
             {
@@ -61,11 +62,11 @@ namespace Piipan.QueryTool.Tests
             }
         }
 
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
+        private async Task<PageHandlerExecutingContext> GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
         {
             var pageModel = new ErrorModel(new NullLogger<ErrorModel>(), serviceProvider);
 
-            return base.GetPageHandlerExecutingContext(pageModel, methodName);
+            return await base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }

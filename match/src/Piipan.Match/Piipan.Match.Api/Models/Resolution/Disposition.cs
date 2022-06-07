@@ -16,7 +16,7 @@ namespace Piipan.Match.Api.Models.Resolution
         [JsonProperty("final_disposition")]
         public string FinalDisposition { get; set; }
         [JsonProperty("final_disposition_date")]
-        public string FinalDispositionDate { get; set; }
+        public DateTime? FinalDispositionDate { get; set; }
         [JsonProperty("vulnerable_individual")]
         public bool? VulnerableIndividual { get; set; }
         [JsonProperty("state")]

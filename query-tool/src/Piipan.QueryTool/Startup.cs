@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
 using Piipan.Match.Client.Extensions;
 using Piipan.QueryTool.Binders;
-using Piipan.QueryTool.Services;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
@@ -64,7 +63,6 @@ namespace Piipan.QueryTool
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
             services.AddTransient<ILocationsProvider, LocationsProvider>();
-            services.AddTransient<IStateInfoService, StateInfoService>();
 
             services.AddSingleton<INameNormalizer, NameNormalizer>();
             services.AddSingleton<IDobNormalizer, DobNormalizer>();
