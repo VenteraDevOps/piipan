@@ -260,6 +260,27 @@ private_dns_zone () {
   echo $base
 }
 
+# Azure CLI 2.37 upgraded azure-mgmt-msi version to 2021-09-30-preview. This API
+# version will not work with AzureUSGovernment, and must be downgraded.
+# https://github.com/Azure/azure-cli/pull/22284
+# https://github.com/Azure/azure-cli/issues/22661
+# https://github.com/Azure/azure-cli/issues/22735
+configure_azure_profile () {
+  if [ "${CLOUD_NAME}" = "AzureUSGovernment" ]; then
+    profile=$(\
+      az cloud show \
+        --name "${CLOUD_NAME}" \
+        --query "profile" \
+        --output tsv)
+
+    if [ "${profile}" = "latest" ]; then
+      az cloud set -n "${CLOUD_NAME}" --profile "2020-09-01-hybrid"
+    else
+      az cloud set -n "${CLOUD_NAME}" --profile "latest"
+    fi
+  fi
+}
+
 # try_run()
 #
 # The function help with the robusness of the IaC code.

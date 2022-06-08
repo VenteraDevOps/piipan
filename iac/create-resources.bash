@@ -58,6 +58,7 @@ az_connection_string () {
   resource_group=$1
   identity=$2
 
+  configure_azure_profile
   client_id=$(\
     az identity show \
       --resource-group "$resource_group" \
@@ -65,12 +66,27 @@ az_connection_string () {
       --query clientId \
       --output tsv)
 
-    echo "RunAs=App;AppId=${client_id}"
+  echo "RunAs=App;AppId=${client_id}"
+  configure_azure_profile
 }
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
+
+  # Only show errors from the CLI ouput, mostly to avoid 'WARNING: This command
+  # or command group has been migrated to Microsoft Graph API. Please carefully
+  # review all breaking changes introduced during this migration:
+  # https://docs.microsoft.com/cli/azure/microsoft-graph-migration'
+  az config set core.only_show_errors=false
+  read -p "Disable Azure CLI warnings? (Yes or No) " -r -t 10 &&
+  if [[ ${REPLY} =~ ^[yY]es$ ]]; then
+    echo "Disabling Azure CLI warnings"
+    az config set core.only_show_errors=true
+  else
+    echo "Showing Azure CLI warnings"
+  fi
+
   # shellcheck source=./iac/env/tts/dev.bash
   source "$(dirname "$0")"/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
@@ -78,12 +94,6 @@ main () {
 
   verify_cloud
   set_constants
-
-  # Only show errors from the CLI ouput, mostly to avoid 'WARNING: This command
-  # or command group has been migrated to Microsoft Graph API. Please carefully
-  # review all breaking changes introduced during this migration:
-  # https://docs.microsoft.com/cli/azure/microsoft-graph-migration'
-  az config set core.only_show_errors=true
 
   echo "Creating Resource Groups"
   ./create-resource-groups.bash "$azure_env"
@@ -242,12 +252,14 @@ main () {
   ./configure-payload-keys.bash "$azure_env"
 
   # Create managed identities to admin each state's database
+  configure_azure_profile
   while IFS=, read -r abbr name _; do
       echo "Creating managed identity for $name ($abbr)"
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       identity=$(state_managed_id_name "$abbr" "$ENV")
       az identity create -g "$RESOURCE_GROUP" -n "$identity"
   done < states.csv
+  configure_azure_profile
 
   exists=$(az ad group member check \
     --group "$PG_AAD_ADMIN" \
@@ -561,12 +573,14 @@ main () {
 
     # Update Key Vault to allow function access
     echo "Granting Key Vault access to ${func_app}"
+    configure_azure_profile
     stateManagedIdentityPrincipalId=$(\
       az identity show \
         --resource-group "${RESOURCE_GROUP}" \
         --name "${identity}" \
         --query principalId \
         --output tsv)
+    configure_azure_profile
 
     az deployment group create \
       --name "${VAULT_NAME}-access-policy-for-${func_app}" \
