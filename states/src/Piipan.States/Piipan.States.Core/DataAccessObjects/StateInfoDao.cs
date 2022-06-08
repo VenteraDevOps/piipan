@@ -10,6 +10,9 @@ using Dapper;
 
 namespace Piipan.States.Core.DataAccessObjects
 {
+    /// <summary>
+    /// This class retreives data from the state_info table in order to grab state email, phone, and region
+    /// </summary>
     public class StateInfoDao : IStateInfoDao
     {
         private readonly IDbConnectionFactory<StateInfoDb> _dbConnectionFactory;
@@ -18,7 +21,11 @@ namespace Piipan.States.Core.DataAccessObjects
         {
             _dbConnectionFactory = dbConnectionFactory;
         }
-
+        /// <summary>
+        /// Get all state info and searches off of state's name
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IState> GetStateById(string id)
         {
             using (var connection = await _dbConnectionFactory.Build())
@@ -31,7 +38,11 @@ namespace Piipan.States.Core.DataAccessObjects
                     LIMIT 1", new { id = id });
             }
         }
-
+        /// <summary>
+        /// Get all state info and searches off of state's id
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public async Task<IState> GetStateByName(string state)
         {
             using (var connection = await _dbConnectionFactory.Build())
@@ -44,7 +55,10 @@ namespace Piipan.States.Core.DataAccessObjects
                     LIMIT 1", new { state = state });
             }
         }
-
+        /// <summary>
+        /// Get all state info for all states
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<IState>> GetStates()
         {
             using (var connection = await _dbConnectionFactory.Build())

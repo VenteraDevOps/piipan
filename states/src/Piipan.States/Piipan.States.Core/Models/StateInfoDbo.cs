@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Piipan.States.Core.Models
 {
+    /// <summary>
+    /// Implementation of IState for database interactions
+    /// </summary>
     public class StateInfoDbo : IState
     {
         public string Id { get; set; }
