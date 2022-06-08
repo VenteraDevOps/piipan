@@ -266,17 +266,23 @@ private_dns_zone () {
 # https://github.com/Azure/azure-cli/issues/22661
 # https://github.com/Azure/azure-cli/issues/22735
 configure_azure_profile () {
-  if [ "${CLOUD_NAME}" = "AzureUSGovernment" ]; then
+  local cn
+  cn=$(\
+    az cloud show \
+      --query "name" \
+      --output tsv)
+
+  if [ "${cn}" = "AzureUSGovernment" ]; then
     profile=$(\
       az cloud show \
-        --name "${CLOUD_NAME}" \
+        --name "${cn}" \
         --query "profile" \
         --output tsv)
 
     if [ "${profile}" = "latest" ]; then
-      az cloud set -n "${CLOUD_NAME}" --profile "2020-09-01-hybrid"
+      az cloud set -n "${cn}" --profile "2020-09-01-hybrid"
     else
-      az cloud set -n "${CLOUD_NAME}" --profile "latest"
+      az cloud set -n "${cn}" --profile "latest"
     fi
   fi
 }
