@@ -7,11 +7,7 @@ namespace Piipan.Shared.Locations.Tests
     {
         LocationOptions locationOptions = new LocationOptions
         {
-            Map = new LocationMapping[]
-            {
-                new LocationMapping { Name = "National", States = new[] { "*" }},
-                new LocationMapping { Name = "Midwest", States = new[] { "WI", "IA", "MN" }},
-            }
+            NationalOfficeValue = "National"
         };
 
         /// <summary>
@@ -31,19 +27,20 @@ namespace Piipan.Shared.Locations.Tests
             Assert.Equal(new string[] { "*" }, states);
         }
 
-        [Fact]
-        public void GetMidwestStates()
-        {
-            // Arrange
-            var options = Options.Create(locationOptions);
-            var locationProvider = new LocationsProvider(options);
+        // TODO: Add regions back in after State Func API is complete
+        //[Fact]
+        //public void GetMidwestStates()
+        //{
+        //    // Arrange
+        //    var options = Options.Create(locationOptions);
+        //    var locationProvider = new LocationsProvider(options);
 
-            // Act
-            var states = locationProvider.GetStates("Midwest");
+        //    // Act
+        //    var states = locationProvider.GetStates("Midwest");
 
-            // Assert
-            Assert.Equal(new string[] { "WI", "IA", "MN" }, states);
-        }
+        //    // Assert
+        //    Assert.Equal(new string[] { "WI", "IA", "MN" }, states);
+        //}
 
         [Fact]
         public void GetSingleState()
@@ -53,10 +50,10 @@ namespace Piipan.Shared.Locations.Tests
             var locationProvider = new LocationsProvider(options);
 
             // Act
-            var states = locationProvider.GetStates("IA");
+            var states = locationProvider.GetStates("EA");
 
             // Assert
-            Assert.Equal(new string[] { "IA" }, states);
+            Assert.Equal(new string[] { "EA" }, states);
         }
 
         [Fact]
