@@ -55,6 +55,29 @@ namespace Piipan.States.Core.Integration.Tests
         }
 
         [Fact]
+        public async void GetStateWithBadNameTest()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                InsertState();
+
+                var expected = GetLastStateName();
+
+                var dao = new StateInfoDao(DbConnFactory());
+
+                // Act
+                var result = await dao.GetStateByName("NotInDB");
+
+                // Assert
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
         public async void GetStateByIdTest()
         {
             using (var conn = Factory.CreateConnection())
@@ -74,6 +97,29 @@ namespace Piipan.States.Core.Integration.Tests
 
                 // Assert
                 Assert.Equal(expected, result.Id);
+            }
+        }
+
+        [Fact]
+        public async void GetStateWithBadIdTest()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                InsertState();
+
+                var expected = GetLastStateId();
+
+                var dao = new StateInfoDao(DbConnFactory());
+
+                // Act
+                var result = await dao.GetStateById("0");
+
+                // Assert
+                Assert.Null(result);
             }
         }
 
@@ -104,6 +150,25 @@ namespace Piipan.States.Core.Integration.Tests
                     Assert.Equal(expected[count], state.Id);
                     count++;
                 }
+            }
+        }
+
+        [Fact]
+        public async void GetStatesTestEmpty()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                var dao = new StateInfoDao(DbConnFactory());
+
+                // Act
+                var result = await dao.GetStates();
+
+                // Assert
+                Assert.Empty(result);
             }
         }
     }

@@ -146,7 +146,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Api", "states
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core", "states\src\Piipan.States\Piipan.States.Core\Piipan.States.Core.csproj", "{7ADE7269-D297-4CB9-8258-E5CD171BD28F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FEC0F4AF-9F64-42C4-A7CC-848F37F9EAA0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FEC0F4AF-9F64-42C4-A7CC-848F37F9EAA0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core.Integration.Tests", "states\Tests\Piipan.States.Core.Integration.Tests\Piipan.States.Core.Integration.Tests.csproj", "{72B0FC2A-8ED9-44C3-9F17-EB00A76CCAC8}"
 EndProject

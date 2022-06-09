@@ -28,15 +28,23 @@ namespace Piipan.States.Core.DataAccessObjects
         /// <returns></returns>
         public async Task<IState> GetStateById(string id)
         {
-            using (var connection = await _dbConnectionFactory.Build())
+            try
             {
-                return await connection
-                    .QuerySingleAsync<StateInfoDbo>(@"
+                using (var connection = await _dbConnectionFactory.Build())
+                {
+                    return await connection
+                        .QuerySingleAsync<StateInfoDbo>(@"
                     SELECT id, state, state_abbreviation, email, phone, region
 	                FROM state_info WHERE id =@id
                     ORDER BY id DESC
                     LIMIT 1", new { id = id });
+                }
             }
+            catch (Exception e)
+            {
+                return null;
+            }
+            
         }
         /// <summary>
         /// Get all state info and searches off of state's id
@@ -45,15 +53,23 @@ namespace Piipan.States.Core.DataAccessObjects
         /// <returns></returns>
         public async Task<IState> GetStateByName(string state)
         {
-            using (var connection = await _dbConnectionFactory.Build())
+            try
             {
-                return await connection
-                    .QuerySingleAsync<StateInfoDbo>(@"
+                using (var connection = await _dbConnectionFactory.Build())
+                {
+                    return await connection
+                        .QuerySingleAsync<StateInfoDbo>(@"
                     SELECT id, state, state_abbreviation, email, phone, region
 	                FROM state_info WHERE state =@state
                     ORDER BY id DESC
                     LIMIT 1", new { state = state });
+                }
             }
+            catch (Exception e)
+            {
+                return null;
+            }
+
         }
         /// <summary>
         /// Get all state info for all states
