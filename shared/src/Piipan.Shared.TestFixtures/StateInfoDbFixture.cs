@@ -12,7 +12,7 @@ namespace Piipan.Shared.TestFixtures
 
         public StateInfoDbFixture()
         {
-            ConnectionString = "Server=cc-psql-core-cjc.postgres.database.azure.com;Database=collaboration;Port=5432;User Id=piipanadmin@cc-psql-core-cjc;Password=qEAqNcaRG6yCaXbmna6HHY2OUWZn6aKEhSkyfGeH8i03AYNBhhY1R9Wha81c7e48aA1!;";
+            ConnectionString = Environment.GetEnvironmentVariable("CollaborationDatabaseConnectionString");
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
