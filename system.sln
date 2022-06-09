@@ -148,9 +148,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core", "state
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FEC0F4AF-9F64-42C4-A7CC-848F37F9EAA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core.Integration.Tests", "states\tests2\Piipan.States.Core.Integration.Tests\Piipan.States.Core.Integration.Tests.csproj", "{72B0FC2A-8ED9-44C3-9F17-EB00A76CCAC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core.Integration.Tests", "states\tests\Piipan.States.Core.Integration.Tests\Piipan.States.Core.Integration.Tests.csproj", "{72B0FC2A-8ED9-44C3-9F17-EB00A76CCAC8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core.Tests", "states\tests2\Piipan.States.Core.Tests\Piipan.States.Core.Tests.csproj", "{FA44CF06-EC0C-422F-8A39-8B222DDAAD00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core.Tests", "states\tests\Piipan.States.Core.Tests\Piipan.States.Core.Tests.csproj", "{FA44CF06-EC0C-422F-8A39-8B222DDAAD00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
