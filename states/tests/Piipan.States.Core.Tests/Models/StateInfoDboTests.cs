@@ -205,5 +205,25 @@ namespace Piipan.States.Core.Tests.Models
             // Act / Assert
             Assert.False(stateOne.Equals(stateTwo));
         }
+
+        [Fact]
+        public void Equals_OverrideTests()
+        {
+            // Arrange
+            var stateOne = new StateInfoDbo
+            {
+                Id = "1",
+                State = "test",
+                StateAbbreviation = "TT",
+                Email = "test@test.com",
+                Phone = "123456789",
+                Region = "TEST"
+            };
+
+
+            // Act / Assert
+            Assert.False(stateOne.Equals(null));
+            Assert.False(stateOne.Equals("test"));
+        }
     }
 }
