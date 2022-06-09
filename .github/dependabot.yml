@@ -171,6 +171,26 @@ updates:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
+  directory: "/states/src/Piipan.States/Piipan.States.Api"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/src/Piipan.States/Piipan.States.Core"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/tests/Piipan.States.Core.Integration.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/tests/Piipan.States.Core.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
   directory: "/perf-tests/src/Etl.BulkUpload.Performance.TestRunner/Etl.BulkUpload.Performance.TestRunner"
   schedule:
     interval: daily
