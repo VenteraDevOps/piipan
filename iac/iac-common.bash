@@ -42,14 +42,19 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 CLOUD_NAME_STR_KEY=CloudName
 
 # Azure Key Vault naming is kebab-case
-# Azure Function enivornment vairable naming is camelCase
+# Azure Function environment variable naming is PascalCase
 # Thus, creating constants for both to avoid naming conflicts
+
+# Column Encryption Key - Azure Function environment variable
+COLUMN_ENCRYPT_KEY=ColumnEncryptionKey
+# Column Encryption Key - Azure Key Vault secret
+COLUMN_ENCRYPT_KEY_KV=column-encryption-key
 # Payload Encryption Key - Azure Function environment variable
-UPLOAD_ENCRYPT_KEY=uploadPayloadKey
+UPLOAD_ENCRYPT_KEY=UploadPayloadKey
 # Payload Encryption Key - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_KV=upload-payload-key
 # Payload Encryption Key SHA - Azure Function environment variable
-UPLOAD_ENCRYPT_KEY_SHA=uploadPayloadKeySHA
+UPLOAD_ENCRYPT_KEY_SHA=UploadPayloadKeySHA
 # Payload Encryption Key SHA - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
 
