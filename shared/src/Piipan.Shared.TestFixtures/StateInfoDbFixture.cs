@@ -16,6 +16,8 @@ namespace Piipan.Shared.TestFixtures
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
+            ApplySchema();
+            
         }
 
         /// <summary>
@@ -60,6 +62,23 @@ namespace Piipan.Shared.TestFixtures
                 conn.Close();
             }
 
+        }
+
+        private void ApplySchema()
+        {
+            string sqltext = System.IO.File.ReadAllText("match-record.sql", System.Text.Encoding.UTF8);
+
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute("DROP TABLE IF EXISTS state_info)");
+                conn.Execute(sqltext);
+                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('99', 'test' ,'TT', 'test@test.com', '5551234', 'TEST')");
+
+                conn.Close();
+            }
         }
 
         public string GetLastStateId()
