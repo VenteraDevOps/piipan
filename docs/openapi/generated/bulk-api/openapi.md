@@ -52,18 +52,6 @@ string
 |filename|path|string|true|Name of file being uploaded|
 |Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
 
-> Example responses
-
-> An upload of a single CSV file of all the participants
-
-```json
-{
-  "data": {
-    "upload_id": "0x8DA2EA86C4C2089"
-  }
-}
-```
-
 <h3 id="upload_all_participants-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
@@ -82,6 +70,18 @@ Status Code **201**
 |---|---|---|---|---|
 |» data|object|false|none|The response payload. Will contain a data property with upload details.|
 |»» upload_id|string|true|none|A unique upload_id for the successful upload.|
+
+### Response Examples
+
+> An upload of a single CSV file of all the participants
+
+```json
+{
+  "data": {
+    "upload_id": "0x8DA2EA86C4C2089"
+  }
+}
+```
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -122,18 +122,6 @@ string
 |filename|path|string|true|Name of file being uploaded|
 |Content-Length|header|integer|true|Size in bytes of your file to be uploaded. A curl request will add this header by default when including a data or file parameter.|
 
-> Example responses
-
-> An upload of a single CSV file of all the participants
-
-```json
-{
-  "data": {
-    "upload_id": "0x8DA2EA86C4C2089"
-  }
-}
-```
-
 <h3 id="upload-(deprecated)-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
@@ -152,6 +140,18 @@ Status Code **201**
 |---|---|---|---|---|
 |» data|object|false|none|The response payload. Will contain a data property with upload details.|
 |»» upload_id|string|true|none|A unique upload_id for the successful upload.|
+
+### Response Examples
+
+> An upload of a single CSV file of all the participants
+
+```json
+{
+  "data": {
+    "upload_id": "0x8DA2EA86C4C2089"
+  }
+}
+```
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:

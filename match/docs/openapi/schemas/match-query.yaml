@@ -9,6 +9,7 @@ MatchRequest:
         properties:
           data:
             type: array
+            description: "An array containing 1 to 50 individuals to match against records of active participants in other States"
             minItems: 1
             maxItems: 50
             items:

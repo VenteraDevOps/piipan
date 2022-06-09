@@ -30,6 +30,7 @@ paths:
               properties:
                 data:
                   type: array
+                  description: An array containing 1 to 50 individuals to match against records of active participants in other States
                   minItems: 1
                   maxItems: 50
                   items:
@@ -214,6 +215,7 @@ paths:
                         - index: 0
                           matches:
                             - match_id: BCD2345
+                              lds_hash: 8846a0dac5cb2a49fa3571d36a41757c8ea955414ac5d88b418a6a9e8065e770f80be56dac18cedf538e718a6dfa10fc5b6058186c681ad61f4bfec976250616
                               state: ea
                               case_id: string
                               participant_id: string
@@ -244,6 +246,7 @@ paths:
                         - index: 0
                           matches:
                             - match_id: XYZ9876
+                              lds_hash: 2581e60af416384c03d60bc6fb3f047838d7fc8642def08fb37717618586286ac83948002a7f12873df5b161eece4fa33dab8a32097b82476ae2901d839dc616
                               state: eb
                               case_id: string
                               participant_id: string
@@ -258,6 +261,7 @@ paths:
                               vulnerable_individual: true
                               match_url: 'https://nac.example/match/XYZ9876'
                             - match_id: 4567CDF
+                              lds_hash: 713ba87711e3ebe6c05cce93595df19fb04a9f7cf423ca33e9d3e8a779a49f37c306ab84b8010986c34f898156a6e073403259cbe069bcd6fbae8f5cb2b0caa9
                               state: ec
                               case_id: string
                               participant_id: string
