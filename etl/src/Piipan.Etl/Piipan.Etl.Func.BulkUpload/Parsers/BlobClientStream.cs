@@ -10,7 +10,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 {
     public class BlobClientStream : IBlobClientStream
     {
-        private const string CUSTOMER_KEY_FUNC_VARIABLE_NAME = "uploadPayloadKey";
+        private const string CUSTOMER_KEY_FUNC_VARIABLE_NAME = "UploadPayloadKey";
 
         public virtual string GetBlobName(StorageBlobCreatedEventData blobEvent) {
 

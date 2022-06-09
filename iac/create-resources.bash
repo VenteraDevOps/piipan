@@ -218,7 +218,7 @@ main () {
     --name "$PG_SECRET_NAME" \
     --file /dev/stdin \
     --query id
-    #--value "$PG_SECRET" \
+    #--value "$PG_SECRET"
 
   echo "Creating PostgreSQL server"
   az deployment group create \
@@ -249,7 +249,7 @@ main () {
     --object-id "$PG_AAD_ADMIN_OBJID"
 
   # Configure Payload Keys
-  ./configure-payload-keys.bash "$azure_env"
+  ./configure-encryption-secrets.bash "$azure_env"
 
   # Create managed identities to admin each state's database
   configure_azure_profile
@@ -393,13 +393,34 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
+
+  # Update Key Vault to allow function access
+  echo "Granting Key Vault access to ${ORCHESTRATOR_FUNC_APP_NAME}"
+  funcIdentityPrincipalId=$(\
+    az functionapp identity show \
+    --name "${ORCHESTRATOR_FUNC_APP_NAME}" \
+    --resource-group "${MATCH_RESOURCE_GROUP}" \
+    --query principalId \
+    --output tsv)
+
+  az deployment group create \
+    --name "${VAULT_NAME}-access-for-${ORCHESTRATOR_FUNC_APP_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --template-file ./arm-templates/key-vault-access-policy.json \
+    --parameters \
+      keyVaultName="${VAULT_NAME}" \
+      objectId="${funcIdentityPrincipalId}" \
+      permissionsSecrets="['get', 'list']"
+
+  echo "Update ${ORCHESTRATOR_FUNC_APP_NAME} settings"
   az functionapp config appsettings set \
     --name "$ORCHESTRATOR_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --settings \
+      ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
+      QueryToolUrl="${QUERY_TOOL_URL}" \
       WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1 \
-      QueryToolUrl="$QUERY_TOOL_URL"
+      WEBSITE_VNET_ROUTE_ALL=1
 
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
@@ -437,10 +458,31 @@ main () {
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
+
+  # Update Key Vault to allow function access
+  echo "Granting Key Vault access to ${MATCH_RES_FUNC_APP_NAME}"
+  funcIdentityPrincipalId=$(\
+    az functionapp identity show \
+    --name "${MATCH_RES_FUNC_APP_NAME}" \
+    --resource-group "${MATCH_RESOURCE_GROUP}" \
+    --query principalId \
+    --output tsv)
+
+  az deployment group create \
+    --name "${VAULT_NAME}-access-for-${MATCH_RES_FUNC_APP_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --template-file ./arm-templates/key-vault-access-policy.json \
+    --parameters \
+      keyVaultName="${VAULT_NAME}" \
+      objectId="${funcIdentityPrincipalId}" \
+      permissionsSecrets="['get', 'list']"
+
+  echo "Update ${MATCH_RES_FUNC_APP_NAME} settings"
   az functionapp config appsettings set \
     --name "$MATCH_RES_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --settings \
+      ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
 
@@ -583,7 +625,7 @@ main () {
     configure_azure_profile
 
     az deployment group create \
-      --name "${VAULT_NAME}-access-policy-for-${func_app}" \
+      --name "${VAULT_NAME}-access-for-${func_app}" \
       --resource-group "${RESOURCE_GROUP}" \
       --template-file ./arm-templates/key-vault-access-policy.json \
       --parameters \
@@ -597,6 +639,7 @@ main () {
     # details that are not part of the default connection string
     db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
     db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
+    echo "Update ${func_app} settings"
     az functionapp config appsettings set \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app" \
@@ -604,6 +647,7 @@ main () {
         ${AZ_SERV_STR_KEY}="${az_serv_str}" \
         ${BLOB_CONN_STR_KEY}="${blob_conn_str}" \
         ${CLOUD_NAME_STR_KEY}="${CLOUD_NAME}" \
+        ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
         ${DB_CONN_STR_KEY}="${db_conn_str}" \
         ${STATE_STR_KEY}="${abbr}" \
         ${UPLOAD_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_KV})" \
