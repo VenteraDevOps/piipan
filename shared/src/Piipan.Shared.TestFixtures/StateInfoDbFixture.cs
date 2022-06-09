@@ -66,7 +66,7 @@ namespace Piipan.Shared.TestFixtures
 
         private void ApplySchema()
         {
-            string sqltext = System.IO.File.ReadAllText("match-record.sql", System.Text.Encoding.UTF8);
+            string sqltext = System.IO.File.ReadAllText("state-record.sql", System.Text.Encoding.UTF8);
 
             using (var conn = Factory.CreateConnection())
             {
