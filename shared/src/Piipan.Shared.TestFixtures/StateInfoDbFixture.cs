@@ -12,11 +12,10 @@ namespace Piipan.Shared.TestFixtures
 
         public StateInfoDbFixture()
         {
-            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString"); 
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
-            ApplySchema();
         }
 
         /// <summary>
@@ -61,24 +60,6 @@ namespace Piipan.Shared.TestFixtures
                 conn.Close();
             }
 
-        }
-
-        private void ApplySchema()
-        {
-            string comments = "This method is being kept in for book-keeping but is not needed because we are not dropping the tables in dispose()";
-        }
-
-        public void ClearStates()
-        {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("DELETE FROM state_info");
-
-                conn.Close();
-            }
         }
 
         public string GetLastStateId()
