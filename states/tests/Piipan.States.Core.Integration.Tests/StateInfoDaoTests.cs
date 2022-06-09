@@ -116,7 +116,7 @@ namespace Piipan.States.Core.Integration.Tests
                 var dao = new StateInfoDao(DbConnFactory());
 
                 // Act
-                var result = await dao.GetStateById("0");
+                var result = await dao.GetStateById("-1");
 
                 // Assert
                 Assert.Null(result);
@@ -131,7 +131,7 @@ namespace Piipan.States.Core.Integration.Tests
                 // Arrange
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-
+                ClearStates();
                 InsertStates();
 
                 string[] expected = { "", "" };
@@ -161,6 +161,8 @@ namespace Piipan.States.Core.Integration.Tests
                 // Arrange
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
+
+                ClearStates();
 
                 var dao = new StateInfoDao(DbConnFactory());
 

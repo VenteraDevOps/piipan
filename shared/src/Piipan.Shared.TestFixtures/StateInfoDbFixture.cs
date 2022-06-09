@@ -12,7 +12,7 @@ namespace Piipan.Shared.TestFixtures
 
         public StateInfoDbFixture()
         {
-            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString"); 
+            ConnectionString = "Server=cc-psql-core-cjc.postgres.database.azure.com;Database=collaboration;Port=5432;User Id=piipanadmin@cc-psql-core-cjc;Password=qEAqNcaRG6yCaXbmna6HHY2OUWZn6aKEhSkyfGeH8i03AYNBhhY1R9Wha81c7e48aA1!;";
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
@@ -52,16 +52,7 @@ namespace Piipan.Shared.TestFixtures
 
         public void Dispose()
         {
-            using (var conn = Factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-
-                conn.Execute("TRUNCATE TABLE state_info");
-
-                conn.Close();
-            }
-
+            ClearStates();
         }
 
         private void ApplySchema()
@@ -75,11 +66,26 @@ namespace Piipan.Shared.TestFixtures
 
                 conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Execute(sqltext);
-                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('99', 'test' ,'TT', 'test@test.com', '5551234', 'TEST')");
+                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('0', 'zero', 'TT', 'test@test.com', '5551234', 'ZERO')");
 
                 conn.Close();
             }
         }
+
+        public void ClearStates()
+        {
+
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute("TRUNCATE TABLE state_info");
+
+                conn.Close();
+            }
+        }
+
 
         public string GetLastStateId()
         {
