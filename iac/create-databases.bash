@@ -193,6 +193,7 @@ main () {
   export PGPASSWORD
   export PGUSER=${PG_AAD_ADMIN}@$PG_SERVER_NAME
 
+  configure_azure_profile
   while IFS=, read -r abbr name _; do
     echo "Creating managed identity roles for $name ($abbr)"
 
@@ -209,6 +210,7 @@ main () {
     create_managed_role "$db" "$role" "$client_id"
     config_managed_role "$db" "$role"
   done < states.csv
+  configure_azure_profile
 
   script_completed
 }

@@ -195,11 +195,11 @@ main () {
     --storage-account "$API_APP_STORAGE_NAME" \
     --assign-identity "[system]" \
     --tags Project=$PROJECT_TAG
-  
+
   # Create an Active Directory app registration associated with the app.
   az ad app create \
     --display-name "$METRICS_API_APP_NAME" \
-    --available-to-other-tenants false
+    --sign-in-audience "AzureADMyOrg"
 
   # Integrate function app into Virtual Network
   echo "Integrating $METRICS_API_APP_NAME into virtual network"

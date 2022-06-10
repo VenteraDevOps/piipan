@@ -47,13 +47,13 @@ main () {
     az ad sp list \
       --display-name "${function}" \
       --filter "appId eq '${application}'" \
-      --query [0].objectId \
+      --query [0].id \
       --output tsv)
 
   # Get user's Azure AD object ID
   user=$(\
     az ad signed-in-user show \
-      --query objectId \
+      --query id \
       --output tsv)
 
   json="\

@@ -14,9 +14,6 @@ DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
 
-# Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
-
 # The default Azure subscription
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
@@ -45,14 +42,19 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 CLOUD_NAME_STR_KEY=CloudName
 
 # Azure Key Vault naming is kebab-case
-# Azure Function enivornment vairable naming is camelCase
+# Azure Function environment variable naming is PascalCase
 # Thus, creating constants for both to avoid naming conflicts
+
+# Column Encryption Key - Azure Function environment variable
+COLUMN_ENCRYPT_KEY=ColumnEncryptionKey
+# Column Encryption Key - Azure Key Vault secret
+COLUMN_ENCRYPT_KEY_KV=column-encryption-key
 # Payload Encryption Key - Azure Function environment variable
-UPLOAD_ENCRYPT_KEY=uploadPayloadKey
+UPLOAD_ENCRYPT_KEY=UploadPayloadKey
 # Payload Encryption Key - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_KV=upload-payload-key
 # Payload Encryption Key SHA - Azure Function environment variable
-UPLOAD_ENCRYPT_KEY_SHA=uploadPayloadKeySHA
+UPLOAD_ENCRYPT_KEY_SHA=UploadPayloadKeySHA
 # Payload Encryption Key SHA - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
 
@@ -118,6 +120,20 @@ OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 ### END Constants
 
 ### Functions
+# Return the object ID for the currently logged in account.
+# Supports both users and service principals.
+current_user_objid () {
+  type=$(az account show --query user.type --output tsv)
+
+  if [ "${type}" = "servicePrincipal" ]; then
+    app_id=$(az account show --query user.name --output tsv)
+    CURRENT_USER_OBJID=$(az ad sp show --id "${app_id}" --query id --output tsv)
+  else
+    CURRENT_USER_OBJID=$(az ad signed-in-user show --query id --output tsv)
+  fi
+}
+current_user_objid
+
 # Create a very long, (mostly) random password. Ensures all Azure character
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
@@ -249,6 +265,33 @@ private_dns_zone () {
   echo $base
 }
 
+# Azure CLI 2.37 upgraded azure-mgmt-msi version to 2021-09-30-preview. This API
+# version will not work with AzureUSGovernment, and must be downgraded.
+# https://github.com/Azure/azure-cli/pull/22284
+# https://github.com/Azure/azure-cli/issues/22661
+# https://github.com/Azure/azure-cli/issues/22735
+configure_azure_profile () {
+  local cn
+  cn=$(\
+    az cloud show \
+      --query "name" \
+      --output tsv)
+
+  if [ "${cn}" = "AzureUSGovernment" ]; then
+    profile=$(\
+      az cloud show \
+        --name "${cn}" \
+        --query "profile" \
+        --output tsv)
+
+    if [ "${profile}" = "latest" ]; then
+      az cloud set -n "${cn}" --profile "2020-09-01-hybrid"
+    else
+      az cloud set -n "${cn}" --profile "latest"
+    fi
+  fi
+}
+
 # try_run()
 #
 # The function help with the robusness of the IaC code.
@@ -342,6 +385,7 @@ set_oidc_secret () {
     --name "$secret_name" \
     --file /dev/stdin \
     --query id > /dev/null
+    #--value "$value"
 }
 
 # Given an App Service instance name, output the secret established for OIDC,
