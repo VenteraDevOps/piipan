@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
-using Microsoft.AspNetCore.Routing;
 using Moq;
-using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
 
@@ -60,30 +52,6 @@ namespace Piipan.QueryTool.Tests
             context.Setup(m => m.Response).Returns(defaultHttpContext.Response);
 
             return context.Object;
-        }
-
-        protected PageHandlerExecutingContext GetPageHandlerExecutingContext<T>(T pageModel, string methodName) where T : BasePageModel
-        {
-            pageModel.PageContext.HttpContext = contextMock();
-
-            var pageContext = new PageContext(new ActionContext(
-                pageModel.PageContext.HttpContext,
-                new RouteData(),
-                new PageActionDescriptor(),
-                new ModelStateDictionary()));
-            var model = new Mock<PageModel>();
-
-            var pageHandlerExecutingContext = new PageHandlerExecutingContext(
-               pageContext,
-               Array.Empty<IFilterMetadata>(),
-               new HandlerMethodDescriptor() { MethodInfo = typeof(T).GetMethod(methodName) },
-               new Dictionary<string, object>(),
-               model.Object);
-
-            pageModel.OnPageHandlerExecuting(pageHandlerExecutingContext);
-
-            return pageHandlerExecutingContext;
-
         }
     }
 }

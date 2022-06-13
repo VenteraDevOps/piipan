@@ -1,7 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Piipan.Shared.Authorization;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -14,7 +13,6 @@ namespace Piipan.QueryTool.Pages
         {
         }
 
-        [IgnoreAuthorization]
         public IActionResult OnGet()
         {
             Message = "You do not have a sufficient role or location to access this page";

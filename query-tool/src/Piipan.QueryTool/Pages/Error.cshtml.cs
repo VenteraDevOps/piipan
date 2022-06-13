@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Extensions.Logging;
-using Piipan.Shared.Authorization;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -16,7 +15,6 @@ namespace Piipan.QueryTool.Pages
             _logger = logger;
         }
 
-        [IgnoreAuthorization]
         public void OnGet(string message)
         {
             _logger.LogError($"Arrived at error page with message {message}");

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -105,40 +103,6 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             return pageModel;
-        }
-
-        [Theory]
-        [InlineData(nameof(ListModel.OnGet), null, null, false)]
-        [InlineData(nameof(ListModel.OnGet), "IA", null, false)]
-        [InlineData(nameof(ListModel.OnGet), null, "Worker", false)]
-        [InlineData(nameof(ListModel.OnGet), "IA", "Worker", true)]
-        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
-        {
-            var mockServiceProvider = serviceProviderMock(location: location, role: role);
-
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
-
-            if (!isAuthorized)
-            {
-                Assert.Equal(403, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
-                Assert.IsType<RedirectToPageResult>(pageHandlerExecutingContext.Result);
-            }
-            else
-            {
-                Assert.Equal(200, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
-            }
-        }
-
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider mockServiceProvider, string methodName)
-        {
-            var mockMatchApi = Mock.Of<IMatchResolutionApi>();
-            var pageModel = new ListModel(
-                new NullLogger<ListModel>(),
-                mockMatchApi,
-                mockServiceProvider
-            );
-
-            return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }
