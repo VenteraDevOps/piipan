@@ -26,7 +26,7 @@ namespace Piipan.States.Client
         /// <returns></returns>
         public async Task<StatesInfoResponse> GetStates()
         {
-            var (states, _) = await _apiClient.TryGetAsync<StatesInfoResponse>("states");
+            var states = await _apiClient.GetAsync<StatesInfoResponse>("states");
             return states;
         }
     }

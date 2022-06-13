@@ -89,10 +89,9 @@ namespace Piipan.Shared.Http
 
             try
             {
-                var responseContentJson = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
 
-
+                var responseContentJson = await response.Content.ReadAsStringAsync();
 
                 return (JsonConvert.DeserializeObject<TResponse>(responseContentJson), (int)response.StatusCode);
             }

@@ -499,7 +499,7 @@ main () {
   echo "Create States API Function App"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME")
   az deployment group create \
-    --name match-res-api \
+    --name state-api \
     --resource-group "$RESOURCE_GROUP" \
     --template-file  ./arm-templates/function-states.json \
     --parameters \
@@ -521,30 +521,12 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
   
-  # Update Key Vault to allow function access
-  echo "Granting Key Vault access to ${STATES_FUNC_APP_NAME}"
-  funcIdentityPrincipalId=$(\
-    az functionapp identity show \
-    --name "${STATES_FUNC_APP_NAME}" \
-    --resource-group "${RESOURCE_GROUP}" \
-    --query principalId \
-    --output tsv)
-  
-  az deployment group create \
-    --name "${VAULT_NAME}-access-for-${STATES_FUNC_APP_NAME}" \
-    --resource-group "${RESOURCE_GROUP}" \
-    --template-file ./arm-templates/key-vault-access-policy.json \
-    --parameters \
-      keyVaultName="${VAULT_NAME}" \
-      objectId="${funcIdentityPrincipalId}" \
-      permissionsSecrets="['get', 'list']"
   
   echo "Update ${STATES_FUNC_APP_NAME} settings"
   az functionapp config appsettings set \
     --name "$STATES_FUNC_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --settings \
-      ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
   
