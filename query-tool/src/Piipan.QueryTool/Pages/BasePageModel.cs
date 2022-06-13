@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
 using Piipan.States.Api;
@@ -32,17 +31,10 @@ namespace Piipan.QueryTool.Pages
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
-            // TODO: Pull the state information from the States API
             StateInfo = await _memoryCache.GetOrCreateAsync("StateInfo", async (e) =>
             {
                 return await _statesApi.GetStates();
             });
-            if ((string.IsNullOrEmpty(Location) || string.IsNullOrEmpty(Role)) &&
-                (!context.HandlerMethod?.MethodInfo.CustomAttributes.Any(n => n.AttributeType == typeof(IgnoreAuthorizationAttribute)) ?? false))
-            {
-                context.HttpContext.Response.StatusCode = 403;
-                context.Result = RedirectToUnauthorized();
-            }
             await next();
         }
 

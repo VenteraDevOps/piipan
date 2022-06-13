@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Piipan.Shared.Authorization
@@ -22,8 +22,21 @@ namespace Piipan.Shared.Authorization
                     // if the allowed values includes a wildcard, allow any value for this claim type
                     if (rcv.Values.Any(v => v == "*"))
                     {
-                        innerBuilder.RequireAssertion(context => {
+                        innerBuilder.RequireAssertion(context =>
+                        {
                             return context.User.Claims.Any(c => c.Type == rcv.Type);
+                        });
+                    }
+                    // If any values contain a wildcard, use a regex expression to test for wildcard
+                    else if (rcv.Values.Any(v => v.Contains("*")))
+                    {
+                        innerBuilder.RequireAssertion(context =>
+                        {
+                            return context.User.Claims.Any(c => c.Type == rcv.Type && rcv.Values.Any(v =>
+                            {
+                                var valueAsRegex = "^" + Regex.Escape(v).Replace("\\*", ".+") + "$";
+                                return Regex.IsMatch(c.Value, valueAsRegex);
+                            }));
                         });
                     }
                     else
@@ -32,7 +45,7 @@ namespace Piipan.Shared.Authorization
                     }
                 }
             }
-            
+
             innerBuilder.RequireAuthenticatedUser();
 
             return innerBuilder.Build();
