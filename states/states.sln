@@ -19,13 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api", "src\Piipan.States.Func.Api\Piipan.States.Func.Api.csproj", "{38A934EE-566D-4E1A-9D11-6E7EDDB74DE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client.Tests", "Tests\Piipan.States.Client.Tests\Piipan.States.Client.Tests.csproj", "{27EB0ACF-897F-4182-9F71-828235D5143A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client.Tests", "tests\Piipan.States.Client.Tests\Piipan.States.Client.Tests.csproj", "{27EB0ACF-897F-4182-9F71-828235D5143A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Core.Integration.Tests", "Tests\Piipan.States.Core.Integration.Tests\Piipan.States.Core.Integration.Tests.csproj", "{23E43FB5-816A-46BA-A4DE-D34D75BE9FC1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api.IntegrationTests", "Tests\Piipan.States.Func.Api.IntegrationTests\Piipan.States.Func.Api.IntegrationTests.csproj", "{6B09AE18-29FC-4AD1-BCF8-1F85ACA33AEC}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api.Tests", "Tests\Piipan.States.Func.Api.Tests\Piipan.States.Func.Api.Tests.csproj", "{713A07D2-F8AE-4550-A59A-AFBA727F538F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api.Tests", "tests\Piipan.States.Func.Api.Tests\Piipan.States.Func.Api.Tests.csproj", "{713A07D2-F8AE-4550-A59A-AFBA727F538F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,14 +53,6 @@ Global
 		{27EB0ACF-897F-4182-9F71-828235D5143A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27EB0ACF-897F-4182-9F71-828235D5143A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27EB0ACF-897F-4182-9F71-828235D5143A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23E43FB5-816A-46BA-A4DE-D34D75BE9FC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23E43FB5-816A-46BA-A4DE-D34D75BE9FC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23E43FB5-816A-46BA-A4DE-D34D75BE9FC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23E43FB5-816A-46BA-A4DE-D34D75BE9FC1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6B09AE18-29FC-4AD1-BCF8-1F85ACA33AEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6B09AE18-29FC-4AD1-BCF8-1F85ACA33AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6B09AE18-29FC-4AD1-BCF8-1F85ACA33AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6B09AE18-29FC-4AD1-BCF8-1F85ACA33AEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{713A07D2-F8AE-4550-A59A-AFBA727F538F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{713A07D2-F8AE-4550-A59A-AFBA727F538F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{713A07D2-F8AE-4550-A59A-AFBA727F538F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,8 +69,6 @@ Global
 		{9DF1C100-C265-4D34-8DC3-0035255FB6D7} = {2CE56EC4-D5DF-4872-9764-DF01968A2386}
 		{38A934EE-566D-4E1A-9D11-6E7EDDB74DE5} = {2CE56EC4-D5DF-4872-9764-DF01968A2386}
 		{27EB0ACF-897F-4182-9F71-828235D5143A} = {5A3E3906-E9D5-4D57-AC22-F9BD7D78B27C}
-		{23E43FB5-816A-46BA-A4DE-D34D75BE9FC1} = {5A3E3906-E9D5-4D57-AC22-F9BD7D78B27C}
-		{6B09AE18-29FC-4AD1-BCF8-1F85ACA33AEC} = {5A3E3906-E9D5-4D57-AC22-F9BD7D78B27C}
 		{713A07D2-F8AE-4550-A59A-AFBA727F538F} = {5A3E3906-E9D5-4D57-AC22-F9BD7D78B27C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
