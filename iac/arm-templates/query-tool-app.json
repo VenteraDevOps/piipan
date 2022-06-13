@@ -26,6 +26,12 @@
         "MatchResApiAppId": {
             "type": "string"
         },
+        "StatesApiUri": {
+            "type": "string"
+        },
+        "StatesApiAppId": {
+            "type": "string"
+        },
         "eventHubName": {
             "type": "String"
         },
@@ -88,6 +94,14 @@
                 {
                     "name": "OrchApiAppId",
                     "value": "[parameters('OrchApiAppId')]"
+                },
+                {
+                    "name": "StatesApiUri",
+                    "value": "[parameters('StatesApiUri')]"
+                },
+                {
+                    "name": "StatesApiAppId",
+                    "value": "[parameters('StatesApiAppId')]"
                 },
                 {
                     "name": "MatchResApiUri",

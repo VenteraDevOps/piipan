@@ -1,7 +1,6 @@
-﻿@using Piipan.Match.Api.Models
-@using Piipan.Match.Api.Models.Resolution
-@using static Piipan.QueryTool.Client.Helpers.ValueToDisplayHelper
+﻿@using static Piipan.QueryTool.Client.Helpers.ValueToDisplayHelper
 @using Piipan.QueryTool.Client.Helpers
+@using Piipan.States.Api.Models
 @code {
     [Parameter] public StateInfoResponseData StateInfo { get; set; }
     [Parameter] public bool InitiatingState { get; set; }

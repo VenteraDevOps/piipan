@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace Piipan.Match.Api.Models
+namespace Piipan.States.Api.Models
 {
-    public class StateInfoResponseData
+    public class StateInfoResponseData : IState
     {
         [JsonProperty("id")]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("state")]
         public string State { get; set; }

@@ -34,12 +34,12 @@ main () {
   echo "Setting key in vault"
   PG_SECRET=$(random_password)
   export PG_SECRET
-  printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
-    --vault-name "$VAULT_NAME" \
-    --name "$PG_SECRET_NAME" \
-    --file /dev/stdin \
-    --query id
-    #--value "$PG_SECRET" \
+   printenv PG_SECRET | tr -d '\n' | az keyvault secret set \
+     --vault-name "$VAULT_NAME" \
+     --name "$PG_SECRET_NAME" \
+     --file /dev/stdin \
+     --query id
+     #--value "$PG_SECRET" \
 
   echo "Creating core database server"
   az deployment group create \
@@ -94,6 +94,13 @@ main () {
   db_create_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP"
   db_config_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
   db_grant_readwrite "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
+
+  local states
+  states=$(get_resources "$STATES_API_TAG" "$RESOURCE_GROUP")
+  echo "Configuring $COLLAB_DB_NAME access for $states"
+  db_create_managed_role "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME" "$RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME"
+  db_grant_readwrite "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME"
 
   db_leave_aad "$PG_AAD_ADMIN"
 

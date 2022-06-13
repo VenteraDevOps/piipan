@@ -15,7 +15,11 @@
     {
         StateValues.Add(new("Case Number", Participant.CaseId));
         StateValues.Add(new("Participant ID", Participant.ParticipantId));
+
+        // If we are the intiating state Participant Closing Date does not make sense to attempt to display. Show N/A
+        // so that the user knows it's a value not applicable to the initiating state.
         StateValues.Add(new("Participant Closing Date", InitiatingState ? "N/A" : Participant.ParticipantClosingDate));
+
         StateValues.Add(new("Recent Benefits Issuance Dates", Participant.RecentBenefitIssuanceDates));
     }
 }

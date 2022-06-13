@@ -4,7 +4,7 @@
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
 @using Piipan.QueryTool.Client.Models
-@using Match.Api.Models
+@using Piipan.States.Api.Models
 @using Piipan.Shared.API.Utilities
 @using static Piipan.Components.Tag.TagConstants
 @inherits BaseComponentTest<MatchDetail>
@@ -95,9 +95,9 @@
                     }
                 }
             },
-            StateInfo = new ParameterBase<StateInfoResponse>
+            StateInfo = new ParameterBase<StatesInfoResponse>
             {
-                Data = new StateInfoResponse
+                Data = new StatesInfoResponse
                 {
                     Results = new List<StateInfoResponseData>
                     {
@@ -158,10 +158,6 @@
                             <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore>SNAP Participant Information</button>
                         </h4>
                         <div id:ignore class="usa-accordion__content usa-prose">
-                            <ul>
-                                <li>Use your state’s Case Number and Participant ID to identify the individual involved</li>
-                                <li>Use the other state’s Case Number and Participant ID to commuinicate about the individual without exposing more sensitive PII, such as Name, Date of Birth, or Social Security Number</li>
-                            </ul>
                             <div class="two-state-grid">
                                 <div>
                                     <h5>Echo Alpha <span>(Initiating State)</span></h5>

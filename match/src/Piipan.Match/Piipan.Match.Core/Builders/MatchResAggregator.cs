@@ -43,16 +43,9 @@ namespace Piipan.Match.Core.Builders
             foreach (var stateAbbr in match.States)
             {
                 var mreFiltered = match_res_events.Where(mre => mre.ActorState == stateAbbr);
-                string jsonString = MergeEvents(mreFiltered);
+                string jsonString = MergeEvents(mreFiltered, match.Initiator == stateAbbr ? match.Input : match.Data);
 
                 var stateObj = JsonConvert.DeserializeObject<Disposition>(jsonString);
-
-                // Grab the vulnerable individual status from the original match if it hasn't been updated by an event
-                var originalMatchDisposition = JsonConvert.DeserializeObject<Disposition>(match.Initiator == stateAbbr ? match.Input : match.Data);
-                if (stateObj.VulnerableIndividual == null && (match.Initiator == stateAbbr || originalMatchDisposition.State == stateAbbr))
-                {
-                    stateObj.VulnerableIndividual = originalMatchDisposition.VulnerableIndividual;
-                }
 
                 stateObj.State = stateAbbr;
                 collect.Add(stateObj);
@@ -60,11 +53,11 @@ namespace Piipan.Match.Core.Builders
             return collect.ToArray();
         }
 
-        private string MergeEvents(IEnumerable<IMatchResEvent> match_res_events)
+        private string MergeEvents(IEnumerable<IMatchResEvent> match_res_events, string originalMatchDetails = null)
         {
             return match_res_events
                 .Select(mre => JObject.Parse(mre.Delta))
-                .Aggregate(JObject.Parse(@"{}"), (acc, x) =>
+                .Aggregate(JObject.Parse(originalMatchDetails ?? @"{}"), (acc, x) =>
                 {
                     acc.Merge(x, new JsonMergeSettings
                     {

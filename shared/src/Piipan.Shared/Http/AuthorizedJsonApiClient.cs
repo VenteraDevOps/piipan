@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Piipan.Shared.Authentication;
@@ -36,7 +35,7 @@ namespace Piipan.Shared.Http
             var token = await _tokenProvider.RetrieveAsync();
             var httpRequestMessage = new HttpRequestMessage(method, path)
             {
-                Headers = 
+                Headers =
                 {
                     { HttpRequestHeader.Authorization.ToString(), $"Bearer {token}" },
                     { HttpRequestHeader.Accept.ToString(), _accept }
@@ -54,7 +53,7 @@ namespace Piipan.Shared.Http
         public async Task<TResponse> PostAsync<TRequest, TResponse>(string path, TRequest body, Func<IEnumerable<(string, string)>> headerFactory)
         {
             var requestMessage = await PrepareRequest(path, HttpMethod.Post);
-            
+
             // add any additional headers using the supplied callback
             headerFactory.Invoke().ToList().ForEach(h => requestMessage.Headers.Add(h.Item1, h.Item2));
 
@@ -67,7 +66,7 @@ namespace Piipan.Shared.Http
             response.EnsureSuccessStatusCode();
 
             var responseContentJson = await response.Content.ReadAsStringAsync();
-            
+
             return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
@@ -90,13 +89,14 @@ namespace Piipan.Shared.Http
 
             try
             {
+                var responseContentJson = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
 
-                var responseContentJson = await response.Content.ReadAsStringAsync();
+
 
                 return (JsonConvert.DeserializeObject<TResponse>(responseContentJson), (int)response.StatusCode);
             }
-            catch(HttpRequestException)
+            catch (HttpRequestException)
             {
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {

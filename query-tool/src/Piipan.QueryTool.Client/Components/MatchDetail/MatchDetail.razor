@@ -1,13 +1,14 @@
 ﻿@using Newtonsoft.Json
 @using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
 @using Piipan.Components.Layout
 @using Piipan.Components.Tag
 
 @code {
     [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
-    [Parameter] public ParameterBase<StateInfoResponse> StateInfo { get; set; }
+    [Parameter] public ParameterBase<StatesInfoResponse> StateInfo { get; set; }
 
     private TagTheme StatusTheme()
     {
@@ -50,10 +51,6 @@
             <UsaAccordionItem StartsExpanded="true">
                 <HeadingContent>SNAP Participant Information</HeadingContent>
                 <BodyContent>
-                    <ul>
-                        <li>Use your state’s Case Number and Participant ID to identify the individual involved</li>
-                        <li>Use the other state’s Case Number and Participant ID to commuinicate about the individual without exposing more sensitive PII, such as Name, Date of Birth, or Social Security Number</li>
-                    </ul>
                     <div class="two-state-grid">
                         @if (InitiatingStateParticipant != null)
                         {
