@@ -156,15 +156,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client", "states\src\Piipan.States.Client\Piipan.States.Client.csproj", "{D4129C31-D9F4-47F6-B6F1-C0559ED7975B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client.Tests", "states\tests2\Piipan.States.Client.Tests\Piipan.States.Client.Tests.csproj", "{B6DE10B2-DD0E-40F7-9F51-5484338AE3CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client.Tests", "states\tests\Piipan.States.Client.Tests\Piipan.States.Client.Tests.csproj", "{B6DE10B2-DD0E-40F7-9F51-5484338AE3CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.States.Func.Api.Tests", "states\tests2\Piipan.States.Func.Api.Tests\Piipan.States.Func.Api.Tests.csproj", "{EC3EB3C2-7B49-4CBC-9D4E-7FEF027C354C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.States.Func.Api.Tests", "states\tests\Piipan.States.Func.Api.Tests\Piipan.States.Func.Api.Tests.csproj", "{EC3EB3C2-7B49-4CBC-9D4E-7FEF027C354C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Notifications", "shared\src\Piipan.Shared.Notifications\Piipan.Shared.Notifications.csproj", "{6CF03FA4-AB6A-4841-858C-A674168D01A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Notifications.Tests", "shared\tests\Piipan.Shared.Notifications.Tests\Piipan.Shared.Notifications.Tests.csproj", "{FD682461-E466-4A0C-A5D9-5AB551F8019D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.States.Func.Api.IntegrationTests", "states\tests2\Piipan.States.Func.Api.IntegrationTests\Piipan.States.Func.Api.IntegrationTests.csproj", "{B38CCADB-1F7E-4BC1-B286-212AA2491EC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.States.Func.Api.IntegrationTests", "states\tests\Piipan.States.Func.Api.IntegrationTests\Piipan.States.Func.Api.IntegrationTests.csproj", "{B38CCADB-1F7E-4BC1-B286-212AA2491EC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
