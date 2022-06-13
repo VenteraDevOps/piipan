@@ -19,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api", "src\Piipan.States.Func.Api\Piipan.States.Func.Api.csproj", "{38A934EE-566D-4E1A-9D11-6E7EDDB74DE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client.Tests", "tests\Piipan.States.Client.Tests\Piipan.States.Client.Tests.csproj", "{27EB0ACF-897F-4182-9F71-828235D5143A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Client.Tests", "tests2\Piipan.States.Client.Tests\Piipan.States.Client.Tests.csproj", "{27EB0ACF-897F-4182-9F71-828235D5143A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api.Tests", "tests\Piipan.States.Func.Api.Tests\Piipan.States.Func.Api.Tests.csproj", "{713A07D2-F8AE-4550-A59A-AFBA727F538F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api.Tests", "tests2\Piipan.States.Func.Api.Tests\Piipan.States.Func.Api.Tests.csproj", "{713A07D2-F8AE-4550-A59A-AFBA727F538F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
