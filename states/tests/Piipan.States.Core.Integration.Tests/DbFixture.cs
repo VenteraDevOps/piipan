@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Piipan.States.Core.Models;
+﻿using Dapper;
 using Npgsql;
 using Piipan.Shared.TestFixtures;
-using Dapper;
+using Piipan.States.Core.Models;
 
 namespace Piipan.States.Core.Integration.Tests
 {

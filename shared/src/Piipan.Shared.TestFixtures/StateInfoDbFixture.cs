@@ -12,12 +12,12 @@ namespace Piipan.Shared.TestFixtures
 
         public StateInfoDbFixture()
         {
-            ConnectionString = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+            ConnectionString = Environment.GetEnvironmentVariable("CollaborationDatabaseConnectionString");
             Factory = NpgsqlFactory.Instance;
 
             Initialize();
             ApplySchema();
-            
+
         }
 
         /// <summary>
