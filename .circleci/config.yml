@@ -109,10 +109,15 @@ jobs:
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
           working_directory: states/tests/Piipan.States.Core.Integration.Tests
+          name: Test States Core integration
+          environment:
+            CollaborationDatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
+          command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
+      - run:
+          working_directory: states/tests/Piipan.States.Func.Api.IntegrationTests
           name: Test States integration
           environment:
-            DatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
-            States: ea
+            CollaborationDatabaseConnectionString: "Server=localhost;Database=ea;Port=5432;User Id=postgres;Password=securepass;"
           command: dotnet test $MSBUILD_PROPS --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov
       - run:
           working_directory: match/tests/Piipan.Match.Core.IntegrationTests
@@ -156,8 +161,11 @@ jobs:
             ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Func.Collect.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.func.collect.json
             ./cc-test-reporter -d format-coverage ./participants/tests/Piipan.Participants.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.participants.core.collect.json
             ./cc-test-reporter -d format-coverage ./participants/tests/Piipan.Participants.Core.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.participants.core.integration.collect.json
-            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.core.collect.json
-            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Core.Integration.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.core.integration.collect.json
+            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Client.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.client.json
+            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Func.Api.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.func.api.json
+            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Func.Api.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.func.api.integration.json
+            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.core.json
+            ./cc-test-reporter -d format-coverage ./states/tests/Piipan.States.Core.Integration.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.states.core.integration.json
             ./cc-test-reporter -d format-coverage ./shared/tests/Piipan.Shared.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.shared.json
             ./cc-test-reporter -d format-coverage ./shared/tests/Piipan.Shared.Notifications.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.shared.Notifications.json
             ./cc-test-reporter sum-coverage /tmp/codeclimate.*.json -o /tmp/sum.json

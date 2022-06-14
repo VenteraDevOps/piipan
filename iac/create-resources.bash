@@ -164,7 +164,7 @@ main () {
      env="$ENV" \
      prefix="$PREFIX" \
      receiverId="$siem_app_id"
-
+  
   # Create a key vault which will store credentials for use in other templates
   az deployment group create \
     --name "$VAULT_NAME" \
@@ -176,7 +176,7 @@ main () {
       objectId="$CURRENT_USER_OBJID" \
       resourceTags="$RESOURCE_TAGS" \
       eventHubName="$EVENT_HUB_NAME"
-
+  
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
     --name activity-log-diagnostics-$LOCATION \
@@ -185,7 +185,7 @@ main () {
     --parameters \
       eventHubName="$EVENT_HUB_NAME" \
       coreResourceGroup="$RESOURCE_GROUP"
-
+  
       # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
   while IFS=, read -r abbr name _; do
@@ -205,7 +205,7 @@ main () {
         sku="$STORAGE_SKU" \
         eventHubNamespace="$EVENT_HUB_NAME"
   done < states.csv
-
+  
   # Avoid echoing passwords in a manner that may show up in process listing,
   # or storing it in a temp file that may be read, or appearing in a CI/CD log.
   #
@@ -219,7 +219,7 @@ main () {
     --file /dev/stdin \
     --query id
     #--value "$PG_SECRET"
-
+  
   echo "Creating PostgreSQL server"
   az deployment group create \
     --name participant-records \
@@ -236,8 +236,8 @@ main () {
       privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
       privateDnsZoneName="$PRIVATE_DNS_ZONE" \
       eventHubName="$EVENT_HUB_NAME"
-
-
+  
+  
   # The AD admin can't be specified in the PostgreSQL ARM template,
   # unlike in Azure SQL
   az ad group create --display-name "${PG_AAD_ADMIN}" --mail-nickname "${PG_AAD_ADMIN}"
@@ -247,10 +247,10 @@ main () {
     --server "$PG_SERVER_NAME" \
     --display-name "$PG_AAD_ADMIN" \
     --object-id "$PG_AAD_ADMIN_OBJID"
-
+  
   # Configure Payload Keys
   ./configure-encryption-secrets.bash "$azure_env"
-
+  
   # Create managed identities to admin each state's database
   configure_azure_profile
   while IFS=, read -r abbr name _; do
@@ -260,12 +260,12 @@ main () {
       az identity create -g "$RESOURCE_GROUP" -n "$identity"
   done < states.csv
   configure_azure_profile
-
+  
   exists=$(az ad group member check \
     --group "$PG_AAD_ADMIN" \
     --member-id "$CURRENT_USER_OBJID" \
     --query value -o tsv)
-
+  
   if [ "$exists" = "true" ]; then
     echo "$CURRENT_USER_OBJID is already a member of $PG_AAD_ADMIN"
   else
@@ -275,7 +275,7 @@ main () {
       --group "$PG_AAD_ADMIN" \
       --member-id "$CURRENT_USER_OBJID"
   fi
-
+  
   PGPASSWORD=$PG_SECRET
   export PGPASSWORD
   PGUSER=${PG_SUPERUSER}@${PG_SERVER_NAME}
@@ -294,7 +294,7 @@ main () {
   # network (as established by its ARM template firewall variable), and apply
   # various Data Definition (DDL) scripts for each state.
   ./create-databases.bash "$RESOURCE_GROUP"
-
+  
   # Apply DDL shared between the ETL and match API subsystems.
   # XXX This should be moved out of IaC, which is not run in CI/CD,
   #     to a continuously deployable workflow that accomodates schema
@@ -302,10 +302,10 @@ main () {
   pushd ../ddl
   ./apply-ddl.bash
   popd
-
+  
   # This is a subscription-level resource provider
   az provider register --wait --namespace Microsoft.EventGrid
-
+  
   # Function apps need an app service plan with private endpoint abilities
   echo "Creating app service plan ${APP_SERVICE_PLAN_FUNC_NAME}"
   az deployment group create \
@@ -318,7 +318,7 @@ main () {
       kind="$APP_SERVICE_PLAN_FUNC_KIND" \
       sku="$APP_SERVICE_PLAN_FUNC_SKU" \
       resourceTags="$RESOURCE_TAGS"
-
+  
   # Function apps need an Event Hub authorization rule ID for log streaming
   eh_rule_id=$(\
     az eventhubs namespace authorization-rule list \
@@ -326,7 +326,7 @@ main () {
       --namespace-name "$EVENT_HUB_NAME" \
       --query "[?name == 'RootManageSharedAccessKey'].id" \
       -o tsv)
-
+  
   # Create the list of state abbreviations, and which states should be disabled from
   # returning matches from the orchestrator API.
   state_abbrs=""
@@ -343,7 +343,7 @@ main () {
     state_enabled_matches=${state_enabled_matches:1}
   fi
   echo "Enabled States: ${state_enabled_matches}"
-
+  
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
   # restrictions for the function app and storage account are added
@@ -367,9 +367,9 @@ main () {
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME" \
       statesToEnableMatches="$state_enabled_matches"
-
+  
   echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
-
+  
   # Subnet ID is needed when vnet and storage are in different resource groups
   func_subnet_id=$(\
     az network vnet subnet show \
@@ -386,14 +386,14 @@ main () {
     --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --default-action Deny
-
+  
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
     --name "$ORCHESTRATOR_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
-
+  
   # Update Key Vault to allow function access
   echo "Granting Key Vault access to ${ORCHESTRATOR_FUNC_APP_NAME}"
   funcIdentityPrincipalId=$(\
@@ -402,7 +402,7 @@ main () {
     --resource-group "${MATCH_RESOURCE_GROUP}" \
     --query principalId \
     --output tsv)
-
+  
   az deployment group create \
     --name "${VAULT_NAME}-access-for-${ORCHESTRATOR_FUNC_APP_NAME}" \
     --resource-group "${RESOURCE_GROUP}" \
@@ -411,7 +411,7 @@ main () {
       keyVaultName="${VAULT_NAME}" \
       objectId="${funcIdentityPrincipalId}" \
       permissionsSecrets="['get', 'list']"
-
+  
   echo "Update ${ORCHESTRATOR_FUNC_APP_NAME} settings"
   az functionapp config appsettings set \
     --name "$ORCHESTRATOR_FUNC_APP_NAME" \
@@ -421,7 +421,7 @@ main () {
       QueryToolUrl="${QUERY_TOOL_URL}" \
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
-
+  
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
 
@@ -430,9 +430,9 @@ main () {
   az ad app create \
     --display-name "$ORCHESTRATOR_FUNC_APP_NAME" \
     --sign-in-audience "AzureADMyOrg"
-
+  
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
-
+  
   # Create Match Resolution API Function App
   echo "Create Match Resolution API Function App"
   collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME")
@@ -451,14 +451,14 @@ main () {
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
-
+  
   echo "Integrating ${MATCH_RES_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
     --name "$MATCH_RES_FUNC_APP_NAME" \
     --resource-group "$MATCH_RESOURCE_GROUP" \
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
-
+  
   # Update Key Vault to allow function access
   echo "Granting Key Vault access to ${MATCH_RES_FUNC_APP_NAME}"
   funcIdentityPrincipalId=$(\
@@ -467,7 +467,7 @@ main () {
     --resource-group "${MATCH_RESOURCE_GROUP}" \
     --query principalId \
     --output tsv)
-
+  
   az deployment group create \
     --name "${VAULT_NAME}-access-for-${MATCH_RES_FUNC_APP_NAME}" \
     --resource-group "${RESOURCE_GROUP}" \
@@ -476,7 +476,7 @@ main () {
       keyVaultName="${VAULT_NAME}" \
       objectId="${funcIdentityPrincipalId}" \
       permissionsSecrets="['get', 'list']"
-
+  
   echo "Update ${MATCH_RES_FUNC_APP_NAME} settings"
   az functionapp config appsettings set \
     --name "$MATCH_RES_FUNC_APP_NAME" \
@@ -485,14 +485,58 @@ main () {
       ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
-
+  
   echo "Publish Match Resolution API Function App"
   try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
-
+  
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
   az ad app create \
     --display-name "$MATCH_RES_FUNC_APP_NAME" \
+    --sign-in-audience "AzureADMyOrg"
+
+  # Create States API Function App
+  echo "Create States API Function App"
+  collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME")
+  az deployment group create \
+    --name state-api \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file  ./arm-templates/function-states.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      functionAppName="$STATES_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+      storageAccountName="$STATES_FUNC_APP_STORAGE_NAME" \
+      collabDatabaseConnectionString="$collab_db_conn_str" \
+      cloudName="$CLOUD_NAME" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
+  
+  
+  echo "Integrating ${STATES_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$STATES_FUNC_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$VNET_ID"
+  
+  
+  echo "Update ${STATES_FUNC_APP_NAME} settings"
+  az functionapp config appsettings set \
+    --name "$STATES_FUNC_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --settings \
+      WEBSITE_CONTENTOVERVNET=1 \
+      WEBSITE_VNET_ROUTE_ALL=1
+  
+  echo "Publish States API Function App"
+  try_run "func azure functionapp publish ${STATES_FUNC_APP_NAME} --dotnet" 7 "../states/src/Piipan.States.Func.Api"
+  
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$STATES_FUNC_APP_NAME" \
     --sign-in-audience "AzureADMyOrg"
 
   if [ "$exists" = "true" ]; then
@@ -510,31 +554,31 @@ main () {
   while IFS=, read -r abbr name ; do
     echo "Creating function app for $name ($abbr)"
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
-
+  
     # Per-state Function App
     func_app=$PREFIX-func-${abbr}etl-$ENV
-
+  
     # Storage account for the Function app for its own use;
     func_stor=${PREFIX}st${abbr}etl${ENV}
-
+  
     # Managed identity to access database
     identity=$(state_managed_id_name "$abbr" "$ENV")
-
+  
     # Per-state database
     db_name=${abbr}
-
+  
     # Per-state storage account for bulk upload;
     # matches name passed to blob-storage.json
     stor_name=${PREFIX}st${abbr}upload${ENV}
-
+  
     # System topic for per-state upload (create blob) events
     # same as topic name in create-metrics-resources.bash
     topic_name=evgt-${abbr}upload-$ENV
     topic_name=$(state_event_grid_topic_name "$abbr" "$ENV")
-
+  
     # Subscription to upload events that get routed to Function
     sub_name=evgs-${abbr}upload-$ENV
-
+  
     # Every Function app needs a storage account for its own internal use;
     # e.g., bindings state, keys, function code. Keep this separate from
     # the storage account used to upload data for better isolation.
@@ -549,7 +593,7 @@ main () {
         vnet="$VNET_ID" \
         subnet="$FUNC_SUBNET_NAME" \
         sku="$STORAGE_SKU"
-
+  
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
     # working with Windows as underlying OS
@@ -562,7 +606,7 @@ main () {
       --os-type Windows \
       --name "$func_app" \
       --storage-account "$func_stor"
-
+  
     # Integrate function app into Virtual Network
     echo "Integrating ${func_app} into virtual network"
     az functionapp vnet-integration add \
@@ -574,7 +618,7 @@ main () {
       --name "$func_app" \
       --resource-group "$RESOURCE_GROUP" \
       --vnet-route-all-enabled true
-
+  
     # Stream logs to Event Hub
     func_id=$(\
       az functionapp show \
@@ -593,12 +637,12 @@ main () {
           "enabled": true
         }
       ]'
-
+  
     # XXX Assumes if any identity is set, it is the one we are specifying below
     exists=$(az functionapp identity show \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app")
-
+  
     stateManagedIdentity="${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}"
     if [ -z "$exists" ]; then
       # Conditionally execute otherwise we will get an error if it is already
@@ -608,11 +652,11 @@ main () {
         --name "${func_app}" \
         --identities "${stateManagedIdentity}"
     fi
-
+  
     # Update function to use state managed identity when referencing key vault
     echo "Configuring ${func_app} Key Vault Reference Identity"
     az rest --method PATCH --uri "${func_id}?api-version=2021-01-01" --body "{'properties':{'keyVaultReferenceIdentity':'${stateManagedIdentity}'}}"
-
+  
     # Update Key Vault to allow function access
     echo "Granting Key Vault access to ${func_app}"
     configure_azure_profile
@@ -623,7 +667,7 @@ main () {
         --query principalId \
         --output tsv)
     configure_azure_profile
-
+  
     az deployment group create \
       --name "${VAULT_NAME}-access-for-${func_app}" \
       --resource-group "${RESOURCE_GROUP}" \
@@ -632,7 +676,7 @@ main () {
         keyVaultName="${VAULT_NAME}" \
         objectId="${stateManagedIdentityPrincipalId}" \
         permissionsSecrets="['get', 'list']"
-
+  
     az_serv_str=$(az_connection_string "${RESOURCE_GROUP}" "${identity}")
     blob_conn_str=$(blob_connection_string "${RESOURCE_GROUP}" "${stor_name}")
     # Long-running bulk upload queries require some specific connection
@@ -653,7 +697,7 @@ main () {
         ${UPLOAD_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_KV})" \
         ${UPLOAD_ENCRYPT_KEY_SHA}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_SHA_KV})" \
       --output none
-
+  
     event_grid_system_topic_id=$(\
       az eventgrid system-topic create \
         --location "$LOCATION" \
@@ -663,14 +707,14 @@ main () {
         --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}" \
         -o tsv \
         --query id)
-
+  
     # Create Function endpoint before setting up event subscription
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
-
+  
     #Queue Storage id
     storageid=$(az storage account show --name "${stor_name}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
     queueid="$storageid/queueservices/default/queues/upload"
-
+  
     az eventgrid system-topic event-subscription create \
       --name "$sub_name" \
       --resource-group "$RESOURCE_GROUP" \
@@ -679,7 +723,7 @@ main () {
       --endpoint "$queueid" \
       --included-event-types Microsoft.Storage.BlobCreated \
       --subject-begins-with /blobServices/default/containers/upload/blobs/
-
+  
     # Stream event topic logs to Event Hub
     az monitor diagnostic-settings create \
       --name "stream-logs-to-event-hub" \
@@ -698,7 +742,7 @@ main () {
   # This needs to happen after the orchestrator is created in order for
   # $orch_api to be set.
   echo "Creating App Service resources for query tool app"
-
+  
   echo "Create Front Door and WAF policy for query tool app"
   suffix=$(web_app_host_suffix)
   query_tool_host=${QUERY_TOOL_APP_NAME}${suffix}
@@ -708,7 +752,7 @@ main () {
     "$QUERY_TOOL_FRONTDOOR_NAME" \
     "$QUERY_TOOL_WAF_NAME" \
     "$query_tool_host"
-
+  
   front_door_id=$(\
   az network front-door show \
     --name "$QUERY_TOOL_FRONTDOOR_NAME" \
@@ -716,7 +760,7 @@ main () {
     --query frontdoorId \
     --output tsv)
   echo "Front Door ID: ${front_door_id}"
-
+  
   orch_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
@@ -730,7 +774,7 @@ main () {
       --filter "displayName eq '${ORCHESTRATOR_FUNC_APP_NAME}'" \
       --query "[0].appId" \
       --output tsv)
-
+  
   match_res_api_uri=$(\
     az functionapp show \
       -g "$MATCH_RESOURCE_GROUP" \
@@ -744,7 +788,21 @@ main () {
       --filter "displayName eq '${MATCH_RES_FUNC_APP_NAME}'" \
       --query "[0].appId" \
       --output tsv)
-
+  
+  states_api_uri=$(\
+    az functionapp show \
+      -g "$RESOURCE_GROUP" \
+      -n "$STATES_FUNC_APP_NAME" \
+      --query defaultHostName \
+      -o tsv)
+  states_api_uri="https://${states_api_uri}/api/v1/"
+  states_api_app_id=$(\
+    az ad app list \
+      --display-name "${STATES_FUNC_APP_NAME}" \
+      --filter "displayName eq '${STATES_FUNC_APP_NAME}'" \
+      --query "[0].appId" \
+      --output tsv)
+  
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
@@ -759,6 +817,8 @@ main () {
       OrchApiAppId="$orch_api_app_id" \
       MatchResApiUri="$match_res_api_uri" \
       MatchResApiAppId="$match_res_api_app_id" \
+      StatesApiUri="$states_api_uri" \
+      StatesApiAppId="$states_api_app_id" \
       eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
@@ -766,14 +826,14 @@ main () {
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
       frontDoorUri="$QUERY_TOOL_URL"
-
+  
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
   az webapp vnet-integration add \
     --name "$QUERY_TOOL_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$WEBAPP_SUBNET_NAME" \
     --vnet "$VNET_ID"
-
+  
   # Create a placeholder OIDC IdP secret
   create_oidc_secret "$QUERY_TOOL_APP_NAME"
 
@@ -790,6 +850,7 @@ main () {
   #   - PerStateMatchApi and OrchestratorApi
   #   - OrchestratorApi and QueryApp
   #   - MatchResApi and QueryApp
+  #   - StatesApi and QueryApp
   ./configure-easy-auth.bash "$azure_env"
 
   # Configure Microsoft Defender for Cloud and assign Azure CIS 1.3.0 benchmark

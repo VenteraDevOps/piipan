@@ -1814,7 +1814,8 @@
         "dependencies": {
           "Microsoft.AspNetCore.Components.WebAssembly": "6.0.5",
           "Piipan.Components": "1.0.0",
-          "Piipan.Match.Api": "1.0.0"
+          "Piipan.Match.Api": "1.0.0",
+          "Piipan.States.Api": "1.0.0"
         }
       },
       "piipan.shared": {
@@ -1837,6 +1838,23 @@
         "type": "Project",
         "dependencies": {
           "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "piipan.states.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "piipan.states.client": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Core": "1.24.0",
+          "Azure.Identity": "1.6.0",
+          "Microsoft.Extensions.Hosting": "6.0.1",
+          "Microsoft.Extensions.Http": "6.0.0",
+          "Piipan.Shared": "1.0.0",
+          "Piipan.States.Api": "1.0.0"
         }
       }
     }

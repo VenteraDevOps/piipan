@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Piipan.States.Api.Models
+﻿namespace Piipan.States.Api.Models
 {
     public interface IState
     {
@@ -15,6 +9,17 @@ namespace Piipan.States.Api.Models
         string Phone { get; set; }
         string Region { get; set; }
 
-
+        T CopyTo<T>() where T : IState, new()
+        {
+            return new T()
+            {
+                Id = Id,
+                State = State,
+                StateAbbreviation = StateAbbreviation,
+                Email = Email,
+                Phone = Phone,
+                Region = Region
+            };
+        }
     }
 }

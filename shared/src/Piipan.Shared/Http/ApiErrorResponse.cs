@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Piipan.Match.Func.Api.Models
+namespace Piipan.Shared.Http
 {
     /// <summary>
     /// Represents a generic error response for an API request
