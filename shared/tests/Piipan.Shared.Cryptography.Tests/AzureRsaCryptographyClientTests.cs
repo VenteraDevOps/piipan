@@ -6,13 +6,14 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Xunit;
 
 namespace Piipan.Shared.Cryptography.Tests
 {
-    public class NacCryptographyClientTests
+    public class AzureRsaCryptographyClientTests
     {
 
         [Fact]
@@ -29,10 +30,10 @@ namespace Piipan.Shared.Cryptography.Tests
             Mock<CryptographyClient> cryptographyClientMock = new Mock<CryptographyClient>();
             cryptographyClientMock.Setup(x => x.Encrypt(EncryptionAlgorithm.RsaOaep, plaintext, default)).Returns(encryptResult);
 
-            NacCryptographyClient nacCryptographyClient = new NacCryptographyClient(cryptographyClientMock.Object);
+            AzureRsaCryptographyClient cryptographyClient = new AzureRsaCryptographyClient(cryptographyClientMock.Object);
 
             //Act
-            string encryptedValue = nacCryptographyClient.EncryptToBase64String(stringToEncrypt);
+            string encryptedValue = cryptographyClient.EncryptToBase64String(stringToEncrypt);
 
             //Assert
             var expectedValue = Convert.ToBase64String(encryptedCipher);
@@ -52,10 +53,10 @@ namespace Piipan.Shared.Cryptography.Tests
             Mock<CryptographyClient> cryptographyClientMock = new Mock<CryptographyClient>();
             cryptographyClientMock.Setup(x => x.Decrypt(EncryptionAlgorithm.RsaOaep, bytesToDecrypt, default)).Returns(decryptResult);
 
-            NacCryptographyClient nacCryptographyClient = new NacCryptographyClient(cryptographyClientMock.Object);
+            AzureRsaCryptographyClient cryptographyClient = new AzureRsaCryptographyClient(cryptographyClientMock.Object);
 
             //Act
-            string decryptedValue = nacCryptographyClient.DecryptFromBase64String(stringToDecrypt);
+            string decryptedValue = cryptographyClient.DecryptFromBase64String(stringToDecrypt);
             
             //Assert
             Assert.Equal(stringToDecrypt, decryptedValue);
@@ -72,7 +73,7 @@ namespace Piipan.Shared.Cryptography.Tests
             generator.Init(keyGenerationParameters);
 
             var keyPair = generator.GenerateKeyPair();
-                        
+
             RSAParameters rsaParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)keyPair.Private);
             var rsa = RSA.Create();
             rsa.ImportParameters(rsaParams);
@@ -81,11 +82,11 @@ namespace Piipan.Shared.Cryptography.Tests
 
             string stringToEncrypt = "This string should get encrypted and then decrypted";
 
-            NacCryptographyClient nacCryptographyClient = new NacCryptographyClient(decryptCryptographyClient);
+            AzureRsaCryptographyClient cryptographyClient = new AzureRsaCryptographyClient(decryptCryptographyClient);
 
             //Act
-            string encryptedValue = nacCryptographyClient.EncryptToBase64String(stringToEncrypt);
-            string decryptedValue = nacCryptographyClient.DecryptFromBase64String(encryptedValue);
+            string encryptedValue = cryptographyClient.EncryptToBase64String(stringToEncrypt);
+            string decryptedValue = cryptographyClient.DecryptFromBase64String(encryptedValue);
 
             //Assert
             Assert.Equal(stringToEncrypt, decryptedValue);

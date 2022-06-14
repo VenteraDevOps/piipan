@@ -1,9 +1,12 @@
 using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
+using Piipan.Shared.Cryptography;
+using Piipan.Shared.Cryptography.Extensions;
 using Xunit;
 
 namespace Piipan.Participants.Core.IntegrationTests
@@ -12,7 +15,20 @@ namespace Piipan.Participants.Core.IntegrationTests
     public class ParticipantDaoTests : DbFixture
     {
         private ParticipantTestDataHelper helper = new ParticipantTestDataHelper();
+        private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
+        private ICryptographyClient cryptographyClient;
 
+        public ParticipantDaoTests()
+        {
+            cryptographyClient = new AzureAesCryptographyClient(base64EncodedKey);
+        }
+
+        private ServiceProvider BuildServices()
+        {
+            var services = new ServiceCollection();
+            services.RegisterKeyVaultClientServices();
+            return services.BuildServiceProvider();
+        }
         [Theory]
         [InlineData(0)]
         [InlineData(1)]
@@ -20,6 +36,7 @@ namespace Piipan.Participants.Core.IntegrationTests
         [InlineData(50)]
         public async void AddParticipants(int nParticipants)
         {
+            var services = BuildServices();
             using (var conn = Factory.CreateConnection())
             {
                 // Arrange
@@ -30,11 +47,18 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
-                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
+
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
 
                 // Act
                 await dao.AddParticipants(participants);
+
+                // updatiing lds_hash with encryption
+                participants = participants.Select(p => new ParticipantDbo(p)
+                {
+                    UploadId = p.UploadId
+                });
 
                 // Assert
                 participants.ToList().ForEach(p =>
@@ -46,7 +70,7 @@ namespace Piipan.Participants.Core.IntegrationTests
 
         [Theory]
         [InlineData(1)]
-        [InlineData(20)]
+        [InlineData(20)]                                              
         public async void GetParticipants(int nMatches)
         {
             using (var conn = Factory.CreateConnection())
@@ -78,7 +102,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
-                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
 
                 // Act
                 var matches = await dao.GetParticipants("ea", randoms.First().LdsHash, randoms.First().UploadId);
@@ -104,7 +128,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var logger = Mock.Of<ILogger<ParticipantDao>>();
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
-                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
                 InsertUpload();
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadIdWithStatus("COMPLETE"));
 
@@ -116,6 +140,19 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var participantsNew = helper.RandomParticipants(nParticipants, GetLastUploadIdWithStatus("COMPLETE"));
 
                 await dao.AddParticipants(participantsNew);
+
+                // updatiing lds_hash with encryption
+                participants = participants.Select(p => new ParticipantDbo(p)
+                {
+                    UploadId = p.UploadId
+
+                });
+                // updatiing lds_hash with encryption
+                participantsNew = participantsNew.Select(p => new ParticipantDbo(p)
+                {
+                    UploadId = p.UploadId
+
+                });
                 // Assert
                 participants.ToList().ForEach(p =>
                 {
@@ -155,7 +192,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var logger = new Mock<ILogger<ParticipantDao>>();   
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
-                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger.Object);
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger.Object, cryptographyClient);
                 InsertUpload();
                 var participants = helper.RandomParticipants(2, GetLastUploadIdWithStatus("COMPLETE"));
 

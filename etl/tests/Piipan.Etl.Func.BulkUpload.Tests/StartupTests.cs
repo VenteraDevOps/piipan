@@ -2,8 +2,6 @@ using System;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Npgsql;
-using Piipan.Etl.Func.BulkUpload;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
@@ -26,9 +24,13 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var target = new Startup();
 
-            // Act
+            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
+            Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
+
             Environment.SetEnvironmentVariable(Startup.DatabaseConnectionString,
                 "Server=server;Database=db;Port=5432;User Id=postgres;Password={password};");
+
+            // Act
             target.Configure(builder.Object);
             var provider = services.BuildServiceProvider();
 

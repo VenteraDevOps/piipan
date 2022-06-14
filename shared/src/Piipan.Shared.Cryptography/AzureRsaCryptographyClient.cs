@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Piipan.Shared.Cryptography
 {
-    public class NacCryptographyClient : ICryptographyClient
+    public class AzureRsaCryptographyClient : ICryptographyClient
     {
         private readonly CryptographyClient _internalCryptographyClient;
         private EncryptionAlgorithm ENCRYPTION_ALGORITHM = EncryptionAlgorithm.RsaOaep;
 
-        public NacCryptographyClient(string vaultUrl, TokenCredential credential, string keyName)
+        public AzureRsaCryptographyClient(string vaultUrl, TokenCredential credential, string keyName)
         {
             var client = new KeyClient(vaultUri: new Uri(vaultUrl), credential: credential);
             KeyVaultKey key = client.GetKey(keyName);
@@ -19,8 +19,8 @@ namespace Piipan.Shared.Cryptography
             var cryptoClient = client.GetCryptographyClient(key.Name, key.Properties.Version);
             _internalCryptographyClient = cryptoClient;
         }
-
-        public NacCryptographyClient(CryptographyClient cryptographyClient)
+        
+        public AzureRsaCryptographyClient(CryptographyClient cryptographyClient)
         {
             _internalCryptographyClient = cryptographyClient;
         }
