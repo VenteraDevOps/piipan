@@ -7,6 +7,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Cryptography;
 
 namespace Piipan.Match.Core.Services
 {
@@ -19,17 +20,19 @@ namespace Piipan.Match.Core.Services
         private readonly IMatchRecordApi _recordApi;
         private readonly IMatchResEventDao _matchResEventDao;
         private readonly IMatchResAggregator _matchResAggregator;
-
+        private readonly ICryptographyClient _cryptographyClient;
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
             IMatchResEventDao matchResEventDao,
-            IMatchResAggregator matchResAggregator)
+            IMatchResAggregator matchResAggregator,
+            ICryptographyClient cryptographyClientt)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
+            _cryptographyClient = cryptographyClientt;
         }
 
         /// <summary>

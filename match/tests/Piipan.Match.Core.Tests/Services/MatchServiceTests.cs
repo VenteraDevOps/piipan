@@ -11,18 +11,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Piipan.Match.Core.Enums;
+using Piipan.Shared.Cryptography;
 
 namespace Piipan.Match.Core.Tests.Services
 {
     public class MatchServiceTests
     {
+        private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
+        private ICryptographyClient cryptographyClient;
+
+        public MatchServiceTests()
+        {
+            cryptographyClient = new AzureAesCryptographyClient(base64EncodedKey);
+        }
+
         [Fact]
         public async Task ReturnsEmptyResponseForEmptyRequest()
         {
             // Arrange
             var participantApi = Mock.Of<IParticipantApi>();
             var requestPersonValidator = Mock.Of<IValidator<RequestPerson>>();
-            var service = new MatchService(participantApi, requestPersonValidator);
+            var service = new MatchService(participantApi, requestPersonValidator,cryptographyClient);
 
             var request = new OrchMatchRequest();
 
@@ -49,7 +58,7 @@ namespace Piipan.Match.Core.Tests.Services
                     new ValidationFailure("property", "invalid value")
                 }));
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -81,7 +90,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -116,7 +125,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -153,7 +162,7 @@ namespace Piipan.Match.Core.Tests.Services
                     new ValidationFailure("searchReason", "StringEnumValidator")
                 }));
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -194,7 +203,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -230,7 +239,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("validator failed"));
 
-            var service = new MatchService(participantApi, requestPersonValidator.Object);
+            var service = new MatchService(participantApi, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -261,7 +270,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -296,7 +305,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
@@ -341,7 +350,7 @@ namespace Piipan.Match.Core.Tests.Services
                 .Setup(m => m.ValidateAsync(It.IsAny<RequestPerson>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new ValidationResult());
 
-            var service = new MatchService(participantApi.Object, requestPersonValidator.Object);
+            var service = new MatchService(participantApi.Object, requestPersonValidator.Object, cryptographyClient);
 
             var request = new OrchMatchRequest
             {
