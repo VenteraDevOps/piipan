@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0.42] - 2022-06-15
+
+### Changed
+- Improved documentation for Duplicate Participation API
+- Moved location & role authorization logic from page level to application
+- Updated IAC scripts to support Azure US Gov & Azure CLI 2.37
+
+### Added
+- Added column encryption support for sensitive PII values in Postgres
+- Added internal support and API for State Metadata
+- Added basic email notification support/infrastructure
+- Added match status, disposition information, state contact information, and participant information to the Match Details page
+
 ## [1.1.0] - 2022-05-31
 
 ### Changed
