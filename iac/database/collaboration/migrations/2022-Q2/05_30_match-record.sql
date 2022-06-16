@@ -1,5 +1,12 @@
 BEGIN;
 
+DO $$ BEGIN
+    CREATE TYPE hash_type AS ENUM ('ldshash');
+EXCEPTION
+    WHEN duplicate_object THEN
+        RAISE NOTICE 'hash_type ENUM already exists, skipping';
+END $$;
+
 CREATE TABLE IF NOT EXISTS matches(
     id serial PRIMARY KEY,
     match_id text UNIQUE NOT NULL,
@@ -38,5 +45,41 @@ COMMENT ON COLUMN match_res_events.match_id IS 'References match ID of original 
 COMMENT ON COLUMN match_res_events.actor IS 'the person or automated system performing this change';
 COMMENT ON COLUMN match_res_events.actor_state IS 'indicates if the actor is associated with a state involved in the match';
 COMMENT ON COLUMN match_res_events.delta IS 'json object representing data changes submitted by states, as well as stateful domain data like match status';
+
+CREATE TABLE IF NOT EXISTS state_info(
+    id text UNIQUE PRIMARY KEY,
+    state text UNIQUE NOT NULL,
+    state_abbreviation text NOT NULL,
+    email text NOT NULL,
+    phone text,
+	region text NOT NULL
+);
+
+COMMENT ON COLUMN state_info.id IS 'Unique number for each state. Will be alphabetical - Alabama = 1, Alaska = 2 etc';
+COMMENT ON COLUMN state_info.phone IS 'The phone number contact';
+COMMENT ON COLUMN state_info.email IS 'The email to contact that state';
+COMMENT ON COLUMN state_info.state IS 'State/territory full name';
+COMMENT ON COLUMN state_info.state_abbreviation IS 'State/territorys two letter abbreviation';
+COMMENT ON COLUMN state_info.region IS 'The region the specified state belongs to';
+
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
+select * from (select '15' as id, 'Iowa' as state, 'IA' as state_abbreviation, 'IA-test@usda.gov' as email, '1234567890' as phone, 'MWRO' AS region) as temp
+WHERE NOT EXISTS 
+(select id from state_info where id = '15') limit 1;
+
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
+select * from (select '18' as id, 'Louisiana' as state, 'LA' as state_abbreviation, 'LA-test@usda.gov' as email, '1234567890' as phone, 'SWRO' AS region) as temp
+WHERE NOT EXISTS 
+(select id from state_info where id = '18') limit 1;
+
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
+select * from (select '21' as id, 'Massachusetts' as state, 'MA' as state_abbreviation, 'MA-test@usda.gov' as email, '1234567890' as phone, 'NERO' AS region) as temp
+WHERE NOT EXISTS 
+(select id from state_info where id = '21') limit 1;
+
+INSERT INTO state_info(id, state, state_abbreviation, email, phone, region)
+select * from (select '26' as id, 'Montana' as state, 'MT' as state_abbreviation, 'MT-test@usda.gov' as email, '1234567890' as phone, 'MPRO' AS region) as temp
+WHERE NOT EXISTS 
+(select id from state_info where id = '26') limit 1;
 
 COMMIT;
