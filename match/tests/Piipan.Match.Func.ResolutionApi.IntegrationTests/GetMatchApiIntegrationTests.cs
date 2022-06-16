@@ -24,7 +24,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
     {
         static GetMatchApi Construct()
         {
-            Environment.SetEnvironmentVariable("States", "ea");
+            Environment.SetEnvironmentVariable("States", "ia");
 
             var services = new ServiceCollection();
             services.AddLogging();
@@ -62,7 +62,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             return api;
         }
 
-        static Mock<HttpRequest> MockGetRequest(string matchId = "foo", string requestLocation = "EA")
+        static Mock<HttpRequest> MockGetRequest(string matchId = "foo", string requestLocation = "IA")
         {
             var mockRequest = new Mock<HttpRequest>();
             var headers = new HeaderDictionary(new Dictionary<String, StringValues>
@@ -115,10 +115,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
                 Hash = "foo",
                 HashType = "ldshash",
-                Initiator = "ea",
+                Initiator = "ia",
                 Input = "{\"CaseId\": \"ABC\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"DEF\"}",
                 MatchId = matchId,
-                States = new string[] { "ea", "bb" }
+                States = new string[] { "ia", "bb" }
             };
             Insert(match);
 
@@ -130,7 +130,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // Assert
             Assert.Equal(200, response.StatusCode);
             // Assert Participant Data
-            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"initial_action_taken\":null,\"invalid_match\":null,\"final_disposition\":null,\"final_disposition_date\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"initial_action_taken\":null,\"invalid_match\":null,\"final_disposition\":null,\"final_disposition_date\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"created_at\":" + JsonConvert.SerializeObject(createdDate) + ",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
+            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"initial_action_taken\":null,\"invalid_match\":null,\"final_disposition\":null,\"final_disposition_date\":null,\"vulnerable_individual\":null,\"state\":\"ia\"},{\"initial_action_at\":null,\"initial_action_taken\":null,\"invalid_match\":null,\"final_disposition\":null,\"final_disposition_date\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ia\",\"match_id\":\"ABC\",\"created_at\":" + JsonConvert.SerializeObject(createdDate) + ",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ia\"}],\"states\":[\"ia\",\"bb\"],\"status\":\"open\"}}";
             Assert.Equal(expected, resString);
             // Assert the created date that is returned is nearly identical to the actual current time
             Assert.True((createdDate - matchCreateDate).Value.TotalMinutes < 1);
@@ -156,7 +156,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
                 Hash = "foo",
                 HashType = "ldshash",
-                Initiator = "ea",
+                Initiator = "eb",
                 Input = "{\"CaseId\": \"ABC\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"DEF\"}",
                 MatchId = matchId,
                 States = new string[] { "eb", "bb" }
@@ -189,9 +189,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var match = new MatchRecordDbo()
             {
                 MatchId = matchId,
-                Initiator = "ea",
+                Initiator = "ia",
                 CreatedAt = DateTime.UtcNow,
-                States = new string[] { "ea", "bb" },
+                States = new string[] { "ia", "bb" },
                 Hash = "foo",
                 HashType = "ldshash",
                 Data = "{}",
@@ -211,7 +211,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var mre = new MatchResEventDbo()
             {
                 MatchId = matchId,
-                ActorState = "ea",
+                ActorState = "ia",
                 Actor = "user",
                 Delta = "{ \"invalid_match\": true }"
             };
