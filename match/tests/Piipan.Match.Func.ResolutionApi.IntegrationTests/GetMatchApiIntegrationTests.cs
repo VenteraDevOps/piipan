@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -13,6 +14,7 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
+using Piipan.States.Core.DataAccessObjects;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -30,6 +32,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             services.AddTransient<IMatchRecordDao, MatchRecordDao>();
             services.AddTransient<IMatchResEventDao, MatchResEventDao>();
             services.AddTransient<IMatchResAggregator, MatchResAggregator>();
+            services.AddTransient<IStateInfoDao, StateInfoDao>();
+            services.AddTransient<IMemoryCache, MemoryCache>();
 
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
@@ -37,25 +41,34 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                     NpgsqlFactory.Instance,
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
             });
+            services.AddTransient<IDbConnectionFactory<StateInfoDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<StateInfoDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
+                );
+            });
 
             var provider = services.BuildServiceProvider();
 
             var api = new GetMatchApi(
                 provider.GetService<IMatchRecordDao>(),
                 provider.GetService<IMatchResEventDao>(),
-                provider.GetService<IMatchResAggregator>()
+                provider.GetService<IMatchResAggregator>(),
+                provider.GetService<IStateInfoDao>(),
+                provider.GetService<IMemoryCache>()
             );
 
             return api;
         }
 
-        static Mock<HttpRequest> MockGetRequest(string matchId = "foo")
+        static Mock<HttpRequest> MockGetRequest(string matchId = "foo", string requestLocation = "EA")
         {
             var mockRequest = new Mock<HttpRequest>();
             var headers = new HeaderDictionary(new Dictionary<String, StringValues>
             {
                 { "From", "foobar"},
-                { "X-Initiating-State", "ea"}
+                { "X-Request-Location", requestLocation}
             }) as IHeaderDictionary;
             mockRequest.Setup(x => x.Headers).Returns(headers);
 
@@ -122,6 +135,42 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // Assert the created date that is returned is nearly identical to the actual current time
             Assert.True((createdDate - matchCreateDate).Value.TotalMinutes < 1);
         }
+
+        [Fact]
+        public async void GetMatch_ReturnsCorrectSchemaIfNotAuthorized()
+        {
+            // Arrange
+            // clear databases
+            ClearMatchRecords();
+            ClearMatchResEvents();
+
+            var matchId = "ABC";
+            var api = Construct();
+            var mockRequest = MockGetRequest(matchId);
+            var mockLogger = Mock.Of<ILogger>();
+            var matchCreateDate = DateTime.UtcNow;
+            // insert into database
+            var match = new MatchRecordDbo()
+            {
+                CreatedAt = matchCreateDate,
+                Data = "{\"State\": \"bb\", \"CaseId\": \"GHI\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"JKL\", \"ParticipantClosingDate\": \"2021-02-28\", \"VulnerableIndividual\": true, \"RecentBenefitIssuanceDates\": [{\"start\": \"2021-03-01\", \"end\":\"2021-03-31\"}]}",
+                Hash = "foo",
+                HashType = "ldshash",
+                Initiator = "ea",
+                Input = "{\"CaseId\": \"ABC\", \"LdsHash\": \"foobar\", \"ParticipantId\": \"DEF\"}",
+                MatchId = matchId,
+                States = new string[] { "eb", "bb" }
+            };
+            Insert(match);
+
+            // Act
+            // Act
+            var response = await api.GetMatch(mockRequest.Object, matchId, mockLogger) as NotFoundObjectResult;
+
+            // Assert
+            Assert.Equal(404, response.StatusCode);
+        }
+
         // When match res events are added, GetMatch response should update accordingly
         [Fact]
         public async void GetMatch_ShowsUpdatedData()
