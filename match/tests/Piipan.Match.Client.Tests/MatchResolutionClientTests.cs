@@ -32,6 +32,7 @@ namespace Piipan.Match.Client.Tests
             var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
             apiClient
                 .Setup(m => m.TryGetAsync<MatchResApiResponse>("matches/m123456", It.IsAny<Func<IEnumerable<(string, string)>>>()))
+                .Callback((string path, Func<IEnumerable<(string, string)>> fn) => fn())
                 .ReturnsAsync((expectedResponse, 200));
 
             var client = new MatchResolutionClient(apiClient.Object);
