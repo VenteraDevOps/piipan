@@ -44,17 +44,15 @@ The reason we chose Liquibase over Flyway
 1. CICD runs migration against DEV databases upon successful PR merge.
 
 
-## Example Commands 
+### Example Commands 
 
 * Run an update for Participants Database
 1. Navigate to dev/piipan/iac/participants
-1. Run
-** liquibase --changeLogFile=master-changelog.xml --username={user} --password={password} --url=jdbc:postgresql://{your host}.postgres.database.azure.com:5432/{your database} --headless=true update
+1. Run -> liquibase --changeLogFile=master-changelog.xml --username={user} --password={password} --url=jdbc:postgresql://{your host}.postgres.database.azure.com:5432/{your database} --headless=true update
 
 * Rollback an update for Participants Database
 1. Navigate to dev/piipan/iac/participants
-1. Run
-** liquibase --changeLogFile=master-changelog.xml --username={user} --password={password} --url=jdbc:postgresql://{your host}.postgres.database.azure.com:5432/{your database} --headless=true rollback-count-1
+1. Run -> liquibase --changeLogFile=master-changelog.xml --username={user} --password={password} --url=jdbc:postgresql://{your host}.postgres.database.azure.com:5432/{your database} --headless=true rollback-count-1
 
 ## Consequences
 
