@@ -165,7 +165,7 @@ main () {
   config_role "$reader"
 
   # Use the state abbreviation as the name of the db and its owner
-  while IFS=, read -r abbr name ; do
+  while IFS=, read -r abbr name _; do
     echo "Creating owner role and database for $name ($abbr)"
 
     db=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
@@ -193,7 +193,8 @@ main () {
   export PGPASSWORD
   export PGUSER=${PG_AAD_ADMIN}@$PG_SERVER_NAME
 
-  while IFS=, read -r abbr name ; do
+  configure_azure_profile
+  while IFS=, read -r abbr name _; do
     echo "Creating managed identity roles for $name ($abbr)"
 
     db=$(echo "$abbr"| tr '[:upper:]' '[:lower:]')
@@ -209,6 +210,7 @@ main () {
     create_managed_role "$db" "$role" "$client_id"
     config_managed_role "$db" "$role"
   done < states.csv
+  configure_azure_profile
 
   script_completed
 }

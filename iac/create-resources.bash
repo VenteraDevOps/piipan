@@ -21,7 +21,7 @@ set_constants () {
   PG_SUPERUSER=postgres
 
   # Name of Azure Active Directory admin for PostgreSQL server
-  PG_AAD_ADMIN=piipan-admins
+  PG_AAD_ADMIN=piipan-admins-${ENV}
 
   # Name of PostgreSQL server
   PG_SERVER_NAME=$PREFIX-psql-participants-$ENV
@@ -58,6 +58,7 @@ az_connection_string () {
   resource_group=$1
   identity=$2
 
+  configure_azure_profile
   client_id=$(\
     az identity show \
       --resource-group "$resource_group" \
@@ -65,20 +66,36 @@ az_connection_string () {
       --query clientId \
       --output tsv)
 
-    echo "RunAs=App;AppId=${client_id}"
+  echo "RunAs=App;AppId=${client_id}"
+  configure_azure_profile
 }
 
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
+
+  # Only show errors from the CLI ouput, mostly to avoid 'WARNING: This command
+  # or command group has been migrated to Microsoft Graph API. Please carefully
+  # review all breaking changes introduced during this migration:
+  # https://docs.microsoft.com/cli/azure/microsoft-graph-migration'
+  az config set core.only_show_errors=false
+  read -p "Disable Azure CLI warnings? (Yes or No) " -r -t 10 &&
+  if [[ ${REPLY} =~ ^[yY]es$ ]]; then
+    echo "Disabling Azure CLI warnings"
+    az config set core.only_show_errors=true
+  else
+    echo "Showing Azure CLI warnings"
+  fi
+
   # shellcheck source=./iac/env/tts/dev.bash
   source "$(dirname "$0")"/env/"${azure_env}".bash
   # shellcheck source=./iac/iac-common.bash
   source "$(dirname "$0")"/iac-common.bash
-  verify_cloud
 
+  verify_cloud
   set_constants
 
+  echo "Creating Resource Groups"
   ./create-resource-groups.bash "$azure_env"
 
   # Virtual network is used to secure connections between
@@ -120,7 +137,7 @@ main () {
     az ad sp list \
       --display-name "$SIEM_RECEIVER" \
       --filter "displayname eq '$SIEM_RECEIVER'" \
-      --query "[0].objectId" \
+      --query "[0].id" \
       --output tsv)
   # Avoid resetting password by only creating app registration if it does not exist
   if [ -z "$siem_app_id" ]; then
@@ -129,24 +146,24 @@ main () {
         --name "$SIEM_RECEIVER" \
         --role "Reader" \
         --scopes "/subscriptions/${SUBSCRIPTION_ID}" \
-        --query "[0].objectId" \
+        --query "[0].id" \
         --output tsv)
 
     # Wait bit to avoid "InvalidPrincipalId" on app registration use below
-    sleep 60
+    sleep 120
   fi
 
   # Create event hub and assign role to app registration
   az deployment group create \
-    --name monitoring \
-    --resource-group "$RESOURCE_GROUP" \
-    --template-file  ./arm-templates/event-hub-monitoring.json \
-    --parameters \
-      resourceTags="$RESOURCE_TAGS" \
-      location="$LOCATION" \
-      env="$ENV" \
-      prefix="$PREFIX" \
-      receiverId="$siem_app_id"
+   --name monitoring \
+   --resource-group "$RESOURCE_GROUP" \
+   --template-file  ./arm-templates/event-hub-monitoring.json \
+   --parameters \
+     resourceTags="$RESOURCE_TAGS" \
+     location="$LOCATION" \
+     env="$ENV" \
+     prefix="$PREFIX" \
+     receiverId="$siem_app_id"
 
   # Create a key vault which will store credentials for use in other templates
   az deployment group create \
@@ -169,9 +186,9 @@ main () {
       eventHubName="$EVENT_HUB_NAME" \
       coreResourceGroup="$RESOURCE_GROUP"
 
-  # For each participating state, create a separate storage account.
+      # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
-  while IFS=, read -r abbr name ; do
+  while IFS=, read -r abbr name _; do
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       func_stor_name=${PREFIX}st${abbr}upload${ENV}
       echo "Creating storage for $name ($func_stor_name)"
@@ -201,6 +218,7 @@ main () {
     --name "$PG_SECRET_NAME" \
     --file /dev/stdin \
     --query id
+    #--value "$PG_SECRET" \
 
   echo "Creating PostgreSQL server"
   az deployment group create \
@@ -222,21 +240,26 @@ main () {
 
   # The AD admin can't be specified in the PostgreSQL ARM template,
   # unlike in Azure SQL
-  az ad group create --display-name "$PG_AAD_ADMIN" --mail-nickname "$PG_AAD_ADMIN"
-  PG_AAD_ADMIN_OBJID=$(az ad group show --group $PG_AAD_ADMIN --query objectId --output tsv)
+  az ad group create --display-name "${PG_AAD_ADMIN}" --mail-nickname "${PG_AAD_ADMIN}"
+  PG_AAD_ADMIN_OBJID=$(az ad group show --group "${PG_AAD_ADMIN}" --query id --output tsv)
   az postgres server ad-admin create \
     --resource-group "$RESOURCE_GROUP" \
     --server "$PG_SERVER_NAME" \
     --display-name "$PG_AAD_ADMIN" \
     --object-id "$PG_AAD_ADMIN_OBJID"
 
+  # Configure Payload Keys
+  ./configure-payload-keys.bash "$azure_env"
+
   # Create managed identities to admin each state's database
-  while IFS=, read -r abbr name ; do
+  configure_azure_profile
+  while IFS=, read -r abbr name _; do
       echo "Creating managed identity for $name ($abbr)"
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       identity=$(state_managed_id_name "$abbr" "$ENV")
       az identity create -g "$RESOURCE_GROUP" -n "$identity"
   done < states.csv
+  configure_azure_profile
 
   exists=$(az ad group member check \
     --group "$PG_AAD_ADMIN" \
@@ -304,12 +327,22 @@ main () {
       --query "[?name == 'RootManageSharedAccessKey'].id" \
       -o tsv)
 
+  # Create the list of state abbreviations, and which states should be disabled from
+  # returning matches from the orchestrator API.
   state_abbrs=""
-  while IFS=, read -r abbr name ; do
+  state_enabled_matches=""
+  while IFS=$',\t\r\n' read -r abbr name enable_matches; do
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     state_abbrs+=",${abbr}"
+    if [ "$enable_matches" = $STATE_ENABLED_KEY ]; then
+        state_enabled_matches+=",${abbr}"
+    fi
   done < states.csv
   state_abbrs=${state_abbrs:1}
+  if [[ -n "$state_enabled_matches" ]]; then
+    state_enabled_matches=${state_enabled_matches:1}
+  fi
+  echo "Enabled States: ${state_enabled_matches}"
 
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
@@ -332,12 +365,11 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
-
-  # Publish function app
-  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+      eventHubName="$EVENT_HUB_NAME" \
+      statesToEnableMatches="$state_enabled_matches"
 
   echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
+
   # Subnet ID is needed when vnet and storage are in different resource groups
   func_subnet_id=$(\
     az network vnet subnet show \
@@ -369,11 +401,14 @@ main () {
       WEBSITE_VNET_ROUTE_ALL=1 \
       QueryToolUrl="$QUERY_TOOL_URL"
 
+  # Publish function app
+  try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
+
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
   az ad app create \
     --display-name "$ORCHESTRATOR_FUNC_APP_NAME" \
-    --available-to-other-tenants false
+    --sign-in-audience "AzureADMyOrg"
 
   ./config-managed-role.bash "$ORCHESTRATOR_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP" "${PG_AAD_ADMIN}@${PG_SERVER_NAME}"
 
@@ -396,9 +431,6 @@ main () {
       coreResourceGroup="$RESOURCE_GROUP" \
       eventHubName="$EVENT_HUB_NAME"
 
-  echo "Publish Match Resolution API Function App"
-  try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
-
   echo "Integrating ${MATCH_RES_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
     --name "$MATCH_RES_FUNC_APP_NAME" \
@@ -412,11 +444,14 @@ main () {
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
 
+  echo "Publish Match Resolution API Function App"
+  try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
+
   # Create an Active Directory app registration associated with the app.
   # Used by subsequent resources to configure auth
   az ad app create \
     --display-name "$MATCH_RES_FUNC_APP_NAME" \
-    --available-to-other-tenants false
+    --sign-in-audience "AzureADMyOrg"
 
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
@@ -522,29 +557,57 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app")
 
+    stateManagedIdentity="${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}"
     if [ -z "$exists" ]; then
       # Conditionally execute otherwise we will get an error if it is already
       # assigned this managed identity
       az functionapp identity assign \
-        --resource-group "$RESOURCE_GROUP" \
-        --name "$func_app" \
-        --identities "${DEFAULT_PROVIDERS}/Microsoft.ManagedIdentity/userAssignedIdentities/${identity}"
+        --resource-group "${RESOURCE_GROUP}" \
+        --name "${func_app}" \
+        --identities "${stateManagedIdentity}"
     fi
 
-    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
+    # Update function to use state managed identity when referencing key vault
+    echo "Configuring ${func_app} Key Vault Reference Identity"
+    az rest --method PATCH --uri "${func_id}?api-version=2021-01-01" --body "{'properties':{'keyVaultReferenceIdentity':'${stateManagedIdentity}'}}"
+
+    # Update Key Vault to allow function access
+    echo "Granting Key Vault access to ${func_app}"
+    configure_azure_profile
+    stateManagedIdentityPrincipalId=$(\
+      az identity show \
+        --resource-group "${RESOURCE_GROUP}" \
+        --name "${identity}" \
+        --query principalId \
+        --output tsv)
+    configure_azure_profile
+
+    az deployment group create \
+      --name "${VAULT_NAME}-access-policy-for-${func_app}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      --template-file ./arm-templates/key-vault-access-policy.json \
+      --parameters \
+        keyVaultName="${VAULT_NAME}" \
+        objectId="${stateManagedIdentityPrincipalId}" \
+        permissionsSecrets="['get', 'list']"
+
+    az_serv_str=$(az_connection_string "${RESOURCE_GROUP}" "${identity}")
+    blob_conn_str=$(blob_connection_string "${RESOURCE_GROUP}" "${stor_name}")
     # Long-running bulk upload queries require some specific connection
     # details that are not part of the default connection string
+    db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
     db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
-    blob_conn_str=$(blob_connection_string "$RESOURCE_GROUP" "$stor_name")
-    az_serv_str=$(az_connection_string "$RESOURCE_GROUP" "$identity")
     az functionapp config appsettings set \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app" \
       --settings \
-        $DB_CONN_STR_KEY="$db_conn_str" \
-        $AZ_SERV_STR_KEY="$az_serv_str" \
-        $BLOB_CONN_STR_KEY="$blob_conn_str" \
-        $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
+        ${AZ_SERV_STR_KEY}="${az_serv_str}" \
+        ${BLOB_CONN_STR_KEY}="${blob_conn_str}" \
+        ${CLOUD_NAME_STR_KEY}="${CLOUD_NAME}" \
+        ${DB_CONN_STR_KEY}="${db_conn_str}" \
+        ${STATE_STR_KEY}="${abbr}" \
+        ${UPLOAD_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_KV})" \
+        ${UPLOAD_ENCRYPT_KEY_SHA}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${UPLOAD_ENCRYPT_KEY_SHA_KV})" \
       --output none
 
     event_grid_system_topic_id=$(\
@@ -608,7 +671,7 @@ main () {
     --resource-group "$RESOURCE_GROUP" \
     --query frontdoorId \
     --output tsv)
-  echo "Front Door iD: ${front_door_id}"
+  echo "Front Door ID: ${front_door_id}"
 
   orch_api_uri=$(\
     az functionapp show \
@@ -637,7 +700,7 @@ main () {
       --filter "displayName eq '${MATCH_RES_FUNC_APP_NAME}'" \
       --query "[0].appId" \
       --output tsv)
- 
+
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
@@ -661,7 +724,7 @@ main () {
       frontDoorUri="$QUERY_TOOL_URL"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
-  az functionapp vnet-integration add \
+  az webapp vnet-integration add \
     --name "$QUERY_TOOL_APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --subnet "$WEBAPP_SUBNET_NAME" \
@@ -677,7 +740,7 @@ main () {
   ./create-core-databases.bash "$azure_env"
 
   # API Management instances need to be created before configuring Easy Auth.
-   ./create-apim.bash "$azure_env" "$APIM_EMAIL"
+  ./create-apim.bash "$azure_env" "$APIM_EMAIL"
 
   # Configures App Service Authentication between:
   #   - PerStateMatchApi and OrchestratorApi

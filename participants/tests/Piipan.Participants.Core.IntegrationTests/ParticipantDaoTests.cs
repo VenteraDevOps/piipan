@@ -139,5 +139,49 @@ namespace Piipan.Participants.Core.IntegrationTests
                 });
             }
         }
+
+       [Fact]
+        public async void DeleteOldParticipantLogEntry()
+        {
+
+
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                ClearParticipants();
+
+                var logger = new Mock<ILogger<ParticipantDao>>();   
+                var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
+                var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
+                var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger.Object);
+                InsertUpload();
+                var participants = helper.RandomParticipants(2, GetLastUploadIdWithStatus("COMPLETE"));
+
+                // Act
+                await dao.AddParticipants(participants);
+
+                // Insert New Participants
+                InsertUpload();
+                var participantsNew = helper.RandomParticipants(2, GetLastUploadIdWithStatus("COMPLETE"));
+
+                await dao.AddParticipants(participantsNew);
+               
+                // Now Delete Old Participants.
+
+                await dao.DeleteOldParticipantsExcept(string.Empty, GetLastUploadIdWithStatus("COMPLETE"));
+                // Assert
+
+                // Assert
+                logger.Verify(m => m.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Information),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((object v, Type _) => v.ToString().Contains("Outdated participant cleanup; Cleanup Time")),
+                    It.IsAny<Exception>(),
+                    (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once());
+            }
+
+        }
     }
 }

@@ -51,8 +51,18 @@ app_role_manifest () {
   echo "$json"
 }
 
-# Generate the application ID URI for a given app, using the default
-# format: https://docs.microsoft.com/en-us/azure/active-directory/develop/security-best-practices-for-app-registration#appid-uri-configuration
+# Generate the necessary JSON object for updating a service principal
+# to require an appRoleAssignment.
+# https://docs.microsoft.com/en-us/graph/api/resources/approleassignment?view=graph-rest-1.0
+app_role_required () {
+  echo "\
+  {
+    \"appRoleAssignmentRequired\": true
+  }"
+}
+
+# Generate the application ID URI for a given app, using the default format
+# https://docs.microsoft.com/en-us/azure/active-directory/develop/security-best-practices-for-app-registration#appid-uri-configuration
 app_id_uri () {
   app=$1
 
@@ -77,7 +87,7 @@ configure_aad_app_reg () {
     az ad app list \
       --display-name "${app}" \
       --filter "displayName eq '${app}'" \
-      --query "[0].objectId" \
+      --query "[0].id" \
       --output tsv)
 
   # First configure the app registration with the application role
@@ -101,7 +111,7 @@ configure_aad_app_reg () {
   app_uri=$(app_id_uri "$app")
   az ad app update \
     --id "$object_id" \
-    --available-to-other-tenants false \
+    --sign-in-audience "AzureADMyOrg" \
     --identifier-uris "$app_uri"
 
   echo "$object_id"
@@ -119,13 +129,13 @@ create_aad_app_sp () {
     az ad sp list \
     --display-name "$app" \
     --filter "${filter}" \
-    --query "[0].objectId" \
+    --query "[0].id" \
     --output tsv)
   if [ -z "$sp" ]; then
     sp=$(\
       az ad sp create \
         --id "$aad_app_id" \
-        --query objectId \
+        --query id \
         --output tsv)
   fi
 
@@ -135,7 +145,7 @@ create_aad_app_sp () {
 # Assign an application role to a service principal (generally in
 # the form of a managed identity)
 assign_app_role () {
-  echo "Assigning app role"
+  echo "Assigning application role: $3"
   resource_id=$1
   principal_id=$2
   role=$3
@@ -146,6 +156,14 @@ assign_app_role () {
     --output tsv)
 
   domain=$(graph_host_suffix)
+
+  # Any client that attemps authentication must be assigned a role
+  update_json=$(app_role_required)
+  az rest \
+  --method PATCH \
+  --uri "https://graph${domain}/v1.0/servicePrincipals/${resource_id}" \
+  --headers 'Content-Type=application/json' \
+  --body "${update_json}"
 
   # Similar to `az ad app create`, `az rest` will throw error when assigning
   # an app role to an identity that already has the role.
@@ -179,7 +197,7 @@ enable_easy_auth () {
     az ad app list \
       --display-name "${app}" \
       --filter "displayName eq '${app}'" \
-      --query "[0].objectId" \
+      --query "[0].id" \
       --output tsv)
 
   app_uri=$(app_id_uri "$app")
@@ -187,14 +205,6 @@ enable_easy_auth () {
   aad_endpoint=$(\
     az cloud show \
       --query endpoints.activeDirectory \
-      --output tsv)
-
-  sp_filter="displayName eq '${app}' and servicePrincipalType eq 'Application'"
-  app_aad_sp=$(\
-    az ad sp list \
-      --display-name "$app" \
-      --filter "${sp_filter}" \
-      --query "[0].objectId" \
       --output tsv)
 
   echo "Configuring Easy Auth settings for ${app}"
@@ -206,11 +216,6 @@ enable_easy_auth () {
     --aad-token-issuer-url "${aad_endpoint}/${TENANT_ID}/" \
     --enabled true \
     --action LoginWithAzureActiveDirectory
-
-  # Any client that attemps authentication must be assigned a role
-  az ad sp update \
-    --id "$app_aad_sp" \
-    --set "appRoleAssignmentRequired=true"
 }
 
 # Configures App Service Authentication (aka Easy Auth) for an API provider

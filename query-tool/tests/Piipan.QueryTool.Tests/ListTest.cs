@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -6,54 +10,24 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Pages;
-using Piipan.Shared.Claims;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.QueryTool.Tests
 {
-    public class ListPageTests
+    public class ListPageTests : BasePageTest
     {
         private string[] matchIds = new string[] { "m123456", "m654321" };
-        public static IClaimsProvider claimsProviderMock(string email)
-        {
-            var claimsProviderMock = new Mock<IClaimsProvider>();
-            claimsProviderMock
-                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
-                .Returns(email);
-            return claimsProviderMock.Object;
-        }
-
-        public static HttpContext contextMock()
-        {
-            var request = new Mock<HttpRequest>();
-
-            request
-                .Setup(m => m.Scheme)
-                .Returns("https");
-
-            request
-                .Setup(m => m.Host)
-                .Returns(new HostString("tts.test"));
-
-            var context = new Mock<HttpContext>();
-            context.Setup(m => m.Request).Returns(request.Object);
-
-            return context.Object;
-        }
 
         [Fact]
         public void TestBeforeOnGet()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockServiceProvider = serviceProviderMock();
             var mockMatchApi = Mock.Of<IMatchResolutionApi>();
             var pageModel = new ListModel(
                 new NullLogger<ListModel>(),
-                mockClaimsProvider,
-                mockMatchApi
+                mockMatchApi,
+                mockServiceProvider
             );
 
             // act
@@ -63,10 +37,10 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async Task Test_Get()
+        public async Task Test_Get_Accessible()
         {
             // arrange
-            var pageModel = SetupMatchModel();
+            var pageModel = SetupMatchModel("National", new string[] { "*" });
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -85,6 +59,20 @@ namespace Piipan.QueryTool.Tests
                 Assert.Empty(list[i].Participants);
                 Assert.Equal(new string[] { "ea", "eb" }, list[i].States);
             }
+        }
+
+        [Fact]
+        public async Task Test_Get_Unauthorized_Location()
+        {
+            // arrange
+            var pageModel = SetupMatchModel("IA");
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var result = await pageModel.OnGet();
+
+            // assert
+            Assert.IsType<RedirectToPageResult>(result);
         }
 
         private Mock<IMatchResolutionApi> SetupMatchResolutionApi()
@@ -106,17 +94,51 @@ namespace Piipan.QueryTool.Tests
             return mockMatchApi;
         }
 
-        private ListModel SetupMatchModel(Mock<IMatchResolutionApi> mockMatchApi = null)
+        private ListModel SetupMatchModel(string location, string[] states = null, Mock<IMatchResolutionApi> mockMatchApi = null)
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
+            var mockServiceProvider = serviceProviderMock(location: location, states: states);
             mockMatchApi ??= SetupMatchResolutionApi();
             var pageModel = new ListModel(
                 new NullLogger<ListModel>(),
-                mockClaimsProvider,
-                mockMatchApi.Object
+                mockMatchApi.Object,
+                mockServiceProvider
             );
             return pageModel;
+        }
+
+        [Theory]
+        [InlineData(nameof(ListModel.OnGet), null, null, false)]
+        [InlineData(nameof(ListModel.OnGet), "IA", null, false)]
+        [InlineData(nameof(ListModel.OnGet), null, "Worker", false)]
+        [InlineData(nameof(ListModel.OnGet), "IA", "Worker", true)]
+        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        {
+            var mockServiceProvider = serviceProviderMock(location: location, role: role);
+
+            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
+
+            if (!isAuthorized)
+            {
+                Assert.Equal(403, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+                Assert.IsType<RedirectToPageResult>(pageHandlerExecutingContext.Result);
+            }
+            else
+            {
+                Assert.Equal(200, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+            }
+        }
+
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider mockServiceProvider, string methodName)
+        {
+            var mockMatchApi = Mock.Of<IMatchResolutionApi>();
+            var pageModel = new ListModel(
+                new NullLogger<ListModel>(),
+                mockMatchApi,
+                mockServiceProvider
+            );
+
+            return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }

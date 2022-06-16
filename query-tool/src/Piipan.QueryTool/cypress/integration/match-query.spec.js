@@ -34,6 +34,13 @@ describe('query tool match query', () => {
         cy.get('.usa-alert').contains('Match ID must be 7 characters').should('be.visible');
     });
 
+    it("server errors are shown and accessible", () => {
+        cy.get('#Query_MatchId').type("123$567").blur();
+
+        setupPa11yPost();
+        cy.pa11y(pa11yOptions);
+    });
+
     it("shows invalid characters error for match ID", () => {
         cy.get('#Query_MatchId').type("m12$345").blur();
         cy.get('#Query_MatchId-message').contains('Match ID contains invalid characters').should('be.visible');
@@ -43,45 +50,40 @@ describe('query tool match query', () => {
         cy.get('.usa-alert').contains('Match ID contains invalid characters').should('be.visible');
     });
 
-    it("shows an empty state on successful submission without match", () => {
-        cy.get('#Query_MatchId').type("1234567").blur();
+    // Commented out for now. We need a long-term solution for end-to-end testing before these tests will work.
 
-        cy.get('form').submit();
+    //it("shows an empty state on successful submission without match", () => {
+    //    cy.get('#Query_MatchId').type("1234567").blur();
 
-        cy.contains('This Match ID does not have a matching record in any other states.').should('be.visible');
+    //    cy.get('form').submit();
 
-        setupPa11yPost();
-        cy.pa11y(pa11yOptions);
-    });
+    //    cy.contains('This Match ID does not have a matching record in any other states.').should('be.visible');
 
-    it("server errors are shown and accessible", () => {
-        cy.get('#Query_MatchId').type("123$567").blur();
+    //    setupPa11yPost();
+    //    cy.pa11y(pa11yOptions);
+    //});
 
-        setupPa11yPost();
-        cy.pa11y(pa11yOptions);
-    });
+    //it("shows results table on successful submission with a match", () => {
+    //    cy.visit('/');
+    //    cy.get('#query-form-search-btn', { timeout: 10000 }).should('be.visible');
+    //    setValue('#QueryFormData_Query_LastName', 'Farrington');
+    //    setValue('#QueryFormData_Query_DateOfBirth', '1931-10-13');
+    //    setValue('#QueryFormData_Query_SocialSecurityNum', '425-46-5417');
+    //    cy.get('#query-form-search-btn').click();
 
-    it("shows results table on successful submission with a match", () => {
-        cy.visit('/');
-        cy.get('#query-form-search-btn', { timeout: 10000 }).should('be.visible');
-        setValue('#Query_LastName', 'Farrington');
-        setValue('#Query_DateOfBirth', '1931-10-13');
-        setValue('#Query_SocialSecurityNum', '425-46-5417');
-        cy.get('#query-form-search-btn').click();
+    //    cy.get('#query-results-area tbody tr td a').invoke('text').then(matchId => {
+    //        cy.visit('/match');
+    //        cy.get('#match-form-search-btn', { timeout: 10000 }).should('be.visible');
+    //        cy.get('#Query_MatchId').type(matchId).blur();
+    //        cy.get('form').submit();
 
-        cy.get('#query-results-area tbody tr td a').invoke('text').then(matchId => {
-            cy.visit('/match');
-            cy.get('#match-form-search-btn', { timeout: 10000 }).should('be.visible');
-            cy.get('#Query_MatchId').type(matchId).blur();
-            cy.get('form').submit();
+    //        cy.contains('Match ID').should('be.visible');
+    //        cy.contains('Matching States').should('be.visible');
 
-            cy.contains('Match ID').should('be.visible');
-            cy.contains('Matching States').should('be.visible');
-
-            setupPa11yPost();
-            cy.pa11y(pa11yOptions);
-        });
-    });
+    //        setupPa11yPost();
+    //        cy.pa11y(pa11yOptions);
+    //    });
+    //});
 })
 
 function setValue(cssSelector, value) {

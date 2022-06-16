@@ -1,21 +1,16 @@
-using Piipan.Etl.Func.BulkUpload.Parsers;
-using Piipan.Shared.API.Utilities;
 using System;
-using System.IO;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
-using System.Linq;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Messaging.EventGrid;
 using Azure.Messaging.EventGrid.SystemEvents;
-using Azure.Storage;
-using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Piipan.Etl.Func.BulkUpload.Parsers;
 using Xunit;
-using System.Text.Json;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 {
@@ -23,6 +18,15 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
     {
 
         private string EventString = "{\"topic\":\"/subscriptions/719bb99b-1a3b-4132-a0f6-1805a75dc30e/resourceGroups/rg-core-dev/providers/Microsoft.Storage/storageAccounts/ttssteauploaddev\",\"subject\":\"/blobServices/default/containers/upload/blobs/example333.csv\",\"eventType\":\"Microsoft.Storage.BlobCreated\",\"id\":\"0b6dcc46-401e-00eb-2f8b-5946db06a8ee\",\"data\":{\"api\":\"PutBlob\",\"requestId\":\"0b6dcc46-401e-00eb-2f8b-5946db000000\",\"eTag\":\"0x8DA27A31DCB5337\",\"contentType\":\"text/plain\",\"contentLength\":6592,\"blobType\":\"BlockBlob\",\"url\":\"https://ttssteauploaddev.blob.core.windows.net/upload/example333.csv\",\"sequencer\":\"00000000000000000000000000002A0D0000000001b0fc63\",\"storageDiagnostics\":{\"batchId\":\"ce49b6a6-f006-00f8-008b-598bff000000\"}},\"dataVersion\":\"\",\"metadataVersion\":\"1\",\"eventTime\":\"2022-04-26T16:37:55.9373378Z\"}";
+        private string CUSTOMER_KEY_FUNC_VARIABLE_NAME = "uploadPayloadKey";
+        private string TEST_KEY = "testEncryptionKey";
+
+        public BlobClientStreamTests()
+        {
+            byte[] bytesForKey = Encoding.UTF8.GetBytes(TEST_KEY);
+            var base64Key = Convert.ToBase64String(bytesForKey);
+            Environment.SetEnvironmentVariable(CUSTOMER_KEY_FUNC_VARIABLE_NAME, base64Key);
+        }
 
         private void VerifyLogError(Mock<ILogger> logger, String expected)
         {
@@ -109,7 +113,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
 
             // Arrange
             var blobClientStream = new BlobClientStream();
-            Environment.SetEnvironmentVariable("BlobStorageConnectionString", "UseDevelopmentStorage=true");
+            Environment.SetEnvironmentVariable("BlobStorageConnectionString", "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=test;AccountKey=abcdefghijklmnopTot4sLIYzB8qKbs9z5Ync5lVy0hOtnr4UFf/mjGFTHhT+Ef0hfGr5kmqjHCq+AStap+0ZA==");
 
             // Act
             var blob = blobClientStream.GetBlob("test");

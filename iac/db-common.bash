@@ -3,7 +3,7 @@
 # shellcheck source=./tools/common.bash
 source "$(dirname "$0")"/../tools/common.bash || exit
 
-CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
+CURRENT_USER_OBJID=$(az ad signed-in-user show --query id --output tsv)
 PSQL_OPTS=(-v ON_ERROR_STOP=1 -X -q)
 TEMPLATE_DB=template1
 
@@ -181,7 +181,7 @@ db_config_aad () {
   az ad group create --display-name "$aad_admin" --mail-nickname "$aad_admin"
 
   local aad_admin_objid
-  aad_admin_objid=$(az ad group show --group "$aad_admin" --query objectId --output tsv)
+  aad_admin_objid=$(az ad group show --group "$aad_admin" --query id --output tsv)
   az postgres server ad-admin create \
     --resource-group "$group" \
     --server "$server" \

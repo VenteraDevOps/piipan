@@ -14,9 +14,6 @@ DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
 
-# Identity object ID for the Azure environment account
-CURRENT_USER_OBJID=$(az ad signed-in-user show --query objectId --output tsv)
-
 # The default Azure subscription
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
@@ -43,6 +40,27 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 # Name of the environment variable used to indicate the active Azure cloud
 # so that application code can use the appropriate, cloud-specific domain
 CLOUD_NAME_STR_KEY=CloudName
+
+# Azure Key Vault naming is kebab-case
+# Azure Function enivornment vairable naming is camelCase
+# Thus, creating constants for both to avoid naming conflicts
+# Payload Encryption Key - Azure Function environment variable
+UPLOAD_ENCRYPT_KEY=uploadPayloadKey
+# Payload Encryption Key - Azure Key Vault secret
+UPLOAD_ENCRYPT_KEY_KV=upload-payload-key
+# Payload Encryption Key SHA - Azure Function environment variable
+UPLOAD_ENCRYPT_KEY_SHA=uploadPayloadKeySHA
+# Payload Encryption Key SHA - Azure Key Vault secret
+UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
+
+# Name of the environment variable used to indicate the current state. This is
+# used in the bulk upload Azure Function.
+STATE_STR_KEY=State
+
+# In the States.csv file, the state is enabled if they have the ENABLED text in column 3. Disabled if they have DISABLED text in column 3.
+# Defaults to disabled, so any text other than ENABLED is disabled.
+STATE_ENABLED_KEY=ENABLED
+STATE_DISABLED_KEY=DISABLED
 
 # For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'
@@ -97,6 +115,20 @@ OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 ### END Constants
 
 ### Functions
+# Return the object ID for the currently logged in account.
+# Supports both users and service principals.
+current_user_objid () {
+  type=$(az account show --query user.type --output tsv)
+
+  if [ "${type}" = "servicePrincipal" ]; then
+    app_id=$(az account show --query user.name --output tsv)
+    CURRENT_USER_OBJID=$(az ad sp show --id "${app_id}" --query id --output tsv)
+  else
+    CURRENT_USER_OBJID=$(az ad signed-in-user show --query id --output tsv)
+  fi
+}
+current_user_objid
+
 # Create a very long, (mostly) random password. Ensures all Azure character
 # class requirements are met by tacking on a non-random, tailored suffix.
 random_password () {
@@ -228,21 +260,48 @@ private_dns_zone () {
   echo $base
 }
 
+# Azure CLI 2.37 upgraded azure-mgmt-msi version to 2021-09-30-preview. This API
+# version will not work with AzureUSGovernment, and must be downgraded.
+# https://github.com/Azure/azure-cli/pull/22284
+# https://github.com/Azure/azure-cli/issues/22661
+# https://github.com/Azure/azure-cli/issues/22735
+configure_azure_profile () {
+  local cn
+  cn=$(\
+    az cloud show \
+      --query "name" \
+      --output tsv)
+
+  if [ "${cn}" = "AzureUSGovernment" ]; then
+    profile=$(\
+      az cloud show \
+        --name "${cn}" \
+        --query "profile" \
+        --output tsv)
+
+    if [ "${profile}" = "latest" ]; then
+      az cloud set -n "${cn}" --profile "2020-09-01-hybrid"
+    else
+      az cloud set -n "${cn}" --profile "latest"
+    fi
+  fi
+}
+
 # try_run()
 #
-# The function help with the robusness of the IaC code. 
-# In ocassions the original when run a command it can fail, because any kind of error. 
-# The wrapper function will try run the command to a max_tries of times. 
+# The function help with the robusness of the IaC code.
+# In ocassions the original when run a command it can fail, because any kind of error.
+# The wrapper function will try run the command to a max_tries of times.
 #
 # mycommand - command to be run
 # max_tries - max number of try, default value 3
 # directory - path where tje mycommand should be run
 #
-# usage:   try_run <mycommand> <max_tries> <directory> 
+# usage:   try_run <mycommand> <max_tries> <directory>
 #
 try_run () {
   mycommand=$1
-  max_tries="${2:-3}" 
+  max_tries="${2:-3}"
   directory="${3:-"./"}"
 
 
@@ -253,7 +312,7 @@ try_run () {
     for (( i=1; i<=max_tries; i++ ))
       do
         ERR=0
-        echo "Running: ${mycommand}"  
+        echo "Running: ${mycommand}"
         eval "$mycommand"
 
         if [ $ERR -eq 0 ];then
@@ -321,6 +380,7 @@ set_oidc_secret () {
     --name "$secret_name" \
     --file /dev/stdin \
     --query id > /dev/null
+    #--value "$value"
 }
 
 # Given an App Service instance name, output the secret established for OIDC,

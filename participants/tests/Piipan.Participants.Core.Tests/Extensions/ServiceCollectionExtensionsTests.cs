@@ -1,10 +1,10 @@
-using System.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Database;
+using Piipan.Shared.Deidentification;
 using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Extensions
@@ -28,6 +28,7 @@ namespace Piipan.Participants.Core.Tests.Extensions
             Assert.NotNull(provider.GetService<IUploadDao>());
             Assert.NotNull(provider.GetService<IParticipantApi>());
             Assert.NotNull(provider.GetService<IParticipantBulkInsertHandler>());
+            Assert.NotNull(provider.GetService<IRedactionService>());
 
         }
     }

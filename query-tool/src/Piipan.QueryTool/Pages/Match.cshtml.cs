@@ -1,14 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
-using Piipan.Shared.Claims;
-using Piipan.Shared.Deidentification;
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -16,7 +14,6 @@ namespace Piipan.QueryTool.Pages
     {
 
         private readonly ILogger<MatchModel> _logger;
-        private readonly ILdsDeidentifier _ldsDeidentifier;
         private readonly IMatchResolutionApi _matchResolutionApi;
 
         [BindProperty]
@@ -27,14 +24,12 @@ namespace Piipan.QueryTool.Pages
         public List<ServerError> RequestErrors { get; private set; } = new();
 
         public MatchModel(ILogger<MatchModel> logger
-                           , IClaimsProvider claimsProvider
-                           , ILdsDeidentifier ldsDeidentifier
-                           , IMatchResolutionApi matchResolutionApi)
-                           : base(claimsProvider)
+                           , IMatchResolutionApi matchResolutionApi
+                           , IServiceProvider serviceProvider)
+                          : base(serviceProvider)
 
         {
             _logger = logger;
-            _ldsDeidentifier = ldsDeidentifier;
             _matchResolutionApi = matchResolutionApi;
         }
 
