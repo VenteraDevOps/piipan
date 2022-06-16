@@ -430,6 +430,26 @@
           "System.Runtime.InteropServices.RuntimeInformation": "4.0.0"
         }
       },
+      "Microsoft.Extensions.Caching.Abstractions": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "bcz5sSFJbganH0+YrfvIjJDIcKNW7TL07C4d1eTmXy/wOt52iz4LVogJb6pazs7W0+74j0YpXFErvp++Aq5Bsw==",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "6.0.0"
+        }
+      },
+      "Microsoft.Extensions.Caching.Memory": {
+        "type": "Transitive",
+        "resolved": "6.0.1",
+        "contentHash": "B4y+Cev05eMcjf1na0v9gza6GUtahXbtY1JCypIgx3B4Ea/KAgsWyXEmW4q6zMbmTMtKzmPVk09rvFJirvMwTg==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "6.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Options": "6.0.0",
+          "Microsoft.Extensions.Primitives": "6.0.0"
+        }
+      },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
         "resolved": "2.1.0",
@@ -2071,9 +2091,12 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.Azure.Functions.Extensions": "1.1.0",
+          "Microsoft.Extensions.Caching.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Caching.Memory": "6.0.1",
           "Microsoft.NET.Sdk.Functions": "4.1.1",
           "Piipan.Match.Api": "1.0.0",
-          "Piipan.Match.Core": "1.0.0"
+          "Piipan.Match.Core": "1.0.0",
+          "Piipan.States.Core": "1.0.0"
         }
       },
       "piipan.participants.api": {
@@ -2112,6 +2135,20 @@
           "Azure.Security.KeyVault.Keys": "4.3.0",
           "Microsoft.Extensions.Hosting.Abstractions": "6.0.0",
           "Piipan.Shared": "1.0.0"
+        }
+      },
+      "piipan.states.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "piipan.states.core": {
+        "type": "Project",
+        "dependencies": {
+          "Dapper": "2.0.123",
+          "Piipan.Shared": "1.0.0",
+          "Piipan.States.Api": "1.0.0"
         }
       }
     }

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Piipan.Shared.Http
@@ -34,6 +32,6 @@ namespace Piipan.Shared.Http
         /// it will return the default TResponse. Will return the status code whether a 404 or a success.
         /// </summary>
         /// <param name="path">path portion of the API endpoint</param>
-        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path);
+        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, Func<IEnumerable<(string, string)>> headerFactory = null);
     }
 }

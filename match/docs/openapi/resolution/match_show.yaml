@@ -12,10 +12,10 @@ get:
       description: "As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization."
       required: true
     - in: header
-      name: X-Initiating-State
+      name: X-Request-Location
       schema:
         type: string
-      description: "Two-letter postal abbreviation for the caller's state role"
+      description: "The state or region abbreviation for the user making the request. If the user is a national office user, this should be *"
       required: true
     - in: path
       name: match_id
