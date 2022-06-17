@@ -39,7 +39,7 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public void TestAfterOnGet()
+        public async Task TestAfterOnGet()
         {
             // arrange
             var mockServiceProvider = serviceProviderMock();
@@ -54,13 +54,14 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-
+            await OnPageHandlerExecutionAsync(pageModel, "OnGet");
             pageModel.OnGet();
 
             // assert
             Assert.Equal("NAC Query Tool", pageModel.Title);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
+            Assert.NotEmpty(pageModel.StateInfo.Results);
         }
 
         [Fact]
@@ -289,6 +290,32 @@ namespace Piipan.QueryTool.Tests
             Assert.NotNull(pageModel.QueryFormData.ServerErrors);
             Assert.Equal(new List<ServerError> {
                 new ServerError("", expectedErrorMessage) }, pageModel.QueryFormData.ServerErrors);
+        }
+
+        [Fact]
+        public async Task PageStillLoadsIfStatesApiErrors()
+        {
+            // arrange
+            var mockServiceProvider = serviceProviderMock(statesResponse: (i) => i.ThrowsAsync(new Exception("Test exception")));
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var mockMatchApi = Mock.Of<IMatchApi>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockLdsDeidentifier,
+                mockMatchApi,
+                mockServiceProvider
+            );
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            await OnPageHandlerExecutionAsync(pageModel, "OnGet");
+            pageModel.OnGet();
+
+            // assert
+            Assert.Equal("NAC Query Tool", pageModel.Title);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
+            Assert.Empty(pageModel.StateInfo.Results);
         }
     }
 }
