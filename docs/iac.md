@@ -2,12 +2,13 @@
 
 ## Prerequisites
 
-- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.32.0
+- [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) >= 2.37.0
 - [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) >= 4.x
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download)
 - `bash` shell >= 4.1, `/dev/urandom` – included in macOS, Linux, Git for Windows, Azure Cloud Shell
 - `psql` client for PostgreSQL – included in Azure Cloud Shell
 - [Node.js](https://nodejs.org/en/) >= 12.20.0 and `npm` [Node Package Manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) for compiling assets during the build of ASP.NET Core web applications. NOTE: As of 4/26/22, it is recommended to use Node.js version 14.19.1, otherwise the package-lock files you generate may not be compatible with the rest of the team's setup.
+- [coreutils/sha256sum](https://formulae.brew.sh/formula/coreutils)  >= 9.1, – sha256sum is included in Linux, Git for Windows, Azure Cloud Shell
 
 ## Steps
 To (re)create the Azure resources that `piipan` uses:
@@ -31,13 +32,15 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     az login
 ```
 
-5. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments). Once this step is completed, all the infrastructure components will be provisioned.
+5. If deploying to TEST environment, update states.csv to enable all states.
+
+6. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments). Once this step is completed, all the infrastructure components will be provisioned.
 ```
     cd iac
     ./create-resources.bash tts/dev
 ```
 
-6. Configuring user account authentication for piipan's Query Tool and Dashboard web apps requires additional actions. These actions can be deferred, but until completed, users will not be able to access these web apps.
+7. Configuring user account authentication for piipan's Query Tool and Dashboard web apps requires additional actions. These actions can be deferred, but until completed, users will not be able to access these web apps.
 
     - Securely obtain the OpenID Connect (OIDC) client secrets for the identity provider (IdP) configured in the `iac/env` file for your environment.
     - Run `store-oidc-secrets` and follow the prompts to store the client secrets in the system's core key vault.
@@ -47,14 +50,14 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./configure-oidc-apps.bash tts/dev
 ```
 
-7. Create a subscription in the API Management service. For now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EB-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
+8. Create a subscription in the API Management service. For now, the API Management subscriptions are created manually and not by the IaC. For example, you’ll need to create `EB-DupPart` and `EA-BulkUpload` before you can use the `test-apim-upload-api.bash` and `test-apim-match-api.bash` test scripts.
 
 ```
     ./match/tools/create-apim-match-subscription.bash tts/dev eb
     ./etl/tools/create-apim-bulk-subscription.bash tts/dev ea
 ```
 
-8. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
+9. Now you have to assign the necessary “application role” for the API. [Detailed documentation is found here](https://github.com/18F/piipan/blob/dev/docs/securing-internal-apis.md#working-locally), but if you just want to test your environment you can run the following steps.
 
     Use assign-app-role to assign your user account the necessary application role:
 
@@ -75,7 +78,7 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./tools/authorize-cli.bash tts/dev tts-func-metricsapi-dev
     ```
 
-9. Time to test your infrastructure
+10. Time to test your infrastructure
     ```
     #Test ETL
     ./etl/tools/test-apim-upload-api.bash tts/dev ea
@@ -106,7 +109,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | Name | Value | Used by |
 |---|---|---|
 | `DatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Collect, Piipan.Metrics.Func.Api |
-| `CollaborationDatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Match.Orchestrator, Piipan.Match.Func.ResolutionApi |
+| `CollaborationDatabaseConnectionString` | ADO.NET-formatted database connection string. If `Password` has the value `{password}`; i.e., `password` in curly quotes, then it is a partial connection string indicating the use of managed identities. An access token must be retrieved at run-time (e.g., via [AzureServiceTokenProvider](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/service-to-service-authentication)) to build the full connection string.  | Piipan.Match.Orchestrator, Piipan.Match.Func.ResolutionApi, Piipan.States.Func.Api |
 | `BlobStorageConnectionString` | Azure Storage Account connection string for accessing blobs. | Piipan.Etl |
 | `OrchApiUri` | URI for the Orchestrator API endpoint. | Piipan.QueryTool |
 | `OrchApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for Orchestrator API's Azure Active Directory application object | Piipan.QueryTool |
@@ -119,7 +122,11 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `KeyVaultName` | Name of key vault resource needed to acquire a secret | Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 | `CloudName` | Name of the active Azure cloud environment, either `AzureCloud` or `AzureUSGovernment` | Piipan.Etl, Piipan.Match.Orchestrator, Piipan.Metrics.Func.Api, Piipan.Metrics.Func.Collect |
 | `QueryToolUrl` | URL for the associated Query Tool. | Piipan.Match.Orchestrator |
-
+| `ColumnEncryptionKey` | Encryption Key for encrypting/decrypting column values. | Piipan.Etl, Piipan.Match.Orchestrator |
+| `EventGridEndpoint` | Connection string for Metrics EventGrid endpoint. | Piipan.Etl, Piipan.Metrics.Func.Collect |
+| `EventGridKeyString` | Key for Metrics EventGrid endpoint.  | Piipan.Etl, Piipan.Metrics.Func.Collect |
+| `UploadPayloadKey` | Payload Encryption Key. | Piipan.Etl |
+| `UploadPayloadKeySHA` | Payload Encryption Key SHA. | Piipan.Etl |
 
 ## `SysType` resource tag
 
