@@ -296,7 +296,7 @@ namespace Piipan.QueryTool.Tests
         public async Task PageStillLoadsIfStatesApiErrors()
         {
             // arrange
-            var mockServiceProvider = serviceProviderMock(statesResponse: (i) => i.ThrowsAsync(new Exception("Test exception")));
+            var mockServiceProvider = serviceProviderMock(statesInfoResponseOverride: (i) => i.ThrowsAsync(new Exception("Test exception")));
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
             var mockMatchApi = Mock.Of<IMatchApi>();
             var pageModel = new IndexModel(

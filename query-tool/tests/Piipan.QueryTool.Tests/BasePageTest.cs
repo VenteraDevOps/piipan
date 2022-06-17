@@ -23,7 +23,7 @@ namespace Piipan.QueryTool.Tests
     {
         public static IServiceProvider serviceProviderMock(string email = "noreply@tts.test",
             string location = "IA", string role = "Worker", string[] states = null,
-            Action<ISetup<IStatesApi, Task<StatesInfoResponse>>> statesResponse = null)
+            Action<ISetup<IStatesApi, Task<StatesInfoResponse>>> statesInfoResponseOverride = null)
         {
             var serviceProviderMock = new Mock<IServiceProvider>();
 
@@ -44,7 +44,7 @@ namespace Piipan.QueryTool.Tests
             var statesApiMock = new Mock<IStatesApi>();
 
             // declare it as object so MemoryCache setup works.
-            object stateInfoResponse = new StatesInfoResponse
+            StatesInfoResponse defaultStateInfoResponse = new StatesInfoResponse
             {
                 Results = new System.Collections.Generic.List<StateInfoResponseData>
                 {
@@ -59,13 +59,13 @@ namespace Piipan.QueryTool.Tests
             };
 
             var statesSetup = statesApiMock.Setup(c => c.GetStates());
-            if (statesResponse != null)
+            if (statesInfoResponseOverride != null)
             {
-                statesResponse.Invoke(statesSetup);
+                statesInfoResponseOverride.Invoke(statesSetup);
             }
             else
             {
-                statesSetup.ReturnsAsync(stateInfoResponse as StatesInfoResponse);
+                statesSetup.ReturnsAsync(defaultStateInfoResponse);
             }
 
             serviceProviderMock.Setup(c => c.GetService(typeof(IClaimsProvider))).Returns(claimsProviderMock.Object);
