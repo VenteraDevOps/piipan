@@ -1,4 +1,23 @@
-﻿namespace Piipan.QueryTool.Tests
+﻿using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Caching.Memory;
+using Moq;
+using Moq.Language.Flow;
+using Piipan.QueryTool.Pages;
+using Piipan.Shared.Claims;
+using Piipan.Shared.Locations;
+using Piipan.States.Api;
+using Piipan.States.Api.Models;
+
+namespace Piipan.QueryTool.Tests
 {
     public class BasePageTest
     {
