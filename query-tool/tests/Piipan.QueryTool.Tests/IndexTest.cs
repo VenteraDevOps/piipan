@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -7,6 +8,7 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Client.Models;
 using Piipan.QueryTool.Pages;
+using Piipan.QueryTool.Tests.Extensions;
 using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Deidentification;
 using Xunit;
@@ -65,7 +67,7 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async void MatchSetsResults()
+        public async Task MatchSetsResults()
         {
             // arrange
             var mockMatchApi = new Mock<IMatchApi>();
@@ -107,7 +109,7 @@ namespace Piipan.QueryTool.Tests
             var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
-                SocialSecurityNum = "987-65-4320",
+                SocialSecurityNum = "887-65-4320",
                 DateOfBirth = new DateTime(1931, 10, 13)
             };
 
@@ -120,6 +122,8 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             pageModel.QueryFormData.Query = requestPii;
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -134,7 +138,7 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async void MatchNoResults()
+        public async Task MatchNoResults()
         {
             // arrange
             var mockMatchApi = new Mock<IMatchApi>();
@@ -159,7 +163,7 @@ namespace Piipan.QueryTool.Tests
             var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
+                SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockServiceProvider = serviceProviderMock();
@@ -171,6 +175,8 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             pageModel.QueryFormData.Query = requestPii;
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -184,13 +190,51 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async void MatchCapturesInvalidLocationError()
+        public async Task MatchCapturesInvalidStateErrors()
         {
             // arrange
             var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
+                SocialSecurityNum = "000-00-0000", // social security number is invalid 3 times
+                DateOfBirth = new DateTime(2021, 1, 1)
+            };
+            var mockServiceProvider = serviceProviderMock(location: "EA");
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var mockMatchApi = new Mock<IMatchApi>();
+
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockLdsDeidentifier,
+                mockMatchApi.Object,
+                mockServiceProvider
+            );
+            pageModel.QueryFormData.Query = requestPii;
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            await pageModel.OnPostAsync();
+
+            // assert
+            Assert.NotNull(pageModel.QueryFormData.ServerErrors);
+            Assert.Equal(new List<ServerError> {
+                new ServerError("QueryFormData.Query.SocialSecurityNum",
+                "The first three numbers of @@@ cannot be 000\nThe middle two numbers of @@@ cannot be 00\nThe last four numbers of @@@ cannot be 0000")
+            }, pageModel.QueryFormData.ServerErrors);
+            Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal("https://tts.test", pageModel.BaseUrl);
+        }
+
+        [Fact]
+        public async Task MatchCapturesInvalidLocationError()
+        {
+            // arrange
+            var requestPii = new PiiRecord
+            {
+                LastName = "Farrington",
+                SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockServiceProvider = serviceProviderMock(location: "National");
@@ -204,6 +248,8 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             pageModel.QueryFormData.Query = requestPii;
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -218,13 +264,13 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async void MatchCapturesApiError()
+        public async Task MatchCapturesApiError()
         {
             // arrange
             var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
+                SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockServiceProvider = serviceProviderMock();
@@ -241,6 +287,8 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             pageModel.QueryFormData.Query = requestPii;
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -263,7 +311,7 @@ namespace Piipan.QueryTool.Tests
             var requestPii = new PiiRecord
             {
                 LastName = "Farrington",
-                SocialSecurityNum = "000-00-0000",
+                SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1)
             };
             var mockServiceProvider = serviceProviderMock();
@@ -281,6 +329,8 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             pageModel.QueryFormData.Query = requestPii;
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
             pageModel.PageContext.HttpContext = contextMock();
 
             // Act
@@ -305,6 +355,8 @@ namespace Piipan.QueryTool.Tests
                 mockMatchApi,
                 mockServiceProvider
             );
+            pageModel.BindModel(pageModel.QueryFormData.Query, $"{nameof(IndexModel.QueryFormData)}.{nameof(IndexModel.QueryFormData.Query)}",
+                validationContext: new ValidationContext(pageModel.QueryFormData.Query));
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
