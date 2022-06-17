@@ -16,6 +16,7 @@ namespace Piipan.Participants.Core.Extensions
             serviceCollection.AddTransient<IUploadDao, UploadDao>();
             serviceCollection.AddTransient<IStateService, StateService>();
             serviceCollection.AddTransient<IParticipantApi, ParticipantService>();
+            serviceCollection.AddTransient<IParticipantPublishUploadMetric, ParticipantPublishUploadMetric>();
         }
     }
 }

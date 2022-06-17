@@ -279,6 +279,23 @@
                                         }
                                     },
                                     {
+                                        "name": "AllowAzureEventGrid",
+                                        "properties": {
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "AzureEventGrid",
+                                            "access": "Allow",
+                                            "priority": 130,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
                                         "name": "DenyInternet",
                                         "properties": {
                                             "protocol": "*",
@@ -287,7 +304,7 @@
                                             "sourceAddressPrefix": "*",
                                             "destinationAddressPrefix": "Internet",
                                             "access": "Deny",
-                                            "priority": 130,
+                                            "priority": 140,
                                             "direction": "Outbound",
                                             "sourcePortRanges": [],
                                             "destinationPortRanges": [],

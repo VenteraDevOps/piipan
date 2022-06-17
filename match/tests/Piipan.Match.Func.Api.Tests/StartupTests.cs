@@ -39,6 +39,9 @@ namespace Piipan.Match.Func.Api.Tests
             Environment.SetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString,
                 "Server=server;Database=db;Port=5432;User Id=postgres;Password={password};");
 
+            Environment.SetEnvironmentVariable("EventGridEndPoint","http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridKeyString","example");
+
             // Assert
             Assert.NotNull(provider.GetService<IMatchApi>());
             Assert.NotNull(provider.GetService<IValidator<OrchMatchRequest>>());

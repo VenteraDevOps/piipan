@@ -3,11 +3,15 @@ using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
 using System.Threading.Tasks;
 using Piipan.Metrics.Core.Builders;
+using Piipan.Metrics.Core.Models;
 
 #nullable enable
 
 namespace Piipan.Metrics.Core.Services
 {
+    /// <summary>
+    /// Service layer for creating, retrieving, updating Metrics UploadParticipant records
+    /// </summary>
     public class ParticipantUploadService : IParticipantUploadReaderApi, IParticipantUploadWriterApi
     {
         private readonly IParticipantUploadDao _participantUploadDao;
@@ -21,7 +25,7 @@ namespace Piipan.Metrics.Core.Services
 
         public async Task<GetParticipantUploadsResponse> GetLatestUploadsByState()
         {
-            var uploads = await _participantUploadDao.GetLatestUploadsByState();
+            var uploads = await _participantUploadDao.GetLatestSuccessfulUploadsByState();
 
             return new GetParticipantUploadsResponse()
             {
@@ -30,9 +34,14 @@ namespace Piipan.Metrics.Core.Services
             };
         }
 
-        public async Task<int> AddUpload(string state, DateTime uploadedAt)
+        public async Task<int> AddUploadMetrics(ParticipantUpload participantUpload)
         {
-            return await _participantUploadDao.AddUpload(state, uploadedAt);
+            return await _participantUploadDao.AddUpload(new ParticipantUploadDbo(participantUpload));
+        }
+
+        public async Task<int> UpdateUploadMetrics(ParticipantUpload participantUpload)
+        {
+            return await _participantUploadDao.UpdateUpload(new ParticipantUploadDbo(participantUpload));
         }
 
         public async Task<GetParticipantUploadsResponse> GetUploads(string? state, int perPage, int page = 0)

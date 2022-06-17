@@ -30,7 +30,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             Environment.SetEnvironmentVariable(Startup.DatabaseConnectionString,
                 "Server=server;Database=db;Port=5432;User Id=postgres;Password={password};");
 
-            // Act
+            Environment.SetEnvironmentVariable("EventGridEndPoint","http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridKeyString","example");
             target.Configure(builder.Object);
             var provider = services.BuildServiceProvider();
 

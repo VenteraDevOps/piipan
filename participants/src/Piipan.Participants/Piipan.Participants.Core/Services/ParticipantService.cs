@@ -4,10 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Enums;
+using Newtonsoft.Json;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.Cryptography;
 using Piipan.Shared.Deidentification;
@@ -22,13 +26,17 @@ namespace Piipan.Participants.Core.Services
         private readonly IRedactionService _redactionService;
         private readonly ILogger<ParticipantService> _logger;
         private readonly ICryptographyClient _cryptographyClient;
+        private readonly IParticipantPublishUploadMetric _participantPublishUploadMetric;
+
         public ParticipantService(
             IParticipantDao participantDao,
             IUploadDao uploadDao,
             IStateService stateService,
             IRedactionService redactionService,
             ILogger<ParticipantService> logger,
-            ICryptographyClient cryptographyClient)
+            ICryptographyClient cryptographyClient,
+            IParticipantPublishUploadMetric participantPublishUploadMetric
+            )
         {
             _participantDao = participantDao;
             _uploadDao = uploadDao;
@@ -36,6 +44,7 @@ namespace Piipan.Participants.Core.Services
             _redactionService = redactionService;
             _logger = logger;
             _cryptographyClient = cryptographyClient;
+            _participantPublishUploadMetric = participantPublishUploadMetric;
         }
 
         public async Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash)
@@ -58,12 +67,18 @@ namespace Piipan.Participants.Core.Services
             }
         }
 
-        public async Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier, Action<Exception> errorCallback)
+        public async Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier, string state, Action<Exception> errorCallback)
         {
             DateTime uploadTime = DateTime.UtcNow;
             // Large participant uploads can be long-running processes and require
             // an increased time out duration to avoid System.TimeoutException
             var upload = await _uploadDao.AddUpload(uploadIdentifier);
+
+            var participanUploadMetrics = new ParticipantUpload();
+            participanUploadMetrics.State = state;
+            participanUploadMetrics.UploadIdentifier = uploadIdentifier;
+            participanUploadMetrics.UploadedAt = uploadTime;
+
             try
             {
                 using (TransactionScope scope = new TransactionScope(
@@ -78,15 +93,36 @@ namespace Piipan.Participants.Core.Services
                         CaseId = _cryptographyClient.EncryptToBase64String(p.CaseId),
                         ParticipantId = _cryptographyClient.EncryptToBase64String(p.ParticipantId)
                     });
- 
-                    await _participantDao.AddParticipants(participantDbos);
+
+                    var count = await _participantDao.AddParticipants(participantDbos);
                     await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.COMPLETE.ToString());
+
+                    participanUploadMetrics.Status = UploadStatuses.COMPLETE.ToString();
+                    participanUploadMetrics.CompletedAt = DateTime.UtcNow;
+                    participanUploadMetrics.ParticipantsUploaded = Convert.ToInt64(count);
+                    participanUploadMetrics.UploadIdentifier = uploadIdentifier;
+
+                    string uploadDBStatus = JsonConvert.SerializeObject(participanUploadMetrics);
+
+                     _logger.LogInformation(uploadDBStatus);
+
+                    await _participantPublishUploadMetric.PublishUploadMetric(participanUploadMetrics);    
+
                     scope.Complete();
                 }
             }
             catch (Exception ex)
             {
                 await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.FAILED.ToString());
+
+                participanUploadMetrics.Status = UploadStatuses.FAILED.ToString();
+                participanUploadMetrics.CompletedAt = DateTime.UtcNow;
+                participanUploadMetrics.ErrorMessage = ex.Message;
+
+                string uploadDBStatus = JsonConvert.SerializeObject(participanUploadMetrics);
+
+                await _participantPublishUploadMetric.PublishUploadMetric(participanUploadMetrics);
+
                 errorCallback?.Invoke(ex);
             }
         }

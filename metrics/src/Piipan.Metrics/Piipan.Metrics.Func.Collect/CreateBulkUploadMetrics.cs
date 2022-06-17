@@ -9,14 +9,19 @@ using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Metrics.Api;
+using Piipan.Participants.Core.Enums;
 
 namespace Piipan.Metrics.Func.Collect
 {
-    public class BulkUploadMetrics
+    /// <summary>
+    /// Azure Function to capture initial metrics for for bulk uploads.
+    /// Creates a ParticipantUpload record in the metrics database with initial meta info
+    /// </summary>
+    public class CreateBulkUploadMetrics
     {
         private readonly IParticipantUploadWriterApi _participantUploadWriterApi;
 
-        public BulkUploadMetrics(IParticipantUploadWriterApi participantUploadWriterApi)
+        public CreateBulkUploadMetrics(IParticipantUploadWriterApi participantUploadWriterApi)
         {
             _participantUploadWriterApi = participantUploadWriterApi;
         }
@@ -28,7 +33,7 @@ namespace Piipan.Metrics.Func.Collect
         /// <param name="eventGridEvent">storage container blob creation event</param>
         /// <param name="log">handle to the function log</param>
 
-        [FunctionName("BulkUploadMetrics")]
+        [FunctionName("CreateBulkUploadMetrics")]
         public async Task Run(
             [EventGridTrigger] EventGridEvent eventGridEvent,
             ILogger log)
@@ -37,9 +42,17 @@ namespace Piipan.Metrics.Func.Collect
             try
             {
                 string state = ParseState(eventGridEvent);
+                string uploadId = ParseUploadId(eventGridEvent);
                 DateTime uploadedAt = eventGridEvent.EventTime.DateTime;
-
-                int nRows = await _participantUploadWriterApi.AddUpload(state, uploadedAt);
+                
+                ParticipantUpload newParticipantUpload = new ParticipantUpload()
+                {
+                    UploadedAt = uploadedAt,
+                    State = state,
+                    Status = UploadStatuses.UPLOADING.ToString(),
+                    UploadIdentifier = uploadId
+                };
+                int nRows = await _participantUploadWriterApi.AddUploadMetrics(newParticipantUpload);
 
                 log.LogInformation(String.Format("Number of rows inserted={0}", nRows));
             }
@@ -67,6 +80,22 @@ namespace Piipan.Metrics.Func.Collect
             catch (Exception ex)
             {
                 throw new FormatException("State not found", ex);
+            }
+        }
+
+        private string ParseUploadId(EventGridEvent eventGridEvent)
+        {
+            try
+            {
+                var jsondata = eventGridEvent.Data.ToString();
+                var tmp = new { eTag = "" };
+                var data = JsonConvert.DeserializeAnonymousType(jsondata, tmp);
+
+                return data.eTag;
+            }
+            catch (Exception ex)
+            {
+                throw new FormatException("ETag (Upload Identifier) not found", ex);
             }
         }
     }

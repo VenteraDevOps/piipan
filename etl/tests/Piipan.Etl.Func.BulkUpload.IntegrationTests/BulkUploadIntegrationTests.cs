@@ -3,23 +3,31 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.Http;
 using Azure;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Dapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
+using Piipan.Participants.Core.Services;
 using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Cryptography;
 using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
+using Piipan.Shared.Deidentification;
 using Xunit;
+using Piipan.Shared.Deidentification;
+
+
 
 namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
 {
@@ -87,8 +95,28 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 return factory.Object;
             });
 
-            services.RegisterParticipantsServices();
             services.RegisterKeyVaultClientServices();
+
+            // Next lines replace services.RegisterParticipantsServices();
+            services.AddTransient<IRedactionService, RedactionService>();
+            services.AddTransient<IParticipantBulkInsertHandler, ParticipantBulkInsertHandler>();
+            services.AddTransient<IParticipantDao, ParticipantDao>();
+            services.AddTransient<IUploadDao, UploadDao>();
+            services.AddTransient<IStateService, StateService>();
+            services.AddTransient<IParticipantApi, ParticipantService>();
+            
+            services.AddTransient<IParticipantPublishUploadMetric>(b => 
+            {
+                var factory = new Mock<IParticipantPublishUploadMetric>();
+                
+                factory.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
+                return factory.Object;
+            });
+
+
             return services.BuildServiceProvider();
         }
 
