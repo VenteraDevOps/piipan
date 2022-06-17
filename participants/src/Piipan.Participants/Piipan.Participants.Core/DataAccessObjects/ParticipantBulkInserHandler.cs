@@ -31,7 +31,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
         /// <param name="participants">The collection of participant records to be loaded</param>
         /// <param name="dbConnection">The open database connection to be used</param>
         /// <param name="tableName">The name of the table where records will be loaded</param>
-        public async Task LoadParticipants(IEnumerable<ParticipantDbo> participants, IDbConnection dbConnection, string tableName)
+        /// <returns>Number of participant records loaded</returns>
+        public async Task<ulong> LoadParticipants(IEnumerable<ParticipantDbo> participants, IDbConnection dbConnection, string tableName)
         {
             // PostgreSQL/Npgsql-specific operations require NpgsqlConnection
             NpgsqlConnection connection = dbConnection as NpgsqlConnection;
@@ -59,6 +60,8 @@ namespace Piipan.Participants.Core.DataAccessObjects
             _logger.LogDebug("Bulk inserting participant records");
             var result = await copyHelper.SaveAllAsync(connection, participants);
             _logger.LogDebug("Completed bulk insert of {0} participant records", result);
+
+            return result;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
     public class DbFixture : MetricsDbFixture
     {
 
-        protected void Insert(string state, DateTime uploadedAt)
+        protected void Insert(string state, DateTime uploadedAt, DateTime? completedAt, string status, string uploadID)
         {
             var factory = NpgsqlFactory.Instance;
 
@@ -23,7 +23,10 @@ namespace Piipan.Metrics.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
-                conn.Execute("INSERT INTO participant_uploads(state, uploaded_at) VALUES (@state, @uploadedAt)", new { state = state, uploadedAt = uploadedAt });
+                conn.Execute(
+                    "INSERT INTO participant_uploads(state, uploaded_at, completed_at, status, upload_identifier) VALUES (@state, @uploadedAt, @completedAt, @status, @uploadID)", 
+                    new { state = state, uploadedAt = uploadedAt, completedAt = completedAt, status = status, uploadID = uploadID}
+                );
 
                 conn.Close();
             }

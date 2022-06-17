@@ -6,6 +6,8 @@ using Piipan.Shared.Database;
 using Piipan.Metrics.Core.DataAccessObjects;
 using Xunit;
 using Microsoft.Extensions.Logging.Abstractions;
+using Piipan.Metrics.Core.Models;
+using Piipan.Participants.Core.Enums;
 
 namespace Piipan.Metrics.Core.IntegrationTests
 {
@@ -43,7 +45,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Arrange
             for (var i = 0; i < expectedCount; i++)
             {
-                Insert(RandomState(), DateTime.Now);
+                Insert(RandomState(), DateTime.Now, DateTime.Now, "status", "upload_identifier");
             }
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
@@ -64,9 +66,9 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Arrange
             for (var i = 0; i < expectedCount; i++)
             {
-                Insert("ea", DateTime.Now);
-                Insert("eb", DateTime.Now);
-                Insert("ec", DateTime.Now);
+                Insert("ea", DateTime.Now, DateTime.Now, "status", "upload_identifier");
+                Insert("eb", DateTime.Now, DateTime.Now, "status", "upload_identifier");
+                Insert("ec", DateTime.Now, DateTime.Now, "status", "upload_identifier");
             }
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
@@ -91,9 +93,9 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Arrange
             for (var i = 0; i < count; i++)
             {
-                Insert("ea", DateTime.Now);
-                Insert("eb", DateTime.Now);
-                Insert("ec", DateTime.Now);
+                Insert("ea", DateTime.Now, DateTime.Now, "status", "upload_identifier");
+                Insert("eb", DateTime.Now, DateTime.Now, "status", "upload_identifier");
+                Insert("ec", DateTime.Now, DateTime.Now, "status", "upload_identifier");
             }
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
@@ -118,7 +120,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Arrange
             for (var i = 0; i < 100; i++)
             {
-                Insert("ea", DateTime.Now);
+                Insert("ea", DateTime.Now, DateTime.Now, "status", "upload_identifier");
             }
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
@@ -139,7 +141,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Arrange
             for (var i = 0; i < 100; i++)
             {
-                Insert("ea", DateTime.Now);
+                Insert("ea", DateTime.Now, DateTime.Now, "status", "upload_identifier");
             }
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
@@ -153,6 +155,8 @@ namespace Piipan.Metrics.Core.IntegrationTests
         [Fact]
         public async Task GetLatestUploadsByState_ReturnsExpected()
         {
+            DateTime uploadTime = new DateTime(2021, 1, 1, 5, 0, 0);
+
             // Arrange
             DateTime latestEA = new DateTime(2021, 1, 1, 5, 10, 0);
             DateTime latestEB = new DateTime(2021, 2, 2, 5, 10, 0);
@@ -162,21 +166,21 @@ namespace Piipan.Metrics.Core.IntegrationTests
                 latestEA = latestEA + TimeSpan.FromSeconds(i);
                 latestEB = latestEB + TimeSpan.FromSeconds(i);
                 latestEC = latestEC + TimeSpan.FromSeconds(i);
-                Insert("ea", latestEA);
-                Insert("eb", latestEB);
-                Insert("ec", latestEC);
+                Insert("ea", uploadTime, latestEA, UploadStatuses.COMPLETE.ToString(), $"upload_identifier_ea{i}");
+                Insert("eb", uploadTime, latestEB, UploadStatuses.COMPLETE.ToString(), $"upload_identifier_eb{i}");
+                Insert("ec", uploadTime, latestEC, UploadStatuses.COMPLETE.ToString(), $"upload_identifier_ec{i}");
             }
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
 
             // Act
-            var latest = await dao.GetLatestUploadsByState();
+            var latest = await dao.GetLatestSuccessfulUploadsByState();
 
             // Assert
             Assert.Equal(3, latest.Count());
-            Assert.Single(latest, u => u.State == "ea" && u.UploadedAt.Equals(latestEA));
-            Assert.Single(latest, u => u.State == "eb" && u.UploadedAt.Equals(latestEB));
-            Assert.Single(latest, u => u.State == "ec" && u.UploadedAt.Equals(latestEC));
+            Assert.Single(latest, u => u.State == "ea" && u.CompletedAt.Equals(latestEA));
+            Assert.Single(latest, u => u.State == "eb" && u.CompletedAt.Equals(latestEB));
+            Assert.Single(latest, u => u.State == "ec" && u.CompletedAt.Equals(latestEC));
         }
 
         [Fact]
@@ -186,13 +190,45 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
             var uploadedAt = new DateTime(2021, 1, 1, 5, 10, 0);
 
+            var uploadCount = await dao.GetUploadCount("ea");
+            Assert.Equal(0, uploadCount);
+
             // Act
-            await dao.AddUpload("ea", uploadedAt);
-            var latest = await dao.GetLatestUploadsByState();
+            await dao.AddUpload(new ParticipantUploadDbo() { State = "ea", UploadedAt = uploadedAt, Status=UploadStatuses.UPLOADING.ToString()});
+            var results = await dao.GetUploads("ea", 10);
 
             // Assert
-            Assert.True(Has("ea", uploadedAt));
-            Assert.Equal(uploadedAt, latest.ToList()[0].UploadedAt);
+            uploadCount = await dao.GetUploadCount("ea");
+            Assert.Equal(1, uploadCount);
+            
+            Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
+        }
+
+        [Fact]
+        public async Task UpdateUpload_UpdatesRecord()
+        {
+            // Arrange
+            var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
+            var uploadedAt = new DateTime(2021, 1, 1, 5, 10, 0);
+            var completedAt = new DateTime(2021, 1, 1, 5, 15, 0);
+            var upload_id = "abcd123";
+            Insert("ea", uploadedAt, null, UploadStatuses.UPLOADING.ToString(), upload_id);
+
+            var results = await dao.GetUploads("ea", 10);
+            var uploadCount = await dao.GetUploadCount("ea");
+            Assert.Equal(1, uploadCount);
+            Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
+            Assert.Null(results.ToList()[0].CompletedAt);
+
+            // Act
+            await dao.UpdateUpload(new ParticipantUploadDbo() { State = "ea", UploadedAt = uploadedAt, CompletedAt=completedAt, Status = UploadStatuses.COMPLETE.ToString(), UploadIdentifier = upload_id });
+
+            // Assert
+            uploadCount = await dao.GetUploadCount("ea");
+            Assert.Equal(1, uploadCount);
+            results = await dao.GetUploads("ea", 10);
+            Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
+            Assert.Equal(completedAt, results.ToList()[0].CompletedAt);
         }
     }
 }

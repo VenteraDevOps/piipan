@@ -694,6 +694,14 @@ main () {
       ]'
   done < states.csv
 
+
+  update_bu_metrics_topic_name=evgt-update-bu-metrics-$ENV
+
+  az eventgrid topic create \
+    --location "$LOCATION" \
+    --name "$update_bu_metrics_topic_name" \
+    --resource-group "$RESOURCE_GROUP" 
+
   # Create App Service resources for query tool app.
   # This needs to happen after the orchestrator is created in order for
   # $orch_api to be set.

@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
-using Azure.Security.KeyVault.Keys.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared.Cryptography;
@@ -44,12 +46,17 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
                 var uploadDao = new UploadDao(helper.DbConnFactory(Factory, ConnectionString));
 
-                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger, cryptographyClient);
+                var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
+                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger, cryptographyClient, participantPublishUploadMetric.Object);
 
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
 
                 // Act
-                await service.AddParticipants(participants, "test-etag", null);
+                await service.AddParticipants(participants, "test-etag", "ea", null);
 
                 long lastUploadId = GetLastUploadId();
 
@@ -94,7 +101,12 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
                 var uploadDao = new UploadDao(helper.DbConnFactory(Factory, ConnectionString));
 
-                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger, cryptographyClient);
+                var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
+                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger, cryptographyClient, participantPublishUploadMetric.Object);
 
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
                 participants.Last().LdsHash = null; //Cause the db commit to fail due to a null hash value
@@ -104,7 +116,7 @@ namespace Piipan.Participants.Core.IntegrationTests
                 try
                 {
                     // Act
-                    await service.AddParticipants(participants, "test-etag", null);
+                    await service.AddParticipants(participants, "test-etag", "ea", null);
                     throw new Exception("Test should have failed because of participant with null ldsHash value");
                 }
                 catch (Exception)

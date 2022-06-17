@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Participants.Core.Enums;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared.API.Utilities;
@@ -98,13 +100,19 @@ namespace Piipan.Participants.Core.Tests.Services
 
             var stateService = Mock.Of<IStateService>();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 _redactionService,
                 logger,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             // Act
             var result = await service.GetParticipants(randomState, randomLdsHash);
@@ -145,13 +153,19 @@ namespace Piipan.Participants.Core.Tests.Services
 
             var stateService = Mock.Of<IStateService>();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 _redactionService,
                 logger,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             // Act
             var result = await service.GetParticipants(randomState, randomLdsHash);
@@ -179,13 +193,19 @@ namespace Piipan.Participants.Core.Tests.Services
 
             var stateService = Mock.Of<IStateService>();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 _redactionService,
                 logger,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             // Act
             var participants = await service.GetParticipants("ea", "hash");
@@ -218,16 +238,22 @@ namespace Piipan.Participants.Core.Tests.Services
 
             var stateService = Mock.Of<IStateService>();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 _redactionService,
                 logger,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             // Act
-            await service.AddParticipants(participants, "test-etag", null);
+            await service.AddParticipants(participants, "test-etag", "ea", null);
 
             // Assert
 
@@ -255,23 +281,27 @@ namespace Piipan.Participants.Core.Tests.Services
             var participants = RandomParticipants(10);
             var uploadId = (new Random()).Next();
             var participantDao = new Mock<IParticipantDao>();
-            var thrownException = new Exception("Unhandled error!");
+            const string exceptionMessage = "Unhandled error!";
+            var thrownException = new Exception(exceptionMessage);
             participantDao.Setup(n => n.AddParticipants(It.IsAny<IEnumerable<ParticipantDbo>>()))
                                 .ThrowsAsync(thrownException);
             Exception foundException = null;
 
             var uploadDao = new Mock<IUploadDao>();
+            UploadDbo uploadRecord = new UploadDbo
+            {
+                Id = uploadId,
+                CreatedAt = DateTime.UtcNow,
+                Publisher = "me"
+            };
             uploadDao
                 .Setup(m => m.AddUpload("test-etag"))
-                .ReturnsAsync(new UploadDbo
-                {
-                    Id = uploadId,
-                    CreatedAt = DateTime.UtcNow,
-                    Publisher = "me"
-                });
+                .ReturnsAsync(uploadRecord);
 
             var stateService = Mock.Of<IStateService>();
             var redactionService = new Mock<IRedactionService>();
+
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
 
             var service = new ParticipantService(
                 participantDao.Object,
@@ -279,13 +309,20 @@ namespace Piipan.Participants.Core.Tests.Services
                 stateService,
                 redactionService.Object,
                 logger.Object,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object
+                );
 
             // Act
-            await service.AddParticipants(participants, "test-etag", (ex) => foundException = ex);
+            await service.AddParticipants(participants, "test-etag", "ea", (ex) => foundException = ex);
 
             // Assert
             Assert.Equal(thrownException, foundException);
+
+            participantPublishUploadMetric.Verify(m => m.PublishUploadMetric(
+                        It.Is<ParticipantUpload>(s => s.Status == UploadStatuses.FAILED.ToString() && s.ErrorMessage == exceptionMessage)));
+            uploadDao.Verify(x => x.UpdateUploadStatus(It.Is<IUpload>(u => u == uploadRecord), UploadStatuses.FAILED.ToString()));
+
         }
 
         /// <summary>
@@ -313,13 +350,19 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
             var redactionService = new RedactionService();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 redactionService,
                 logger.Object,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             var uploadDetails = new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Exception with first participant: " + participants.First().LdsHash), "test.csv");
 
@@ -362,13 +405,19 @@ namespace Piipan.Participants.Core.Tests.Services
             var stateService = Mock.Of<IStateService>();
             var redactionService = new RedactionService();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 redactionService,
                 logger.Object,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             var uploadDetails = new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Exception with first participant: " + participants.First().LdsHash), "test.csv");
 
@@ -407,13 +456,19 @@ namespace Piipan.Participants.Core.Tests.Services
                 .Setup(m => m.GetStates())
                 .ReturnsAsync(new List<string> { "ea", "eb", "ec" });
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao,
                 uploadDao,
                 stateService.Object,
                 _redactionService,
                 logger,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             // Act
             var result = await service.GetStates();
@@ -450,16 +505,22 @@ namespace Piipan.Participants.Core.Tests.Services
 
             var stateService = Mock.Of<IStateService>();
 
+            var participantPublishUploadMetric = new Mock<IParticipantPublishUploadMetric>();
+                participantPublishUploadMetric.Setup(m => m.PublishUploadMetric(
+                                        It.IsAny<ParticipantUpload>()))
+                       .Returns(Task.CompletedTask);
+
             var service = new ParticipantService(
                 participantDao.Object,
                 uploadDao.Object,
                 stateService,
                 _redactionService,
                 logger,
-                cryptographyClient);
+                cryptographyClient,
+                participantPublishUploadMetric.Object);
 
             // Act
-            await service.AddParticipants(participants, "test-etag", null);
+            await service.AddParticipants(participants, "test-etag", "ea", null);
 
             // Now Add another Upload 
             var uploadIdNew = (new Random()).Next();
@@ -479,8 +540,9 @@ namespace Piipan.Participants.Core.Tests.Services
                stateService,
                _redactionService,
                logger,
-                cryptographyClient);
-            await serviceNew.AddParticipants(participants, "test-etag1", null);
+                cryptographyClient,
+               participantPublishUploadMetric.Object);
+            await serviceNew.AddParticipants(participants, "test-etag1", "ea", null);
 
             // Assert
 
@@ -498,15 +560,14 @@ namespace Piipan.Participants.Core.Tests.Services
                    Publisher = "me",
                });
 
-
             var serviceDelete = new ParticipantService(
              participantDao.Object,
              uploadDaoDelete.Object,
              stateService,
              _redactionService,
              logger,
-             cryptographyClient
-             );
+             cryptographyClient,
+             participantPublishUploadMetric.Object);
 
             await serviceDelete.DeleteOldParticpants();
 

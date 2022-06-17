@@ -5,6 +5,8 @@ namespace Piipan.Metrics.Api
 {
     public interface IParticipantUploadWriterApi
     {
-        Task<int> AddUpload(string state, DateTime uploadedAt);
+        Task<int> AddUploadMetrics(ParticipantUpload newParticipantUpload);
+        Task<int> UpdateUploadMetrics(ParticipantUpload participantUpload); 
+
     }
 }

@@ -123,8 +123,8 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
 
             var participantApi = new Mock<IParticipantApi>();
             participantApi
-                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>(), It.IsAny<Action<Exception>>()))
-                .Callback<IEnumerable<IParticipant>, string, Action<Exception>>((participants, uploadIdentifier, errorCallback) =>
+                .Setup(m => m.AddParticipants(It.IsAny<IEnumerable<IParticipant>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<Exception>>()))
+                .Callback<IEnumerable<IParticipant>, string, string, Action<Exception>>((participants, uploadIdentifier, state, errorCallback) =>
                 {
                     Exception exception = new Exception("the api broke");
                     errorCallback.Invoke(exception);
@@ -213,7 +213,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
-            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>(), It.IsAny<Action<Exception>>()), Times.Once);
+            participantApi.Verify(m => m.AddParticipants(participants, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<Exception>>()), Times.Once);
             participantApi.Verify(m => m.DeleteOldParticpants(It.IsAny<string>()), Times.Once);
         }
     }

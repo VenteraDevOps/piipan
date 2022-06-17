@@ -65,11 +65,15 @@ namespace Piipan.Etl.Func.BulkUpload
 
                     if (input != null)
                     {
-
-
                         var participants = _participantParser.Parse(input);
                         DateTime startUploadTime = DateTime.UtcNow;
-                        await _participantApi.AddParticipants(participants, blobProperties.ETag.ToString(), (ex) =>
+
+                        //Azure documents that ETags are quoted. So we need to remove the quotes in order to get the upload_id
+                        var upload_id = blobProperties.ETag.ToString().Replace("\"", "");
+
+                        string state = Environment.GetEnvironmentVariable("State");
+
+                        await _participantApi.AddParticipants(participants, upload_id, state, (ex) =>
                             {
                                 // reset the participants and input stream. If you only reset the input stream you start with the header row, 
                                 // and if you don't reset it you're missing participants that have already been read
@@ -77,7 +81,7 @@ namespace Piipan.Etl.Func.BulkUpload
                                 participants = _participantParser.Parse(input);
 
                                 _participantApi.LogParticipantsUploadError(
-                                    new(Environment.GetEnvironmentVariable("State"), startUploadTime, DateTime.UtcNow, ex, blockBlobClient.Name),
+                                    new(state, startUploadTime, DateTime.UtcNow, ex, blockBlobClient.Name),
                                     participants);
                             })
                                 .ContinueWith(t => _blobStream.DeleteBlobAfterProcessing(t, blockBlobClient, log))
