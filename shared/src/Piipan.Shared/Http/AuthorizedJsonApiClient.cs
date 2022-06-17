@@ -82,9 +82,13 @@ namespace Piipan.Shared.Http
             return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
-        public async Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path)
+        public async Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, IEnumerable<(string, string)> headerFactory = null)
         {
             var requestMessage = await PrepareRequest(path, HttpMethod.Get);
+
+            // add any additional headers using the supplied callback
+            headerFactory?.ToList().ForEach(h => requestMessage.Headers.Add(h.Item1, h.Item2));
+
             var response = await Client().SendAsync(requestMessage);
 
             try

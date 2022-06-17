@@ -22,7 +22,7 @@ namespace Piipan.QueryTool.Tests
     public class BasePageTest
     {
         public static IServiceProvider serviceProviderMock(string email = "noreply@tts.test",
-            string location = "IA", string role = "Worker", string[] states = null,
+            string location = "EA", string role = "Worker", string[] states = null,
             Action<ISetup<IStatesApi, Task<StatesInfoResponse>>> statesInfoResponseOverride = null)
         {
             var serviceProviderMock = new Mock<IServiceProvider>();

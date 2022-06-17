@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using Piipan.Match.Api.Models;
@@ -29,13 +30,13 @@ namespace Piipan.Match.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
             apiClient
-                .Setup(m => m.TryGetAsync<MatchResApiResponse>("matches/m123456"))
+                .Setup(m => m.TryGetAsync<MatchResApiResponse>("matches/m123456", It.IsAny<IEnumerable<(string, string)>>()))
                 .ReturnsAsync((expectedResponse, 200));
 
             var client = new MatchResolutionClient(apiClient.Object);
 
             // Act
-            var response = await client.GetMatch("m123456");
+            var response = await client.GetMatch("m123456", "ea");
 
             // Assert
             Assert.Equal(expectedResponse, response);
@@ -62,7 +63,7 @@ namespace Piipan.Match.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
             apiClient
-                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("matches"))
+                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("matches", null))
                 .ReturnsAsync((expectedResponse, 200));
 
             var client = new MatchResolutionClient(apiClient.Object);

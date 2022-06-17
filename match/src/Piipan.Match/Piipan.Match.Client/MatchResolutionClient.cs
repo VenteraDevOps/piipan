@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
@@ -26,11 +27,14 @@ namespace Piipan.Match.Client
         /// Includes in the request headers the identifier of the state initiating the request
         /// </summary>
         /// <param name="request">A collection of participants to attempt to find matches for</param>
-        /// <param name="initiatingState">The two character identifier of the state initiating the request</param>
+        /// <param name="requestLocation">The location (state, region, or national office) of the requestor</param>
         /// <returns></returns>
-        public async Task<MatchResApiResponse> GetMatch(string matchId)
+        public async Task<MatchResApiResponse> GetMatch(string matchId, string requestLocation)
         {
-            var (response, _) = await _apiClient.TryGetAsync<MatchResApiResponse>($"matches/{matchId}");
+            var (response, _) = await _apiClient.TryGetAsync<MatchResApiResponse>($"matches/{matchId}", new List<(string, string)>
+                    {
+                        ("X-Request-Location", requestLocation)
+                    });
             return response;
         }
 
