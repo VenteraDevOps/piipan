@@ -56,7 +56,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
             }
         }
 
-        public async Task AddParticipants(IEnumerable<ParticipantDbo> participants)
+        public async Task<ulong> AddParticipants(IEnumerable<ParticipantDbo> participants)
         {
             using (var connection = await _dbConnectionFactory.Build() as DbConnection)
             {
@@ -64,7 +64,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
                 try
                 {
-                    await _bulkInsertHandler.LoadParticipants(participants, connection, "participants");
+                    return await _bulkInsertHandler.LoadParticipants(participants, connection, "participants");
                 }
                 catch (Exception ex)
                 {

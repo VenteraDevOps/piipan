@@ -63,10 +63,19 @@ UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
 # used in the bulk upload Azure Function.
 STATE_STR_KEY=State
 
+# Name of environment variable used to pass event grid connection
+# strings to app or function code
+EVENTGRID_CONN_STR_ENDPOINT=EventGridEndPoint
+EVENTGRID_CONN_STR_KEY=EventGridKeyString
+
 # In the States.csv file, the state is enabled if they have the ENABLED text in column 3. Disabled if they have DISABLED text in column 3.
 # Defaults to disabled, so any text other than ENABLED is disabled.
 STATE_ENABLED_KEY=ENABLED
 STATE_DISABLED_KEY=DISABLED
+# Name of environment variable used to pass event grid connection
+# strings to app or function code
+EVENTGRID_CONN_STR_ENDPOINT=EventGridEndPoint
+EVENTGRID_CONN_STR_KEY=EventGridKeyString
 
 # For connection strings, our established placeholder values
 PASSWORD_PLACEHOLDER='{password}'

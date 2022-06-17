@@ -7,6 +7,7 @@ using Moq;
 using Xunit;
 using Piipan.Metrics.Core.Builders;
 using System.Threading.Tasks;
+using Piipan.Metrics.Core.Models;
 
 namespace Piipan.Metrics.Core.Tests.Services
 {
@@ -52,7 +53,7 @@ namespace Piipan.Metrics.Core.Tests.Services
             var uploadedAt = DateTime.Now;
             var uploadDao = new Mock<IParticipantUploadDao>();
             uploadDao
-                .Setup(m => m.GetLatestUploadsByState())
+                .Setup(m => m.GetLatestSuccessfulUploadsByState())
                 .ReturnsAsync(new List<ParticipantUpload>()
                 {
                     new ParticipantUpload
@@ -81,18 +82,18 @@ namespace Piipan.Metrics.Core.Tests.Services
             var uploadedAt = DateTime.Now;
             var uploadDao = new Mock<IParticipantUploadDao>();
             uploadDao
-                .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Setup(m => m.AddUpload(It.IsAny<ParticipantUploadDbo>()))
                 .ReturnsAsync(1);
             var metaBuilder = Mock.Of<IMetaBuilder>();
 
             var service = new ParticipantUploadService(uploadDao.Object, metaBuilder);
 
             // Act
-            var nRows = await service.AddUpload("somestate", uploadedAt);
+            var nRows = await service.AddUploadMetrics(new ParticipantUpload());
 
             // Assert
             Assert.Equal(1, nRows);
-            uploadDao.Verify(m => m.AddUpload("somestate", uploadedAt), Times.Once);
+            uploadDao.Verify(m => m.AddUpload(It.IsAny<ParticipantUploadDbo>()), Times.Once);
         }
     }
 }

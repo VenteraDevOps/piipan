@@ -7,6 +7,6 @@ namespace Piipan.Participants.Core.DataAccessObjects
 {
     public interface IParticipantBulkInsertHandler
     {
-        Task LoadParticipants(IEnumerable<ParticipantDbo> records, IDbConnection connection, string tableName);
+        Task<ulong> LoadParticipants(IEnumerable<ParticipantDbo> records, IDbConnection connection, string tableName);
     }
 }

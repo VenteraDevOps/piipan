@@ -21,17 +21,43 @@ set_constants () {
   # Metrics Collection Info
   COLLECT_APP_FILEPATH=Piipan.Metrics.Func.Collect
   COLLECT_STORAGE_NAME=${PREFIX}st${METRICS_COLLECT_APP_ID}${ENV}
-  COLLECT_FUNC=BulkUploadMetrics
+  COLLECT_NEW_BULKUPLOAD_FUNC=CreateBulkUploadMetrics
+  COLLECT_UPDATED_BULKUPLOAD_FUNC=UpdateBulkUploadMetricsStatus
 
   # Metrics API Info
   API_APP_FILEPATH=Piipan.Metrics.Func.Api
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
 }
 
+# Generate the eventgrid key string for the corresponding
+eventgrid_endpoint () {
+  group=$1
+  name=$2
+
+  az eventgrid topic show \
+  --name "$name" \
+  -g "$group" \
+  --query "endpoint" \
+  -o tsv
+}
+
+# Generate the eventgrid key string for the corresponding
+eventgrid_key_string () {
+  group=$1
+  name=$2
+  
+  az eventgrid topic key list \
+    --name "$name" \
+    --resource-group "$group" \
+    --query "key2" \
+    -o tsv
+}
+
 main () {
   # Load agency/subscription/deployment-specific settings
   azure_env=$1
   source "$(dirname "$0")"/env/"${azure_env}".bash
+
   # shellcheck source=./iac/iac-common.bash
   source "$(dirname "$0")"/iac-common.bash
   verify_cloud
@@ -124,6 +150,11 @@ main () {
       }
     ]'
 
+
+  # Subscribe each dynamically created event blob topic to this function
+  METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+  SUBS_RESOURCE_GROUP=$RESOURCE_GROUP
+
   # Waiting before publishing the app, since publishing immediately after creation returns an   App Not Found error
   # Waiting was the best solution I could find. More info in these GH issues:
   # https://github.com/Azure/azure-functions-core-tools/issues/1616
@@ -131,37 +162,60 @@ main () {
   echo "Waiting to publish function app"
   sleep 60
 
+  update_bu_metrics_topic_name=evgt-update-bu-metrics-$ENV
+  update_bu_metrics_custom_topic=evgs-update-bu-metrics-$ENV
+
   echo "configure settings"
   db_conn_str=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "${METRICS_COLLECT_APP_NAME//-/_}")
+  eventgrid_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "$update_bu_metrics_topic_name")
+  eventgrid_key_str=$(eventgrid_key_string "$RESOURCE_GROUP" "$update_bu_metrics_topic_name")
   az functionapp config appsettings set \
     --resource-group "$RESOURCE_GROUP" \
     --name "$METRICS_COLLECT_APP_NAME" \
     --settings \
       $DB_CONN_STR_KEY="$db_conn_str" \
       $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
-    --output none
+      $EVENTGRID_CONN_STR_ENDPOINT="$eventgrid_endpoint" \
+      $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str"
+    # --output none
 
   # publish the function app
   try_run "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" 7 "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
 
-  # Subscribe each dynamically created event blob topic to this function
-  METRICS_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
-  SUBS_RESOURCE_GROUP=$RESOURCE_GROUP
+  # Create a Subscription to upload events that get routed to Function
+  az eventgrid event-subscription create \
+    --source-resource-id "${METRICS_PROVIDERS}/Microsoft.EventGrid/topics/${update_bu_metrics_topic_name}" \
+    --name "$update_bu_metrics_custom_topic" \
+    --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_UPDATED_BULKUPLOAD_FUNC}" \
+    --endpoint-type azurefunction
 
   while IFS=, read -r abbr name ; do
+
       echo "Subscribing to ${name} blob events"
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       sub_name=evgs-${abbr}metricsupload-${ENV}
       topic_name=$(state_event_grid_topic_name "$abbr" "$ENV")
 
+
       az eventgrid system-topic event-subscription create \
           --name "$sub_name" \
           --resource-group "$SUBS_RESOURCE_GROUP" \
           --system-topic-name "$topic_name" \
-          --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_FUNC}" \
+          --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_NEW_BULKUPLOAD_FUNC}" \
           --endpoint-type azurefunction \
           --included-event-types Microsoft.Storage.BlobCreated \
           --subject-begins-with /blobServices/default/containers/upload/blobs/
+
+      func_app=$PREFIX-func-${abbr}etl-$ENV
+      
+      az functionapp config appsettings set \
+        --resource-group "$RESOURCE_GROUP" \
+        --name "$func_app" \
+        --settings \
+          $EVENTGRID_CONN_STR_ENDPOINT="$eventgrid_endpoint" \
+          $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str" \
+        --output none
+
   done < states.csv
 
   # Create Metrics API Function App in Azure

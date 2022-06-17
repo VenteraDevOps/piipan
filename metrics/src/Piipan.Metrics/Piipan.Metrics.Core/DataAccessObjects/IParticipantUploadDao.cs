@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Piipan.Metrics.Api; 
+using Piipan.Metrics.Api;
+using Piipan.Metrics.Core.Models;
 
 #nullable enable
 
@@ -11,7 +12,9 @@ namespace Piipan.Metrics.Core.DataAccessObjects
     {
         Task<Int64> GetUploadCount(string? state);
         Task<IEnumerable<ParticipantUpload>> GetUploads(string? state, int limit, int offset = 0);
-        Task<IEnumerable<ParticipantUpload>> GetLatestUploadsByState();
-        Task<int> AddUpload(string state, DateTime uploadedAt);
+        Task<IEnumerable<ParticipantUpload>> GetLatestSuccessfulUploadsByState();
+
+        Task<int> AddUpload(ParticipantUploadDbo newUploadDbo);
+        Task<int> UpdateUpload(ParticipantUploadDbo uploadDbo);
     }
 }
