@@ -137,7 +137,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         }
 
         [Fact]
-        public async void GetMatch_ReturnsCorrectSchemaIfNotAuthorized()
+        public async void GetMatch_ReturnsNotFoundWhenNotAuthorized()
         {
             // Arrange
             // clear databases

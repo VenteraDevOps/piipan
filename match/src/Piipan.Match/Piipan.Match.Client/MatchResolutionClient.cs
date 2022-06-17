@@ -31,13 +31,10 @@ namespace Piipan.Match.Client
         /// <returns></returns>
         public async Task<MatchResApiResponse> GetMatch(string matchId, string requestLocation)
         {
-            var (response, _) = await _apiClient.TryGetAsync<MatchResApiResponse>($"matches/{matchId}", () =>
-            {
-                return new List<(string, string)>
+            var (response, _) = await _apiClient.TryGetAsync<MatchResApiResponse>($"matches/{matchId}", new List<(string, string)>
                     {
                         ("X-Request-Location", requestLocation)
-                    };
-            });
+                    });
             return response;
         }
 

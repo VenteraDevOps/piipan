@@ -32,6 +32,6 @@ namespace Piipan.Shared.Http
         /// it will return the default TResponse. Will return the status code whether a 404 or a success.
         /// </summary>
         /// <param name="path">path portion of the API endpoint</param>
-        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, Func<IEnumerable<(string, string)>> headerFactory = null);
+        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, IEnumerable<(string, string)> headerFactory = null);
     }
 }
