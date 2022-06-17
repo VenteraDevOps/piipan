@@ -16,6 +16,7 @@ namespace Piipan.QueryTool.Pages
     public class BasePageModel : PageModel
     {
         private const string NotAuthorizedPageName = "/NotAuthorized";
+        private const string StateInfoCacheName = "StateInfo";
         private readonly IClaimsProvider _claimsProvider;
         private readonly ILocationsProvider _locationsProvider;
         private readonly IMemoryCache _memoryCache;
@@ -31,9 +32,22 @@ namespace Piipan.QueryTool.Pages
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
-            StateInfo = await _memoryCache.GetOrCreateAsync("StateInfo", async (e) =>
+            // If there are no states or it's null, let's try to fetch it again.
+            if (StateInfo?.Results?.Count() == 0)
             {
-                return await _statesApi.GetStates();
+                _memoryCache.Remove(StateInfoCacheName);
+            }
+            StateInfo = await _memoryCache.GetOrCreateAsync(StateInfoCacheName, async (e) =>
+            {
+                try
+                {
+                    return await _statesApi.GetStates();
+                }
+                catch
+                {
+                    // If an error occurs while fetching the states just return an empty enumerable
+                    return new StatesInfoResponse { Results = Enumerable.Empty<StateInfoResponseData>() };
+                }
             });
             await next();
         }
