@@ -33,6 +33,7 @@ namespace Piipan.Etl.Func.BulkUpload
             builder.Services.AddTransient<IBlobClientStream, BlobClientStream>();
 
             builder.Services.RegisterParticipantsServices();
+
             builder.Services.RegisterKeyVaultClientServices();
         }
     }
