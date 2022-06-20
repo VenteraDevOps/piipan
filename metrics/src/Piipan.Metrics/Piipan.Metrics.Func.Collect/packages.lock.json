@@ -75,9 +75,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[6.0.4, )",
-        "resolved": "6.0.4",
-        "contentHash": "SJMlOmFHr32oOzVXeHmarGaBKkhi0wHVN/rzuu2tUSJ4Qx2AkHCpr9R/DhLWwDiklqgzFU++9wkFyGJxbx/zzg==",
+        "requested": "[6.0.5, )",
+        "resolved": "6.0.5",
+        "contentHash": "a11H5/b5yNTuFN0Ycjvb920oI6vQHadt6KhEMmcC7DfvsSHH8Z3wBam+CHmyWcfDxJJaxamcdBb8XA3BvqS4Kw==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
@@ -793,11 +793,11 @@
       },
       "Npgsql.NodaTime": {
         "type": "Transitive",
-        "resolved": "6.0.4",
-        "contentHash": "kk3DtqlIFupk9P6ccONJdUzATHrjkgfUQj0XVQhpTNzpof1jjFuiBSR1TSCNReSGulZ9Q8TQDby1WM3yEwnUgg==",
+        "resolved": "6.0.5",
+        "contentHash": "7rF+at3dd2tmVLqQq94Iv/OUT9m+MM0k8qNyNUquWpFWHZ9sCV9Ju4gZvY5V8M8sEJjk5ePZsr4qpk18A4fX+g==",
         "dependencies": {
           "NodaTime": "3.0.9",
-          "Npgsql": "6.0.4"
+          "Npgsql": "6.0.5"
         }
       },
       "PostgreSQLCopyHelper": {
@@ -1995,7 +1995,7 @@
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Newtonsoft.Json": "13.0.1",
-          "Npgsql.NodaTime": "6.0.4",
+          "Npgsql.NodaTime": "6.0.5",
           "Piipan.Metrics.Api": "1.0.0",
           "Piipan.Metrics.Core": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
@@ -2017,7 +2017,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.4"
+          "Npgsql": "6.0.5"
         }
       },
       "piipan.shared.api": {
