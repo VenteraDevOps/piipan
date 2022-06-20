@@ -176,8 +176,8 @@ main () {
       $DB_CONN_STR_KEY="$db_conn_str" \
       $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       $EVENTGRID_CONN_STR_ENDPOINT="$eventgrid_endpoint" \
-      $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str"
-    # --output none
+      $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str" \
+    --output none
 
   # publish the function app
   try_run "func azure functionapp publish ${METRICS_COLLECT_APP_NAME} --dotnet" 7 "../metrics/src/Piipan.Metrics/$COLLECT_APP_FILEPATH"
