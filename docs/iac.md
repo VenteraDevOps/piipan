@@ -65,17 +65,23 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     #Template
     ./tools/assign-app-role.bash <azure-env> <function-app-name> <app-role-name>
 
-    #Example
+    #Examples
     ./tools/assign-app-role.bash tts/dev tts-func-metricsapi-dev Metrics.Read
+    ./tools/assign-app-role.bash tts/dev tts-func-orchestrator-dev OrchestratorApi.Query
+    ./tools/assign-app-role.bash tts/dev tts-func-matchres-dev MatchResolution.Query
+    ./tools/assign-app-role.bash tts/dev tts-func-states-dev States.Query
     ```
 
-    Use authorize-cli to add the Azure CLI as an authorized client application for the Function's application registration:
+    Use authorize-cli to add the Azure CLI and Visual Studio as authorized client applications for the Function's application registration:
     ```
     #Template
     ./tools/authorize-cli.bash <azure-env> <function-app-name>
     
-    #Example
+    #Examples
     ./tools/authorize-cli.bash tts/dev tts-func-metricsapi-dev
+    ./tools/authorize-cli.bash tts/dev tts-func-orchestrator-dev
+    ./tools/authorize-cli.bash tts/dev tts-func-matchres-dev
+    ./tools/authorize-cli.bash tts/dev tts-func-states-dev
     ```
 
 10. Time to test your infrastructure
