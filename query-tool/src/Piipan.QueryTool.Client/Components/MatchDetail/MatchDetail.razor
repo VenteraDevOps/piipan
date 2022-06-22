@@ -72,11 +72,11 @@
                     <div class="two-state-grid">
                         @if (InitiatingStateDisposition != null)
                         {
-                            <StateDispositionInformation Disposition="@InitiatingStateDisposition" InitiatingState="true" />
+                            <StateDispositionInformation Disposition="@InitiatingStateDisposition" InitiatingState="true" MatchDate="@Match.Data.Data.CreatedAt" InitiatingStateName="@InitiatingStateContactInfo.State" InitiatingStateAbbr="@Match.Data.Data.Initiator" />
                         }
                         @if (MatchingStateDisposition != null)
                         {
-                            <StateDispositionInformation Disposition="@MatchingStateDisposition" InitiatingState="false" />
+                            <StateDispositionInformation Disposition="@MatchingStateDisposition" InitiatingState="false" MatchDate="@Match.Data.Data.CreatedAt" InitiatingStateName="@InitiatingStateContactInfo.State" InitiatingStateAbbr="@Match.Data.Data.Initiator" />
                         }
                     </div>
                 </BodyContent>

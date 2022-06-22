@@ -35,7 +35,7 @@
     protected override void CreateTestComponent()
     {
         Component = Render<StateDispositionInformation>(
-            @<StateDispositionInformation InitiatingState="InitialValues.InitiatingState" Disposition="InitialValues.Disposition">
+            @<StateDispositionInformation InitiatingState="InitialValues.InitiatingState" Disposition="InitialValues.Disposition" InitiatingStateName="Echo Alpha" InitiatingStateAbbr="EA">
             </StateDispositionInformation>
         );
     }
@@ -75,6 +75,14 @@
                     <div>
                         <dt>Final Disposition Taken:</dt>
                         <dd>Benefits Approved</dd>
+                    </div>
+                    <div>
+                        <dt>Match recorded on:</dt>
+                        <dd>-</dd>
+                    </div>
+                    <div>
+                        <dt>Match query by:</dt>
+                        <dd>Echo Alpha (EA)</dd>
                     </div>
                     <div>
                         <dt>Benefits Start Date:</dt>
@@ -119,6 +127,14 @@
                     <div>
                         <dt>Final Disposition Taken:</dt>
                         <dd>Benefits Approved</dd>
+                    </div>
+                    <div>
+                        <dt>Match recorded on:</dt>
+                        <dd>-</dd>
+                    </div>
+                    <div>
+                        <dt>Match query by:</dt>
+                        <dd>Echo Alpha (EA)</dd>
                     </div>
                     <div>
                         <dt>Benefits Start Date:</dt>
@@ -166,6 +182,14 @@
                     <div>
                         <dt>Final Disposition Taken:</dt>
                         <dd>-</dd>
+                    </div>
+                    <div>
+                        <dt>Match recorded on:</dt>
+                        <dd>-</dd>
+                    </div>
+                    <div>
+                        <dt>Match query by:</dt>
+                        <dd>Echo Alpha (EA)</dd>
                     </div>
                 </dl>
         </div>
