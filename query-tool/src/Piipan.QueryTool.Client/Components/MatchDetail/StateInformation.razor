@@ -4,6 +4,8 @@
 @code {
     [Parameter] public List<DisplayInfo> StateInfo { get; set; }
     [Parameter] public RenderFragment Header { get; set; }
+    private DateTime currentDate = new DateTime();
+    private DateTime matchDate = new DateTime();
 
 }
 
@@ -17,7 +19,20 @@
 
             if (info.Value != null && info.DisplayType == DisplayInfoType.Email)
             {
-                format = @<a href="mailto:@(displayValue)">@displayValue</a>;
+                format = @<a href="mailto:@(displayValue)">@displayValue</a>
+        ;
+            }
+            else if (info.Label != null && info.Label == "Match recorded on" && displayValue != null)
+            {
+                DateTime matchDate = new DateTime();
+                bool validDate = DateTime.TryParse(displayValue, out matchDate);
+                if (validDate)
+                {
+                    currentDate = DateTime.Today;                
+                    string daysSinceMatch = (currentDate - matchDate).TotalDays.ToString();
+                    format = @<text>@displayValue <text style="color:#6E6E6E">(@daysSinceMatch days since match)</text></text>;
+                }
+                
             }
 
             <div>
