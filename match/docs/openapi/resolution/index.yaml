@@ -9,6 +9,8 @@ tags:
 servers:
   - url: "/v0"
 paths:
+  /matches:
+    $ref: './get_matches.yaml'
   /matches/{match_id}:
     $ref: './match_show.yaml'
   /matches/{match_id}/disposition:
