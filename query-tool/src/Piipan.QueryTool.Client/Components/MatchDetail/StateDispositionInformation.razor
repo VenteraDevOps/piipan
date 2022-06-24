@@ -21,9 +21,6 @@
         StateValues.Add(new("Initial Action Taken", Disposition.InitialActionTaken));
         StateValues.Add(new("Initial Action Date", Disposition.InitialActionAt));
         StateValues.Add(new("Final Disposition Taken", Disposition.FinalDisposition));
-        StateValues.Add(new("Match recorded on", MatchDate));
-        string stateNameAbbrCombo = InitiatingStateName + " (" + (InitiatingStateAbbr == null ? "" : InitiatingStateAbbr.ToUpper()) + ")";
-        StateValues.Add(new("Match query by", stateNameAbbrCombo));
 
         if (!string.IsNullOrWhiteSpace(Disposition.FinalDisposition))
         {
