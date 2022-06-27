@@ -7,6 +7,7 @@ using Piipan.Match.Core.Extensions;
 using Piipan.Participants.Api;
 using Piipan.Match.Core.Enums;
 using System;
+using Piipan.Shared.Cryptography;
 
 namespace Piipan.Match.Core.Services
 {
@@ -17,16 +18,18 @@ namespace Piipan.Match.Core.Services
     {
         private readonly IParticipantApi _participantApi;
         private readonly IValidator<RequestPerson> _requestPersonValidator;
-
+        private readonly ICryptographyClient _cryptographyClient;
         /// <summary>
         /// Initializes a new instance of MatchService
         /// </summary>
         public MatchService(
             IParticipantApi participantApi,
-            IValidator<RequestPerson> requestPersonValidator)
+            IValidator<RequestPerson> requestPersonValidator,
+            ICryptographyClient cryptographyClient)
         {
             _participantApi = participantApi;
             _requestPersonValidator = requestPersonValidator;
+            _cryptographyClient = cryptographyClient;
         }
 
         /// <summary>
@@ -67,6 +70,8 @@ namespace Piipan.Match.Core.Services
         private async Task<OrchMatchResult> PersonMatch(RequestPerson person, int index, string initiatingState)
         {
             var states = await _participantApi.GetStates();
+            //Encrypt hash
+            person.LdsHash = _cryptographyClient.EncryptToBase64String(person.LdsHash);
             //Removing the initiatingState from the list of states for Match.
             states = states.Where(state => state != initiatingState);
 

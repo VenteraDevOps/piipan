@@ -45,7 +45,7 @@ We use this commit message template:
 The usual suspects, plus some variants:
 - Commented source code: required on public classes, methods; elsewhere as appropriate
 - Supporting developer documentation for new build/test/API changes or for particularly complex portions of the system
-- Architectual Decision Records (as appropriate) for research spikes
+- Architectural Decision Records (as appropriate) for research spikes
 - Automated unit tests to maintain or increase level of code coverage
 - If a PR changes the IaC, the IaC should be manually applied to tts/dev as our CI/CD pipeline does not run IaC automatically
 - As warranted, add the `changelog` tag to the PR and leave text to add to CHANGELOG at the end of the sprint – this is particularly important for any external API changes (e.g.; [#1374](https://github.com/18F/piipan/pull/1374))
@@ -60,7 +60,7 @@ We work in 2 week sprint cycles, starting on Tuesdays and ending on Mondays. A [
 Dependabot does not support package lock files with .NET and so the automated PRs that it generates will fail in CI.
 
 To address these Dependabot PRs, a developer can:
-- assign the PRs to themselves (typically in bulk via the Asignee function)
+- assign the PRs to themselves (typically in bulk via the Assignee function)
 - follow the [steps to update dependencies](./update-deps.md) using a a new PR
 
 The Dependabot PRs should close automatically after the new PR is merged.

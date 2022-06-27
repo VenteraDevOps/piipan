@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\Piipan.Match.Core\Piipan.Match.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
 </Project>

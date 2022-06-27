@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Messaging.EventGrid;
-using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using Dapper;
@@ -21,6 +16,8 @@ using Piipan.Participants.Core;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.API.Utilities;
+using Piipan.Shared.Cryptography;
+using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
 using Xunit;
 
@@ -31,6 +28,9 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
         private ServiceProvider BuildServices()
         {
             var services = new ServiceCollection();
+
+            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
+            Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
 
             services.AddLogging();
             SqlMapper.AddTypeHandler(new DateRangeListHandler());
@@ -88,7 +88,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
             });
 
             services.RegisterParticipantsServices();
-
+            services.RegisterKeyVaultClientServices();
             return services.BuildServiceProvider();
         }
 
@@ -101,7 +101,7 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 services.GetService<IBlobClientStream>()
             );
         }
-
+        
         [Fact]
         public async void SavesCsvRecords()
         {
@@ -116,16 +116,20 @@ namespace Piipan.Etl.Func.BulkUpload.IntegrationTests
                 "Event Grid Event String",
                 Mock.Of<ILogger>()
             );
-
+            
+            AzureAesCryptographyClient cryptographyClient = new AzureAesCryptographyClient();
             var records = QueryParticipants("SELECT * from participants;").ToList();
 
-            // assert
+           // assert Need to check for Encryption,  While Decrypt we are getting some padding with \0. Need to check
             for (int i = 0; i < records.Count(); i++)
-            {
-                Assert.Equal($"caseid{i + 1}", records.ElementAt(i).CaseId);
-                Assert.Equal($"participantid{i + 1}", records.ElementAt(i).ParticipantId);
-            }
-            Assert.Equal("a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec", records.First().LdsHash);
+                {
+                    Assert.Equal($"caseid{i + 1}", cryptographyClient.DecryptFromBase64String(records.ElementAt(i).CaseId));
+                    Assert.Equal($"participantid{i + 1}", cryptographyClient.DecryptFromBase64String(records.ElementAt(i).ParticipantId));
+                }
+
+            string firstParticipantHash = "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec";
+            string decryptedHash = cryptographyClient.DecryptFromBase64String(records.First().LdsHash);
+            Assert.Equal(firstParticipantHash, decryptedHash);
             Assert.Equal(new DateTime(2021, 05, 15), records.First().ParticipantClosingDate);
             Assert.Equal(new DateRange(new DateTime(2021, 04, 01) , new DateTime(2021, 04, 15)), records.First().RecentBenefitIssuanceDates.First());
             Assert.Equal(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 30)), records.First().RecentBenefitIssuanceDates.ElementAt(1));

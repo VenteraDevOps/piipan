@@ -30,6 +30,7 @@ paths:
               properties:
                 data:
                   type: array
+                  description: An array containing 1 to 50 individuals to match against records of active participants in other States
                   minItems: 1
                   maxItems: 50
                   items:
@@ -214,6 +215,7 @@ paths:
                         - index: 0
                           matches:
                             - match_id: BCD2345
+                              lds_hash: 8846a0dac5cb2a49fa3571d36a41757c8ea955414ac5d88b418a6a9e8065e770f80be56dac18cedf538e718a6dfa10fc5b6058186c681ad61f4bfec976250616
                               state: ea
                               case_id: string
                               participant_id: string
@@ -244,6 +246,7 @@ paths:
                         - index: 0
                           matches:
                             - match_id: XYZ9876
+                              lds_hash: 2581e60af416384c03d60bc6fb3f047838d7fc8642def08fb37717618586286ac83948002a7f12873df5b161eece4fa33dab8a32097b82476ae2901d839dc616
                               state: eb
                               case_id: string
                               participant_id: string
@@ -258,6 +261,7 @@ paths:
                               vulnerable_individual: true
                               match_url: 'https://nac.example/match/XYZ9876'
                             - match_id: 4567CDF
+                              lds_hash: 713ba87711e3ebe6c05cce93595df19fb04a9f7cf423ca33e9d3e8a779a49f37c306ab84b8010986c34f898156a6e073403259cbe069bcd6fbae8f5cb2b0caa9
                               state: ec
                               case_id: string
                               participant_id: string
@@ -313,6 +317,119 @@ paths:
           description: Bad request. Request body does not match the required format.
         '429':
           description: Too Many Requests. The status code indicates the user has sent too many requests in a given amount of time 'rate limiting'.
+  /matches:
+    get:
+      operationId: Get Matches
+      tags:
+        - Match
+      summary: Search for all existing matches in match database
+      description: Searches for all open existing matches in match database
+      responses:
+        '200':
+          description: Successful response. Returns matches
+          content:
+            application/json:
+              schema:
+                title: Get Matches response
+                type: object
+                properties:
+                  data:
+                    type: array
+                    nullable: true
+                    description: 'The response payload. Either an errors or data property will be present in the response, but not both.'
+                    items:
+                      type: object
+                      required:
+                        - dispositions
+                        - initiator
+                        - match_id
+                        - created_at
+                        - participants
+                        - states
+                        - status
+                      properties:
+                        created_at:
+                          type: string
+                          description: The date the match was created on
+                        dispositions:
+                          type: array
+                          description: The dispostions of each state
+                          items:
+                            type: object
+                            required:
+                              - state
+                            properties:
+                              initial_action_at:
+                                type: string
+                                description: The date the initial action was taken
+                              initial_action_taken:
+                                type: string
+                                description: Which action was taken
+                              invalid_match:
+                                type: boolean
+                                description: Whether or not the match was valid
+                              final_disposition:
+                                type: string
+                                description: What the final dispostion was
+                              final_disposition_date:
+                                type: string
+                                description: The date the final disposition was taken on
+                              vulnerable_individual:
+                                type: boolean
+                                description: 'A true, false, or null value on whether or not the participants location needs to be protected'
+                              state:
+                                type: string
+                                description: The state that took these actions
+                        initiator:
+                          type: string
+                          description: The state that initiated the match
+                        match_id:
+                          type: string
+                          description: The unique id that identifies the match
+                        participants:
+                          type: array
+                          description: The participant was matched in both states
+                          items:
+                            type: object
+                            required:
+                              - case_id
+                              - participant_id
+                              - recent_benefit_issuance_dates
+                              - state
+                            properties:
+                              case_id:
+                                type: string
+                                description: The identifier for this participants instance of benefits
+                              participant_closing_date:
+                                type: string
+                                description: The last date the participant will recieve benefits in that state
+                              participant_id:
+                                type: string
+                                description: An identifier for the participant
+                              recent_benefit_issuance_dates:
+                                type: array
+                                description: The list of months the participant has recently recieved benefits
+                                items:
+                                  type: object
+                                  required:
+                                    - start
+                                    - end
+                                  properties:
+                                    start:
+                                      type: string
+                                      description: The start of that months benefits
+                                    end:
+                                      type: string
+                                      description: The end of that months benefits
+                              state:
+                                type: string
+                                description: The state that the other parameters refer to
+                        states:
+                          type: array
+                          description: The states that are involved in the match
+                        status:
+                          type: string
+                          description: The status of whether or not the match resolution has been closed. Possible statuses are open or closed
 security:
   - ApiKeyAuth: []
 components:

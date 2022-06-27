@@ -1,0 +1,107 @@
+﻿@using Newtonsoft.Json
+@using Piipan.Match.Api.Models
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.States.Api.Models
+@using Piipan.QueryTool.Client.Models
+@using Piipan.Components.Layout
+@using Piipan.Components.Tag
+
+@code {
+    [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
+    [Parameter] public ParameterBase<StatesInfoResponse> StateInfo { get; set; }
+
+    private TagTheme StatusTheme()
+    {
+        return Match.Data.Data.Status.ToLower() switch
+        {
+            "open" => TagTheme.Green,
+            _ => TagTheme.Gray
+        };
+    }
+    private string MatchingStateAbbreviation => 
+        Match.Data.Data.States.FirstOrDefault(s => string.Compare(s, Match.Data.Data.Initiator, StringComparison.CurrentCultureIgnoreCase) != 0);
+
+    private Disposition InitiatingStateDisposition =>
+        Match.Data.Data.Dispositions.FirstOrDefault(n => string.Compare(n.State, Match.Data.Data.Initiator, StringComparison.CurrentCultureIgnoreCase) == 0);
+
+    private Disposition MatchingStateDisposition =>
+        Match.Data.Data.Dispositions.FirstOrDefault(n => string.Compare(n.State, MatchingStateAbbreviation, StringComparison.CurrentCultureIgnoreCase) == 0);
+
+    private Participant InitiatingStateParticipant =>
+        Match.Data.Data.Participants.FirstOrDefault(n => string.Compare(n.State, Match.Data.Data.Initiator, StringComparison.CurrentCultureIgnoreCase) == 0);
+
+    private Participant MatchingStateParticipant =>
+        Match.Data.Data.Participants.FirstOrDefault(n => string.Compare(n.State, MatchingStateAbbreviation, StringComparison.CurrentCultureIgnoreCase) == 0);
+
+    private StateInfoResponseData InitiatingStateContactInfo =>
+        StateInfo.Data.Results.FirstOrDefault(n => string.Compare(n.StateAbbreviation, Match.Data.Data.Initiator, StringComparison.CurrentCultureIgnoreCase) == 0);
+
+    private StateInfoResponseData MatchingStateContactInfo =>
+        StateInfo.Data.Results.FirstOrDefault(n => string.Compare(n.StateAbbreviation, MatchingStateAbbreviation, StringComparison.CurrentCultureIgnoreCase) == 0);
+}
+<div class="grid-container">
+
+    <!-- Match header -->
+    <div class="grid-row">
+        <h1><UsaTag Theme="StatusTheme()">@Match.Data.Data.Status</UsaTag><span>Match ID: @Match.Data.Data.MatchId</span></h1>
+    </div>
+    <!-- \match header -->
+    <div style="max-width: 860px">
+        <UsaAccordion>
+            <UsaAccordionItem StartsExpanded="true">
+                <HeadingContent>SNAP Participant Information</HeadingContent>
+                <BodyContent>
+                    <div class="two-state-grid">
+                        @if (InitiatingStateParticipant != null)
+                        {
+                            <StateParticipantInformation Participant="@InitiatingStateParticipant" InitiatingState="true" />
+                        }
+                        @if (MatchingStateParticipant != null)
+                        {
+                            <StateParticipantInformation Participant="@MatchingStateParticipant" InitiatingState="false" />
+                        }
+                    </div>
+                </BodyContent>
+            </UsaAccordionItem>
+        </UsaAccordion>
+        <UsaAccordion>
+            <UsaAccordionItem StartsExpanded="true">
+                <HeadingContent>Match Information</HeadingContent>
+                <BodyContent>
+                    <p>Each state's most recent updates are displayed below.</p>
+                    <div class="two-state-grid">
+                        @if (InitiatingStateDisposition != null)
+                        {
+                            <StateDispositionInformation Disposition="@InitiatingStateDisposition" InitiatingState="true" />
+                        }
+                        @if (MatchingStateDisposition != null)
+                        {
+                            <StateDispositionInformation Disposition="@MatchingStateDisposition" InitiatingState="false" />
+                        }
+                    </div>
+                </BodyContent>
+            </UsaAccordionItem>
+        </UsaAccordion>
+        <UsaAccordion>
+            <UsaAccordionItem StartsExpanded="true">
+                <HeadingContent>State Agency Contact Information</HeadingContent>
+                <BodyContent>
+                    <ul>
+                        <li>Use this information if you need to contact the other state in regards to this match</li>
+                        <li>Do not exchange PII about the participant by email; use their state’s Participant ID</li>
+                    </ul>
+                    <div class="two-state-grid">
+                        @if (InitiatingStateContactInfo != null)
+                        {
+                            <StateContactInformation StateInfo="InitiatingStateContactInfo" InitiatingState="true" />    
+                        }
+                        @if (MatchingStateContactInfo != null)
+                        {
+                            <StateContactInformation StateInfo="MatchingStateContactInfo" InitiatingState="false" />    
+                        }
+                    </div>
+                </BodyContent>
+            </UsaAccordionItem>
+        </UsaAccordion>
+    </div>
+</div> 

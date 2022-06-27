@@ -22,6 +22,6 @@ There will be special cases where mocking all external functionality is not poss
 
 We have seen that mocking all external dependencies when unit testing greatly reduces the effort required to achieve maximal test coverage. 
 
-Additionally, mocking external depenencies makes the tests we write more robust -- changes to the internal behavior of dependencies does not necessitate updates to the tests. 
+Additionally, mocking external dependencies makes the tests we write more robust -- changes to the internal behavior of dependencies does not necessitate updates to the tests. 
 
 This approach to unit testing validates the internal functionality of the individual components, but does not test the relationships between components. Therefore, a separate integration test suite is necessary in order to verify that the system as a whole satisfies functional requirements. 

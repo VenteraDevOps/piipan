@@ -6,6 +6,7 @@ using Npgsql;
 using Piipan.Etl.Func.BulkUpload.Parsers;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
+using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
 
 [assembly: FunctionsStartup(typeof(Piipan.Etl.Func.BulkUpload.Startup))]
@@ -32,6 +33,7 @@ namespace Piipan.Etl.Func.BulkUpload
             builder.Services.AddTransient<IBlobClientStream, BlobClientStream>();
 
             builder.Services.RegisterParticipantsServices();
+            builder.Services.RegisterKeyVaultClientServices();
         }
     }
 }

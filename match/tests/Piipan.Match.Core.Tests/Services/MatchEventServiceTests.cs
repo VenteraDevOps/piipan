@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using Moq;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
@@ -10,6 +12,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.Cryptography;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
@@ -17,10 +20,13 @@ namespace Piipan.Match.Core.Tests.Services
     public class MatchEventServiceTests
     {
         private const string QueryToolUrl = "https://tts.test";
-
+        private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
+        private ICryptographyClient cryptographyClient;
+                
         public MatchEventServiceTests()
         {
             Environment.SetEnvironmentVariable("QueryToolUrl", QueryToolUrl);
+            cryptographyClient = new AzureAesCryptographyClient(base64EncodedKey);
         }
 
         private Mock<IActiveMatchRecordBuilder> BuilderMock(MatchRecordDbo record)
@@ -110,7 +116,8 @@ namespace Piipan.Match.Core.Tests.Services
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object
+                aggDao.Object, 
+                cryptographyClient
             );
 
             // Act
@@ -162,7 +169,8 @@ namespace Piipan.Match.Core.Tests.Services
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object
+                aggDao.Object, 
+                cryptographyClient
             );
 
             // Act
@@ -213,7 +221,8 @@ namespace Piipan.Match.Core.Tests.Services
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object
+                aggDao.Object, 
+                cryptographyClient
             );
 
             // Act
@@ -272,7 +281,8 @@ namespace Piipan.Match.Core.Tests.Services
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object
+                aggDao.Object, 
+                cryptographyClient
             );
 
             // Act
@@ -320,12 +330,14 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
+            
 
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object
+                aggDao.Object, 
+                cryptographyClient
             );
 
             // Act
@@ -381,7 +393,8 @@ namespace Piipan.Match.Core.Tests.Services
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object
+                aggDao.Object,
+                cryptographyClient
             );
 
             // Act

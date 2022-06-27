@@ -10,6 +10,7 @@ PER_STATE_ETL_TAG="SysType=PerStateEtl"
 PER_STATE_STORAGE_TAG="SysType=PerStateStorage"
 ORCHESTRATOR_API_TAG="SysType=OrchestratorApi"
 MATCH_RES_API_TAG="SysType=MatchResApi"
+STATES_API_TAG="SysType=StatesApi"
 DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
@@ -42,14 +43,19 @@ AZ_SERV_STR_KEY=AzureServicesAuthConnectionString
 CLOUD_NAME_STR_KEY=CloudName
 
 # Azure Key Vault naming is kebab-case
-# Azure Function enivornment vairable naming is camelCase
+# Azure Function environment variable naming is PascalCase
 # Thus, creating constants for both to avoid naming conflicts
+
+# Column Encryption Key - Azure Function environment variable
+COLUMN_ENCRYPT_KEY=ColumnEncryptionKey
+# Column Encryption Key - Azure Key Vault secret
+COLUMN_ENCRYPT_KEY_KV=column-encryption-key
 # Payload Encryption Key - Azure Function environment variable
-UPLOAD_ENCRYPT_KEY=uploadPayloadKey
+UPLOAD_ENCRYPT_KEY=UploadPayloadKey
 # Payload Encryption Key - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_KV=upload-payload-key
 # Payload Encryption Key SHA - Azure Function environment variable
-UPLOAD_ENCRYPT_KEY_SHA=uploadPayloadKeySHA
+UPLOAD_ENCRYPT_KEY_SHA=UploadPayloadKeySHA
 # Payload Encryption Key SHA - Azure Key Vault secret
 UPLOAD_ENCRYPT_KEY_SHA_KV=upload-payload-key-sha
 
@@ -108,6 +114,10 @@ DASHBOARD_WAF_NAME=wafdashboard${ENV}
 # Match Resolution Function App Info
 MATCH_RES_FUNC_APP_NAME=$PREFIX-func-matchres-$ENV
 MATCH_RES_FUNC_APP_STORAGE_NAME=${PREFIX}stmatchres${ENV}
+
+# States Function App Info
+STATES_FUNC_APP_NAME=$PREFIX-func-states-$ENV
+STATES_FUNC_APP_STORAGE_NAME=${PREFIX}ststates${ENV}
 
 # Names of apps authenticated by OIDC
 OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")

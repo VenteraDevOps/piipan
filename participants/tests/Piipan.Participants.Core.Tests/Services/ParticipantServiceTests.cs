@@ -9,6 +9,7 @@ using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Models;
 using Piipan.Participants.Core.Services;
 using Piipan.Shared.API.Utilities;
+using Piipan.Shared.Cryptography;
 using Piipan.Shared.Deidentification;
 using Xunit;
 
@@ -17,9 +18,13 @@ namespace Piipan.Participants.Core.Tests.Services
     public class ParticipantServiceTests
     {
         private IRedactionService _redactionService;
+        private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
+        private ICryptographyClient cryptographyClient;
+
         public ParticipantServiceTests()
         {
             _redactionService = Mock.Of<IRedactionService>();
+            cryptographyClient = new AzureAesCryptographyClient(base64EncodedKey);
         }
 
         private IEnumerable<ParticipantDbo> RandomParticipants(int n)
@@ -30,9 +35,9 @@ namespace Piipan.Participants.Core.Tests.Services
             {
                 result.Add(new ParticipantDbo
                 {
-                    LdsHash = Guid.NewGuid().ToString(),
-                    CaseId = Guid.NewGuid().ToString(),
-                    ParticipantId = Guid.NewGuid().ToString(),
+                    LdsHash = cryptographyClient.EncryptToBase64String(Guid.NewGuid().ToString()),
+                    CaseId = cryptographyClient.EncryptToBase64String(Guid.NewGuid().ToString()),
+                    ParticipantId = cryptographyClient.EncryptToBase64String(Guid.NewGuid().ToString()),
                     ParticipantClosingDate = DateTime.UtcNow.Date,
                     RecentBenefitIssuanceDates = new List<DateRange>(),
                     VulnerableIndividual = (new Random()).Next(2) == 0,
@@ -98,14 +103,19 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 _redactionService,
-                logger);
+                logger,
+                cryptographyClient);
 
             // Act
             var result = await service.GetParticipants(randomState, randomLdsHash);
 
             // Assert
             // results should have the State set
-            var expected = participants.Select(p => new ParticipantDto(p) { State = randomState });
+            var expected = participants.Select(p => new ParticipantDto(p) { 
+                State = randomState,
+                ParticipantId = cryptographyClient.DecryptFromBase64String(p.ParticipantId),
+                CaseId = cryptographyClient.DecryptFromBase64String(p.CaseId),
+            });
             Assert.Equal(expected, result);
         }
 
@@ -140,7 +150,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 _redactionService,
-                logger);
+                logger,
+                cryptographyClient);
 
             // Act
             var result = await service.GetParticipants(randomState, randomLdsHash);
@@ -173,7 +184,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 _redactionService,
-                logger);
+                logger,
+                cryptographyClient);
 
             // Act
             var participants = await service.GetParticipants("ea", "hash");
@@ -211,7 +223,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 _redactionService,
-                logger);
+                logger,
+                cryptographyClient);
 
             // Act
             await service.AddParticipants(participants, "test-etag", null);
@@ -265,7 +278,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 redactionService.Object,
-                logger.Object);
+                logger.Object,
+                cryptographyClient);
 
             // Act
             await service.AddParticipants(participants, "test-etag", (ex) => foundException = ex);
@@ -304,7 +318,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 redactionService,
-                logger.Object);
+                logger.Object,
+                cryptographyClient);
 
             var uploadDetails = new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Exception with first participant: " + participants.First().LdsHash), "test.csv");
 
@@ -352,7 +367,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 redactionService,
-                logger.Object);
+                logger.Object,
+                cryptographyClient);
 
             var uploadDetails = new ParticipantUploadErrorDetails("EA", DateTime.UtcNow, DateTime.UtcNow, new Exception("Exception with first participant: " + participants.First().LdsHash), "test.csv");
 
@@ -396,7 +412,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao,
                 stateService.Object,
                 _redactionService,
-                logger);
+                logger,
+                cryptographyClient);
 
             // Act
             var result = await service.GetStates();
@@ -438,7 +455,8 @@ namespace Piipan.Participants.Core.Tests.Services
                 uploadDao.Object,
                 stateService,
                 _redactionService,
-                logger);
+                logger,
+                cryptographyClient);
 
             // Act
             await service.AddParticipants(participants, "test-etag", null);
@@ -460,7 +478,8 @@ namespace Piipan.Participants.Core.Tests.Services
                uploadDaoNew.Object,
                stateService,
                _redactionService,
-               logger);
+               logger,
+                cryptographyClient);
             await serviceNew.AddParticipants(participants, "test-etag1", null);
 
             // Assert
@@ -485,7 +504,9 @@ namespace Piipan.Participants.Core.Tests.Services
              uploadDaoDelete.Object,
              stateService,
              _redactionService,
-             logger);
+             logger,
+             cryptographyClient
+             );
 
             await serviceDelete.DeleteOldParticpants();
 

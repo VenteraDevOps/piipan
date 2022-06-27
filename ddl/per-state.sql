@@ -21,8 +21,7 @@ COMMENT ON COLUMN uploads.status IS 'Current status for upload processing';
 
 CREATE TABLE IF NOT EXISTS participants(
 	id serial PRIMARY KEY,
-	lds_hash text NOT NULL
-		CONSTRAINT hex_check CHECK (lds_hash ~ '^[0-9a-f]{128}$'),
+	lds_hash text NOT NULL,
 	upload_id integer REFERENCES uploads (id),
     	case_id text NOT NULL,
     	participant_id text NOT NULL,
