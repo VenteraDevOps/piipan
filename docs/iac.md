@@ -133,6 +133,8 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `EventGridKeyString` | Key for Metrics EventGrid endpoint.  | Piipan.Etl, Piipan.Metrics.Func.Collect |
 | `UploadPayloadKey` | Payload Encryption Key. | Piipan.Etl |
 | `UploadPayloadKeySHA` | Payload Encryption Key SHA. | Piipan.Etl |
+| `StatesApiUri` | URI for the States API endpoint. | Piipan.QueryTool |
+| `StatesApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for State API's Azure Active Directory application object | Piipan.QueryTool |
 
 ## `SysType` resource tag
 
