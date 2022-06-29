@@ -127,7 +127,7 @@
     protected override void CreateTestComponent()
     {
         Component = Render<MatchDetail>(
-    @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo">
+    @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo">
     </MatchDetail>
     );
     }
@@ -146,217 +146,266 @@
         // Assert
         Component!.MarkupMatches(
     @<div class="grid-container" >
-      <h1 >
-        <span class="usa-tag usa-tag--green usa-tag--round" >open</span>
-        <span >Match ID: M123456</span>
-      </h1>
-      <div class="grid-row" >
-        <dl >
-          <div >
-            <dt >Match Record Created:</dt>
-            <dd >
-              <span style="color:#6E6E6E" >( days since match)</span>
-            </dd>
-          </div>
-          <div >
-            <dt >Match Query By:</dt>
-            <dd >Echo Alpha (EA)</dd>
-          </div>
-        </dl>
+  <h1 >
+    <span class="usa-tag usa-tag--green usa-tag--round" >open</span>
+    <span >Match ID: M123456</span>
+  </h1>
+  <div class="grid-row" >
+    <dl >
+      <div >
+        <dt >Match Record Created:</dt>
+        <dd >
+          <span style="color:#6E6E6E" >( days since match)</span>
+        </dd>
       </div>
-      <div class="grid-row" >
-        <div class="grid-col-4" style="background-color: red" >
-          <div class="grid-container">
-            <h2>Update information about this match for STATE HERE</h2>
-            <p>After the information is saved, it will appear in the
-              <b>match information</b>
-              panel.</p>
-            <h4>VULNERABLE COMPONENT HERE</h4>
-            <h4>INITIAL ACTION COMPONENT HERE</h4>
-            <h4>FINAL DISPOSITION COMPONENT HERE</h4>
-            <button class="usa-button">Save Changes</button>
+      <div >
+        <dt >Match Query By:</dt>
+        <dd >Echo Alpha (EA)</dd>
+      </div>
+    </dl>
+  </div>
+  <div class="grid-row" >
+    <div class="grid-col-4" >
+      <div>
+        <h2>Update information about this match for Echo Bravo</h2>
+        <p>After the information is saved, it will appear in the
+          <b>match information</b>
+          panel.</p>
+        <div>
+          <h2>Vulnerable &amp; Invalid Status</h2>
+          <fieldset class="usa-fieldset">
+            <legend class="usa-legend usa-legend">
+              <b>
+                <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="A vulnerable individual is a participant that should have their location protected. Indicating that this participant is a vulnerable individual will inform any states involved with this match that this participant's location is not to be revealed in any communications." aria-hidden="true">
+                  <use xlink:href="/images/sprite.svg#help"></use>
+                </svg>
+                Does this match involve a vulnerable individual?</b>
+            </legend>
+            <div class="usa-radio">
+              <input class="usa-radio__input" id="vulnerable_yes" name="vulnerable_individual" type="radio" value="yes">
+              <label class="usa-radio__label" for="vulnerable_yes">Yes</label>
+            </div>
+            <div class="usa-radio">
+              <input class="usa-radio__input" id="vulnerable_no" name="vulnerable_individual" type="radio" value="No">
+              <label class="usa-radio__label" for="vulnerable_no">No</label>
+            </div>
+          </fieldset>
+          <br>
+          <fieldset class="usa-fieldset">
+            <legend class="usa-legend usa-legend">
+              <b>
+                <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="Invalid matches involve participants who are NOT receiving or applying for benefits in more than one state and may occur if there has been a typo in the information submitted to the NAC or in cases of identity theft. An explanation will be required if this match is indicated as invalid. " aria-hidden="true">
+                  <use xlink:href="/images/sprite.svg#help"></use>
+                </svg>
+                Is this an invalid match?</b>
+            </legend>
+            <div class="usa-radio">
+              <input class="usa-radio__input" id="invalid_yes" name="valid_match" type="radio" value="yes">
+              <label class="usa-radio__label" for="invalid_yes">Yes</label>
+            </div>
+            <div style="margin-left:26px">
+              <form class="usa-form">
+                <label class="usa-label" for="options">Invalid Match Reason</label>
+                <select class="usa-select" style="max-width:196px" name="options" id="options">
+                  <option value="">- Select -</option>
+                  <option value="clientInfo">Incorrect Client Information</option>
+                  <option value="stem">System Error</option>
+                  <option value="identity">Potential Identity Theft</option>
+                  <option value="other">Other</option>
+                </select>
+              </form>
+            </div>
+            <div class="usa-radio">
+              <input class="usa-radio__input" id="invalid_no" name="valid_match" type="radio" value="No">
+              <label class="usa-radio__label" for="invalid_no">No</label>
+            </div>
+          </fieldset>
+        </div>
+        <h4>INITIAL ACTION COMPONENT HERE</h4>
+        <h4>FINAL DISPOSITION COMPONENT HERE</h4>
+        <button class="usa-button">Save Changes</button>
+      </div>
+    </div>
+    <div class="grid-col-8" >
+      <div style="max-width: 860px" >
+        <div class="usa-accordion" aria-multiselectable="false">
+          <h4 class="usa-accordion__heading" >
+            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >SNAP Participant Information</button>
+          </h4>
+          <div id:ignore class="usa-accordion__content usa-prose" >
+            <div class="two-state-grid" >
+              <div >
+                <h5>Echo Alpha
+                  <span>(Initiating State)</span>
+                </h5>
+                <dl >
+                  <div >
+                    <dt >Case Number:</dt>
+                    <dd >c123</dd>
+                  </div>
+                  <div >
+                    <dt >Participant ID:</dt>
+                    <dd >p123</dd>
+                  </div>
+                  <div >
+                    <dt >Participant Closing Date:</dt>
+                    <dd >N/A</dd>
+                  </div>
+                  <div >
+                    <dt >Recent Benefits Issuance Dates:</dt>
+                    <dd >01/01/2022 - 02/02/2022 03/03/2022 - 04/04/2022</dd>
+                  </div>
+                </dl>
+              </div>
+              <div >
+                <h5>Echo Bravo
+                  <span>(Matching State)</span>
+                </h5>
+                <dl >
+                  <div >
+                    <dt >Case Number:</dt>
+                    <dd >c456</dd>
+                  </div>
+                  <div >
+                    <dt >Participant ID:</dt>
+                    <dd >p456</dd>
+                  </div>
+                  <div >
+                    <dt >Participant Closing Date:</dt>
+                    <dd >01/01/2021</dd>
+                  </div>
+                  <div >
+                    <dt >Recent Benefits Issuance Dates:</dt>
+                    <dd >01/01/2021 - 02/02/2021 03/03/2021 - 04/04/2021</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="grid-col-8" >
-          <div style="max-width: 860px" >
-            <div class="usa-accordion" aria-multiselectable="false">
-              <h4 class="usa-accordion__heading" >
-                <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore >SNAP Participant Information</button>
-              </h4>
-              <div id:ignore class="usa-accordion__content usa-prose" >
-                <div class="two-state-grid" >
+        <div class="usa-accordion" aria-multiselectable="false">
+          <h4 class="usa-accordion__heading" >
+            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >Match Information</button>
+          </h4>
+          <div id:ignore class="usa-accordion__content usa-prose" >
+            <p >Each state's most recent updates are displayed below.</p>
+            <div class="two-state-grid" >
+              <div >
+                <h5>Echo Alpha
+                  <span>(Initiating State)</span>
+                </h5>
+                <dl >
                   <div >
-                    <h5>Echo Alpha
-                      <span>(Initiating State)</span>
-                    </h5>
-                    <dl >
-                      <div >
-                        <dt >Case Number:</dt>
-                        <dd >c123</dd>
-                      </div>
-                      <div >
-                        <dt >Participant ID:</dt>
-                        <dd >p123</dd>
-                      </div>
-                      <div >
-                        <dt >Participant Closing Date:</dt>
-                        <dd >N/A</dd>
-                      </div>
-                      <div >
-                        <dt >Recent Benefits Issuance Dates:</dt>
-                        <dd >01/01/2022 - 02/02/2022 03/03/2022 - 04/04/2022</dd>
-                      </div>
-                    </dl>
+                    <dt >Vulnerable Individual:</dt>
+                    <dd >No</dd>
                   </div>
                   <div >
-                    <h5>Echo Bravo
-                      <span>(Matching State)</span>
-                    </h5>
-                    <dl >
-                      <div >
-                        <dt >Case Number:</dt>
-                        <dd >c456</dd>
-                      </div>
-                      <div >
-                        <dt >Participant ID:</dt>
-                        <dd >p456</dd>
-                      </div>
-                      <div >
-                        <dt >Participant Closing Date:</dt>
-                        <dd >01/01/2021</dd>
-                      </div>
-                      <div >
-                        <dt >Recent Benefits Issuance Dates:</dt>
-                        <dd >01/01/2021 - 02/02/2021 03/03/2021 - 04/04/2021</dd>
-                      </div>
-                    </dl>
+                    <dt >Invalid Match:</dt>
+                    <dd >No</dd>
                   </div>
-                </div>
+                  <div >
+                    <dt >Initial Action Taken:</dt>
+                    <dd >Notice Sent</dd>
+                  </div>
+                  <div >
+                    <dt >Initial Action Date:</dt>
+                    <dd >01/01/2022</dd>
+                  </div>
+                  <div >
+                    <dt >Final Disposition Taken:</dt>
+                    <dd >Benefits Approved</dd>
+                  </div>
+                  <div >
+                    <dt >Benefits Start Date:</dt>
+                    <dd >02/02/2022</dd>
+                  </div>
+                </dl>
+              </div>
+              <div >
+                <h5>Echo Bravo
+                  <span>(Matching State)</span>
+                </h5>
+                <dl >
+                  <div >
+                    <dt >Vulnerable Individual:</dt>
+                    <dd >No</dd>
+                  </div>
+                  <div >
+                    <dt >Invalid Match:</dt>
+                    <dd >No</dd>
+                  </div>
+                  <div >
+                    <dt >Initial Action Taken:</dt>
+                    <dd >Notice Sent</dd>
+                  </div>
+                  <div >
+                    <dt >Initial Action Date:</dt>
+                    <dd >01/01/2021</dd>
+                  </div>
+                  <div >
+                    <dt >Final Disposition Taken:</dt>
+                    <dd >Benefits Terminated</dd>
+                  </div>
+                  <div >
+                    <dt >Benefits End Date:</dt>
+                    <dd >02/02/2021</dd>
+                  </div>
+                </dl>
               </div>
             </div>
-            <div class="usa-accordion" aria-multiselectable="false">
-              <h4 class="usa-accordion__heading" >
-                <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore >Match Information</button>
-              </h4>
-              <div id:ignore class="usa-accordion__content usa-prose" >
-                <p >Each state's most recent updates are displayed below.</p>
-                <div class="two-state-grid" >
+          </div>
+        </div>
+        <div class="usa-accordion" aria-multiselectable="false">
+          <h4 class="usa-accordion__heading" >
+            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >State Agency Contact Information</button>
+          </h4>
+          <div id:ignore class="usa-accordion__content usa-prose" >
+            <ul >
+              <li >Use this information if you need to contact the other state in regards to this match</li>
+              <li >Do not exchange PII about the participant by email; use their state’s Participant ID</li>
+            </ul>
+            <div class="two-state-grid" >
+              <div >
+                <h5>Echo Alpha
+                  <span>(Initiating State)</span>
+                </h5>
+                <dl >
                   <div >
-                    <h5>Echo Alpha
-                      <span>(Initiating State)</span>
-                    </h5>
-                    <dl >
-                      <div >
-                        <dt >Vulnerable Individual:</dt>
-                        <dd >No</dd>
-                      </div>
-                      <div >
-                        <dt >Invalid Match:</dt>
-                        <dd >No</dd>
-                      </div>
-                      <div >
-                        <dt >Initial Action Taken:</dt>
-                        <dd >Notice Sent</dd>
-                      </div>
-                      <div >
-                        <dt >Initial Action Date:</dt>
-                        <dd >01/01/2022</dd>
-                      </div>
-                      <div >
-                        <dt >Final Disposition Taken:</dt>
-                        <dd >Benefits Approved</dd>
-                      </div>
-                      <div >
-                        <dt >Benefits Start Date:</dt>
-                        <dd >02/02/2022</dd>
-                      </div>
-                    </dl>
+                    <dt >Email Address:</dt>
+                    <dd >
+                      <a href="mailto:ea-test@usda.gov" >ea-test@usda.gov</a>
+                    </dd>
                   </div>
                   <div >
-                    <h5>Echo Bravo
-                      <span>(Matching State)</span>
-                    </h5>
-                    <dl >
-                      <div >
-                        <dt >Vulnerable Individual:</dt>
-                        <dd >No</dd>
-                      </div>
-                      <div >
-                        <dt >Invalid Match:</dt>
-                        <dd >No</dd>
-                      </div>
-                      <div >
-                        <dt >Initial Action Taken:</dt>
-                        <dd >Notice Sent</dd>
-                      </div>
-                      <div >
-                        <dt >Initial Action Date:</dt>
-                        <dd >01/01/2021</dd>
-                      </div>
-                      <div >
-                        <dt >Final Disposition Taken:</dt>
-                        <dd >Benefits Terminated</dd>
-                      </div>
-                      <div >
-                        <dt >Benefits End Date:</dt>
-                        <dd >02/02/2021</dd>
-                      </div>
-                    </dl>
+                    <dt >Phone Number:</dt>
+                    <dd >123-456-7890</dd>
                   </div>
-                </div>
+                </dl>
               </div>
-            </div>
-            <div class="usa-accordion" aria-multiselectable="false">
-              <h4 class="usa-accordion__heading" >
-                <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >State Agency Contact Information</button>
-              </h4>
-              <div id:ignore class="usa-accordion__content usa-prose" >
-                <ul >
-                  <li >Use this information if you need to contact the other state in regards to this match</li>
-                  <li >Do not exchange PII about the participant by email; use their state’s Participant ID</li>
-                </ul>
-                <div class="two-state-grid" >
+              <div >
+                <h5>Echo Bravo
+                  <span>(Matching State)</span>
+                </h5>
+                <dl >
                   <div >
-                    <h5>Echo Alpha
-                      <span>(Initiating State)</span>
-                    </h5>
-                    <dl >
-                      <div >
-                        <dt >Email Address:</dt>
-                        <dd >
-                          <a href="mailto:ea-test@usda.gov" >ea-test@usda.gov</a>
-                        </dd>
-                      </div>
-                      <div >
-                        <dt >Phone Number:</dt>
-                        <dd >123-456-7890</dd>
-                      </div>
-                    </dl>
+                    <dt >Email Address:</dt>
+                    <dd >
+                      <a href="mailto:eb-test@usda.gov" >eb-test@usda.gov</a>
+                    </dd>
                   </div>
                   <div >
-                    <h5>Echo Bravo
-                      <span>(Matching State)</span>
-                    </h5>
-                    <dl >
-                      <div >
-                        <dt >Email Address:</dt>
-                        <dd >
-                          <a href="mailto:eb-test@usda.gov" >eb-test@usda.gov</a>
-                        </dd>
-                      </div>
-                      <div >
-                        <dt >Phone Number:</dt>
-                        <dd >123-456-7890</dd>
-                      </div>
-                    </dl>
+                    <dt >Phone Number:</dt>
+                    <dd >123-456-7890</dd>
                   </div>
-                </div>
+                </dl>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
         );
     }
 

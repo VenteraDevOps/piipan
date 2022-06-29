@@ -22,6 +22,7 @@ namespace Piipan.QueryTool.Pages
         public MatchResApiResponse Match { get; set; } = null;
         public List<MatchResApiResponse> AvailableMatches { get; set; } = null;
         public List<ServerError> RequestErrors { get; private set; } = new();
+        public string UserState { get; set; } = "";
 
         public MatchModel(ILogger<MatchModel> logger
                            , IMatchResolutionApi matchResolutionApi
@@ -31,6 +32,20 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _matchResolutionApi = matchResolutionApi;
+        }
+
+        public void InitializeUserState()
+        {
+            if (Match != null)
+            {
+                foreach (var state in StateInfo.Results)
+                {
+                    if (state.StateAbbreviation == Location)
+                    {
+                        UserState = state.State;
+                    }
+                }
+            }
         }
 
         public async Task<IActionResult> OnGet([FromRoute] string id)

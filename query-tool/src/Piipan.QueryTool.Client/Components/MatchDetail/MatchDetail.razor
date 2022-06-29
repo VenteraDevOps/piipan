@@ -9,6 +9,7 @@
 @code {
     [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
     [Parameter] public ParameterBase<StatesInfoResponse> StateInfo { get; set; }
+    [Parameter] public string LoggedInUsersState { get; set; }
 
     private TagTheme StatusTheme()
     {
@@ -73,8 +74,8 @@
     </div>
     <!-- \match header -->
     <div class="grid-row">
-        <div class="grid-col-4" style="background-color: red">
-            <ResolutionFields />
+        <div class="grid-col-4">
+            <ResolutionFields State="@LoggedInUsersState"/>
         </div>
         <div class="grid-col-8">
             <div style="max-width: 860px">

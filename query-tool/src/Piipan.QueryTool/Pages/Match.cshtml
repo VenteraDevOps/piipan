@@ -12,10 +12,12 @@
 
 @if (Model.Match != null)
 {
+    Model.InitializeUserState(); 
     <div class="grid-container">
         <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetail)" render-mode="WebAssembly"
         param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)"
-        param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"  />
+        param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"
+        param-LoggedInUsersState="Model.UserState"/>
     </div>
 }
 else

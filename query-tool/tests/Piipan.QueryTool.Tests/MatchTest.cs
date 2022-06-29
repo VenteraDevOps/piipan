@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -109,6 +110,31 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.IsType<RedirectToPageResult>(result);
             Assert.Equal("Error", (result as RedirectToPageResult).PageName);
+        }
+
+        [Fact]
+        public void TestInitializeUserState()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            pageModel.Match = new MatchResApiResponse();
+
+            var results = new List<States.Api.Models.StateInfoResponseData>();
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EA", State="Echo Alpha" });
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EB", State = "Echo Bravo" });
+
+            pageModel.StateInfo = new States.Api.Models.StatesInfoResponse();
+            pageModel.StateInfo.Results = results;
+
+            pageModel.PageContext.HttpContext = contextMock();
+
+            Assert.True(string.IsNullOrEmpty(pageModel.UserState));
+
+            // act
+            pageModel.InitializeUserState();
+
+            // assert
+            Assert.Equal("Echo Alpha", pageModel.UserState);
         }
 
         private Mock<IMatchResolutionApi> SetupMatchResolutionApi()
