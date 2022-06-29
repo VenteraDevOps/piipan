@@ -3,6 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0.43] - 2022-06-28
+
+### Changed
+- Added support for capturing participant upload status and start/completion timestamps in the Metrics database
+
+### Added
+- State API internal documentation
+- IAC documentation updates for recently added environment variables, AZ CLI updates, and Sha256Sum dependency
+- Role checks for Match Details and Match ID searching.
+- IAC support for registering Visual Studio as an authorized client application in Azure
+- Display for Match creation details and days since a Match was found/created to the Match Details page
+- Framework for Resolution portion of Match Details page
+
+### Fixed
+- Moved Match Resolution documenation out of Duplicate Participation API documentation to internal Match Resolution API documentation.
+- Cypress tests failures caused by States API
+
 ## [1.1.0.42] - 2022-06-15
 
 ### Changed
