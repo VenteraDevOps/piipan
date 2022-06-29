@@ -121,6 +121,7 @@ namespace Piipan.Participants.Core.Tests.Services
             // results should have the State set
             var expected = participants.Select(p => new ParticipantDto(p) { 
                 State = randomState,
+                LdsHash = cryptographyClient.DecryptFromBase64String(p.LdsHash),
                 ParticipantId = cryptographyClient.DecryptFromBase64String(p.ParticipantId),
                 CaseId = cryptographyClient.DecryptFromBase64String(p.CaseId),
             });

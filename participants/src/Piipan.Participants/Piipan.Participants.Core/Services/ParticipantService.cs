@@ -53,11 +53,12 @@ namespace Piipan.Participants.Core.Services
                 var participants = await _participantDao.GetParticipants(state, ldsHash, upload.Id);
 
                 // Set the participant State before returning
-                return participants.Select(p => new ParticipantDto(p) { 
+                return participants.Select(p => new ParticipantDto(p) {
                     State = state,
+                    LdsHash = _cryptographyClient.DecryptFromBase64String(p.LdsHash),
                     ParticipantId = _cryptographyClient.DecryptFromBase64String(p.ParticipantId),
                     CaseId = _cryptographyClient.DecryptFromBase64String(p.CaseId)
-                });
+                }) ;
             }
             catch (InvalidOperationException)
             {
