@@ -373,15 +373,18 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var result = response as JsonResult;
             var resultObject = result.Value as OrchMatchResponse;
 
+            AzureAesCryptographyClient cryptoClient = new AzureAesCryptographyClient(base64EncodedKey);
+
             // Assert
             Assert.All(resultObject.Data.Results, result =>
             {
                 var match = result.Matches.First();
                 var record = GetMatchRecord(match.MatchId);
 
+                string encryptedLdsHashOfMatch = cryptoClient.EncryptToBase64String(match.LdsHash);
                 Assert.Equal(InitiatingState, record.Initiator);
                 Assert.True(record.States.SequenceEqual(new string[] { InitiatingState, state[0] }));
-                Assert.Equal(match.LdsHash, record.Hash);
+                Assert.Equal(encryptedLdsHashOfMatch, record.Hash);
                 Assert.Equal("ldshash", record.HashType);
             });
         }
