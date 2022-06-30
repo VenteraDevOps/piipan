@@ -67,6 +67,7 @@ main () {
   echo "Creating $COLLAB_DB_NAME database and applying DDL"
   db_init "$COLLAB_DB_NAME" "$SUPERUSER"
   db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/match-record.sql
+  db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/state-info.sql
 
   echo "Inserting state info data"
   db_apply_ddl "$COLLAB_DB_NAME" ../match/dml/insert-state-info.sql

@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\..\match\ddl\match-record.sql" Link="match-record.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\match\ddl\state-info.sql" Link="state-info.sql" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\..\match\dml\insert-state-info.sql" Link="insert-state-info.sql" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\..\metrics\ddl\metrics.sql" Link="metrics.sql" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\..\ddl\per-state.sql" Link="per-state.sql" CopyToOutputDirectory="PreserveNewest" />
