@@ -53,139 +53,19 @@
 
         // Assert
         Component!.MarkupMatches(
-            @<div>
-                <h2>Update information about this match for Echo Bravo</h2>
-                <p>After the information is saved, it will appear in the
-                <b>match information</b>
+            @<div >
+              <h3 >Update information about this match for Echo Bravo</h3>
+              <p class="infoSavedText" >After the information is saved, it will appear in the
+                <b >match information</b>
                 panel.</p>
-                <div>
-                <h2>Vulnerable &amp; Invalid Status</h2>
-                <fieldset class="usa-fieldset">
-                <legend class="usa-legend usa-legend">
-                <b>
-                    <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="A vulnerable individual is a participant that should have their location protected. Indicating that this participant is a vulnerable individual will inform any states involved with this match that this participant's location is not to be revealed in any communications." aria-hidden="true">
-                    <use xlink:href="/images/sprite.svg#help"></use>
-                    </svg>
-                    Does this match involve a vulnerable individual?</b>
-                </legend>
-                <div class="usa-radio">
-                <input class="usa-radio__input" id="vulnerable_yes" name="vulnerable_individual" type="radio" value="yes">
-                <label class="usa-radio__label" for="vulnerable_yes">Yes</label>
-                </div>
-                <div class="usa-radio">
-                <input class="usa-radio__input" id="vulnerable_no" name="vulnerable_individual" type="radio" value="No">
-                <label class="usa-radio__label" for="vulnerable_no">No</label>
-                </div>
-                </fieldset>
-                <br>
-                <fieldset class="usa-fieldset">
-                <legend class="usa-legend usa-legend">
-                <b>
-                    <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="Invalid matches involve participants who are NOT receiving or applying for benefits in more than one state and may occur if there has been a typo in the information submitted to the NAC or in cases of identity theft. An explanation will be required if this match is indicated as invalid. " aria-hidden="true">
-                    <use xlink:href="/images/sprite.svg#help"></use>
-                    </svg>
-                    Is this an invalid match?</b>
-                </legend>
-                <div class="usa-radio">
-                <input class="usa-radio__input" id="invalid_yes" name="valid_match" type="radio" value="yes">
-                <label class="usa-radio__label" for="invalid_yes">Yes</label>
-                </div>
-                <div style="margin-left:26px">
-                <form class="usa-form">
-                    <label class="usa-label" for="options">Invalid Match Reason</label>
-                    <select class="usa-select" style="max-width:196px" name="options" id="options">
-                    <option value="">- Select -</option>
-                    <option value="clientInfo">Incorrect Client Information</option>
-                    <option value="stem">System Error</option>
-                    <option value="identity">Potential Identity Theft</option>
-                    <option value="other">Other</option>
-                    </select>
-                </form>
-                </div>
-                <div class="usa-radio">
-                <input class="usa-radio__input" id="invalid_no" name="valid_match" type="radio" value="No">
-                <label class="usa-radio__label" for="invalid_no">No</label>
-                </div>
-                </fieldset>
-                </div>
-                <h4>INITIAL ACTION COMPONENT HERE</h4>
-                <h4>FINAL DISPOSITION COMPONENT HERE</h4>
-                <button class="usa-button">Save Changes</button>
-            </div>
-        );
-    }
-
-    /// <summary>
-    /// Verify the default markup of the state contact information
-    /// </summary>
-    [Fact]
-    public void Vulnerable_Invalid_status_markup_fail()
-    {
-        // Arrange
-        CreateTestComponentAlpha();
-
-        // Assert
-        Component!.MarkupMatches(
-            @<div>
-              <h2>Update information about this match for Echo Alpha</h2>
-              <p>After the information is saved, it will appear in the
-                <b>match information</b>
-                panel.</p>
-              <div>
-                <h2>Vulnerable &amp; Invalid Status</h2>
-                <fieldset class="usa-fieldset">
-                  <legend class="usa-legend usa-legend">
-                    <b>
-                      <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="A vulnerable individual is a participant that should have their location protected. Indicating that this participant is a vulnerable individual will inform any states involved with this match that this participant's location is not to be revealed in any communications." aria-hidden="true">
-                        <use xlink:href="/images/sprite.svg#help"></use>
-                      </svg>
-                      Does this match involve a vulnerable individual?</b>
-                  </legend>
-                  <div class="usa-radio">
-                    <input class="usa-radio__input" id="vulnerable_yes" name="vulnerable_individual" type="radio" value="yes">
-                    <label class="usa-radio__label" for="vulnerable_yes">Yes</label>
-                  </div>
-                  <div class="usa-radio">
-                    <input class="usa-radio__input" id="vulnerable_no" name="vulnerable_individual" type="radio" value="No">
-                    <label class="usa-radio__label" for="vulnerable_no">No</label>
-                  </div>
-                </fieldset>
-                <br>
-                <fieldset class="usa-fieldset">
-                  <legend class="usa-legend usa-legend">
-                    <b>
-                      <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="Invalid matches involve participants who are NOT receiving or applying for benefits in more than one state and may occur if there has been a typo in the information submitted to the NAC or in cases of identity theft. An explanation will be required if this match is indicated as invalid. " aria-hidden="true">
-                        <use xlink:href="/images/sprite.svg#help"></use>
-                      </svg>
-                      Is this an invalid match?</b>
-                  </legend>
-                  <div class="usa-radio">
-                    <input class="usa-radio__input" id="invalid_yes" name="valid_match" type="radio" value="yes">
-                    <label class="usa-radio__label" for="invalid_yes">Yes</label>
-                  </div>
-                  <div style="margin-left:26px">
-                    <form class="usa-form">
-                      <label class="usa-label" for="options">Invalid Match Reason</label>
-                      <select class="usa-select" style="max-width:196px" name="options" id="options">
-                        <option value="">- Select -</option>
-                        <option value="clientInfo">Incorrect Client Information</option>
-                        <option value="stem">System Error</option>
-                        <option value="identity">Potential Identity Theft</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </form>
-                  </div>
-                  <div class="usa-radio">
-                    <input class="usa-radio__input" id="invalid_no" name="valid_match" type="radio" value="No">
-                    <label class="usa-radio__label" for="invalid_no">No</label>
-                  </div>
-                </fieldset>
+              <div diff:ignore> //Ignoring Vulnerable Invalid Status Component
               </div>
-              <h4>INITIAL ACTION COMPONENT HERE</h4>
-              <h4>FINAL DISPOSITION COMPONENT HERE</h4>
-              <button class="usa-button">Save Changes</button>
-            </div>
-        );
+              <div diff:ignore> //Ignoring Initial Action Component
+              </div> 
+              <h4 >FINAL DISPOSITION COMPONENT HERE</h4>
+              <button class="usa-button" >Save Changes</button>
+            </div>);
     }
+
     #endregion
 }

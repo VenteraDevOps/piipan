@@ -35,6 +35,11 @@
 
     } 
 
+    private bool IsUserInInitiatingState (string loggedInUsersState, string InitiatingState)
+    {
+        return loggedInUsersState == InitiatingState;
+    }
+
     private string MatchingStateAbbreviation => 
         Match.Data.Data.States.FirstOrDefault(s => string.Compare(s, Match.Data.Data.Initiator, StringComparison.CurrentCultureIgnoreCase) != 0);
 
@@ -60,7 +65,7 @@
 
     <!-- Match header -->
     <h1><UsaTag Theme="StatusTheme()">@Match.Data.Data.Status</UsaTag><span>Match ID: @Match.Data.Data.MatchId</span></h1>
-    <div class="grid-row">
+    <div class="grid-row matchInfoDiv">
         <dl>
             <div>
                 <dt>Match Record Created:</dt>
@@ -70,12 +75,15 @@
                 <dt>Match Query By:</dt>
                 <dd>@InitiatingStateContactInfo.State (@Match.Data.Data.Initiator.ToUpper())</dd>
             </div>
+            <div>
+                <dd>All NAC matches are based on an exact match of Last Name, Date of Birth, and Social Security Number.</dd>
+            </div>
         </dl>
     </div>
     <!-- \match header -->
     <div class="grid-row">
         <div class="grid-col-4">
-            <ResolutionFields State="@LoggedInUsersState"/>
+            <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState(LoggedInUsersState, InitiatingStateContactInfo.State)"/>
         </div>
         <div class="grid-col-8">
             <div style="max-width: 860px">

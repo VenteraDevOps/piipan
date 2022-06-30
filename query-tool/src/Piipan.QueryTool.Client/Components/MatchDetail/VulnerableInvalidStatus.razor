@@ -1,11 +1,11 @@
 ﻿
 
 @code {
-    private bool invalidMatch = true;
+    private bool invalidMatch = false;
 }
 <div>
-    <h2>Vulnerable & Invalid Status</h2>
-
+    <h5>Vulnerable & Invalid Status</h5>
+    <!--Vulnerable Individual Radio Button-->
     <fieldset class="usa-fieldset">
       <legend class="usa-legend usa-legend">
           <b><svg class="usa-icon usa-tooltip text-blue"
@@ -37,6 +37,7 @@
       </div>
     </fieldset>
     <br />
+    <!--Invalid Match Radio Button-->
     <fieldset class="usa-fieldset">
       <legend class="usa-legend usa-legend">
           <b><svg class="usa-icon usa-tooltip text-blue"

@@ -1,0 +1,106 @@
+﻿@using Piipan.QueryTool.Client.Components.MatchDetail
+@inherits BaseComponentTest<InitialAction>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public InitialActionTests() : base()
+    {
+
+    }
+
+
+    /// <summary>
+    /// Create a StateParticipantInformation component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        Component = Render<InitialAction>(
+            @<InitialAction InitiatingState="true">
+            </InitialAction>
+        );
+    }
+
+    /// <summary>
+    /// Create a StateParticipantInformation component
+    /// </summary>
+    protected void CreateTestComponentMatching()
+    {
+        Component = Render<InitialAction>(
+            @<InitialAction InitiatingState="false">
+            </InitialAction>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void Initial_Action_status_markup_Initiating()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div>
+            <h5 class="InitalActionHeader">Initial Action</h5>
+                <form class="usa-form initalActionDropdown">
+                  <label class="usa-label initalActionDropdownLabel" for="options">Initial Action Taken</label>
+                  <select class="usa-select" name="options" id="options">
+                    <option value>- Select -</option>
+                    <option value="NoticeSent">Notice Sent</option>
+                    <option value="ProvidedVerification">Client Provided Required Verification</option>
+                  </select>
+                </form>
+            <label class="usa-label" for="options">Initial Action Date</label>
+            <div class="usa-date-picker initialActionDatePicker">
+                <input
+                  class="usa-input"
+                  id="initialActiondate"
+                  name="initialActiondate"
+                  placeholder="mm/dd/yyyy"
+                />
+            </div>
+        </div>
+        );
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void Initial_Action_status_markup_Matching()
+    {
+        // Arrange
+        CreateTestComponentMatching();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div>
+            <h5 class="InitalActionHeader">Initial Action</h5>
+                <form class="usa-form initalActionDropdown">
+                  <label class="usa-label initalActionDropdownLabel" for="options">Initial Action Taken</label>
+                  <select class="usa-select" name="options" id="options">
+                    <option value>- Select -</option>
+                    <option value="NoticeSent">Notice Sent</option>
+                    <option value="ClientMoved">Client Verified Moved Out of State</option>
+                  </select>
+                </form>
+            <label class="usa-label" for="options">Initial Action Date</label>
+            <div class="usa-date-picker initialActionDatePicker">
+                <input
+                  class="usa-input"
+                  id="initialActiondate"
+                  name="initialActiondate"
+                  placeholder="mm/dd/yyyy"
+                />
+            </div>
+        </div>
+        );
+    }
+    #endregion
+}

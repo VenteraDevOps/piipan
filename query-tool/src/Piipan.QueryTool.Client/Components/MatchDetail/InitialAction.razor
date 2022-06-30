@@ -1,0 +1,34 @@
+﻿@using Piipan.Components.Forms
+
+@code {
+    [Parameter] public bool InitiatingState { get; set; }
+}
+<div>
+    <h5 class="InitalActionHeader">Initial Action</h5>
+        <form class="usa-form initalActionDropdown">
+          <label class="usa-label initalActionDropdownLabel" for="options">Initial Action Taken</label>
+          <select class="usa-select" name="options" id="options">
+            <option value>- Select -</option>
+                @if (InitiatingState)
+                {
+                    <option value="NoticeSent">Notice Sent</option>
+                    <option value="ProvidedVerification">Client Provided Required Verification</option>
+                }
+                else
+                {
+                    <option value="NoticeSent">Notice Sent</option>
+                    <option value="ClientMoved">Client Verified Moved Out of State</option>
+                }
+                
+          </select>
+        </form>
+    <label class="usa-label" for="options">Initial Action Date</label>
+    <div class="usa-date-picker initialActionDatePicker">
+        <input
+          class="usa-input"
+          id="initialActiondate"
+          name="initialActiondate"
+          placeholder="mm/dd/yyyy"
+        />
+    </div>
+</div>
