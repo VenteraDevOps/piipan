@@ -8,6 +8,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
     {
         Task<IUpload> GetLatestUpload(string state = null);
         Task<IUpload> AddUpload(string uploadIdentifier);
-        Task<IUpload> UpdateUploadStatus(IUpload upload, string newStatus);
+        Task<int> UpdateUpload(IUpload upload);
+        Task<IUpload> GetUploadById(string uploadIdentifier);
     }
 } 

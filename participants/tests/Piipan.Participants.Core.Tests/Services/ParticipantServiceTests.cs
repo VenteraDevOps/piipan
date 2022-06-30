@@ -292,7 +292,8 @@ namespace Piipan.Participants.Core.Tests.Services
             {
                 Id = uploadId,
                 CreatedAt = DateTime.UtcNow,
-                Publisher = "me"
+                Publisher = "me",
+                Status = UploadStatuses.FAILED.ToString()
             };
             uploadDao
                 .Setup(m => m.AddUpload("test-etag"))
@@ -321,7 +322,7 @@ namespace Piipan.Participants.Core.Tests.Services
 
             participantPublishUploadMetric.Verify(m => m.PublishUploadMetric(
                         It.Is<ParticipantUpload>(s => s.Status == UploadStatuses.FAILED.ToString() && s.ErrorMessage == exceptionMessage)));
-            uploadDao.Verify(x => x.UpdateUploadStatus(It.Is<IUpload>(u => u == uploadRecord), UploadStatuses.FAILED.ToString()));
+            uploadDao.Verify(x => x.UpdateUpload(It.Is<IUpload>(u => u == uploadRecord)));
 
         }
 

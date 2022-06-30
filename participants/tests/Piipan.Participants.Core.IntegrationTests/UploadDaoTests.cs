@@ -3,6 +3,7 @@ using Dapper;
 using Moq;
 using Npgsql;
 using Piipan.Participants.Core.DataAccessObjects;
+using Piipan.Participants.Core.Enums;
 using Piipan.Shared.Database;
 using Xunit;
 
@@ -35,7 +36,8 @@ namespace Piipan.Participants.Core.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
 
-                InsertUpload();
+                string uploadId = "test_etag";
+                InsertUpload(uploadId);
 
                 var expected = GetLastUploadId();
 
@@ -46,6 +48,35 @@ namespace Piipan.Participants.Core.IntegrationTests
 
                 // Assert
                 Assert.Equal(expected, result.Id);
+            }
+        }
+
+        [Fact]
+        public async void GetUploadById()
+        {
+            string uploadId1 = "test_etag";
+            string uploadId2 = "test_etag_2";
+
+            using (var conn = Factory.CreateConnection())
+            {
+                // Arrange
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                InsertUpload(uploadId1);
+                InsertUpload(uploadId2);
+
+                var dao = new UploadDao(DbConnFactory());
+
+                // Act
+                var upload1 = await dao.GetUploadById(uploadId1);
+                var upload2 = await dao.GetUploadById(uploadId2);
+
+                // Assert
+                Assert.NotEqual(upload1, upload2);
+                Assert.True(upload1.CreatedAt < upload2.CreatedAt);
+                Assert.Equal(uploadId1, upload1.UploadIdentifier);
+                Assert.Equal(uploadId2, upload2.UploadIdentifier);
             }
         }
 
@@ -78,6 +109,29 @@ namespace Piipan.Participants.Core.IntegrationTests
 
             // Assert
             Assert.Equal(GetLastUploadId(), result.Id);
+        }
+
+        [Fact]
+        public async void UpdateUpload()
+        {
+            string uploadId1 = "test_etag";
+
+            // Arrange
+            var dao = new UploadDao(DbConnFactory());
+
+            InsertUpload(uploadId1);
+
+            var upload = await dao.GetUploadById(uploadId1);
+            Assert.Equal(UploadStatuses.COMPLETE.ToString(), upload.Status);
+
+
+            // Act
+            upload.Status = UploadStatuses.FAILED.ToString();
+            await dao.UpdateUpload(upload);
+
+            // Assert
+            var updatedUpload = await dao.GetUploadById(uploadId1);
+            Assert.Equal(UploadStatuses.FAILED.ToString(), upload.Status);
         }
     }
 }

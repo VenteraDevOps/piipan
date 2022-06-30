@@ -93,7 +93,10 @@ namespace Piipan.Participants.Core.Services
                     });
 
                     var count = await _participantDao.AddParticipants(participantDbos);
-                    await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.COMPLETE.ToString());
+
+                    upload.Status = UploadStatuses.COMPLETE.ToString();
+
+                    await _uploadDao.UpdateUpload(upload);
 
                     participantUploadMetrics.Status = UploadStatuses.COMPLETE.ToString();
                     participantUploadMetrics.CompletedAt = DateTime.UtcNow;
@@ -111,7 +114,8 @@ namespace Piipan.Participants.Core.Services
             }
             catch (Exception ex)
             {
-                await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.FAILED.ToString());
+                upload.Status = UploadStatuses.FAILED.ToString();
+                await _uploadDao.UpdateUpload(upload);
 
                 participantUploadMetrics.Status = UploadStatuses.FAILED.ToString();
                 participantUploadMetrics.CompletedAt = DateTime.UtcNow;

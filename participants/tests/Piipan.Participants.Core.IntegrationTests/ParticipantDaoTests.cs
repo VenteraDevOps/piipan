@@ -129,14 +129,14 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
                 var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
-                InsertUpload();
+                InsertUpload("test_etag");
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadIdWithStatus("COMPLETE"));
 
                 // Act
                 await dao.AddParticipants(participants);
 
                 // Insert New Participants
-                InsertUpload();
+                InsertUpload("test_etag");
                 var participantsNew = helper.RandomParticipants(nParticipants, GetLastUploadIdWithStatus("COMPLETE"));
 
                 await dao.AddParticipants(participantsNew);
@@ -193,14 +193,14 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
                 var dao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger.Object, cryptographyClient);
-                InsertUpload();
+                InsertUpload("test_etag");
                 var participants = helper.RandomParticipants(2, GetLastUploadIdWithStatus("COMPLETE"));
 
                 // Act
                 await dao.AddParticipants(participants);
 
                 // Insert New Participants
-                InsertUpload();
+                InsertUpload("test_etag");
                 var participantsNew = helper.RandomParticipants(2, GetLastUploadIdWithStatus("COMPLETE"));
 
                 await dao.AddParticipants(participantsNew);
