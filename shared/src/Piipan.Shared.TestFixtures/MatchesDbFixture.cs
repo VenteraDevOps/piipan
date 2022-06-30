@@ -76,6 +76,7 @@ namespace Piipan.Shared.TestFixtures
         private void ApplySchema()
         {
             string sqltext = System.IO.File.ReadAllText("match-record.sql", System.Text.Encoding.UTF8);
+            string insertStateInfo = System.IO.File.ReadAllText("insert-state-info.sql", System.Text.Encoding.UTF8);
 
             using (var conn = Factory.CreateConnection())
             {
@@ -87,6 +88,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TYPE IF EXISTS hash_type");
                 conn.Execute(sqltext);
+                conn.Execute(insertStateInfo);
 
                 conn.Close();
             }

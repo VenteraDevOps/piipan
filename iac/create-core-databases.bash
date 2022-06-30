@@ -68,6 +68,9 @@ main () {
   db_init "$COLLAB_DB_NAME" "$SUPERUSER"
   db_apply_ddl "$COLLAB_DB_NAME" ../match/ddl/match-record.sql
 
+  echo "Inserting state info data"
+  db_apply_ddl "$COLLAB_DB_NAME" ../match/dml/insert-state-info.sql
+
   db_config_aad "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
   db_use_aad "$CORE_DB_SERVER_NAME" "$PG_AAD_ADMIN"
 
