@@ -75,6 +75,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
+                conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Close();
             }
 
@@ -84,6 +85,8 @@ namespace Piipan.Shared.TestFixtures
         {
             string perstateSql = System.IO.File.ReadAllText("per-state.sql", System.Text.Encoding.UTF8);
             string matchesSql = System.IO.File.ReadAllText("match-record.sql", System.Text.Encoding.UTF8);
+            string createStateInfo = System.IO.File.ReadAllText("state-info.sql", System.Text.Encoding.UTF8);
+            string insertStateInfo = System.IO.File.ReadAllText("insert-state-info.sql", System.Text.Encoding.UTF8);
 
             // Participants DB
             using (var conn = Factory.CreateConnection())
@@ -108,8 +111,10 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
+                conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Execute(matchesSql);
-
+                conn.Execute(createStateInfo);   
+                conn.Execute(insertStateInfo);   
                 conn.Close();
             }
         }
