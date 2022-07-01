@@ -75,6 +75,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
+                conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Close();
             }
 
@@ -110,6 +111,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP INDEX IF EXISTS index_match_id_on_match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS match_res_events");
                 conn.Execute("DROP TABLE IF EXISTS matches");
+                conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Execute(matchesSql);
                 conn.Execute(createStateInfo);   
                 conn.Execute(insertStateInfo);   
