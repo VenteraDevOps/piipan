@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.6" />
-    <PackageReference Include="Azure.Core" Version="1.24.0" />
+    <PackageReference Include="Azure.Core" Version="1.25.0" />
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
