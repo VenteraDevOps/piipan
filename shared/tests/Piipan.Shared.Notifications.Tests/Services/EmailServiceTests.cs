@@ -27,14 +27,14 @@ namespace Piipan.Shared.Notifications.Tests.Services
         //        Body = "Test email body.",
         //        ToList = new List<string>
         //        {
-        //             "ccaprio@ventera.com"
+        //             "test@email.example"
         //        },
-        //        From = "ccaprio.adm1n@ventera-nac-test.com",
+        //        From = "from.test@email.example",
         //        Subject = "Test Email From Email Service Tests"
 
         //    };
 
-        //    var emailService = new EmailService("smtp.gmail.com", "ccaprio.adm1n@ventera-nac-test.com", "Deadbeef123!", logger);
+        //    var emailService = new EmailService("smtp.gmail.com", "from.test@email.example", "Deadbeef123!", logger);
 
         //    // Act
         //    var result = await emailService.SendEmail(emailModel);
@@ -57,15 +57,15 @@ namespace Piipan.Shared.Notifications.Tests.Services
         //        Body = "Test email body.",
         //        ToList = new List<string>
         //        {
-        //             "ccaprio@ventera.com",
-        //             "bfoshay@ventera.com"
+        //             "test@email.example",
+        //             "test2@email.example"
         //        },
-        //        From = "ccaprio.adm1n@ventera-nac-test.com",
+        //        From = "from.test@email.example",
         //        Subject = "Test Email From Email Service Tests"
 
         //    };
 
-        //    var emailService = new EmailService("smtp.gmail.com", "ccaprio.adm1n@ventera-nac-test.com", "Deadbeef123!", logger);
+        //    var emailService = new EmailService("smtp.gmail.com", "from.test@email.example", "Deadbeef123!", logger);
 
         //    // Act
         //    var result = await emailService.SendEmail(emailModel);
@@ -85,14 +85,14 @@ namespace Piipan.Shared.Notifications.Tests.Services
                 Body = "Test email body.",
                 ToList = new List<string>
                 {
-                     "bfoshay@ventera.com"
+                     "test@email.example"
                 },
-                From = "ccaprio.adm1n@ventera-nac-test.com",
+                From = "from.test@email.example",
                 Subject = "Test Email From Email Service Tests"
 
             };
 
-            var emailService = new EmailService("smtp.gmail.com", "bad-account@gmail.com", "FalsePassword", logger);
+            var emailService = new EmailService("smtp.email.com", "bad-account@email.invalid", "FalsePassword", logger);
 
             // Act
             var result = await emailService.SendEmail(emailModel);
