@@ -1,0 +1,90 @@
+﻿@using Piipan.QueryTool.Client.Components.MatchDetail
+@inherits BaseComponentTest<FinalDisposition>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public FinalDispositionTests() : base()
+    {
+
+    }
+
+
+    /// <summary>
+    /// Create a StateParticipantInformation component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        Component = Render<FinalDisposition>(
+            @<FinalDisposition InitiatingState="true">
+            </FinalDisposition>
+        );
+    }
+
+    /// <summary>
+    /// Create a StateParticipantInformation component
+    /// </summary>
+    protected void CreateTestComponentMatching()
+    {
+        Component = Render<FinalDisposition>(
+            @<FinalDisposition InitiatingState="false">
+            </FinalDisposition>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void Final_Disposition_status_markup_Initiating()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="FinalDispositionDiv" >
+              <h5 class="FinalDispositionHeader" >Final Disposition</h5>
+              <p >Final Disposition information can be added once the initial Action has been selected.</p>
+              <form class="usa-form FinalDispositionDropdown" >
+                <label class="usa-label" for="options" >Final Disposition Taken</label>
+                <select class="usa-select" name="options" id="options" >
+                  <option value="" >- Select -</option>
+                  <option value="approved" >Benefits Approved</option>
+                  <option value="denied" >Benefits Denied</option>
+                </select>
+              </form>
+            </div>
+        );
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void Final_Disposition_status_markup_Matching()
+    {
+        // Arrange
+        CreateTestComponentMatching();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="FinalDispositionDiv" >
+              <h5 class="FinalDispositionHeader" >Final Disposition</h5>
+              <p >Final Disposition information can be added once the initial Action has been selected.</p>
+              <form class="usa-form FinalDispositionDropdown" >
+                <label class="usa-label" for="options" >Final Disposition Taken</label>
+                <select class="usa-select" name="options" id="options" >
+                  <option value="" >- Select -</option>
+                  <option value="terminated" >Benefits Terminated</option>
+                  <option value="unchanged" >Benefits Unchanged</option>
+                </select>
+              </form>
+            </div>
+        );
+    }
+    #endregion
+}
