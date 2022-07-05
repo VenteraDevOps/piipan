@@ -24,8 +24,8 @@
     protected override void CreateTestComponent()
     {
         Component = Render<ResolutionFields>(
-            @<ResolutionFields State="Echo Bravo">
-            </ResolutionFields>
+    @<ResolutionFields State="Echo Bravo">
+    </ResolutionFields>
         );
     }
 
@@ -35,8 +35,8 @@
     protected void CreateTestComponentAlpha()
     {
         Component = Render<ResolutionFields>(
-            @<ResolutionFields State="Echo Alpha">
-            </ResolutionFields>
+    @<ResolutionFields State="Echo Alpha">
+    </ResolutionFields>
         );
     }
 
@@ -53,19 +53,19 @@
 
         // Assert
         Component!.MarkupMatches(
-            @<div >
-              <h3 >Update information about this match for Echo Bravo</h3>
-              <p class="infoSavedText" >After the information is saved, it will appear in the
-                <b >match information</b>
-                panel.</p>
-              <div diff:ignore> //Ignoring Vulnerable Invalid Status Component
-              </div>
-              <div diff:ignore> //Ignoring Initial Action Component
-              </div> 
-              <div diff:ignore> //Ignoring Final Disposition Component
-              </div>
-              <button class="usa-button" >Save Changes</button>
-            </div>);
+    @<div >
+                  <h3 >Update information about this match for Echo Bravo</h3>
+                  <p class="infoSavedText" >After the information is saved, it will appear in the
+                    <b >match information</b>
+                    panel.</p>
+                  <div diff:ignore> //Ignoring Vulnerable Invalid Status Component
+                  </div>
+                  <div diff:ignore> //Ignoring Initial Action Component
+                  </div> 
+                  <div diff:ignore> //Ignoring Final Disposition Component
+                  </div>
+                  <button class="usa-button" >Save Changes</button>
+    </div>);
     }
 
     #endregion
