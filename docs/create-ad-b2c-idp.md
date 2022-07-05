@@ -57,7 +57,7 @@ We use an [Azure AD B2C](https://docs.microsoft.com/en-us/azure/active-directory
    2. Select `Create Azure AD B2C user`
    3. Under `Sign in method`, select `Email`
    4. Enter the email address of the new user
-      - NOTE: if this user already has an administrative account with the same email address, some email providers allow for aliases (e.g., example.user@gsa.gov can be aliased as example.user+b2c@gsa.gov)
+      - NOTE: if this user already has an administrative account with the same email address, some email providers allow for aliases (e.g., example.user@gov.example can be aliased as example.user+b2c@gov.example)
    5. Set a temporary password for the new user
    6. Click `Create`
    7. [Open the profile editing user flow and sign in as the new user](https://ttsb2cdev.b2clogin.com/ttsb2cdev.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1_pe&client_id=e7e769ad-e9bc-4c5f-8c3e-ebaf6cf9cacb&nonce=defaultNonce&redirect_uri=https%3A%2F%2Fjwt.ms&scope=openid&response_type=id_token&prompt=login). Under email, enter the same email address that was used for sign in and click continue.

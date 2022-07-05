@@ -162,7 +162,7 @@ Example of a complete `match_res_events` object:
   id: 123,
   match_id: "ABCDE",
   inserted_at: "2022-04-23T18:25:43.511Z",
-  actor: "john.doe@example.gov",
+  actor: "john.doe@email.example",
   actor_state: "MO",
   delta: {
     vulnerable_individual: TRUE,
