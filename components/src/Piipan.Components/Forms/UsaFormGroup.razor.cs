@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Piipan.Components.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Forms;
+using Piipan.Components.Enums;
 
 namespace Piipan.Components.Forms
 {
@@ -17,7 +17,7 @@ namespace Piipan.Components.Forms
 
         public List<string> ValidationMessages { get; set; } = new List<string>();
         public Func<Task<List<string>>> PreverificationChecks { get; set; } = null;
-        private bool HasErrors => ValidationMessages.Count > 0;
+        protected bool HasErrors => ValidationMessages.Count > 0;
 
         /// <summary>
         /// Get all of the errors associated with this form group. First do prevalidation checks, and then if they pass validate the whole edit context.

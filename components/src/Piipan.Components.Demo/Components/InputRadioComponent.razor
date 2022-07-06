@@ -1,0 +1,14 @@
+﻿@using Piipan.Components.Demo.Models
+@using static Piipan.Components.Shared.CommonConstants
+@code {
+    [Parameter] public InputTextModel TextModel { get; set; } = new InputTextModel();
+}
+
+<UsaForm Model="TextModel">
+    <UsaRadioGroup @bind-Value="TextModel.RequiredField">
+        <UsaRadio Value="Saved First Value">First Display Text</UsaRadio>
+        <UsaRadio Value="Saved Second Value">Second Display Text</UsaRadio>
+    </UsaRadioGroup>
+    <p>Current value is @TextModel.RequiredField</p>
+    <button class="@ButtonClass">Submit</button>
+</UsaForm>
