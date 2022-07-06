@@ -1,7 +1,8 @@
 ﻿
 
 @code {
-    private bool invalidMatch = false;
+    private bool invalidMatch = true;
+    private string VulernableRadioResult = "No";
 }
 <div>
     <h5>Vulnerable & Invalid Status</h5>
@@ -16,27 +17,9 @@
           </svg>
                 Does this match involve a vulnerable individual?</b>
       </legend>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="vulnerable_yes"
-          name="vulnerable_individual"
-          type="radio"
-          value="yes"
-        />
-        <label class="usa-radio__label" for="vulnerable_yes">Yes</label>
-      </div>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="vulnerable_no"
-          name="vulnerable_individual"
-          type="radio"
-          value="No"/>
-        <label class="usa-radio__label" for="vulnerable_no">No</label>
-      </div>
+      <UsaRadio RadioId="VulnerableYes" RadioName="VulnerableIndividual" RadioValue="Yes"></UsaRadio>
+      <UsaRadio RadioId="VulnerableNo" RadioName="VulnerableIndividual" RadioValue="No"></UsaRadio>
     </fieldset>
-    <br />
     <!--Invalid Match Radio Button-->
     <fieldset class="usa-fieldset">
       <legend class="usa-legend usa-legend">
@@ -48,16 +31,7 @@
           </svg>
                 Is this an invalid match?</b>
       </legend>
-      <div class="usa-radio">
-        <input
-          class="usa-radio__input"
-          id="invalid_yes"
-          name="valid_match"
-          type="radio"
-          value="yes"
-        />
-        <label class="usa-radio__label" for="invalid_yes">Yes</label>
-      </div>
+      <UsaRadio RadioId="InvalidYes" RadioName="InvalidMatch" RadioValue="Yes"></UsaRadio>
        @if (@invalidMatch)
     {
         <div style="margin-left:26px">

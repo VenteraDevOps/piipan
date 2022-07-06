@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 namespace Piipan.Match.Api.Models.Resolution
 {
@@ -14,7 +15,9 @@ namespace Piipan.Match.Api.Models.Resolution
         [JsonProperty("invalid_match")]
         public bool? InvalidMatch { get; set; }
         [JsonProperty("final_disposition")]
+        [Display(Name = "Final Disposition Taken")]
         public string FinalDisposition { get; set; }
+        [Display(Name = "Final Disposition Date")]
         [JsonProperty("final_disposition_date")]
         public DateTime? FinalDispositionDate { get; set; }
         [JsonProperty("vulnerable_individual")]

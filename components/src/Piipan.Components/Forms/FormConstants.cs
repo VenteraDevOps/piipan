@@ -13,5 +13,7 @@
         public const string InputFormGroupClass = "usa-form-group";
         public const string InputFormGroupErrorClass = "usa-form-group--error";
         public const string InputTextAreaClass = "usa-textarea";
+        public const string InputSelect = "usa-select";
+        public const string InputRadio = "usa-radio";
     }
 }

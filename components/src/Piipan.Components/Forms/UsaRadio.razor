@@ -1,0 +1,22 @@
+﻿@using static FormConstants
+@code {
+    [Parameter] public string RadioValue { get; set; }
+    [Parameter] public string RadioId { get; set; }
+    [Parameter] public string RadioName { get; set; }
+}
+
+   <div class="@InputRadio  @(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")"
+    @ref="ElementReference"
+    @bind="CurrentValue" @onblur="BlurField"
+    required="@FormGroup.Required" 
+    id="@Id"
+    name="@Id.Replace("_", ".")"
+    aria-errormessage="@(FormGroup.Status == InputStatus.Error ? $"{Id}-message" : null)"
+    aria-invalid="@(FormGroup.Status == InputStatus.Error ? "true" : null)"
+    @attributes="AdditionalAttributes" style="@(Width != null ? $"width: {Width}px;" : "")">
+        
+        <input class="usa-radio__input" id="@RadioId" name="@RadioName" type="radio" value="@RadioValue" />
+        <label class="usa-radio__label" for="@RadioId">@RadioValue</label>
+   </div>
+
+
