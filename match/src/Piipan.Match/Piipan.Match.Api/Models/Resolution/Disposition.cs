@@ -8,12 +8,19 @@ namespace Piipan.Match.Api.Models.Resolution
     /// </summary>
     public class Disposition
     {
+        [Display(Name = "Inital Action Date")]
         [JsonProperty("initial_action_at")]
         public DateTime? InitialActionAt { get; set; }
         [JsonProperty("initial_action_taken")]
         public string InitialActionTaken { get; set; }
         [JsonProperty("invalid_match")]
         public bool? InvalidMatch { get; set; }
+        [Display(Name = "Invalid Match Reason")]
+        [JsonProperty("invalid_match_reason")]
+        public string? InvalidMatchReason { get; set; }
+        [Display(Name = "Reason for Other")]
+        [JsonProperty("reason_for_other")]
+        public string? ReasonForOther { get; set; }
         [JsonProperty("final_disposition")]
         [Display(Name = "Final Disposition Taken")]
         public string FinalDisposition { get; set; }

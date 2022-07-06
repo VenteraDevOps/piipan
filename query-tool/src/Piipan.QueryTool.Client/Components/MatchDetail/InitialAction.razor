@@ -1,34 +1,22 @@
 ﻿@using Piipan.Components.Forms
+@using Piipan.Match.Api.Models.Resolution
 
 @code {
     [Parameter] public bool InitiatingState { get; set; }
+    [Parameter] public Disposition DispositionData { get; set; }
+
+    private (string,string)[] DropdownOptionsInitiating = new (string,string)[] {("Notice Sent", "Notice Sent"), ("Client Provided Required Verification", "Client Provided Required Verification")};
+    private (string,string)[] DropdownOptionsMatching = new (string, string)[] { ("Notice Sent", "Notice Sent"), ("Client Verified Moved Out of State", "Client Verified Moved Out of State") };
 }
 <div>
     <h5 class="InitalActionHeader">Initial Action</h5>
         <form class="usa-form initalActionDropdown">
           <label class="usa-label initalActionDropdownLabel" for="options">Initial Action Taken</label>
-          <select class="usa-select" name="options" id="options">
-            <option value>- Select -</option>
-                @if (InitiatingState)
-                {
-                    <option value="NoticeSent">Notice Sent</option>
-                    <option value="ProvidedVerification">Client Provided Required Verification</option>
-                }
-                else
-                {
-                    <option value="NoticeSent">Notice Sent</option>
-                    <option value="ClientMoved">Client Verified Moved Out of State</option>
-                }
-                
-          </select>
+          <UsaFormGroup>
+            <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsInitiating : DropdownOptionsMatching)" @bind-Value="DispositionData.InitialActionTaken" />
+        </UsaFormGroup>
         </form>
-    <label class="usa-label" for="options">Initial Action Date</label>
-    <div class="usa-date-picker initialActionDatePicker">
-        <input
-          class="usa-input"
-          id="initialActiondate"
-          name="initialActiondate"
-          placeholder="mm/dd/yyyy"
-        />
-    </div>
+    <UsaFormGroup>
+            <UsaInputDate @bind-Value="DispositionData.InitialActionAt" />
+        </UsaFormGroup>
 </div>

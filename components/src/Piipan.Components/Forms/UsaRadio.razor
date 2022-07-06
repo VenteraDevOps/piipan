@@ -1,6 +1,7 @@
 ﻿@using static FormConstants
+@typeparam TValue
 @code {
-    [Parameter] public string Value { get; set; }
+    [Parameter] public TValue? Value { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; }
 
     string id = "g" + Guid.NewGuid().ToString();
@@ -25,7 +26,7 @@
     <InputRadio
         class="@InputRadioClass"
         id="@id"
-        Value="Value"
+        Value=Value
         @onblur="BlurField"
         required="@FormGroup.Required">
     </InputRadio>

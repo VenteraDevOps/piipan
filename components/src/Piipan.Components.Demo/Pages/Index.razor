@@ -25,7 +25,8 @@
         [Display(Name = "Input SSN")]
         public string InputSSNField { get; set; }
     }
-
+    private string firstExample = "Saved First Value";
+    private string secondExample = "Saved Second Value";
     private IndexModel indexModel = new IndexModel();
 }
 
@@ -62,8 +63,8 @@
             <BodyContent>
                 <p>A radio button group allows a user to select one option from the available choices</p>
                 <UsaRadioGroup @bind-Value="indexModel.InputRadioField">
-                    <UsaRadio Value="Saved First Value">First Display Text</UsaRadio>
-                    <UsaRadio Value="Saved Second Value">Second Display Text</UsaRadio>
+                    <UsaRadio Value="@firstExample">First Display Text</UsaRadio>
+                    <UsaRadio Value="@secondExample">Second Display Text</UsaRadio>
                 </UsaRadioGroup>
                 <p>Current value is @indexModel.InputRadioField</p>
             </BodyContent>
