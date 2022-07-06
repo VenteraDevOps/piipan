@@ -43,6 +43,8 @@ apply_ddl () {
 }
 
 main () {
+  azure_env=$1
+
   while IFS=, read -r abbr _; do
     db=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     owner=$db
@@ -52,7 +54,7 @@ main () {
     echo "Applying DDL to database $db..."
     apply_ddl "$db" "$owner" "$admin"
 
-  done < ../iac/states.csv
+  done < ../iac/env/"${azure_env}"/states.csv
 }
 
 main "$@"
