@@ -18,6 +18,9 @@
         [Display(Name = "Input Date")]
         public DateTime? InputDateField { get; set; }
 
+        [Display(Name = "Input Radio")]
+        public string InputRadioField { get; set; }
+
         [UsaSSN]
         [Display(Name = "Input SSN")]
         public string InputSSNField { get; set; }
@@ -54,6 +57,17 @@
                 </UsaFormGroup>
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-date"))" class="@ButtonClass">View Input Date</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Input Radio">
+            <BodyContent>
+                <p>A radio button group allows a user to select one option from the available choices</p>
+                <UsaRadioGroup @bind-Value="indexModel.InputRadioField">
+                    <UsaRadio Value="Saved First Value">First Display Text</UsaRadio>
+                    <UsaRadio Value="Saved Second Value">Second Display Text</UsaRadio>
+                </UsaRadioGroup>
+                <p>Current value is @indexModel.InputRadioField</p>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-radio"))" class="@ButtonClass">View Input Radio</button></FooterContent>
         </UsaCard>
         <UsaCard Header="Input SSN">
             <BodyContent>

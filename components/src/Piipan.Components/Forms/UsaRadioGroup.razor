@@ -1,21 +1,54 @@
-﻿@using static FormConstants
-@inherits UsaInputBase<string>
+﻿@using System.Linq.Expressions
+@using static FormConstants
+@using static Shared.CommonConstants
+@using static Piipan.Components.Validation.ValidationConstants
+@typeparam TValue
+@inherits UsaFormGroup
+
 @code {
-    [Parameter] public (string, string)[] DropdownOptions { get; set; }
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<TValue>>? ValueExpression { get; set; }
 }
 
-   <fieldset class="@FieldsetClass @InputClass @(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")"
-    @ref="ElementReference"
-    @bind="CurrentValue" @onblur="BlurField"
-    required="@FormGroup.Required" 
-    id="@Id"
-    name="@Id.Replace("_", ".")"
-    aria-errormessage="@(FormGroup.Status == InputStatus.Error ? $"{Id}-message" : null)"
-    aria-invalid="@(FormGroup.Status == InputStatus.Error ? "true" : null)"
-    @attributes="AdditionalAttributes" style="@(Width != null ? $"width: {Width}px;" : "")">
-        
-            <legend class="usa-legend usa-legend">
-              <b>RENDER FRAGMENT HERE
-                    Does this match involve a vulnerable individual?</b>
-          </legend>
-   </fieldset>
+<CascadingValue Value="this">
+    <div class="@InputFormGroupClass @(HasErrors ? InputFormGroupErrorClass : "")">
+        <UsaRadioGroupInput ValueExpression="ValueExpression" Value="Value" ValueChanged="ValueChanged">
+            <UsaLegend Status="Status">
+                @if (LabelOverride != null)
+                {
+                    @LabelOverride
+                }
+                else
+                {
+                    @Label
+                }
+            </UsaLegend>
+            @if (HintContent != null)
+            {
+                <span class="@HintClass">@HintContent</span>
+            }
+            @if (HasErrors)
+            {
+                <span class="@InputErrorMessageClass" id="@(InputElementId)-message">
+                    @foreach (var message in ValidationMessages)
+                    {
+                        var splitMessages = message.Split('\n');
+                        @foreach (var splitMessage in splitMessages)
+                        {
+                            @splitMessage.Replace(ValidationFieldPlaceholder, Label)
+                            <br />
+                        }
+                    }
+                </span>
+            }
+            @ChildContent
+            <p>Value is @Value</p>
+        </UsaRadioGroupInput>
+    </div>
+</CascadingValue>
