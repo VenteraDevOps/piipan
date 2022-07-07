@@ -191,16 +191,16 @@ verify_cloud () {
   fi
 }
 
-# Verify that the states.csv file exist for the current enviroment 
-verify_states_file () {
+# Verify that the file exist for the current enviroment 
+verify_file () {
 
   local FILE
-  FILE=env/"${azure_env}"/states.csv
+  FILE=$1
   if [ -f "$FILE" ]; then
       echo "$FILE exists."
   else 
-      echo "$FILE does not exist. The states.csv file is required."
-      exit 
+      echo "$FILE does not exist. The file is required."
+      exit 64
   fi
 }
 
