@@ -16,7 +16,7 @@ To query the API:
 1. The `POST` event triggers a function named `Find` in the orchestrator Function App.
 1. The orchestrator Function App looks for matches across each per-state participant database
 
-Note: If the initiating state or the matching state is disabled you will not see a response come back from this API. However, a match record will be created in the database. Adjust your EnabledStates environment variable or your initiating state to see matches. The EnabledStates environment variable gets set during the [create-resources](https://github.com/18F/piipan/blob/dev/docs/iac.md#prerequisites), which is step 5 of this process. You can adjust the [states.csv](https://github.com/18F/piipan/blob/dev/iac/states.csv) by setting states to ENABLED or DISABLED, or adjust the EnabledStates environment variable post-deploy in the Azure portal.
+Note: If the initiating state or the matching state is disabled you will not see a response come back from this API. However, a match record will be created in the database. Adjust your EnabledStates environment variable or your initiating state to see matches. The EnabledStates environment variable gets set during the [create-resources](https://github.com/18F/piipan/blob/dev/docs/iac.md#prerequisites), which is step 5 of this process. You can adjust the [states.csv](https://github.com/18F/piipan/blob/dev/iac/env/dev/states.csv) by setting states to ENABLED or DISABLED, or adjust the EnabledStates environment variable post-deploy in the Azure portal.
 
 ## Environment variables
 
