@@ -1,5 +1,6 @@
-﻿@using Piipan.QueryTool.Client.Components.MatchDetail
-@inherits BaseComponentTest<VulnerableInvalidStatus>
+﻿@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.MatchDetail
+@inherits BaseComponentTest<ResolutionFields>
 
 @code {
     /// <summary>
@@ -7,7 +8,7 @@
     /// </summary>
     public VulnerableInvalidStatusTests() : base()
     {
-        
+
     }
 
 
@@ -16,9 +17,25 @@
     /// </summary>
     protected override void CreateTestComponent()
     {
-        Component = Render<VulnerableInvalidStatus>(
-            @<VulnerableInvalidStatus>
-            </VulnerableInvalidStatus>
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
+        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
+        JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
+        Disposition disp = new Disposition
+            {
+                InitialActionAt = null,
+                InitialActionTaken = "",
+                InvalidMatch = false,
+                InvalidMatchReason = "",
+                ReasonForOther = "",
+                FinalDisposition = "",
+                FinalDispositionDate = null,
+                VulnerableIndividual = null,
+                State = "EA"
+            };
+        Component = Render<ResolutionFields>(
+    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
+    </ResolutionFields>
         );
     }
 
@@ -36,42 +53,62 @@
         // Assert
         Component!.MarkupMatches(
             @<div >
-      <h5 >Vulnerable &amp; Invalid Status</h5>
-      <fieldset class="usa-fieldset" >
-        <legend class="usa-legend usa-legend" >
-          <b >
-            <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="A vulnerable individual is a participant that should have their location protected. Indicating that this participant is a vulnerable individual will inform any states involved with this match that this participant's location is not to be revealed in any communications." aria-hidden="true" >
-              <use xlink:href="/images/sprite.svg#help" ></use>
-            </svg>
-            Does this match involve a vulnerable individual?</b>
-        </legend>
-        <div class="usa-radio" >
-          <input class="usa-radio__input" id="vulnerable_yes" name="vulnerable_individual" type="radio" value="yes" >
-          <label class="usa-radio__label" for="vulnerable_yes" >Yes</label>
-        </div>
-        <div class="usa-radio" >
-          <input class="usa-radio__input" id="vulnerable_no" name="vulnerable_individual" type="radio" value="No" >
-          <label class="usa-radio__label" for="vulnerable_no" >No</label>
-        </div>
-      </fieldset>
-      <br >
-      <fieldset class="usa-fieldset" >
-        <legend class="usa-legend usa-legend" >
-          <b >
-            <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="Invalid matches involve participants who are NOT receiving or applying for benefits in more than one state and may occur if there has been a typo in the information submitted to the NAC or in cases of identity theft. An explanation will be required if this match is indicated as invalid. " aria-hidden="true" >
-              <use xlink:href="/images/sprite.svg#help" ></use>
-            </svg>
-            Is this an invalid match?</b>
-        </legend>
-        <div class="usa-radio" >
-          <input class="usa-radio__input" id="invalid_yes" name="valid_match" type="radio" value="yes" >
-          <label class="usa-radio__label" for="invalid_yes" >Yes</label>
-        </div>
-        <div class="usa-radio" >
-          <input class="usa-radio__input" id="invalid_no" name="valid_match" type="radio" value="No" >
-          <label class="usa-radio__label" for="invalid_no" >No</label>
-        </div>
-      </fieldset>
+      <h3 >Update information about this match for Echo Bravo</h3>
+      <p class="infoSavedText" >After the information is saved, it will appear in the
+        <b >match information</b>
+        panel.</p>
+      <div class="usa-form ">
+        <form id="snap-participants-query-form" method="post" novalidate="" >
+          <fieldset class="usa-fieldset">
+            <div >
+              <h5 >Vulnerable &amp; Invalid Status</h5>
+              <div class="usa-form-group ">
+                <fieldset class="usa-fieldset" style=";">
+                  <legend class="usa-label usa-legend" for="DispositionData_VulnerableIndividual">
+                    <b >
+                      <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="A vulnerable individual is a participant that should have their location protected. Indicating that this participant is a vulnerable individual will inform any states involved with this match that this participant's location is not to be revealed in any communications." aria-hidden="true" >
+                        <use xlink:href="/images/sprite.svg#help" ></use>
+                      </svg>
+                      Does this match involve a vulnerable individual?</b>
+                  </legend>
+                  <div class="usa-radio">
+                    <input id:ignore  class="usa-radio__input valid" type="radio" name="DispositionData.VulnerableIndividual" value="True" >
+                    <label for:ignore class="usa-radio__label">Yes</label>
+                  </div>
+                  <div class="usa-radio">
+                    <input id:ignore  class="usa-radio__input valid" type="radio" name="DispositionData.VulnerableIndividual" value="False" >
+                    <label for:ignore class="usa-radio__label">No</label>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="usa-form-group ">
+                <fieldset class="usa-fieldset" style=";">
+                  <legend class="usa-label usa-legend" for="DispositionData_InvalidMatch">
+                    <b >
+                      <svg class="usa-icon usa-tooltip text-blue" data-position="top" title="Invalid matches involve participants who are NOT receiving or applying for benefits in more than one state and may occur if there has been a typo in the information submitted to the NAC or in cases of identity theft. An explanation will be required if this match is indicated as invalid. " aria-hidden="true" >
+                        <use xlink:href="/images/sprite.svg#help" ></use>
+                      </svg>
+                      Is this an invalid match?</b>
+                  </legend>
+                  <div class="usa-radio">
+                    <input id:ignore  class="usa-radio__input valid" type="radio" name="DispositionData.InvalidMatch" value="True" >
+                    <label for:ignore class="usa-radio__label">Yes</label>
+                  </div>
+                  <div class="usa-radio">
+                    <input id:ignore  class="usa-radio__input valid" type="radio" name="DispositionData.InvalidMatch" value="False" checked="" >
+                    <label for:ignore class="usa-radio__label">No</label>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <div diff:ignore> //Ignoring Initial Action Component
+            </div>
+            <div diff:ignore> //Ignoring Final Disposition Component
+            </div>
+            <button class="usa-button " >Save Changes</button>
+          </fieldset>
+        </form>
+      </div>
     </div>
         );
     }

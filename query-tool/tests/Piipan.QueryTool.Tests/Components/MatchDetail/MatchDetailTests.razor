@@ -126,6 +126,10 @@
     /// </summary>
     protected override void CreateTestComponent()
     {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
+            JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+            JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
+            JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetail>(
     @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo">
     </MatchDetail>
