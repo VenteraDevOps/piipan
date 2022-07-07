@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using Piipan.Components.Routing;
 
 namespace Piipan.Components.Forms
 {
     public partial class UsaForm
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
+        [Inject] protected PiipanNavigationManager NavigationManager { get; set; }
         private bool HasErrors => currentErrors?.Count() > 0;
         private EditContext editContext;
         private bool showAlertBox = false;
@@ -19,6 +21,18 @@ namespace Piipan.Components.Forms
         public List<UsaFormGroup> FormGroups { get; set; } = new List<UsaFormGroup>();
         private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors =
             new List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)>();
+
+        private bool _isDirty = false;
+        public bool IsDirty
+        {
+            get => _isDirty;
+            set
+            {
+                _isDirty = value;
+                IsDirtyChanged?.Invoke(_isDirty);
+            }
+        }
+        public Func<bool, Task> IsDirtyChanged { get; set; }
 
         /// <summary>
         /// Set the edit context of this form when it's initialized
@@ -49,6 +63,7 @@ namespace Piipan.Components.Forms
                         }
                     }
                     showAlertBox = true;
+                    IsDirty = true;
                     StateHasChanged();
                 }
                 await JSRuntime.InvokeVoidAsync("piipan.utilities.registerFormValidation", Id, DotNetObjectReference.Create(this));
@@ -72,6 +87,7 @@ namespace Piipan.Components.Forms
                 }
                 StateHasChanged();
             }
+            IsDirty = true;
         }
 
         [JSInvokable]
@@ -99,6 +115,11 @@ namespace Piipan.Components.Forms
             if (OnBeforeSubmit != null)
             {
                 await OnBeforeSubmit(currentErrors.Count == 0);
+                if (currentErrors.Count == 0)
+                {
+                    // Form will submit now, so let's mark the form dirty so it doesn't get flagged that we're leaving the page without saving
+                    IsDirty = false;
+                }
             }
         }
 
