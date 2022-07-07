@@ -1,6 +1,6 @@
 ﻿using System;
 using Piipan.Participants.Core.Enums;
-using Piipan.Participants.Core.Models;
+using Piipan.Participants.Api.Models;
 using Xunit;
 
 namespace Piipan.Participants.Core.Tests.Models

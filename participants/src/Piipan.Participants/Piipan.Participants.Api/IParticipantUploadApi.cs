@@ -5,9 +5,9 @@ namespace Piipan.Participants.Api
 {
     public interface IParticipantUploadApi
     {
-        Task<IUpload> GetLatestUpload(string state = null);
-        Task<IUpload> AddUpload(string uploadIdentifier);
+        Task<UploadDto> GetLatestUpload(string state = null);
+        Task<UploadDto> AddUpload(string uploadIdentifier);
         Task<int> UpdateUpload(IUpload upload);
-        Task<IUpload> GetUploadById(string uploadIdentifier);
+        Task<UploadDto> GetUploadById(string uploadIdentifier);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
-using Piipan.Participants.Api.Models;
+using Newtonsoft.Json;
 
-namespace Piipan.Participants.Core.Models
+namespace Piipan.Participants.Api.Models
 {
     public class UploadDto : IUpload
     {
@@ -22,13 +22,31 @@ namespace Piipan.Participants.Core.Models
             Status = upload.Status;
         }
 
+        [JsonProperty("id")]
         public long Id { get; set; }
+
+        [JsonProperty("upload_identifier")]
         public string UploadIdentifier { get; set; }
+
+        [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
+
+        [JsonProperty("publisher")]
         public string Publisher { get; set; }
+
+        [JsonProperty("participants_uploaded",
+            NullValueHandling = NullValueHandling.Ignore)]
         public long? ParticipantsUploaded { get; set; }
+
+        [JsonProperty("error_message",
+            NullValueHandling = NullValueHandling.Ignore)]
         public string ErrorMessage { get; set; }
+
+        [JsonProperty("completed_at",
+            NullValueHandling = NullValueHandling.Ignore)]
         public DateTime? CompletedAt { get; set; }
+
+        [JsonProperty("status")]
         public string Status { get; set; }
 
         public override bool Equals(Object obj)

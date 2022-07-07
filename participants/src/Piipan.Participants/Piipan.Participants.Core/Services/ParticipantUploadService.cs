@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
-using Piipan.Participants.Core.Models;
 
 namespace Piipan.Participants.Core.Services
 {
@@ -26,7 +25,7 @@ namespace Piipan.Participants.Core.Services
         /// </summary>
         /// <param name="uploadIdentifier">The unique identifier of the upload to be added </param>
         /// <returns>The Upload record that was created in the database</returns>
-        public async Task<IUpload> AddUpload(string uploadIdentifier)
+        public async Task<UploadDto> AddUpload(string uploadIdentifier)
         {
             var upload = await _uploadDao.AddUpload(uploadIdentifier);
             return new UploadDto(upload);
@@ -37,7 +36,7 @@ namespace Piipan.Participants.Core.Services
         /// </summary>
         /// <param name="state">The State we want to retrieve the latest upload for</param>
         /// <returns>The latest successful Upload</returns>
-        public async Task<IUpload> GetLatestUpload(string state = null)
+        public async Task<UploadDto> GetLatestUpload(string state = null)
         {
             var upload = await _uploadDao.GetLatestUpload(state);
             return new UploadDto(upload);
@@ -48,7 +47,7 @@ namespace Piipan.Participants.Core.Services
         /// </summary>
         /// <param name="uploadIdentifier">The desired upload id for the upload we want to retrieve metadata</param>
         /// <returns>Upload whose upload identifier matches uploadIdentifier</returns>
-        public async Task<IUpload> GetUploadById(string uploadIdentifier)
+        public async Task<UploadDto> GetUploadById(string uploadIdentifier)
         {
             var upload = await _uploadDao.GetUploadById(uploadIdentifier);
             return new UploadDto(upload);
