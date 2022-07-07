@@ -39,7 +39,7 @@
             @if (DispositionData.InvalidMatchReason == "Other" && DispositionData.InvalidMatch == true)
             {
                 <UsaFormGroup>
-                    <UsaInputTextArea DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.ReasonForOther" />
+                    <UsaInputTextArea DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.OtherReasoningForInvalidMatch" />
                 </UsaFormGroup>
             }
             <UsaRadio Value=false>No</UsaRadio>
