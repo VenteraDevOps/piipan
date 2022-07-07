@@ -191,15 +191,21 @@ verify_cloud () {
   fi
 }
 
-# Verify that the file exist for the current enviroment 
+# Verify that the FILE exist 
 verify_file () {
 
+  local FILEPATH
+  local FILENAME
   local FILE
-  FILE=$1
+
+  FILEPATH=$1
+  FILENAME=$2
+  FILE=$FILEPATH$FILENAME
+  
   if [ -f "$FILE" ]; then
-      echo "$FILE exists."
+      echo "$FILENAME exists."
   else 
-      echo "$FILE does not exist. The file is required."
+      echo "$FILENAME does not exist. A $FILENAME file is required to be present at $FILEPATH"
       exit 64
   fi
 }
