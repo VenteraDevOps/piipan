@@ -93,6 +93,7 @@ main () {
   source "$(dirname "$0")"/iac-common.bash
 
   verify_cloud
+  verify_states_file
   set_constants
 
   echo "Creating Resource Groups"

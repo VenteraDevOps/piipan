@@ -191,6 +191,19 @@ verify_cloud () {
   fi
 }
 
+# Verify that the states.csv file exist for the current enviroment 
+verify_states_file () {
+
+  local FILE
+  FILE=env/"${azure_env}"/states.csv
+  if [ -f "$FILE" ]; then
+      echo "$FILE exists."
+  else 
+      echo "$FILE does not exist. The states.csv file is required."
+      exit 
+  fi
+}
+
 # Return a space-delimited string of resource names for the resources
 # that match the provided SysType tag and are in the specified resource group.
 # If no matching resources are found, a non-zero error is returned.
