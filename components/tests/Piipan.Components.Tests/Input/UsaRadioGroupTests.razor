@@ -1,0 +1,87 @@
+﻿@using Piipan.Components.Forms
+@using static Piipan.Components.Forms.FormConstants
+@inherits BaseTest<UsaRadioGroup<bool?>>
+@code {
+    public class TestModel {
+        public bool? NotRequiredField { get; set; }
+
+        [UsaRequired]
+        [Display(Name = "Required Field")]
+        public bool? RequiredField { get; set; }
+    }
+    private IRenderedComponent<UsaForm>? form = null;
+    private IElement? inputElement = null;
+    private TestModel model = new TestModel();
+    private RenderFragment? renderFragment = null;
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of an input text
+    /// </summary>
+    [Fact]
+    public void Input_Should_Exist_And_Have_Correct_Markup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="usa-form-group ">
+              <fieldset class="usa-fieldset" style=";">
+                <legend class="usa-label usa-legend" for="model_RequiredField">Required Field<span class="usa-required">*</span>
+                </legend>
+                <div class="usa-radio">
+                  <input id:ignore  required="" class="usa-radio__input valid" type="radio" name="model.RequiredField" value="True" >
+                  <label for:ignore class="usa-radio__label">Yes</label>
+                </div>
+                <div class="usa-radio">
+                  <input id:ignore  required="" class="usa-radio__input valid" type="radio" name="model.RequiredField" value="False" >
+                  <label for:ignore class="usa-radio__label">No</label>
+                </div>
+              </fieldset>
+            </div>
+        );
+    }
+
+    #endregion Tests
+
+    #region Helper Function
+
+    protected override void CreateTestComponent()
+    {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true);
+        var componentFragment = Render<UsaForm>(
+            @<UsaForm Model="model">
+                <UsaFormGroup>
+                    <UsaRadioGroup @bind-Value="model.RequiredField">
+                           <UsaRadio Value=true>Yes</UsaRadio>
+                           <UsaRadio Value=false>No</UsaRadio>
+                    </UsaRadioGroup>
+                </UsaFormGroup>
+            </UsaForm>
+        );
+        form = componentFragment;
+        Component = componentFragment.FindComponent<UsaRadioGroup<bool?>>();
+    }
+
+    private void AssertHasNoErrors()
+    {
+        Assert.False(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorSpans = form!.FindAll($".{InputErrorMessageClass}");
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        Assert.Equal(0, errorForms.Count);
+        Assert.Equal(0, errorSpans.Count);
+    }
+
+    private void AssertHasRequiredErrors()
+    {
+        Assert.True(inputElement!.ClassList.Contains(InputErrorClass));
+        var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
+        var errorSpan = form!.Find($".{InputErrorMessageClass}");
+        Assert.Equal("Required Field is required", errorSpan.TextContent);
+        Assert.Equal(1, errorForms.Count);
+    }
+
+    #endregion Helper Functions
+}
