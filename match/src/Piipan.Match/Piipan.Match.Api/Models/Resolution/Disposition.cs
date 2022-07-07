@@ -19,8 +19,8 @@ namespace Piipan.Match.Api.Models.Resolution
         [JsonProperty("invalid_match_reason")]
         public string? InvalidMatchReason { get; set; }
         [Display(Name = "Reason for Other")]
-        [JsonProperty("reason_for_other")]
-        public string? ReasonForOther { get; set; }
+        [JsonProperty("other_reasoning_for_invalid_match")]
+        public string? OtherReasoningForInvalidMatch { get; set; }
         [JsonProperty("final_disposition")]
         [Display(Name = "Final Disposition Taken")]
         public string FinalDisposition { get; set; }
