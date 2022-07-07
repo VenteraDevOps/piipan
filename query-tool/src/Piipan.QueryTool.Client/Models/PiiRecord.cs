@@ -30,6 +30,7 @@ namespace Piipan.QueryTool.Client.Models
         [JsonPropertyName("ssn")]
         public string SocialSecurityNum { get; set; }
 
+        [UsaRequired]
         [Display(Name = "Participant ID")]
         [JsonPropertyName("participant_id")]
         public string ParticipantId { get; set; }
