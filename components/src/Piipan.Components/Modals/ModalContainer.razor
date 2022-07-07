@@ -9,7 +9,7 @@
     /// </summary>
     protected override void OnInitialized()
     {
-        ModalManager.ModalsUpdated += StateHasChanged;
+        ModalManager.ModalsUpdated += async () => await InvokeAsync(StateHasChanged);
     }
 
     /// <summary>

@@ -2,6 +2,8 @@
 using System.Linq.Expressions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Piipan.Components.Modals;
+using Piipan.Components.Routing;
 
 namespace Piipan.QueryTool.Tests
 {
@@ -22,6 +24,11 @@ namespace Piipan.QueryTool.Tests
                 parameters.Add(parameter, value));
         }
 
+        public BaseComponentTest()
+        {
+            Services.AddModalManager();
+            Services.AddPiipanNavigationManager();
+        }
         protected abstract void CreateTestComponent();
     }
 }

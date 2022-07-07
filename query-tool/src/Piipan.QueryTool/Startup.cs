@@ -74,7 +74,7 @@ namespace Piipan.QueryTool
             services.AddSingleton<ILdsDeidentifier, LdsDeidentifier>();
 
             services.AddModalManager();
-            services.AddLockableNavigationManager();
+            services.AddPiipanNavigationManager();
 
             services.AddHttpContextAccessor();
             services.AddEasyAuth();

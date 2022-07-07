@@ -9,5 +9,5 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddModalManager();
-builder.Services.AddLockableNavigationManager();
+builder.Services.AddPiipanNavigationManager();
 await builder.Build().RunAsync();

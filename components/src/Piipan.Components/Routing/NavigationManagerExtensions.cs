@@ -6,7 +6,7 @@ namespace Piipan.Components.Routing
     {
         /// <summary>Adds services for the lockable navigation manager.</summary>
         /// <param name="services">The service collection to register with.</param>
-        public static void AddLockableNavigationManager(this IServiceCollection services)
+        public static void AddPiipanNavigationManager(this IServiceCollection services)
         {
             services.AddScoped<PiipanNavigationManager>();
         }
