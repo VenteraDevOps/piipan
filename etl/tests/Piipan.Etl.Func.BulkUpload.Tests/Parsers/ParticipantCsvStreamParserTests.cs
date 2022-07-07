@@ -262,7 +262,48 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Null(records.First().VulnerableIndividual);
             Assert.Empty(records.First().RecentBenefitIssuanceDates);
         }
-        
+        [Theory]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId#,ParticipantId,,,")] //  CaseId is not alphanumeric
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId#,,")] //  ParticipantId is not alphanumeric
+        public void ExpectAlphanumericValidationError(String inline)
+        {
+            // Arrange
+            var stream = CsvFixture(new string[] { inline });
+            var parser = new ParticipantCsvStreamParser();
 
+            // Act
+            var records = parser.Parse(stream);
+
+            // Assert
+            Assert.Throws<CsvHelper.FieldValidationException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+        }
+
+        [Theory]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId12345678901234567890,ParticipantId,,,")] //  CaseId is more than 20 chars
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantIdCaseId12345678901234567890,,")] //  ParticipantId  is more than 20 chars
+        public void MaxLengthValidationError(String inline)
+        {
+            // Arrange
+            var stream = CsvFixture(new string[] { inline });
+            var parser = new ParticipantCsvStreamParser();
+
+            // Act
+            var records = parser.Parse(stream);
+
+            // Assert
+            Assert.Throws<CsvHelper.FieldValidationException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+        }
     }
 }

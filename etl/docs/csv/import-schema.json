@@ -15,7 +15,9 @@
         "description": "Participant's state-specific case identifier. Can be the same for multiple participants.",
         "constraints": {
           "required": true,
-          "minLength": 1
+          "pattern": "^[A-Za-z0-9]+$",
+          "minLength": 1,
+          "maxLength":20
         }
       },
       {
@@ -23,7 +25,9 @@
         "type": "string",
         "description": "Participant's state-specific identifier. Unique to the participant. Must not include social security number or other identifying information used outside of the benefits eligibility context.",
         "constraints": {
-          "required": true
+          "pattern": "^[A-Za-z0-9]+$",
+          "required": true,
+          "maxLength":20
         }
       },
       {
