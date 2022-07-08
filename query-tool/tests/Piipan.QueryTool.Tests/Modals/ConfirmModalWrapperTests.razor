@@ -29,7 +29,7 @@
     }
 
     /// <summary>
-    /// Verify the default markup of the matches list table when there are two items
+    /// Verify the default markup of the modal wrapper
     /// </summary>
     [Fact]
     public void ConfirmModalWrapper_ShouldExist_And_HaveCorrectMarkup()
@@ -49,7 +49,7 @@
     }
 
     /// <summary>
-    /// Verify the default markup of the matches list table when there are two items
+    /// Verify the default markup of the confirm modal does NOT appear when navigation changes and the form is NOT dirty
     /// </summary>
     [Fact]
     public void ConfirmModalWrapper_ShouldNotDisplayModal_When_NavigationChangesAndFormNotDirty()
@@ -73,7 +73,7 @@
     }
 
     /// <summary>
-    /// Verify the default markup of the matches list table when there are two items
+    /// Verify the default markup of the confirm modal appears when navigation changes and the form is dirty
     /// </summary>
     [Fact]
     public void ConfirmModalWrapper_ShouldDisplayModal_When_NavigationChangesAndFormDirty()
@@ -138,7 +138,53 @@
     }
 
     /// <summary>
-    /// Create a card component
+    /// Verify the confirmation modal closes when the cancel button is clicked
+    /// </summary>
+    [Fact]
+    public void ConfirmModal_ShouldClose_When_CancelButtonIsClicked()
+    {
+        // Arrange
+        CreateTestComponent();
+        var navigationManager = Services.GetService<PiipanNavigationManager>();
+        var inputElement = Component.Find($".{InputClass}");
+        inputElement!.Change("Test");
+        inputElement!.Blur();
+
+        // Act
+        navigationManager.NavigateTo("/test");
+
+        var buttons = modalContainer.FindAll($".usa-button");
+        buttons[1].Click();
+
+        Assert.DoesNotContain("/test", navigationManager.Uri);
+        modalContainer.MarkupMatches(@<text></text>);
+    }
+
+    /// <summary>
+    /// Verify the confirmation modal closes and continues navigation when the continue button is clicked
+    /// </summary>
+    [Fact]
+    public void ConfirmModal_ShouldCloseAndContinue_When_ContinueButtonIsClicked()
+    {
+        // Arrange
+        CreateTestComponent();
+        var navigationManager = Services.GetService<PiipanNavigationManager>();
+        var inputElement = Component.Find($".{InputClass}");
+        inputElement!.Change("Test");
+        inputElement!.Blur();
+
+        // Act
+        navigationManager.NavigateTo("/test");
+
+        var buttons = modalContainer.FindAll($".usa-button");
+        buttons[0].Click();
+
+        Assert.EndsWith("/test", navigationManager.Uri);
+        modalContainer.MarkupMatches(@<text></text>);
+    }
+
+    /// <summary>
+    /// Create a confirm modal component
     /// </summary>
     protected override void CreateTestComponent()
     {
