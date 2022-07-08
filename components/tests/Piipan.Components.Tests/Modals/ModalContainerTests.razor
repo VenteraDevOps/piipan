@@ -54,7 +54,7 @@
         CreateTestComponent();
 
         var modalManager = Services.GetService<IModalManager>();
-        modalManager!.Show(new DummyModal());
+        modalManager!.Show(new DummyModal() { Text = "Test modal" });
 
         // Assert
         Component!.MarkupMatches(
@@ -73,8 +73,9 @@
                   </div>
                 </div>
               </div>
-        </div>
-    );
+            </div>
+        );
+        Assert.True(Component!.HasComponent<DummyModal>());
     }
 
     /// <summary>
@@ -95,6 +96,7 @@
         Component!.MarkupMatches(
             @<text></text>
         );
+        Assert.False(Component!.HasComponent<DummyModal>());
     }
 
     /// <summary>
@@ -115,6 +117,48 @@
         Component!.MarkupMatches(
             @<text></text>
         );
+        Assert.False(Component!.HasComponent<DummyModal>());
+    }
+
+    /// <summary>
+    /// Verify the modal closes after the escape key is clicked
+    /// </summary>
+    [Fact]
+    public void Modal_Closes_When_Escape_Key_Is_Pressed()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        var modalManager = Services.GetService<IModalManager>();
+        modalManager!.Show(new DummyModal());
+
+        // This gets called from Javascript when the Escape key is pressed
+        Component.Instance.CloseNearestModal();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<text></text>
+        );
+        Assert.False(Component!.HasComponent<DummyModal>());
+    }
+
+    /// <summary>
+    /// Verify the modal closes after the escape key is clicked
+    /// </summary>
+    [Fact]
+    public void Modal_Does_Not_Close_When_Escape_Key_Is_Pressed_And_Action_Is_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        var modalManager = Services.GetService<IModalManager>();
+        modalManager!.Show(new DummyModal(), new ModalInfo { ForceAction = true });
+
+        // This gets called from Javascript when the Escape key is pressed
+        Component.Instance.CloseNearestModal();
+
+        // Assert
+        Assert.True(Component!.HasComponent<DummyModal>());
     }
 
     #endregion
