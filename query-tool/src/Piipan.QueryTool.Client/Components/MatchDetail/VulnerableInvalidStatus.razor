@@ -30,18 +30,20 @@
     <UsaRadioGroup @bind-Value="DispositionData.InvalidMatch">
         <ChildContent>
             <UsaRadio Value=true>Yes</UsaRadio>
-            @if (DispositionData.InvalidMatch??false)
-            {
-                <UsaFormGroup>
-                    <UsaSelect DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.InvalidMatchReason" />
-                </UsaFormGroup>
-            }
-            @if (DispositionData.InvalidMatchReason == "Other" && DispositionData.InvalidMatch == true)
-            {
-                <UsaFormGroup>
-                    <UsaInputTextArea DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.OtherReasoningForInvalidMatch" />
-                </UsaFormGroup>
-            }
+            
+                <div hidden="@(DispositionData.InvalidMatch!=true)">
+                    <UsaFormGroup>
+                        <UsaSelect DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.InvalidMatchReason" />
+                    </UsaFormGroup>
+                </div>
+                
+                <div hidden="@(DispositionData.InvalidMatchReason != "Other" || DispositionData.InvalidMatch != true)">
+                    <UsaFormGroup>
+                        <UsaInputTextArea DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.OtherReasoningForInvalidMatch" />
+                    </UsaFormGroup>
+                </div>
+                
+            
             <UsaRadio Value=false>No</UsaRadio>
         </ChildContent>
         <LabelOverride>

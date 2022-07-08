@@ -38,10 +38,12 @@
         <UsaFormGroup>
             <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsOne : DropdownOptionsTwo)" @bind-Value="DispositionData.FinalDisposition" />
         </UsaFormGroup>
-        @if (!String.IsNullOrEmpty(DispositionData.FinalDisposition) || DispositionData.FinalDispositionDate != null)
-    {
-        <UsaFormGroup LabelOverride="@GetDispositonLabel()">
-            <UsaInputDate @bind-Value="DispositionData.FinalDispositionDate" />
-        </UsaFormGroup>
-    }
+        
+        <div>
+            <UsaFormGroup LabelOverride="@GetDispositonLabel()">
+                <UsaInputDate @bind-Value="DispositionData.FinalDispositionDate" />
+            </UsaFormGroup>
+        </div>
+        
+    
 </div>

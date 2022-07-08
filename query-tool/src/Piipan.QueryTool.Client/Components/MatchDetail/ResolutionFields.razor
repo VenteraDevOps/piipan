@@ -3,11 +3,13 @@
     [Parameter] public string State { get; set; }
     [Parameter] public bool InitiatingState { get; set; }
     [Parameter] public Disposition DispositionData { get; set; }
+    [Parameter] public string Token { get; set; }
 }
 <div>
     <h3>Update information about this match for @State</h3>
     <p class="infoSavedText">After the information is saved, it will appear in the <b>match information</b> panel.</p>
-     <UsaForm Id="snap-participants-query-form" InitialErrors="null" Model="DispositionData" method="post">
+     <UsaForm Id="snap-resolution-fields-form" InitialErrors="null" Model="DispositionData" method="post">
+         <input type="hidden" name="__RequestVerificationToken" value="@Token" />
         <VulnerableInvalidStatus DispositionData="@DispositionData"></VulnerableInvalidStatus>
         <InitialAction InitiatingState="@InitiatingState" DispositionData="@DispositionData"></InitialAction>
         <FinalDisposition InitiatingState="@InitiatingState" DispositionData="@DispositionData"></FinalDisposition>

@@ -70,6 +70,26 @@ namespace Piipan.Shared.Http
             return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
+        public async Task<TResponse> PatchAsync<TRequest, TResponse>(string path, TRequest body, Func<IEnumerable<(string, string)>> headerFactory)
+        {
+            var requestMessage = await PrepareRequest(path, HttpMethod.Patch);
+
+            // add any additional headers using the supplied callback
+            headerFactory.Invoke().ToList().ForEach(h => requestMessage.Headers.Add(h.Item1, h.Item2));
+
+            var json = JsonConvert.SerializeObject(body);
+
+            requestMessage.Content = new StringContent(json);
+
+            var response = await Client().SendAsync(requestMessage);
+
+            response.EnsureSuccessStatusCode();
+
+            var responseContentJson = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
+        }
+
         public async Task<TResponse> GetAsync<TResponse>(string path)
         {
             var requestMessage = await PrepareRequest(path, HttpMethod.Get);
