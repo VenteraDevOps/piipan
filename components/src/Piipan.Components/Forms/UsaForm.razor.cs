@@ -78,9 +78,9 @@ namespace Piipan.Components.Forms
         public async Task<bool> ValidateForm()
         {
             currentErrors.Clear();
-            foreach (var formGroup in FormGroups)
+            for (int i = 0; i < FormGroups.Count; i++)
             {
-                await formGroup.GetValidationErrorsAsync(editContext);
+                await FormGroups[i].GetValidationErrorsAsync(editContext);
             }
             refreshAlertBox = true;
             UpdateState();

@@ -11,6 +11,7 @@ namespace Piipan.Match.Api.Models.Resolution
         [Display(Name = "Inital Action Date")]
         [JsonProperty("initial_action_at")]
         public DateTime? InitialActionAt { get; set; }
+        [Display(Name = "Initial Action Taken")]
         [JsonProperty("initial_action_taken")]
         public string InitialActionTaken { get; set; }
         [JsonProperty("invalid_match")]
