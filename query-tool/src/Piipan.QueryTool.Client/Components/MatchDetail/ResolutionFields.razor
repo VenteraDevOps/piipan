@@ -1,12 +1,17 @@
-﻿@code {
+﻿@using Piipan.Match.Api.Models.Resolution
+@code {
     [Parameter] public string State { get; set; }
     [Parameter] public bool InitiatingState { get; set; }
+    [Parameter] public Disposition DispositionData { get; set; }
 }
 <div>
     <h3>Update information about this match for @State</h3>
     <p class="infoSavedText">After the information is saved, it will appear in the <b>match information</b> panel.</p>
-    <VulnerableInvalidStatus></VulnerableInvalidStatus>
-    <InitialAction InitiatingState="@InitiatingState"></InitialAction>
-    <h4>FINAL DISPOSITION COMPONENT HERE</h4>
-    <button class="usa-button">Save Changes</button>
+     <UsaForm Id="snap-resolution-fields-form" InitialErrors="null" Model="DispositionData" method="post">
+        <VulnerableInvalidStatus DispositionData="@DispositionData"></VulnerableInvalidStatus>
+        <InitialAction InitiatingState="@InitiatingState" DispositionData="@DispositionData"></InitialAction>
+        <FinalDisposition InitiatingState="@InitiatingState" DispositionData="@DispositionData"></FinalDisposition>
+        <button class="usa-button ">Save Changes</button>
+    </UsaForm>
+   
 </div>
