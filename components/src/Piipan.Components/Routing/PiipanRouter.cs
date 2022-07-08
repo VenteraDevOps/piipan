@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.ExceptionServices;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Piipan.Components.Routing
 {
+    [ExcludeFromCodeCoverage]
     /// <summary>
     /// A component that supplies route data corresponding to the current navigation state.
     /// </summary>
