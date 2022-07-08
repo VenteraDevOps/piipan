@@ -56,24 +56,12 @@
         CreateTestComponent();
 
         // Assert
-        Component!.FindComponent<UsaLabel>().MarkupMatches(
-            @<label class="usa-label" for="@Component!.Instance.InputElementId">
-                <span>Overriding the label!</span>
-            </label>
+        Component!.FindComponent<UsaLegend>().MarkupMatches(
+            @<legend class="usa-label usa-legend" for="model_RequiredField">
+              <span>Overriding the label!</span>
+              <span class="usa-required">*</span>
+            </legend>
         );
-    }
-
-    /// <summary>
-    /// Verify that when the hint content is not specified it does not exist on the form
-    /// </summary>
-    [Fact]
-    public void Form_When_Hint_Content_Is_Null_It_Is_Missing()
-    {
-        // Arrange
-        CreateTestComponent();
-
-        // Assert
-        Assert.Empty(Component!.FindAll($".{HintClass}"));
     }
 
     /// <summary>
@@ -102,13 +90,11 @@
         JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true);
         var componentFragment = Render<UsaForm>(
             @<UsaForm Model="model" >
-                <UsaFormGroup LabelOverride="@InitialValues.LabelOverride" 
-                    HintContent="InitialValues.HintContent">
-                    <UsaRadioGroup @bind-Value="model.RequiredField">
-                           <UsaRadio Value=true>Yes</UsaRadio>
-                           <UsaRadio Value=false>No</UsaRadio>
-                    </UsaRadioGroup>
-                </UsaFormGroup>
+                <UsaRadioGroup @bind-Value="model.RequiredField" LabelOverride="@InitialValues.LabelOverride" 
+                HintContent="InitialValues.HintContent">
+                        <UsaRadio Value=true>Yes</UsaRadio>
+                        <UsaRadio Value=false>No</UsaRadio>
+                </UsaRadioGroup>
             </UsaForm>
         );
         form = componentFragment;
