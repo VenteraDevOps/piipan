@@ -81,6 +81,22 @@
         );
     }
 
+    /// <summary>
+    /// Verify that if the value isn't set that we get errors if field is required
+    /// </summary>
+    [Fact]
+    public void Radio_Should_Have_Errors_When_Empty_And_Required()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        inputElement!.Blur();
+
+        // Assert
+        AssertHasRequiredErrors();
+    }
+
     #endregion Tests
 
     #region Helper Function
@@ -99,6 +115,7 @@
         );
         form = componentFragment;
         Component = componentFragment.FindComponent<UsaRadioGroup<bool?>>();
+        inputElement = componentFragment.Find($".{InputRadioClass}");
     }
 
     private void AssertHasNoErrors()
@@ -112,7 +129,6 @@
 
     private void AssertHasRequiredErrors()
     {
-        Assert.True(inputElement!.ClassList.Contains(InputErrorClass));
         var errorForms = form!.FindAll($".{InputFormGroupErrorClass}");
         var errorSpan = form!.Find($".{InputErrorMessageClass}");
         Assert.Equal("Required Field is required", errorSpan.TextContent);
