@@ -3,7 +3,7 @@ using Piipan.Participants.Api.Models;
 
 namespace Piipan.Participants.Core.Models
 {
-    public class UploadDbo : IUpload
+    public record UploadDbo : IUpload
     {
         public Int64 Id { get; set; }
         public string UploadIdentifier { get; set; }

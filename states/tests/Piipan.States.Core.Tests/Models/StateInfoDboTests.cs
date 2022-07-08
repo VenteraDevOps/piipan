@@ -19,7 +19,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "1234567890",
                 Region = "TEST"
             };
@@ -47,7 +47,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };
@@ -75,7 +75,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };
@@ -103,7 +103,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };
@@ -131,7 +131,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };
@@ -159,7 +159,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };
@@ -187,7 +187,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };
@@ -215,7 +215,7 @@ namespace Piipan.States.Core.Tests.Models
                 Id = "1",
                 State = "test",
                 StateAbbreviation = "TT",
-                Email = "test@test.com",
+                Email = "test@email.example",
                 Phone = "123456789",
                 Region = "TEST"
             };

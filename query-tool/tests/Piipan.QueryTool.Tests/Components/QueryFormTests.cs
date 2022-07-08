@@ -157,6 +157,7 @@ namespace Piipan.QueryTool.Tests.Components
             queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
             queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
             queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
             bool isFormValid = false;
             await form.InvokeAsync(async () =>
             {
@@ -280,14 +281,15 @@ namespace Piipan.QueryTool.Tests.Components
 
             // Assert
             Assert.False(isFormValid);
-            Assert.Equal(3, alertBoxErrors.Count);
-            Assert.Equal(3, inputErrorMessages.Count);
+            Assert.Equal(4, alertBoxErrors.Count);
+            Assert.Equal(4, inputErrorMessages.Count);
 
             List<string> errors = new List<string>
             {
                 "Last Name is required",
                 "Date of Birth is required",
-                "Social Security Number is required"
+                "Social Security Number is required",
+                "Participant ID is required"
             };
 
             for (int i = 0; i < alertBoxErrors.Count; i++)

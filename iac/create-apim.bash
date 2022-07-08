@@ -88,7 +88,7 @@ get_state_abbrs () {
   while IFS=, read -r abbr _; do
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     state_abbrs+=("${abbr}")
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
 
   echo "${state_abbrs[*]}"
 }

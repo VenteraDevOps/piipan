@@ -154,6 +154,7 @@ EOF
 # https://info.enterprisedb.com/rs/069-ALB-339/images/Multitenancy%20Approaches%20Whitepaper.pdf
 main () {
   RESOURCE_GROUP=$1
+  azure_env=$2
   source "$(dirname "$0")"/iac-common.bash
 
   echo "Baseline $TEMPLATE_DB before creating new databases from it"
@@ -178,7 +179,7 @@ main () {
     set_db_owner "$db" "$owner"
     config_readonly_role "$db" "$reader"
     config_db "$db"
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
 
   # Assumes there's only the single admin group that was set elsewhere
   PG_AAD_ADMIN=$(az postgres server ad-admin list \
@@ -209,7 +210,7 @@ main () {
     role=${identity//-/_}
     create_managed_role "$db" "$role" "$client_id"
     config_managed_role "$db" "$role"
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
   configure_azure_profile
 
   script_completed

@@ -1,5 +1,5 @@
 ﻿@using Piipan.Components.Alerts
-@using Piipan.Components.Enums
+@using Piipan.Components.Forms
 @using System.Linq.Expressions
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
@@ -23,20 +23,25 @@
     /// </summary>
     protected override void CreateTestComponent()
     {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
+            JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+            JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
+            JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
+        Disposition disp = new Disposition
+            {
+                InitialActionAt = null,
+                InitialActionTaken = "",
+                InvalidMatch = false,
+                InvalidMatchReason = "",
+                OtherReasoningForInvalidMatch = "",
+                FinalDisposition = "",
+                FinalDispositionDate = null,
+                VulnerableIndividual = null,
+                State = "EA"
+            };
         Component = Render<ResolutionFields>(
-            @<ResolutionFields State="Echo Bravo">
-            </ResolutionFields>
-        );
-    }
-
-    /// <summary>
-    /// Create a StateParticipantInformation component
-    /// </summary>
-    protected void CreateTestComponentAlpha()
-    {
-        Component = Render<ResolutionFields>(
-            @<ResolutionFields State="Echo Alpha">
-            </ResolutionFields>
+    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
+    </ResolutionFields>
         );
     }
 
@@ -46,25 +51,32 @@
     /// Verify the default markup of the state contact information
     /// </summary>
     [Fact]
-    public void Vulnerable_Invalid_status_markup()
+    public void Resolution_Fields_status_markup()
     {
         // Arrange
         CreateTestComponent();
 
         // Assert
         Component!.MarkupMatches(
-            @<div >
-              <h3 >Update information about this match for Echo Bravo</h3>
-              <p class="infoSavedText" >After the information is saved, it will appear in the
-                <b >match information</b>
-                panel.</p>
-              <div diff:ignore> //Ignoring Vulnerable Invalid Status Component
-              </div>
-              <div diff:ignore> //Ignoring Initial Action Component
-              </div> 
-              <h4 >FINAL DISPOSITION COMPONENT HERE</h4>
-              <button class="usa-button" >Save Changes</button>
-            </div>);
+    @<div >
+      <h3 >Update information about this match for Echo Bravo</h3>
+      <p class="infoSavedText" >After the information is saved, it will appear in the
+        <b >match information</b>
+        panel.</p>
+      <div class="usa-form ">
+        <form id="snap-resolution-fields-form" method="post" novalidate="" >
+          <fieldset class="usa-fieldset">
+            <div diff:ignore> //Ignoring Vulnerable Invalid Component
+            </div>
+            <div diff:ignore> //Ignoring Initial Action Component
+            </div>
+            <div diff:ignore> //Ignoring Final Disposition Component
+            </div>
+            <button class="usa-button " >Save Changes</button>
+          </fieldset>
+        </form>
+      </div>
+    </div>);
     }
 
     #endregion

@@ -110,7 +110,8 @@ namespace Piipan.QueryTool.Tests
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "887-65-4320",
-                DateOfBirth = new DateTime(1931, 10, 13)
+                DateOfBirth = new DateTime(1931, 10, 13),
+                ParticipantId = "participantid1"
             };
 
             var mockServiceProvider = serviceProviderMock();
@@ -164,7 +165,8 @@ namespace Piipan.QueryTool.Tests
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
-                DateOfBirth = new DateTime(2021, 1, 1)
+                DateOfBirth = new DateTime(2021, 1, 1),
+                ParticipantId = "participantid1"
             };
             var mockServiceProvider = serviceProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -197,7 +199,8 @@ namespace Piipan.QueryTool.Tests
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000", // social security number is invalid 3 times
-                DateOfBirth = new DateTime(2021, 1, 1)
+                DateOfBirth = new DateTime(2021, 1, 1),
+                ParticipantId = "participantid1"
             };
             var mockServiceProvider = serviceProviderMock(location: "EA");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -235,7 +238,8 @@ namespace Piipan.QueryTool.Tests
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
-                DateOfBirth = new DateTime(2021, 1, 1)
+                DateOfBirth = new DateTime(2021, 1, 1),
+                ParticipantId = "participantid1"
             };
             var mockServiceProvider = serviceProviderMock(location: "National");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -271,7 +275,8 @@ namespace Piipan.QueryTool.Tests
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
-                DateOfBirth = new DateTime(2021, 1, 1)
+                DateOfBirth = new DateTime(2021, 1, 1),
+                ParticipantId = "participantid1"
             };
             var mockServiceProvider = serviceProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -312,7 +317,8 @@ namespace Piipan.QueryTool.Tests
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
-                DateOfBirth = new DateTime(2021, 1, 1)
+                DateOfBirth = new DateTime(2021, 1, 1),
+                ParticipantId = "participantid1"
             };
             var mockServiceProvider = serviceProviderMock();
             var mockLdsDeidentifier = new Mock<ILdsDeidentifier>();
