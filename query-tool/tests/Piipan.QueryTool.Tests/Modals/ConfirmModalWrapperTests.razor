@@ -1,0 +1,161 @@
+﻿@using Piipan.Components
+@using System.Linq.Expressions
+@using Piipan.Components.Forms
+@using Piipan.Components.Layout
+@using Piipan.Components.Modals
+@using Piipan.Components.Routing
+@using Piipan.QueryTool.Client.Modals
+@using static Piipan.Components.Layout.LayoutConstants
+@using static Piipan.Components.Forms.FormConstants
+@inherits BaseComponentTest<ConfirmModalWrapper>
+
+@code {
+    public class TestModel {
+        [UsaRequired]
+        [Display(Name = "Required Field")]
+        public string? RequiredField { get; set; }
+    }
+    private IElement? inputElement = null;
+    private TestModel model = new TestModel();
+    private IRenderedComponent<ModalContainer> modalContainer;
+    BunitJSModuleInterop moduleInterop;
+
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public ConfirmModalWrapperTests() : base()
+    {
+        moduleInterop = this.JSInterop.SetupModule("./Modals/ConfirmModalWrapper.razor.js");
+    }
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are two items
+    /// </summary>
+    [Fact]
+    public void ConfirmModalWrapper_ShouldExist_And_HaveCorrectMarkup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="usa-form-group ">
+              <label class="usa-label" for="model_RequiredField">Required Field<span class="usa-required">*</span>
+              </label>
+              <input class="usa-input" required="" id="model_RequiredField" name="model.RequiredField" style=""  >
+            </div>
+        );
+        modalContainer.MarkupMatches(@<text></text>);
+    }
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are two items
+    /// </summary>
+    [Fact]
+    public void ConfirmModalWrapper_ShouldNotDisplayModal_When_NavigationChangesAndFormNotDirty()
+    {
+        // Arrange
+        CreateTestComponent();
+        var navigationManager = Services.GetService<PiipanNavigationManager>();
+
+        // Act
+        navigationManager.NavigateTo("/test");
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="usa-form-group ">
+              <label class="usa-label" for="model_RequiredField">Required Field<span class="usa-required">*</span>
+              </label>
+              <input class="usa-input" required="" id="model_RequiredField" name="model.RequiredField" style=""  >
+            </div>
+        );
+        modalContainer.MarkupMatches(@<text></text>);
+    }
+
+    /// <summary>
+    /// Verify the default markup of the matches list table when there are two items
+    /// </summary>
+    [Fact]
+    public void ConfirmModalWrapper_ShouldDisplayModal_When_NavigationChangesAndFormDirty()
+    {
+        // Arrange
+        CreateTestComponent();
+        var navigationManager = Services.GetService<PiipanNavigationManager>();
+        var inputElement = Component.Find($".{InputClass}");
+        inputElement!.Change("Test");
+        inputElement!.Blur();
+
+        // Act
+        navigationManager.NavigateTo("/test");
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div class="usa-form-group ">
+              <label class="usa-label" for="model_RequiredField">Required Field<span class="usa-required">*</span>
+              </label>
+              <input class="usa-input" required="" id="model_RequiredField" name="model.RequiredField" style="" value="Test" >
+            </div>
+        );
+        modalContainer.MarkupMatches(
+            @<div class="usa-modal-wrapper is-visible" role="dialog">
+              <div class="usa-modal-overlay" aria-controls="example-modal-1" >
+                <div class="usa-modal" aria-labelledby="modal-1-heading" aria-describedby="modal-1-description"  >
+                  <div class="usa-modal__content" >
+                    <div class="usa-modal__main" >
+                      <h2 class="usa-modal__heading" id="modal-1-heading">
+                        Continue Without Saving?
+                      </h2>
+                      <div class="usa-prose">
+                        <p id="modal-1-description">
+                          Any unsaved changes will be lost.
+                        </p>
+                      </div>
+                      <div class="usa-modal__footer">
+                        <ul class="usa-button-group">
+                          <li class="usa-button-group__item">
+                            <button type="button" class="usa-button" >
+                              Continue
+                            </button>
+                          </li>
+                          <li class="usa-button-group__item">
+                            <button type="button" class="usa-button usa-button--unstyled padding-105 text-center" >
+                              Cancel and return to form
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <button class="usa-button usa-modal__close" aria-label="Close this window"  >
+                      <svg class="usa-icon" aria-hidden="true" focusable="false" role="img" >
+                        <use xlink:href="/images/sprite.svg#close" ></use>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        );
+    }
+
+    /// <summary>
+    /// Create a card component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        moduleInterop.SetupVoid("SetUnloadListener", _ => true).SetVoidResult();
+            
+        var htmlFragment = Render(
+            @<div><div id="inert-area">
+                <UsaForm Model="model">
+                    <ConfirmModalWrapper>
+                        <UsaFormGroup>
+                            <UsaInputText @bind-Value="model.RequiredField" />
+                        </UsaFormGroup>
+                    </ConfirmModalWrapper>
+                </UsaForm>
+            </div><Piipan.Components.Modals.ModalContainer /></div>
+        );
+        modalContainer = htmlFragment.FindComponent<ModalContainer>();
+        Component = htmlFragment.FindComponent<ConfirmModalWrapper>();
+    }
+}

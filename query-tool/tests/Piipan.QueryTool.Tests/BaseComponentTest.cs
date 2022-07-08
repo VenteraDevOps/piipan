@@ -26,6 +26,7 @@ namespace Piipan.QueryTool.Tests
 
         public BaseComponentTest()
         {
+            JSInterop.Mode = JSRuntimeMode.Loose;
             Services.AddModalManager();
             Services.AddPiipanNavigationManager();
         }
