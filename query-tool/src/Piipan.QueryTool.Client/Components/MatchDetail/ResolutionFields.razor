@@ -8,10 +8,12 @@
     <h3>Update information about this match for @State</h3>
     <p class="infoSavedText">After the information is saved, it will appear in the <b>match information</b> panel.</p>
      <UsaForm Id="snap-resolution-fields-form" InitialErrors="null" Model="DispositionData" method="post">
-        <VulnerableInvalidStatus DispositionData="@DispositionData"></VulnerableInvalidStatus>
-        <InitialAction InitiatingState="@InitiatingState" DispositionData="@DispositionData"></InitialAction>
-        <FinalDisposition InitiatingState="@InitiatingState" DispositionData="@DispositionData"></FinalDisposition>
-        <button class="usa-button ">Save Changes</button>
+        <Piipan.QueryTool.Client.Modals.ConfirmModalWrapper>
+            <VulnerableInvalidStatus DispositionData="@DispositionData"></VulnerableInvalidStatus>
+            <InitialAction InitiatingState="@InitiatingState" DispositionData="@DispositionData"></InitialAction>
+            <FinalDisposition InitiatingState="@InitiatingState" DispositionData="@DispositionData"></FinalDisposition>
+            <button class="usa-button ">Save Changes</button>
+        </Piipan.QueryTool.Client.Modals.ConfirmModalWrapper>
     </UsaForm>
    
 </div>
