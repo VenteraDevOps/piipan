@@ -80,6 +80,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
         /// <summary>
         /// Retrieves upload record by id
         /// </summary>
+        /// <remarks>
+        /// Throws InvalidOperationException if no matching record is found.
+        /// </remarks>
         /// <param name="uploadIdentifier">The upload id of the desired record</param>
         /// <returns>Upload Record whose upload_identifier matches uploadIdentifier</returns>
         public async Task<IUpload> GetUploadById(string uploadIdentifier)
@@ -92,13 +95,13 @@ namespace Piipan.Participants.Core.DataAccessObjects
                     .QuerySingleAsync<UploadDbo>(@"
                     SELECT 
                         id Id, 
+                        upload_identifier UploadIdentifier, 
                         created_at CreatedAt, 
                         publisher Publisher,
-                        upload_identifier UploadIdentifier, 
-                        status Status, 
-                        completed_at CompletedAt, 
                         participants_uploaded ParticipantsUploaded, 
-                        error_message ErrorMessage
+                        error_message ErrorMessage, 
+                        completed_at CompletedAt, 
+                        status Status
                     FROM uploads 
                     where upload_identifier=@uploadIdentifier
                     ORDER BY id DESC

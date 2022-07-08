@@ -260,6 +260,9 @@ namespace Piipan.Participants.Core.Tests.Services
             // we should add a new upload for this batch
             uploadDao.Verify(m => m.AddUpload("test-etag"), Times.Once);
 
+            // we should verify the status of the upload was set to Complete upon finishing
+            uploadDao.Verify(m => m.UpdateUpload(It.Is<IUpload>(x=>x.Status == UploadStatuses.COMPLETE.ToString())), Times.Once);
+
             // each participant added via the DAO should have the created upload ID
             participantDao
                 .Verify(m => m
@@ -322,7 +325,7 @@ namespace Piipan.Participants.Core.Tests.Services
 
             participantPublishUploadMetric.Verify(m => m.PublishUploadMetric(
                         It.Is<ParticipantUpload>(s => s.Status == UploadStatuses.FAILED.ToString() && s.ErrorMessage == exceptionMessage)));
-            uploadDao.Verify(x => x.UpdateUpload(It.Is<IUpload>(u => u == uploadRecord)));
+            uploadDao.Verify(x => x.UpdateUpload(It.Is<IUpload>(u => u == uploadRecord && u.Status == UploadStatuses.FAILED.ToString() && u.ErrorMessage == exceptionMessage)));
 
         }
 

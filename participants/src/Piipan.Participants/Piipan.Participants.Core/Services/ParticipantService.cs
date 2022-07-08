@@ -93,14 +93,19 @@ namespace Piipan.Participants.Core.Services
                     });
 
                     var count = await _participantDao.AddParticipants(participantDbos);
+                    long participantsUploaded = Convert.ToInt64(count);
 
+                    DateTime completionTime = DateTime.UtcNow;
+
+                    upload.ParticipantsUploaded = participantsUploaded;
                     upload.Status = UploadStatuses.COMPLETE.ToString();
+                    upload.CompletedAt = completionTime;
 
                     await _uploadDao.UpdateUpload(upload);
 
                     participantUploadMetrics.Status = UploadStatuses.COMPLETE.ToString();
-                    participantUploadMetrics.CompletedAt = DateTime.UtcNow;
-                    participantUploadMetrics.ParticipantsUploaded = Convert.ToInt64(count);
+                    participantUploadMetrics.CompletedAt = completionTime;
+                    participantUploadMetrics.ParticipantsUploaded = participantsUploaded;
                     participantUploadMetrics.UploadIdentifier = uploadIdentifier;
 
                     string uploadDBStatus = JsonConvert.SerializeObject(participantUploadMetrics);
@@ -114,11 +119,15 @@ namespace Piipan.Participants.Core.Services
             }
             catch (Exception ex)
             {
+                DateTime failureTime = DateTime.UtcNow;
+
                 upload.Status = UploadStatuses.FAILED.ToString();
+                upload.ErrorMessage = ex.Message;
+                upload.CompletedAt = failureTime;
                 await _uploadDao.UpdateUpload(upload);
 
                 participantUploadMetrics.Status = UploadStatuses.FAILED.ToString();
-                participantUploadMetrics.CompletedAt = DateTime.UtcNow;
+                participantUploadMetrics.CompletedAt = failureTime;
                 participantUploadMetrics.ErrorMessage = ex.Message;
 
                 string uploadDBStatus = JsonConvert.SerializeObject(participantUploadMetrics);

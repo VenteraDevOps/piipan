@@ -35,7 +35,7 @@ namespace Piipan.Match.Core.Tests.Builders
                     Id = 123,
                     MatchId = _matchId,
                     InsertedAt = new DateTime(2022, 01, 01),
-                    Actor = "ea@example.com",
+                    Actor = "ea@email.example",
                     ActorState = "ea",
                     Delta = "{ initial_action_at: '2022-01-01T00:00:00.0000000' }"
                 },
@@ -44,7 +44,7 @@ namespace Piipan.Match.Core.Tests.Builders
                     Id = 124,
                     MatchId = _matchId,
                     InsertedAt = new DateTime(2022, 01, 02),
-                    Actor = "ea@example.com",
+                    Actor = "ea@email.example",
                     ActorState = "ea",
                     Delta = "{ 'final_disposition': 'final disposition for ea' }"
                 },
@@ -53,7 +53,7 @@ namespace Piipan.Match.Core.Tests.Builders
                     Id = 456,
                     MatchId = _matchId,
                     InsertedAt = new DateTime(2022, 02, 01),
-                    Actor = "eb@example.com",
+                    Actor = "eb@email.example",
                     ActorState = "eb",
                     Delta = "{ 'invalid_match': false, initial_action_at: '2022-02-01T00:00:00.0000000' }"
                 },
@@ -62,7 +62,7 @@ namespace Piipan.Match.Core.Tests.Builders
                     Id = 125,
                     MatchId = _matchId,
                     InsertedAt = new DateTime(2022, 02, 03),
-                    Actor = "eb@example.com",
+                    Actor = "eb@email.example",
                     ActorState = "eb",
                     Delta = "{ 'invalid_match': true, 'final_disposition': 'final disposition for eb' }"
                 },

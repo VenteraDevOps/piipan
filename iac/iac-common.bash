@@ -191,6 +191,25 @@ verify_cloud () {
   fi
 }
 
+# Verify that the FILE exist 
+verify_file () {
+
+  local FILEPATH
+  local FILENAME
+  local FILE
+
+  FILEPATH=$1
+  FILENAME=$2
+  FILE=$FILEPATH$FILENAME
+  
+  if [ -f "$FILE" ]; then
+      echo "$FILENAME exists."
+  else 
+      echo "$FILENAME does not exist. A $FILENAME file is required to be present at $FILEPATH"
+      exit 64
+  fi
+}
+
 # Return a space-delimited string of resource names for the resources
 # that match the provided SysType tag and are in the specified resource group.
 # If no matching resources are found, a non-zero error is returned.

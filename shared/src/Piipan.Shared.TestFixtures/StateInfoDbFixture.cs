@@ -66,7 +66,7 @@ namespace Piipan.Shared.TestFixtures
 
                 conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Execute(sqltext);
-                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('0', 'zero', 'TT', 'test@test.com', '5551234', 'ZERO')");
+                conn.Execute("INSERT INTO state_info(id, state, state_abbreviation, email, phone, region) VALUES('0', 'zero', 'TT', 'test@email.example', '5551234', 'ZERO')");
 
                 conn.Close();
             }

@@ -6,19 +6,6 @@
     private (string,string)[] DropdownOptionsOne = new (string,string)[] {("Benefits Approved", "Benefits Approved"), ("Benefits Denied", "Benefits Denied")};
     private (string,string)[] DropdownOptionsTwo = new (string, string)[] { ("Benefits Terminated", "Benefits Terminated"), ("Benefits Unchanged", "Benefits Unchanged") };
 
-    private int InitiatingStateIndex = 0;
-    private int GetInitiatingIndex ()
-    {
-        if (InitiatingState)
-        {
-            return 0;
-        }
-        else
-        {
-            return 1;
-        }
-    }
-
     private RenderFragment GetDispositonLabel()
     {
         return @<text> @(DispositionData.FinalDisposition switch
@@ -38,12 +25,11 @@
         <UsaFormGroup>
             <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsOne : DropdownOptionsTwo)" @bind-Value="DispositionData.FinalDisposition" />
         </UsaFormGroup>
-        
-        <div>
-            <UsaFormGroup LabelOverride="@GetDispositonLabel()">
-                <UsaInputDate @bind-Value="DispositionData.FinalDispositionDate" />
-            </UsaFormGroup>
-        </div>
-        
-    
+
+        @if (!String.IsNullOrEmpty(DispositionData.FinalDisposition) || DispositionData.FinalDispositionDate != null)
+    {
+        <UsaFormGroup LabelOverride="@GetDispositonLabel()">
+            <UsaInputDate @bind-Value="DispositionData.FinalDispositionDate" />
+        </UsaFormGroup>
+    }
 </div>
