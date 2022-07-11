@@ -117,7 +117,6 @@ namespace Piipan.QueryTool.Pages
                         }
                     }
                 }
-                return Page();
             }
             else
             {
@@ -136,8 +135,13 @@ namespace Piipan.QueryTool.Pages
                     }
                 };
                 await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
-                return Page();
+                Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
+                if (Match == null)
+                {
+                    return RedirectToPage("Error", new { message = "MatchId not found" });
+                }
             }
+            return Page();
         }
 
     }
