@@ -45,7 +45,7 @@ namespace Piipan.Components.Routing
 
         private bool _onNavigateCalled;
 
-        // Piipan Update: Switch NavigationManager to BlockableNavigationManager
+        // Piipan Update: Switch NavigationManager to PiipanNavigationManager
         [Inject] private PiipanNavigationManager NavigationManager { get; set; }
 
         [Inject] private INavigationInterception NavigationInterception { get; set; }
