@@ -20,8 +20,8 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Shared.API.Utilities;
-using Piipan.Shared.Http;
 using Xunit;
 
 namespace Piipan.Match.Func.Api.Tests

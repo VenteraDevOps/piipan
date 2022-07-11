@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Piipan.Match.Core.Builders
 {
@@ -43,21 +43,19 @@ namespace Piipan.Match.Core.Builders
             foreach (var stateAbbr in match.States)
             {
                 var mreFiltered = match_res_events.Where(mre => mre.ActorState == stateAbbr);
-                string jsonString = MergeEvents(mreFiltered, match.Initiator == stateAbbr ? match.Input : match.Data);
-
+                string jsonString = MergeEvents(mreFiltered);
                 var stateObj = JsonConvert.DeserializeObject<Disposition>(jsonString);
-
                 stateObj.State = stateAbbr;
                 collect.Add(stateObj);
             }
             return collect.ToArray();
         }
 
-        private string MergeEvents(IEnumerable<IMatchResEvent> match_res_events, string originalMatchDetails = null)
+        private string MergeEvents(IEnumerable<IMatchResEvent> match_res_events)
         {
             return match_res_events
                 .Select(mre => JObject.Parse(mre.Delta))
-                .Aggregate(JObject.Parse(originalMatchDetails ?? @"{}"), (acc, x) =>
+                .Aggregate(JObject.Parse(@"{}"), (acc, x) =>
                 {
                     acc.Merge(x, new JsonMergeSettings
                     {

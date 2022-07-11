@@ -1,7 +1,6 @@
 ﻿@page "{id?}"
 @using Microsoft.AspNetCore.Antiforgery
 @using Piipan.Match.Api.Models.Resolution
-@using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
 @inject IAntiforgery antiforgery
 @model Piipan.QueryTool.Pages.MatchModel
@@ -12,9 +11,8 @@
 @if (Model.Match != null)
 {
     <div class="grid-container">
-        <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetail)" render-mode="WebAssembly"
-            param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)"
-            param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"  />
+        <component type="typeof(QueryTool.Client.Components.MatchDetail)" render-mode="WebAssembly"
+            param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)" />
     </div>
 }
 else

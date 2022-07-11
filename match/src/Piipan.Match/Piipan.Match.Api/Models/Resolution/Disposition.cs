@@ -1,5 +1,5 @@
-using System;
 using Newtonsoft.Json;
+using System;
 namespace Piipan.Match.Api.Models.Resolution
 {
     /// <summary>
@@ -9,14 +9,10 @@ namespace Piipan.Match.Api.Models.Resolution
     {
         [JsonProperty("initial_action_at")]
         public DateTime? InitialActionAt { get; set; }
-        [JsonProperty("initial_action_taken")]
-        public string InitialActionTaken { get; set; }
         [JsonProperty("invalid_match")]
-        public bool? InvalidMatch { get; set; }
+        public bool InvalidMatch { get; set; } = false;
         [JsonProperty("final_disposition")]
         public string FinalDisposition { get; set; }
-        [JsonProperty("final_disposition_date")]
-        public DateTime? FinalDispositionDate { get; set; }
         [JsonProperty("vulnerable_individual")]
         public bool? VulnerableIndividual { get; set; }
         [JsonProperty("state")]

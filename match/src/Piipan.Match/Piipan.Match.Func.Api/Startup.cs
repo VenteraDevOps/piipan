@@ -13,7 +13,6 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Validators;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
-using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
 
 [assembly: FunctionsStartup(typeof(Piipan.Match.Func.Api.Startup))]
@@ -57,8 +56,6 @@ namespace Piipan.Match.Func.Api
 
             builder.Services.RegisterMatchServices();
             builder.Services.RegisterParticipantsServices();
-            builder.Services.RegisterKeyVaultClientServices();
-
         }
     }
 }

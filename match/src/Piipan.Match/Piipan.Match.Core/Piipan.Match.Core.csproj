@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj" />
     <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
     <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />

@@ -44,7 +44,6 @@
     <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Client\Piipan.Match.Client.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
-    <ProjectReference Include="..\..\..\states\src\Piipan.States.Client\Piipan.States.Client.csproj" />
     <ProjectReference Include="..\Piipan.QueryTool.Client\Piipan.QueryTool.Client.csproj" />
   </ItemGroup>
 </Project>

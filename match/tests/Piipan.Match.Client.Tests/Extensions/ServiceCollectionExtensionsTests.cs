@@ -26,9 +26,6 @@ namespace Piipan.Match.Client.Tests.Extensions
             var env = Mock.Of<IHostEnvironment>();
             env.EnvironmentName = Environments.Development;
 
-            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
-            Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
-
             // Act
             services.RegisterMatchClientServices(env);
             var provider = services.BuildServiceProvider();

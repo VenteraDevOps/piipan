@@ -24,8 +24,6 @@ using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
 using Piipan.Shared.API.Utilities;
-using Piipan.Shared.Cryptography;
-using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
 using Xunit;
 
@@ -35,16 +33,15 @@ namespace Piipan.Match.Func.Api.IntegrationTests
     public class ApiIntegrationTests : DbFixture
     {
         private string InitiatingState = "eb";
-        private const string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
 
         static ParticipantDbo FullRecord()
         {
             return new ParticipantDbo
             {
                 // farrington,1931-10-13,000-12-3456
-                LdsHash = "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec",
+                LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
                 CaseId = "CaseIdExample",
-                ParticipantId = "participantid1",
+                ParticipantId = "ParticipantIdExample",
                 ParticipantClosingDate = new DateTime(1970, 1, 15),
                 RecentBenefitIssuanceDates = new List<DateRange>
                 {
@@ -53,21 +50,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     new DateRange(new DateTime(2021, 02, 28),new DateTime(2021, 3, 15))
                 },
                 VulnerableIndividual = true
-            };
-        }
-        static ParticipantDbo EncryptedFullRecord(ParticipantDbo unencryptedRecord)
-        {
-            AzureAesCryptographyClient client = new AzureAesCryptographyClient(base64EncodedKey);
-
-            return new ParticipantDbo
-            {
-                // farrington,1931-10-13,000-12-3456
-                LdsHash = client.EncryptToBase64String(unencryptedRecord.LdsHash),
-                CaseId = client.EncryptToBase64String(unencryptedRecord.CaseId),
-                ParticipantId = client.EncryptToBase64String(unencryptedRecord.ParticipantId),
-                ParticipantClosingDate = unencryptedRecord.ParticipantClosingDate,
-                RecentBenefitIssuanceDates = unencryptedRecord.RecentBenefitIssuanceDates,
-                VulnerableIndividual = unencryptedRecord.VulnerableIndividual
             };
         }
 
@@ -113,9 +95,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             // Mixing cases to verify the enabled states can be used no matter their casing.
             Environment.SetEnvironmentVariable("EnabledStates", "ea,EB");
 
-            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
-            Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
-
             var services = new ServiceCollection();
             services.AddLogging();
 
@@ -136,7 +115,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             });
             services.RegisterParticipantsServices();
             services.RegisterMatchServices();
-            services.RegisterKeyVaultClientServices();
 
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
@@ -162,7 +140,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         {
             // Arrange
             var record = FullRecord();
-            var recordEncrypted = EncryptedFullRecord(record);
             var logger = Mock.Of<ILogger>();
             var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
             var mockRequest = MockRequest(JsonBody(body));
@@ -170,7 +147,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var state = Environment.GetEnvironmentVariable("States").Split(",");
 
             ClearParticipants();
-            Insert(recordEncrypted);
+            Insert(record);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -184,8 +161,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Assert.Equal(record.CaseId, person.Matches.First().CaseId);
             Assert.Equal(record.ParticipantId, person.Matches.First().ParticipantId);
             Assert.Equal(state[0], person.Matches.First().State);
-            Assert.Equal(recordEncrypted.ParticipantClosingDate, person.Matches.First().ParticipantClosingDate);
-            Assert.Equal(recordEncrypted.VulnerableIndividual, person.Matches.First().VulnerableIndividual);
+            Assert.Equal(record.ParticipantClosingDate, person.Matches.First().ParticipantClosingDate);
+            Assert.Equal(record.VulnerableIndividual, person.Matches.First().VulnerableIndividual);
             // serialization
             var match = person.Matches.First();
             var json = JsonConvert.SerializeObject(match);
@@ -219,7 +196,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         {
             // Arrange
             var record = FullRecord();
-            var recordEncrypted = EncryptedFullRecord(record);
             var logger = Mock.Of<ILogger>();
             var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
             InitiatingState = "ec"; // set to a state that is disabled
@@ -227,10 +203,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var api = Construct();
 
             ClearParticipants();
-            Insert(recordEncrypted);
+            Insert(record);
 
             // Assert database is empty prior to the call
-            ClearMatchRecords();
             var matchesBefore = GetMatches();
             Assert.Empty(matchesBefore);
 
@@ -281,12 +256,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             // Arrange
             var recordA = FullRecord();
             var recordB = FullRecord();
-            var recordEncryptedA = EncryptedFullRecord(recordA);
-
             // lynn,1940-08-01,000-12-3457
             recordB.LdsHash = "97719c32bb3c6a5e08c1241a7435d6d7047e75f40d8b3880744c07fef9d586954f77dc93279044c662d5d379e9c8a447ce03d9619ce384a7467d322e647e5d95";
             recordB.ParticipantId = "ParticipantB";
-            var recordEncryptedB = EncryptedFullRecord(recordB);
             var logger = Mock.Of<ILogger>();
             var body = new object[] {
                 new RequestPerson { LdsHash = recordA.LdsHash, SearchReason = "other" },
@@ -294,11 +266,10 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
-            InsertUpload();
+
             ClearParticipants();
-            ClearMatchRecords();
-            Insert(recordEncryptedA);
-            Insert(recordEncryptedB);
+            Insert(recordA);
+            Insert(recordB);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -309,18 +280,15 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var resultA = resultObject.Data.Results.Find(p => p.Index == 0);
             var resultB = resultObject.Data.Results.Find(p => p.Index == 1);
 
-            AzureAesCryptographyClient cryptographyClient = new AzureAesCryptographyClient(base64EncodedKey);
-
             Assert.Equal(resultA.Matches.First().ParticipantId, recordA.ParticipantId);
             Assert.Equal(resultB.Matches.First().ParticipantId, recordB.ParticipantId);
         }
-        
+
         [Fact]
         public async void ApiCreatesMatchRecords()
         {
             // Arrange
             var record = FullRecord();
-            var recordEncrypted = EncryptedFullRecord(record);
             var logger = Mock.Of<ILogger>();
             var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
             var mockRequest = MockRequest(JsonBody(body));
@@ -329,7 +297,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             ClearParticipants();
             ClearMatchRecords();
-            Insert(recordEncrypted);
+            Insert(record);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);
@@ -339,18 +307,14 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         }
 
         [Fact]
-
         public async void ApiCreatesMatchRecordsWithCorrectValues()
         {
             // Arrange
             var recordA = FullRecord();
-            var recordEncryptedA = EncryptedFullRecord(recordA);
-            
             var recordB = FullRecord();
             // lynn,1940-08-01,000-12-3457
             recordB.LdsHash = "97719c32bb3c6a5e08c1241a7435d6d7047e75f40d8b3880744c07fef9d586954f77dc93279044c662d5d379e9c8a447ce03d9619ce384a7467d322e647e5d95";
             recordB.ParticipantId = "ParticipantB";
-            var recordEncryptedB = EncryptedFullRecord(recordB);
             var logger = Mock.Of<ILogger>();
             var body = new object[] {
                 new RequestPerson { LdsHash = recordA.LdsHash, SearchReason = "other" },
@@ -362,8 +326,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
             ClearParticipants();
             ClearMatchRecords();
-            Insert(recordEncryptedA);
-            Insert(recordEncryptedB);
+            Insert(recordA);
+            Insert(recordB);
 
             // Act
             var response = await api.Find(mockRequest.Object, logger);

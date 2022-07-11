@@ -37,12 +37,6 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
       },
-      "Portable.BouncyCastle": {
-        "type": "Direct",
-        "requested": "[1.9.0, )",
-        "resolved": "1.9.0",
-        "contentHash": "eZZBCABzVOek+id9Xy04HhmgykF0wZg9wpByzrWN7q8qEI0Qen9b7tfd7w8VA3dOeesumMG7C5ZPy0jk7PSRHw=="
-      },
       "xunit": {
         "type": "Direct",
         "requested": "[2.4.1, )",
@@ -84,17 +78,6 @@
           "Microsoft.Identity.Client.Extensions.Msal": "2.19.3",
           "System.Memory": "4.5.4",
           "System.Security.Cryptography.ProtectedData": "4.7.0",
-          "System.Text.Json": "4.7.2",
-          "System.Threading.Tasks.Extensions": "4.5.4"
-        }
-      },
-      "Azure.Security.KeyVault.Keys": {
-        "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "9asI1h3z4LeTyf17FwSJV9fcG+asOcyZOwcCCEb1HhBTqlTUgjHXFUt0S+PCnjtMlMzrsRS7HRXhuNHjzVXGrg==",
-        "dependencies": {
-          "Azure.Core": "1.23.0",
-          "System.Memory": "4.5.4",
           "System.Text.Json": "4.7.2",
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
@@ -223,14 +206,6 @@
           "System.Threading": "4.3.0"
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "qWzV9o+ZRWq+pGm+1dF+R7qTgTYoXvbyowRoBxQJGfqTpqDun2eteerjRQhq5PQ/14S+lqto3Ft4gYaRyl4rdQ==",
-        "dependencies": {
-          "Microsoft.Extensions.Primitives": "6.0.0"
-        }
-      },
       "Microsoft.Extensions.DependencyInjection": {
         "type": "Transitive",
         "resolved": "6.0.0",
@@ -247,20 +222,10 @@
       },
       "Microsoft.Extensions.FileProviders.Abstractions": {
         "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "0pd4/fho0gC12rQswaGQxbU34jOS1TPS8lZPpkFCH68ppQjHNHYle9iRuHeev1LhrJ94YPvzcRd8UmIuFk23Qw==",
+        "resolved": "2.2.0",
+        "contentHash": "EcnaSsPTqx2MGnHrmWOD0ugbuuqVT8iICqSqPzi45V5/MA1LjUNb0kwgcxBGqizV1R+WeBK7/Gw25Jzkyk9bIw==",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "6.0.0"
-        }
-      },
-      "Microsoft.Extensions.Hosting.Abstractions": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "GcT5l2CYXL6Sa27KCSh0TixsRfADUgth+ojQSD5EkzisZxmGFh7CwzkcYuGwvmXLjr27uWRNrJ2vuuEjMhU05Q==",
-        "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "6.0.0",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
-          "Microsoft.Extensions.FileProviders.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Primitives": "2.2.0"
         }
       },
       "Microsoft.Extensions.Http": {
@@ -1667,8 +1632,7 @@
           "Npgsql": "6.0.4",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
-          "Piipan.Shared": "1.0.0",
-          "Piipan.Shared.Cryptography": "1.0.0"
+          "Piipan.Shared": "1.0.0"
         }
       },
       "piipan.participants.api": {
@@ -1697,16 +1661,6 @@
         "type": "Project",
         "dependencies": {
           "Newtonsoft.Json": "13.0.1"
-        }
-      },
-      "piipan.shared.cryptography": {
-        "type": "Project",
-        "dependencies": {
-          "Azure.Core": "1.24.0",
-          "Azure.Identity": "1.6.0",
-          "Azure.Security.KeyVault.Keys": "4.3.0",
-          "Microsoft.Extensions.Hosting.Abstractions": "6.0.0",
-          "Piipan.Shared": "1.0.0"
         }
       }
     }

@@ -1,10 +1,8 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Piipan.Participants.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
-using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
 using Piipan.Shared.Deidentification;
 using Xunit;
@@ -21,13 +19,8 @@ namespace Piipan.Participants.Core.Tests.Extensions
             services.AddLogging();
             services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(c => Mock.Of<IDbConnectionFactory<ParticipantsDb>>());
 
-            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
-            Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
-
-
             // Act
             services.RegisterParticipantsServices();
-            services.RegisterKeyVaultClientServices();
             var provider = services.BuildServiceProvider();
 
             // Assert
@@ -36,7 +29,7 @@ namespace Piipan.Participants.Core.Tests.Extensions
             Assert.NotNull(provider.GetService<IParticipantApi>());
             Assert.NotNull(provider.GetService<IParticipantBulkInsertHandler>());
             Assert.NotNull(provider.GetService<IRedactionService>());
-        
+
         }
     }
 }

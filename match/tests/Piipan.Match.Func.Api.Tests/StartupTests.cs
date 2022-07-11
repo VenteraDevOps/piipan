@@ -32,8 +32,6 @@ namespace Piipan.Match.Func.Api.Tests
             // Act
             target.Configure(builder.Object);
             var provider = services.BuildServiceProvider();
-            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
-            Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
             Environment.SetEnvironmentVariable(Startup.DatabaseConnectionString,
                 "Server=server;Database=db;Port=5432;User Id=postgres;Password={password};");
             Environment.SetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString,

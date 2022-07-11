@@ -1,11 +1,9 @@
 using System;
 using System.Linq;
-using Azure.Security.KeyVault.Keys.Cryptography;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Services;
-using Piipan.Shared.Cryptography;
 using Piipan.Shared.Deidentification;
 using Xunit;
 
@@ -15,13 +13,6 @@ namespace Piipan.Participants.Core.IntegrationTests
     public class ParticipantServiceTests : DbFixture
     {
         private ParticipantTestDataHelper helper = new ParticipantTestDataHelper();
-        private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
-        private ICryptographyClient cryptographyClient;
-
-        public ParticipantServiceTests()
-        {
-            cryptographyClient = new AzureAesCryptographyClient(base64EncodedKey);
-        }
 
         [Theory]
         [InlineData(2)]
@@ -38,13 +29,11 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var redactionService = Mock.Of<IRedactionService>();
                 var serviceLogger = Mock.Of<ILogger<ParticipantService>>();
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
-    
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
-
-                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
+                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
                 var uploadDao = new UploadDao(helper.DbConnFactory(Factory, ConnectionString));
 
-                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger, cryptographyClient);
+                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger);
 
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
 
@@ -52,16 +41,6 @@ namespace Piipan.Participants.Core.IntegrationTests
                 await service.AddParticipants(participants, "test-etag", null);
 
                 long lastUploadId = GetLastUploadId();
-
-                // updatiing lds_hash with encryption
-                
-                participants.ToList().ForEach(p =>
-                {
-                    p.LdsHash = cryptographyClient.EncryptToBase64String(p.LdsHash);
-                    p.CaseId = cryptographyClient.EncryptToBase64String(p.CaseId);
-                    p.ParticipantId = cryptographyClient.EncryptToBase64String(p.ParticipantId);
-                    p.UploadId = p.UploadId;
-                });
 
                 // Assert
                 participants.ToList().ForEach(p =>
@@ -73,7 +52,6 @@ namespace Piipan.Participants.Core.IntegrationTests
             }
         }
 
-       
         [Theory]
         [InlineData(5)]
         public async void AfterException_AddParticipantsRollsTranactionBack(int nParticipants)
@@ -90,11 +68,10 @@ namespace Piipan.Participants.Core.IntegrationTests
                 var serviceLogger = Mock.Of<ILogger<ParticipantService>>();
                 var bulkLogger = Mock.Of<ILogger<ParticipantBulkInsertHandler>>();
                 var bulkInserter = new ParticipantBulkInsertHandler(bulkLogger);
-                
-                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger, cryptographyClient);
+                var participantDao = new ParticipantDao(helper.DbConnFactory(Factory, ConnectionString), bulkInserter, logger);
                 var uploadDao = new UploadDao(helper.DbConnFactory(Factory, ConnectionString));
 
-                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger, cryptographyClient);
+                ParticipantService service = new ParticipantService(participantDao, uploadDao, null, redactionService, serviceLogger);
 
                 var participants = helper.RandomParticipants(nParticipants, GetLastUploadId());
                 participants.Last().LdsHash = null; //Cause the db commit to fail due to a null hash value
@@ -112,7 +89,6 @@ namespace Piipan.Participants.Core.IntegrationTests
                     long expectedNewUploadId = ++lastUploadId;
                     long actualLastUploadId = GetLastUploadIdWithStatus("COMPLETE");
                     Assert.NotEqual(expectedNewUploadId, actualLastUploadId);
-
 
                     // Assert
                     participants.ToList().ForEach(p =>

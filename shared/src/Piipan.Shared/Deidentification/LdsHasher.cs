@@ -40,7 +40,7 @@ namespace Piipan.Shared.Deidentification
         /// <param name="input">concatenated PII elements of individual</param>
         private byte[] ToHash(string input)
         {
-            SHA512 sha = SHA512.Create();
+            SHA512 sha = SHA512Managed.Create();
             return sha.ComputeHash(Encoding.UTF8.GetBytes(input));
         }
 

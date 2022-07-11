@@ -113,18 +113,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Close();
             }
         }
-        public void InsertUpload()
-        {
-            var factory = NpgsqlFactory.Instance;
 
-            using (var conn = factory.CreateConnection())
-            {
-                conn.ConnectionString = ConnectionString;
-                conn.Open();
-                conn.Execute("INSERT INTO uploads(created_at, publisher,upload_identifier, status) VALUES(now() at time zone 'utc', current_user ,'test-etag', 'COMPLETE')");
-                conn.Close();
-            }
-        }
         public void ClearParticipants()
         {
             using (var conn = Factory.CreateConnection())

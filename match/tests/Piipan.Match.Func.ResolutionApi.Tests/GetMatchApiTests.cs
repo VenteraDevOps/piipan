@@ -1,17 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
+using Moq.Protected;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
-using Piipan.Shared.Http;
+using Piipan.Match.Func.ResolutionApi;
+using Piipan.Match.Func.ResolutionApi.Models;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.Tests
@@ -84,7 +90,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                     { "Ocp-Apim-Subscription-Name", "sub-name" }
                 }));
             var logger = new Mock<ILogger>();
-            // Mocks
+             // Mocks
             var matchRecord = new MatchRecordDbo();
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
@@ -132,7 +138,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
                 .ReturnsAsync(new MatchRecordDbo());
-            var mock = new Mock<IMatchResEventDao>();
+                var mock = new Mock<IMatchResEventDao>();
             var matchResEventDao = new Mock<IMatchResEventDao>();
             matchResEventDao
                 .Setup(r => r.GetEvents(
@@ -143,8 +149,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResAggregator = new Mock<IMatchResAggregator>();
             matchResAggregator
                 .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
-                .Returns(new MatchResRecord()
-                {
+                .Returns(new MatchResRecord(){
                     Status = "open"
                 });
 

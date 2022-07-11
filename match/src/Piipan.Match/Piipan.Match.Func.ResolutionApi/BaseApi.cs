@@ -1,9 +1,9 @@
-﻿using System;
-using System.Net;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Piipan.Shared.Http;
+using Piipan.Match.Func.ResolutionApi.Models;
+using System;
+using System.Net;
 
 namespace Piipan.Match.Func.ResolutionApi
 {

@@ -9,7 +9,6 @@ MatchRequest:
         properties:
           data:
             type: array
-            description: "An array containing 1 to 50 individuals to match against records of active participants in other States"
             minItems: 1
             maxItems: 50
             items:
@@ -135,120 +134,6 @@ MatchResponse:
       description: "Holds HTTP and other top-level errors. Either an errors or data property will be present in the response, but not both."
       items:
         $ref: '#/ResponseError'
-        
-GetMatchesResponse:
-  title: Get Matches response
-  type: object
-  properties:
-    data:
-      type: array
-      nullable: true
-      description: The response payload. Either an errors or data property will be present in the response, but not both.
-      items:
-            $ref: '#/GetMatchesResult'
-            
-GetMatchesResult:
-  type: object
-  required:
-    - dispositions
-    - initiator
-    - match_id
-    - created_at
-    - participants
-    - states
-    - status
-  properties:
-    created_at:
-      type: string
-      description: "The date the match was created on"
-    dispositions:
-      type: array
-      description: "The dispostions of each state"
-      items:
-        $ref: '../schemas/match-query.yaml#/Disposition'
-    initiator:
-      type: string
-      description: "The state that initiated the match"
-    match_id: 
-      type: string
-      description: "The unique id that identifies the match"
-    participants:
-      type: array
-      description: "The participant was matched in both states"
-      items:
-        $ref: '../schemas/match-query.yaml#/Participant'
-    states:
-      type: array
-      description: "The states that are involved in the match"
-    status:
-      type: string
-      description: "The status of whether or not the match resolution has been closed. Possible statuses are open or closed"
-      
-Participant:
-  type: object
-  required:
-    - case_id
-    - participant_id
-    - recent_benefit_issuance_dates
-    - state
-  properties:
-    case_id:
-      type: string
-      description: "The identifier for this participants instance of benefits"
-    participant_closing_date:
-      type: string
-      description: "The last date the participant will recieve benefits in that state"
-    participant_id:
-      type: string
-      description: "An identifier for the participant"
-    recent_benefit_issuance_dates:
-      type: array
-      description: "The list of months the participant has recently recieved benefits"
-      items:
-        $ref: '#/Issuance_Dates'
-    state:
-      type: string
-      description: "The state that the other parameters refer to"
-      
-Issuance_Dates:
-  type: object
-  required:
-    - start
-    - end
-  properties:
-    start:
-      type: string
-      description: "The start of that months benefits"
-    end:
-      type: string
-      description: "The end of that months benefits"
- 
-Disposition:
-  type: object
-  required:
-    - state
-  properties:
-    initial_action_at:
-      type: string
-      description: "The date the initial action was taken"
-    initial_action_taken:
-      type: string
-      description: "Which action was taken"
-    invalid_match:
-      type: boolean
-      description: "Whether or not the match was valid"
-    final_disposition:
-      type: string
-      description: "What the final dispostion was"
-    final_disposition_date:
-      type: string
-      description: "The date the final disposition was taken on"
-    vulnerable_individual:
-      type: boolean
-      description: "A true, false, or null value on whether or not the participants location needs to be protected"
-    state:
-      type: string
-      description: "The state that took these actions"
 
 Result:
   type: object
@@ -414,9 +299,3 @@ components:
       description: "Bad request. Request body does not match the required format."
     '429':
       description: "Too Many Requests. The status code indicates the user has sent too many requests in a given amount of time 'rate limiting'."
-    '200_Get_Matches':
-      description: "Successful response. Returns matches"
-      content:
-        application/json:
-          schema:
-            $ref: '../schemas/match-query.yaml#/GetMatchesResponse'
