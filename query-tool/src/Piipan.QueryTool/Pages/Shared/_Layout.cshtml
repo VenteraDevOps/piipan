@@ -15,6 +15,7 @@
     var pageName = Context.Request.Path.ToString().Split('/').Last().ToLower();
 }
 <body>
+    <div id="inert-area">
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
     <div class="usa-overlay"></div>
         <div class="sticky-footer">
@@ -99,6 +100,7 @@
             <partial name="_CUI" />
         </div>
     </div>
+    <component type="typeof(Piipan.Components.Modals.ModalContainer)" render-mode="WebAssembly" />
     @Html.AntiForgeryToken()
     <script src="~/js/uswds.min.js" asp-append-version="true"></script>
     <script src="/_framework/blazor.webassembly.js" asp-append-version="true"></script>

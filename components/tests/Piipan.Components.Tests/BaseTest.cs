@@ -1,7 +1,9 @@
-﻿using Bunit;
-using Microsoft.AspNetCore.Components;
-using System;
+﻿using System;
 using System.Linq.Expressions;
+using Bunit;
+using Microsoft.AspNetCore.Components;
+using Piipan.Components.Modals;
+using Piipan.Components.Routing;
 
 namespace Piipan.Components.Tests
 {
@@ -12,6 +14,11 @@ namespace Piipan.Components.Tests
     /// <typeparam name="T">The type of the component we are testing</typeparam>
     public abstract class BaseTest<T> : TestContext where T : IComponent, new()
     {
+        public BaseTest()
+        {
+            Services.AddModalManager();
+            Services.AddPiipanNavigationManager();
+        }
         protected T InitialValues { get; set; } = new T();
 
         protected IRenderedComponent<T>? Component { get; set; }
