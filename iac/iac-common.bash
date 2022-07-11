@@ -210,6 +210,25 @@ verify_file () {
   fi
 }
 
+# Run setup environment configuration script
+setup_enviroment () {
+
+  local envc
+  # local FILENAME
+  # local FILE
+
+  ENV_CONFIG=$1
+  # FILENAME=$2
+  FILE=$ENV_CONFIG/config.bash
+  
+  if [ -f "$FILE" ]; then
+      echo "Setting up environment configuration $FILE."
+      source $FILE
+  else 
+      echo "No environment configuration found at $FILE."
+  fi
+}
+
 # Return a space-delimited string of resource names for the resources
 # that match the provided SysType tag and are in the specified resource group.
 # If no matching resources are found, a non-zero error is returned.
