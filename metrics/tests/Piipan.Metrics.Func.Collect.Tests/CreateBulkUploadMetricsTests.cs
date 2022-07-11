@@ -9,7 +9,7 @@ using Azure.Messaging.EventGrid;
 
 namespace Piipan.Metrics.Func.Collect.Tests
 {
-    public class BulkUploadMetricsTests
+    public class CreateBulkUploadMetricsTests
     {
         private EventGridEvent MockEvent(string url, DateTime eventTime)
         {
@@ -17,6 +17,7 @@ namespace Piipan.Metrics.Func.Collect.Tests
             gridEvent.Object.EventTime = eventTime;
             return gridEvent.Object;
         }
+
 
         [Fact]
         public async Task Run_Success()
@@ -27,16 +28,16 @@ namespace Piipan.Metrics.Func.Collect.Tests
 
             var uploadApi = new Mock<IParticipantUploadWriterApi>();
             uploadApi
-                .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Setup(m => m.AddUploadMetrics(It.IsAny<ParticipantUpload>()))
                 .ReturnsAsync(1);
 
-            var function = new BulkUploadMetrics(uploadApi.Object);
+            var function = new CreateBulkUploadMetrics(uploadApi.Object);
 
             // Act
             await function.Run(MockEvent("https://somethingeaupload", now), logger.Object);
 
             // Assert
-            uploadApi.Verify(m => m.AddUpload("ea", now), Times.Once);
+            uploadApi.Verify(m => m.AddUploadMetrics(It.IsAny<ParticipantUpload>()));
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Information),
                 It.IsAny<EventId>(),
@@ -57,16 +58,16 @@ namespace Piipan.Metrics.Func.Collect.Tests
 
             var uploadApi = new Mock<IParticipantUploadWriterApi>();
             uploadApi
-                .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Setup(m => m.AddUploadMetrics(It.IsAny<ParticipantUpload>()))
                 .ReturnsAsync(1);
 
-            var function = new BulkUploadMetrics(uploadApi.Object);
+            var function = new CreateBulkUploadMetrics(uploadApi.Object);
 
             // Act
             await Assert.ThrowsAsync<FormatException>(() => function.Run(MockEvent(url, now), logger.Object));
 
             // Assert
-            uploadApi.Verify(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()), Times.Never);
+            uploadApi.Verify(m => m.AddUploadMetrics(It.IsAny<ParticipantUpload>()), Times.Never);
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Error),
                 It.IsAny<EventId>(),
@@ -75,6 +76,7 @@ namespace Piipan.Metrics.Func.Collect.Tests
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
             ));
         }
+
 
         [Fact]
         public async Task Run_UploadApiThrows()
@@ -85,16 +87,16 @@ namespace Piipan.Metrics.Func.Collect.Tests
 
             var uploadApi = new Mock<IParticipantUploadWriterApi>();
             uploadApi
-                .Setup(m => m.AddUpload(It.IsAny<string>(), It.IsAny<DateTime>()))
+                .Setup(m => m.AddUploadMetrics(It.IsAny<ParticipantUpload>()))
                 .ThrowsAsync(new Exception("upload api broke"));
 
-            var function = new BulkUploadMetrics(uploadApi.Object);
+            var function = new CreateBulkUploadMetrics(uploadApi.Object);
 
             // Act
             await Assert.ThrowsAsync<Exception>(() => function.Run(MockEvent("https://somethingeaupload", now), logger.Object));
 
             // Assert
-            uploadApi.Verify(m => m.AddUpload("ea", now), Times.Once);
+            uploadApi.Verify(m => m.AddUploadMetrics(It.IsAny<ParticipantUpload>()));
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Error),
                 It.IsAny<EventId>(),

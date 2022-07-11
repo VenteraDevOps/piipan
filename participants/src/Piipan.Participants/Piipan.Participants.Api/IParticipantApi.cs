@@ -8,7 +8,7 @@ namespace Piipan.Participants.Api
     public interface IParticipantApi
     {
         Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash);
-        Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier, Action<Exception> errorCallback);
+        Task AddParticipants(IEnumerable<IParticipant> participants, string uploadIdentifier, string state, Action<Exception> errorCallback);
         Task<IEnumerable<string>> GetStates();
         Task DeleteOldParticpants(string state = null);
 

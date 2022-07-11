@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Core.Models;
+using Piipan.Shared.Cryptography;
 using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.DataAccessObjects
@@ -14,16 +16,17 @@ namespace Piipan.Participants.Core.DataAccessObjects
         private readonly IDbConnectionFactory<ParticipantsDb> _dbConnectionFactory;
         private readonly IParticipantBulkInsertHandler _bulkInsertHandler;
         private readonly ILogger<ParticipantDao> _logger;
-
+        private readonly ICryptographyClient _cryptographyClient;
         public ParticipantDao(
             IDbConnectionFactory<ParticipantsDb> dbConnectionFactory,
             IParticipantBulkInsertHandler bulkInsertHandler,
-            ILogger<ParticipantDao> logger)
+            ILogger<ParticipantDao> logger,
+            ICryptographyClient cryptographyClientt)
         {
             _dbConnectionFactory = dbConnectionFactory;
             _bulkInsertHandler = bulkInsertHandler;
             _logger = logger;
-
+            _cryptographyClient = cryptographyClientt;
             SqlMapper.AddTypeHandler(new DateRangeListHandler());
         }
 
@@ -53,7 +56,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
             }
         }
 
-        public async Task AddParticipants(IEnumerable<ParticipantDbo> participants)
+        public async Task<ulong> AddParticipants(IEnumerable<ParticipantDbo> participants)
         {
             using (var connection = await _dbConnectionFactory.Build() as DbConnection)
             {
@@ -61,7 +64,7 @@ namespace Piipan.Participants.Core.DataAccessObjects
 
                 try
                 {
-                    await _bulkInsertHandler.LoadParticipants(participants, connection, "participants");
+                    return await _bulkInsertHandler.LoadParticipants(participants, connection, "participants");
                 }
                 catch (Exception ex)
                 {

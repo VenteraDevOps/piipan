@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2022-06-30
+
+### Changed
+- Added support for capturing participant upload status and start/completion timestamps in the Metrics database.
+
+### Added
+- Added AES encryption for columns containing sensitive PII values in Postgres
+
 ## [1.1.0] - 2022-05-31
 
 ### Changed

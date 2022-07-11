@@ -149,6 +149,7 @@ jobs:
             ./cc-test-reporter -d format-coverage ./metrics/tests/Piipan.Metrics.Func.Collect.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.metrics.func.collect.json
             ./cc-test-reporter -d format-coverage ./participants/tests/Piipan.Participants.Core.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.participants.core.collect.json
             ./cc-test-reporter -d format-coverage ./participants/tests/Piipan.Participants.Core.IntegrationTests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.participants.core.integration.collect.json
+            ./cc-test-reporter -d format-coverage ./shared/tests/Piipan.Shared.Cryptography.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.shared.cryptography.collect.json
             ./cc-test-reporter -d format-coverage ./shared/tests/Piipan.Shared.Tests/TestResults/**/coverage.info --input-type lcov -p /root/project -o /tmp/codeclimate.shared.json
             ./cc-test-reporter sum-coverage /tmp/codeclimate.*.json -o /tmp/sum.json
             ./cc-test-reporter upload-coverage -i /tmp/sum.json
