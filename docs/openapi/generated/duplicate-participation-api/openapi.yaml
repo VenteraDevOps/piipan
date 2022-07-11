@@ -38,6 +38,7 @@ paths:
                     required:
                       - lds_hash
                       - search_reason
+                      - participant_id
                     properties:
                       lds_hash:
                         type: string
@@ -46,9 +47,11 @@ paths:
                       participant_id:
                         type: string
                         description: Participant's state-specific identifier. Unique to the participant. Must not include social security number or other identifying information used outside of the benefits eligibility context.
+                        pattern: '^[A-Za-z0-9]+$'
                       case_id:
                         type: string
                         description: Participant's state-specific case number
+                        pattern: '^[A-Za-z0-9]+$'
                       search_reason:
                         type: string
                         description: 'The case action or other valid reason for performing the NAC search.  Valid options are ''application'', ''recertification'', ''new_household_member'', or ''other'''
@@ -70,6 +73,7 @@ paths:
                 value:
                   data:
                     - lds_hash: eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458
+                      participant_id: ParticipantId12345
                       search_reason: other
               Multiple persons:
                 description: A request with multiple persons

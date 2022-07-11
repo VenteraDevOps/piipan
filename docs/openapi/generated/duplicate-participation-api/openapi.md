@@ -61,7 +61,7 @@ Searches all state databases for any participant records that are an exact match
 |From|header|string|false|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
 |data|body|[object]|true|An array containing 1 to 50 individuals to match against records of active participants in other States|
 |» lds_hash|body|string|true|SHA-512 digest of participant's last name, DoB, and SSN. See docs/pprl.md for details|
-|» participant_id|body|string|false|Participant's state-specific identifier. Unique to the participant. Must not include social security number or other identifying information used outside of the benefits eligibility context.|
+|» participant_id|body|string|true|Participant's state-specific identifier. Unique to the participant. Must not include social security number or other identifying information used outside of the benefits eligibility context.|
 |» case_id|body|string|false|Participant's state-specific case number|
 |» search_reason|body|string|true|The case action or other valid reason for performing the NAC search.  Valid options are 'application', 'recertification', 'new_household_member', or 'other'|
 |» vulnerable_individual|body|boolean|false|Location protection flag for vulnerable individuals. True values indicate that the individual’s location must be protected from disclosure to avoid harm to the individual. Apply the same protections to true and null values.|

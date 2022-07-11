@@ -47,18 +47,18 @@ namespace Piipan.Match.Core.Tests.Parsers
         }
 
         [Theory]
-        [InlineData(@"{ data: [{ lds_hash: 'abc','search_reason': 'other' }]}", 1)] // invalid hash, but valid request
-        [InlineData(@"{ data: [{ lds_hash: '','search_reason': 'other' }]}", 1)] // empty hash, but valid request
+        [InlineData(@"{ data: [{ lds_hash: 'abc','participant_id': 'participant1','search_reason': 'other' }]}", 1)] // invalid hash, but valid request
+        [InlineData(@"{ data: [{ lds_hash: '','participant_id': 'participant1','search_reason': 'other' }]}", 1)] // empty hash, but valid request
         // farrington,1931-10-13,000-12-3456
         [InlineData(@"{'data':[
 
-            { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458', 
+            { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458',  'participant_id': 'participant1',
               'search_reason': 'other'}
         ]}", 1)]
         [InlineData(@"{'data':[
-            { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458', 
+            { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458', 'participant_id': 'participant1',
               'search_reason': 'other' },
-            { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458', 
+            { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458',  'participant_id': 'participant1',
               'search_reason': 'other' },
         ]}", 2)]
         public async Task WellFormedStreamReturnsObject(string body, int count)
@@ -102,6 +102,7 @@ namespace Piipan.Match.Core.Tests.Parsers
                     new RequestPerson
                     {
                         LdsHash = "eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458",
+                        ParticipantId = "participant1",
                         SearchReason = "other",
                         VulnerableIndividual = vulnerableStatus
                     }
@@ -121,7 +122,7 @@ namespace Piipan.Match.Core.Tests.Parsers
         {
             // Arrange
             var body = @"{'data':[
-                { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458',
+                { 'lds_hash':'eaa834c957213fbf958a5965c46fa50939299165803cd8043e7b1b0ec07882dbd5921bce7a5fb45510670b46c1bf8591bf2f3d28d329e9207b7b6d6abaca5458','participant_id': 'participant1',
                   'search_reason': 'other'}
             ]}";
             
