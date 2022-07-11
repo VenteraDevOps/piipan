@@ -11,7 +11,7 @@ namespace Piipan.Components.Modals
     public class ModalManager : IModalManager
     {
         public Action ModalsUpdated { get; set; }
-        public List<ModalInfo> OpenModals { get; set; } = new List<ModalInfo>();
+        public IReadOnlyCollection<ModalInfo> OpenModals { get; private set; } = Array.Empty<ModalInfo>();
 
         // Creates the ModalInfo and adds it to our open modals, and then calls ModalsUpdated.
         // This will get picked up by the ModalContainer to render all open modals.
@@ -35,7 +35,12 @@ namespace Piipan.Components.Modals
 
                 n.CloseComponent();
             });
-            OpenModals.Add(modalInfo);
+
+            // Add a new modal by creating a temporary list, adding a modal to it,
+            // and then converting it to a read-only list
+            var tempModals = OpenModals.ToList();
+            tempModals.Add(modalInfo);
+            OpenModals = tempModals.AsReadOnly();
             ModalsUpdated?.Invoke();
         }
 
@@ -43,7 +48,11 @@ namespace Piipan.Components.Modals
         // This will get picked up by the ModalContainer to render all remaining open modals.
         public void Close(ModalInfo modalInfo)
         {
-            OpenModals.Remove(modalInfo);
+            // Remove a modal by creating a temporary list, removing a modal from it,
+            // and then converting it to a read-only list
+            var tempModals = OpenModals.ToList();
+            tempModals.Remove(modalInfo);
+            OpenModals = tempModals.AsReadOnly();
             ModalsUpdated?.Invoke();
         }
     }

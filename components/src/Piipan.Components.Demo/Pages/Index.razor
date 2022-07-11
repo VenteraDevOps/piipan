@@ -100,6 +100,13 @@
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-text-area"))" class="@ButtonClass">View Input Text Area</button></FooterContent>
         </UsaCard>
+        <UsaCard Header="Modal">
+            <BodyContent>
+                <p>A modal disables page content and focuses the user’s attention on a single task or message.</p>
+                <ModalComponent />
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/modal"))" class="@ButtonClass">View Modal</button></FooterContent>
+        </UsaCard>
         <UsaCard Header="Tag">
             <BodyContent>
                 <p>A tag draws attention to new or categorized content elements.</p>
