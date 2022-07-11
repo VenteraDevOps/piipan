@@ -1,0 +1,17 @@
+<!-- Generated via IaC -->
+
+<policies>
+    <inbound>
+        <base />
+        <set-backend-service base-url="{getUploadByIdUrl}" />        
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

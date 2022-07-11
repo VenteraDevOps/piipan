@@ -3,7 +3,6 @@
 <policies>
     <inbound>
         <base />
-        <rewrite-uri template="/upload/{filename}" />
     </inbound>
     <backend>
         <base />
