@@ -5,6 +5,7 @@
 @using Piipan.Components.Modals
 @using Piipan.Components.Routing
 @using Piipan.QueryTool.Client.Modals
+@using System.IO
 @using static Piipan.Components.Layout.LayoutConstants
 @using static Piipan.Components.Forms.FormConstants
 @inherits BaseComponentTest<ConfirmModalWrapper>
@@ -15,6 +16,7 @@
         [Display(Name = "Required Field")]
         public string? RequiredField { get; set; }
     }
+    const string JSFileRelativePath = "/Modals/ConfirmModalWrapper.razor.js";
     private IElement? inputElement = null;
     private TestModel model = new TestModel();
     private IRenderedComponent<ModalContainer> modalContainer;
@@ -25,7 +27,18 @@
     /// </summary>
     public ConfirmModalWrapperTests() : base()
     {
-        moduleInterop = this.JSInterop.SetupModule("./Modals/ConfirmModalWrapper.razor.js");
+        moduleInterop = this.JSInterop.SetupModule($".{JSFileRelativePath}");
+    }
+
+    /// <summary>
+    /// Sometimes when generating the package-lock.json file the peer dependencies for uswds-gulp get added back in.
+    /// If this test is failing, manually remove the peer dependencies from the node_modules/uswds-gulp file.
+    /// </summary>
+    [Fact]
+    public void VerifyConfirmModalWrapperJSExists()
+    {
+        // Assert
+        Assert.True(File.Exists($"../../../../../src/Piipan.QueryTool.Client{JSFileRelativePath}"));
     }
 
     /// <summary>

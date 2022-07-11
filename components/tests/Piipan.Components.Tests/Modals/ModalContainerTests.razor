@@ -2,18 +2,31 @@
 @using System.Linq.Expressions
 @using Piipan.Components.Layout
 @using Piipan.Components.Modals
+@using System.IO
 @using static Piipan.Components.Layout.LayoutConstants
 @inherits BaseTest<ModalContainer>
 
 @code {
     BunitJSModuleInterop moduleInterop;
+    private const string JSFileRelativePath = "/Modals/ModalContainer.razor.js";
     /// <summary>
     /// Set the default initial values for this test component
     /// </summary>
     public ModalContainerTests() : base()
     {
         InitialValues = new ModalContainer();
-        moduleInterop = this.JSInterop.SetupModule("./_content/Piipan.Components/Modals/ModalContainer.razor.js");
+        moduleInterop = this.JSInterop.SetupModule($"./_content/Piipan.Components{JSFileRelativePath}");
+    }
+
+    /// <summary>
+    /// Sometimes when generating the package-lock.json file the peer dependencies for uswds-gulp get added back in.
+    /// If this test is failing, manually remove the peer dependencies from the node_modules/uswds-gulp file.
+    /// </summary>
+    [Fact]
+    public void VerifyModalContainerJSExists()
+    {
+        // Assert
+        Assert.True(File.Exists($"../../../../../src/Piipan.Components{JSFileRelativePath}"));
     }
 
     /// <summary>
