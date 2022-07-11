@@ -50,18 +50,10 @@ namespace Piipan.Match.Client
         }
 
         /// <summary>
-        /// sendsS a patch to update match res events
+        /// sendsS a patch request to update match res events
         /// </summary>
         public async Task<MatchResApiResponse> AddMatchResEvent(string matchId, AddEventRequest request, string initiatingState)
         {
-            //await _apiClient
-            //    .PostAsync<OrchMatchRequest, OrchMatchResponse>("find_matches", request, () =>
-            //    {
-            //        return new List<(string, string)>
-            //        {
-            //            ("X-Initiating-State", initiatingState)
-            //        };
-            //    });
             return await _apiClient.PatchAsync<AddEventRequest, MatchResApiResponse>($"matches/{matchId}/disposition", request, () =>
             {
                 return new List<(string, string)>
