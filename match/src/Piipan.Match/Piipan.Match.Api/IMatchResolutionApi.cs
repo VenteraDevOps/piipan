@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using Piipan.Match.Api.Models.Resolution;
+﻿using Piipan.Match.Api.Models.Resolution;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Api
 {

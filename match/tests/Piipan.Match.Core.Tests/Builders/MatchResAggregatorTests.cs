@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
+using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
-using Piipan.Shared.API.Utilities;
 using Xunit;
+using Moq;
+using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Match.Core.Tests.Builders
 {
@@ -128,7 +131,7 @@ namespace Piipan.Match.Core.Tests.Builders
             Assert.Equal(new DateTime(2022, 02, 01), ebObj.InitialActionAt);
 
             // invalid match
-            Assert.Null(eaObj.InvalidMatch);
+            Assert.False(eaObj.InvalidMatch);
             Assert.True(ebObj.InvalidMatch);
 
             // final disposition
@@ -163,7 +166,7 @@ namespace Piipan.Match.Core.Tests.Builders
             Assert.Equal(new DateTime(2021, 2, 28), ebParticipant.ParticipantClosingDate);
             Assert.Single(ebParticipant.RecentBenefitIssuanceDates);
             Assert.Collection(ebParticipant.RecentBenefitIssuanceDates,
-                item => item.Equals(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03, 31)))
+                item => item.Equals(new DateRange(new DateTime(2021, 03, 01), new DateTime(2021, 03,31)))
             );
         }
 

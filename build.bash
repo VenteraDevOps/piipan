@@ -9,7 +9,7 @@
 source "$(dirname "$0")"/tools/common.bash || exit
 
 run_all() {
-  subsystems=(components dashboard etl match metrics participants query-tool shared states)
+  subsystems=(components dashboard etl match metrics participants query-tool shared)
 
   for s in "${subsystems[@]}"
   do

@@ -4,6 +4,12 @@
 {{ if (response.content) data.responseSchemas = true; }}
 {{~}}
 
+{{? data.responseSchemas }}
+> Example responses
+
+{{= data.utils.getResponseExamples(data) }}
+{{?}}
+
 {{= data.tags.section }}
 <h3 id="{{=data.operationUniqueSlug}}-responses">Responses</h3>
 
@@ -78,11 +84,4 @@ Status Code **{{=response.status}}**
 {{~}}
 
 {{?}}
-
-{{? data.responseSchemas }}
-### Response Examples
-
-{{= data.utils.getResponseExamples(data) }}
-{{?}}
-
 {{= data.tags.endSection }}

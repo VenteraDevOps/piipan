@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Components\MatchDetail\StateDispositionInformation.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
   </ItemGroup>
@@ -28,7 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\components\src\Piipan.Components\Piipan.Components.csproj" />
     <ProjectReference Include="..\..\..\match\src\Piipan.Match\Piipan.Match.Api\Piipan.Match.Api.csproj" />
-    <ProjectReference Include="..\..\..\states\src\Piipan.States\Piipan.States.Api\Piipan.States.Api.csproj" />
   </ItemGroup>
 
 </Project>

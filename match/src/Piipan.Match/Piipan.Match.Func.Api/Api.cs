@@ -15,8 +15,8 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
+using Piipan.Match.Func.Api.Models;
 using Piipan.Participants.Core;
-using Piipan.Shared.Http;
 
 namespace Piipan.Match.Func.Api
 {

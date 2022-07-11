@@ -9,7 +9,6 @@ using Piipan.Participants.Api.Models;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Enums;
 using Piipan.Participants.Core.Models;
-using Piipan.Shared.Cryptography;
 using Piipan.Shared.Deidentification;
 
 namespace Piipan.Participants.Core.Services
@@ -21,21 +20,19 @@ namespace Piipan.Participants.Core.Services
         private readonly IStateService _stateService;
         private readonly IRedactionService _redactionService;
         private readonly ILogger<ParticipantService> _logger;
-        private readonly ICryptographyClient _cryptographyClient;
+
         public ParticipantService(
             IParticipantDao participantDao,
             IUploadDao uploadDao,
             IStateService stateService,
             IRedactionService redactionService,
-            ILogger<ParticipantService> logger,
-            ICryptographyClient cryptographyClient)
+            ILogger<ParticipantService> logger)
         {
             _participantDao = participantDao;
             _uploadDao = uploadDao;
             _stateService = stateService;
             _redactionService = redactionService;
             _logger = logger;
-            _cryptographyClient = cryptographyClient;
         }
 
         public async Task<IEnumerable<IParticipant>> GetParticipants(string state, string ldsHash)
@@ -46,11 +43,7 @@ namespace Piipan.Participants.Core.Services
                 var participants = await _participantDao.GetParticipants(state, ldsHash, upload.Id);
 
                 // Set the participant State before returning
-                return participants.Select(p => new ParticipantDto(p) { 
-                    State = state,
-                    ParticipantId = _cryptographyClient.DecryptFromBase64String(p.ParticipantId),
-                    CaseId = _cryptographyClient.DecryptFromBase64String(p.CaseId)
-                });
+                return participants.Select(p => new ParticipantDto(p) { State = state });
             }
             catch (InvalidOperationException)
             {
@@ -73,12 +66,9 @@ namespace Piipan.Participants.Core.Services
                 {
                     var participantDbos = participants.Select(p => new ParticipantDbo(p)
                     {
-                        UploadId = upload.Id,
-                        LdsHash = _cryptographyClient.EncryptToBase64String(p.LdsHash),
-                        CaseId = _cryptographyClient.EncryptToBase64String(p.CaseId),
-                        ParticipantId = _cryptographyClient.EncryptToBase64String(p.ParticipantId)
+                        UploadId = upload.Id
                     });
- 
+
                     await _participantDao.AddParticipants(participantDbos);
                     await _uploadDao.UpdateUploadStatus(upload, UploadStatuses.COMPLETE.ToString());
                     scope.Complete();

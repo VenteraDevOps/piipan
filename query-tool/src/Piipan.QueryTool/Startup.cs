@@ -15,7 +15,6 @@ using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using Piipan.Shared.Locations;
 using Piipan.Shared.Logging;
-using Piipan.States.Client.Extensions;
 
 namespace Piipan.QueryTool
 {
@@ -86,7 +85,6 @@ namespace Piipan.QueryTool
 
             services.RegisterMatchClientServices(_env);
             services.RegisterMatchResolutionClientServices(_env);
-            services.RegisterStatesClientServices(_env);
 
             if (_env.IsDevelopment())
             {

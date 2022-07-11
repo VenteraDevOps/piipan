@@ -269,13 +269,10 @@ main () {
   ORCH_API_APP_ROLE='OrchestratorApi.Query'
   METRICS_API_APP_ROLE='Metrics.Read'
   MATCH_RESOLUTION_API_APP_ROLE='MatchResolution.Query'
-  STATES_API_APP_ROLE='States.Query'
 
   orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
 
   match_resolution_name=$(get_resources "$MATCH_RES_API_TAG" "$MATCH_RESOURCE_GROUP")
-
-  states_name=$(get_resources "$STATES_API_TAG" "$RESOURCE_GROUP")
 
   query_tool_name=$(get_resources "$QUERY_APP_TAG" "$RESOURCE_GROUP")
 
@@ -328,12 +325,6 @@ main () {
   configure_easy_auth_pair \
     "$match_resolution_name" "$MATCH_RESOURCE_GROUP" \
     "$MATCH_RESOLUTION_API_APP_ROLE" \
-    "$query_tool_identity"
-
-  echo "Configure Easy Auth for StatesApi and QueryApp"
-  configure_easy_auth_pair \
-    "$states_name" "$RESOURCE_GROUP" \
-    "$STATES_API_APP_ROLE" \
     "$query_tool_identity"
 
   script_completed

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +11,8 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Database;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -117,7 +117,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // Assert
             Assert.Equal(200, response.StatusCode);
             // Assert Participant Data
-            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"initial_action_taken\":null,\"invalid_match\":null,\"final_disposition\":null,\"final_disposition_date\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"initial_action_taken\":null,\"invalid_match\":null,\"final_disposition\":null,\"final_disposition_date\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"created_at\":" + JsonConvert.SerializeObject(createdDate) + ",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
+            var expected = "{\"data\":{\"dispositions\":[{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"ea\"},{\"initial_action_at\":null,\"invalid_match\":false,\"final_disposition\":null,\"vulnerable_individual\":null,\"state\":\"bb\"}],\"initiator\":\"ea\",\"match_id\":\"ABC\",\"created_at\":" + JsonConvert.SerializeObject(createdDate) + ",\"participants\":[{\"case_id\":\"GHI\",\"participant_closing_date\":\"2021-02-28\",\"participant_id\":\"JKL\",\"recent_benefit_issuance_dates\":[{\"start\":\"2021-03-01\",\"end\":\"2021-03-31\"}],\"state\":\"bb\"},{\"case_id\":\"ABC\",\"participant_closing_date\":null,\"participant_id\":\"DEF\",\"recent_benefit_issuance_dates\":[],\"state\":\"ea\"}],\"states\":[\"ea\",\"bb\"],\"status\":\"open\"}}";
             Assert.Equal(expected, resString);
             // Assert the created date that is returned is nearly identical to the actual current time
             Assert.True((createdDate - matchCreateDate).Value.TotalMinutes < 1);
@@ -155,7 +155,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             // Assert first request
             Assert.Equal(200, response.StatusCode);
             var resBody = response.Value as MatchResApiResponse;
-            Assert.Null(resBody.Data.Dispositions[0].InvalidMatch);
+            Assert.False(resBody.Data.Dispositions[0].InvalidMatch);
 
             // Act again
             // creating an "invalid match" match event results in newly pulled Match request having invalid_match = true

@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj" />
     <ProjectReference Include="..\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
   </ItemGroup>

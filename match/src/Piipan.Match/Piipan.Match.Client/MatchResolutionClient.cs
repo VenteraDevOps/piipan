@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Piipan.Match.Api;
+﻿using Piipan.Match.Api;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
+using System.Threading.Tasks;
 
 namespace Piipan.Match.Client
 {

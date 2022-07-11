@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Piipan.Match.Api;
@@ -289,6 +291,45 @@ namespace Piipan.QueryTool.Tests
             Assert.NotNull(pageModel.QueryFormData.ServerErrors);
             Assert.Equal(new List<ServerError> {
                 new ServerError("", expectedErrorMessage) }, pageModel.QueryFormData.ServerErrors);
+        }
+
+        [Theory]
+        [InlineData(nameof(IndexModel.OnGet), null, null, false)]
+        [InlineData(nameof(IndexModel.OnGet), "IA", null, false)]
+        [InlineData(nameof(IndexModel.OnGet), null, "Worker", false)]
+        [InlineData(nameof(IndexModel.OnGet), "IA", "Worker", true)]
+        [InlineData(nameof(IndexModel.OnPostAsync), null, null, false)]
+        [InlineData(nameof(IndexModel.OnPostAsync), "IA", null, false)]
+        [InlineData(nameof(IndexModel.OnPostAsync), null, "Worker", false)]
+        [InlineData(nameof(IndexModel.OnPostAsync), "IA", "Worker", true)]
+        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
+        {
+            var mockServiceProvider = serviceProviderMock(location: location, role: role);
+
+            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockServiceProvider, method);
+
+            if (!isAuthorized)
+            {
+                Assert.Equal(403, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+                Assert.IsType<RedirectToPageResult>(pageHandlerExecutingContext.Result);
+            }
+            else
+            {
+                Assert.Equal(200, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
+            }
+        }
+
+        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
+        {
+            var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
+            var mockMatchApi = Mock.Of<IMatchApi>();
+            var pageModel = new IndexModel(
+                new NullLogger<IndexModel>(),
+                mockLdsDeidentifier,
+                mockMatchApi,
+                serviceProvider
+            );
+            return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
     }
 }

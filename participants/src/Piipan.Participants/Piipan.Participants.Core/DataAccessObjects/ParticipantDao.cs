@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Piipan.Participants.Core.Models;
-using Piipan.Shared.Cryptography;
 using Piipan.Shared.Database;
 
 namespace Piipan.Participants.Core.DataAccessObjects
@@ -16,17 +14,16 @@ namespace Piipan.Participants.Core.DataAccessObjects
         private readonly IDbConnectionFactory<ParticipantsDb> _dbConnectionFactory;
         private readonly IParticipantBulkInsertHandler _bulkInsertHandler;
         private readonly ILogger<ParticipantDao> _logger;
-        private readonly ICryptographyClient _cryptographyClient;
+
         public ParticipantDao(
             IDbConnectionFactory<ParticipantsDb> dbConnectionFactory,
             IParticipantBulkInsertHandler bulkInsertHandler,
-            ILogger<ParticipantDao> logger,
-            ICryptographyClient cryptographyClientt)
+            ILogger<ParticipantDao> logger)
         {
             _dbConnectionFactory = dbConnectionFactory;
             _bulkInsertHandler = bulkInsertHandler;
             _logger = logger;
-            _cryptographyClient = cryptographyClientt;
+
             SqlMapper.AddTypeHandler(new DateRangeListHandler());
         }
 
