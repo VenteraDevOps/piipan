@@ -223,7 +223,7 @@ setup_enviroment () {
   
   if [ -f "$FILE" ]; then
       echo "Setting up environment configuration $FILE."
-      source $FILE
+      source "$FILE"
   else 
       echo "No environment configuration found at $FILE."
   fi
