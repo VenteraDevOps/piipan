@@ -223,7 +223,7 @@ setup_enviroment () {
   
   if [ -f "$(dirname "$0")$FILE" ]; then
       echo "Setting up environment configuration $FILE."
-      source "$(dirname "$0")$FILE"
+      source "$(dirname "$0")$ENV_CONFIG/config.bash"
   else 
       echo "No environment configuration found at $FILE."
   fi
