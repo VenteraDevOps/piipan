@@ -177,7 +177,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Equal(new List<ServerError> { new("Query.MatchId", expectedError) },
@@ -199,7 +199,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Empty(pageModel.RequestErrors);
@@ -219,7 +219,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Empty(pageModel.RequestErrors);
@@ -244,7 +244,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Equal(new List<ServerError> { new("", "There was an error running your search. Please try again.") }, pageModel.RequestErrors);
