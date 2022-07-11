@@ -23,6 +23,7 @@ namespace Piipan.QueryTool.Pages
         public MatchResApiResponse Match { get; set; } = null;
         public List<MatchResApiResponse> AvailableMatches { get; set; } = null;
         public List<ServerError> RequestErrors { get; private set; } = new();
+        public MatchDetailSaveResponseData MatchDetailSaveResponse { get; set; }
         public string UserState { get; set; } = "";
 
         public MatchModel(ILogger<MatchModel> logger
@@ -140,6 +141,7 @@ namespace Piipan.QueryTool.Pages
                 {
                     return RedirectToPage("Error", new { message = "MatchId not found" });
                 }
+                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = true };
             }
             return Page();
         }

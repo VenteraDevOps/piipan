@@ -62,3 +62,7 @@ dd {
     max-width: 910px;
     margin-bottom: 24px;
 }
+
+.match-detail-save-success {
+    margin-top: 24px;
+}
