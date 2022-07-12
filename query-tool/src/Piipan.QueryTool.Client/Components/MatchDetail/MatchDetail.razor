@@ -10,6 +10,7 @@
     [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
     [Parameter] public ParameterBase<StatesInfoResponse> StateInfo { get; set; }
     [Parameter] public string LoggedInUsersState { get; set; }
+    [Parameter] public string Token { get; set; }
 
     private TagTheme StatusTheme()
     {
@@ -83,7 +84,7 @@
     <!-- \match header -->
     <div class="grid-row">
         <div class="grid-col-4">
-            <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" DispositionData="@(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition)"/>
+            <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition)"/>
         </div>
         <div class="grid-col-8">
             <div style="max-width: 860px">

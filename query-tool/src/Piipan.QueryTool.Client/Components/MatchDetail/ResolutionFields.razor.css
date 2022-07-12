@@ -12,3 +12,11 @@ h3 {
     line-height: 33px;
     margin: 0;
 }
+
+.ResolutionFieldsSave {
+    margin-top: 5px;
+}
+
+.ResolutionFieldsDropdownWidth {
+    max-width: 296px;
+}

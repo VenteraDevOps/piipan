@@ -43,5 +43,17 @@ namespace Piipan.Match.Api.Models
         [JsonProperty("vulnerable_individual",
             NullValueHandling = NullValueHandling.Ignore)]
         public bool? VulnerableIndividual { get; set; } = null;
+        
+        [JsonProperty("initial_action_taken")]
+        public string? InitialActionTaken { get; set; }
+        
+        [JsonProperty("invalid_match_reason")]
+        public string? InvalidMatchReason { get; set; }
+        
+        [JsonProperty("other_reasoning_for_invalid_match")]
+        public string? OtherReasoningForInvalidMatch { get; set; }
+        
+        [JsonProperty("final_disposition_date")]
+        public DateTime? FinalDispositionDate { get; set; }
     }
 }

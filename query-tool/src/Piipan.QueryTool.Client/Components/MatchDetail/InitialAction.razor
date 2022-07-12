@@ -10,9 +10,11 @@
 }
 <div>
     <h5 class="InitalActionHeader">Initial Action</h5>
-          <UsaFormGroup>
-            <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsInitiating : DropdownOptionsMatching)" @bind-Value="DispositionData.InitialActionTaken" />
-        </UsaFormGroup>
+        <div class="ResolutionFieldsDropdownWidth">
+              <UsaFormGroup>
+                <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsInitiating : DropdownOptionsMatching)" @bind-Value="DispositionData.InitialActionTaken" />
+            </UsaFormGroup>
+        </div>
     <UsaFormGroup>
             <UsaInputDate @bind-Value="DispositionData.InitialActionAt" />
         </UsaFormGroup>

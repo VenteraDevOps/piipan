@@ -12,3 +12,15 @@ h5 {
     color: #1B1B1B;
     margin-bottom: 16px;
 }
+
+.InvalidMatchTrueReasoning {
+    margin-left: 32px;
+}
+
+.InvalidMatchReasoningTextArea {
+    max-width: 369px;
+}
+
+.ResolutionFieldsDropdownWidth {
+    max-width: 296px;
+}

@@ -87,6 +87,7 @@
       <div class="usa-form ">
         <form id="snap-resolution-fields-form" method="post" novalidate="" >
           <fieldset class="usa-fieldset">
+          <input type="hidden" name="__RequestVerificationToken" >
             <div diff:ignore> //Ignoring Vulnerable Invalid Component
             </div>
             <div diff:ignore> //Ignoring Initial Action Component
@@ -94,16 +95,18 @@
             <div class="FinalDispositionDiv" >
               <h5 class="FinalDispositionHeader" >Final Disposition</h5>
               <p class="FinalDispositionText" >Final Disposition information can be added once the initial Action has been selected.</p>
-              <div class="usa-form-group ">
-                <label class="usa-label" for="DispositionData_FinalDisposition">Final Disposition Taken</label>
-                <select class="usa-select usa-input "  id="DispositionData_FinalDisposition" name="DispositionData.FinalDisposition" style="" value=""  >
-                  <option value="">- Select -</option>
-                  <option value="Benefits Approved">Benefits Approved</option>
-                  <option value="Benefits Denied">Benefits Denied</option>
-                </select>
+              <div class="ResolutionFieldsDropdownWidth" >
+                  <div class="usa-form-group ">
+                    <label class="usa-label" for="DispositionData_FinalDisposition">Final Disposition Taken</label>
+                    <select class="usa-select usa-input "  id="DispositionData_FinalDisposition" name="DispositionData.FinalDisposition" style="" value=""  >
+                      <option value="">- Select -</option>
+                      <option value="Benefits Approved">Benefits Approved</option>
+                      <option value="Benefits Denied">Benefits Denied</option>
+                    </select>
+                  </div>
               </div>
             </div>
-            <button class="usa-button " >Save Changes</button>
+            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
           </fieldset>
         </form>
       </div>
@@ -130,6 +133,7 @@
       <div class="usa-form ">
         <form id="snap-resolution-fields-form" method="post" novalidate="" >
           <fieldset class="usa-fieldset">
+          <input type="hidden" name="__RequestVerificationToken" >
             <div diff:ignore> //Ignoring Vulnerable Invalid Component
             </div>
             <div diff:ignore> //Ignoring Initial Action Component
@@ -137,16 +141,18 @@
             <div class="FinalDispositionDiv" >
               <h5 class="FinalDispositionHeader" >Final Disposition</h5>
               <p class="FinalDispositionText" >Final Disposition information can be added once the initial Action has been selected.</p>
-              <div class="usa-form-group ">
-                <label class="usa-label" for="DispositionData_FinalDisposition">Final Disposition Taken</label>
-                <select class="usa-select usa-input "  id="DispositionData_FinalDisposition" name="DispositionData.FinalDisposition" style="" value=""  >
-                  <option value="">- Select -</option>
-                  <option value="Benefits Approved">Benefits Approved</option>
-                  <option value="Benefits Denied">Benefits Denied</option>
-                </select>
+              <div class="ResolutionFieldsDropdownWidth" >
+                  <div class="usa-form-group ">
+                    <label class="usa-label" for="DispositionData_FinalDisposition">Final Disposition Taken</label>
+                    <select class="usa-select usa-input "  id="DispositionData_FinalDisposition" name="DispositionData.FinalDisposition" style="" value=""  >
+                      <option value="">- Select -</option>
+                      <option value="Benefits Approved">Benefits Approved</option>
+                      <option value="Benefits Denied">Benefits Denied</option>
+                    </select>
+                  </div>
               </div>
             </div>
-            <button class="usa-button " >Save Changes</button>
+            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
           </fieldset>
         </form>
       </div>

@@ -32,15 +32,20 @@
             <UsaRadio Value=true>Yes</UsaRadio>
             @if (DispositionData.InvalidMatch??false)
             {
-                <UsaFormGroup>
-                    <UsaSelect DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.InvalidMatchReason" />
-                </UsaFormGroup>
+                <div class="InvalidMatchTrueReasoning ResolutionFieldsDropdownWidth">
+                    <UsaFormGroup>
+                        <UsaSelect DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.InvalidMatchReason" />
+                    </UsaFormGroup>
+                </div>
             }
             @if (DispositionData.InvalidMatchReason == "Other" && DispositionData.InvalidMatch == true)
             {
-                <UsaFormGroup>
-                    <UsaInputTextArea DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.OtherReasoningForInvalidMatch" />
-                </UsaFormGroup>
+                <div class="InvalidMatchTrueReasoning InvalidMatchReasoningTextArea">
+                    <UsaFormGroup>
+                        <UsaInputTextArea DropdownOptions="@DropdownOptions" @bind-Value="DispositionData.OtherReasoningForInvalidMatch" />
+                    </UsaFormGroup>
+                </div>
+                
             }
             <UsaRadio Value=false>No</UsaRadio>
         </ChildContent>

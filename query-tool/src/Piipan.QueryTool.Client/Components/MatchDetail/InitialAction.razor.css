@@ -26,3 +26,6 @@
     margin-bottom: 0;
 }
 
+.ResolutionFieldsDropdownWidth {
+    max-width: 296px;
+}

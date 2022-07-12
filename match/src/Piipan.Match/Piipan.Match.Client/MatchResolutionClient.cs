@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Piipan.Match.Api;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
 
@@ -45,6 +47,20 @@ namespace Piipan.Match.Client
         {
             var (response, _) = await _apiClient.TryGetAsync<MatchResListApiResponse>($"matches");
             return response;
+        }
+
+        /// <summary>
+        /// sendsS a patch request to update match res events
+        /// </summary>
+        public async Task<MatchResApiResponse> AddMatchResEvent(string matchId, AddEventRequest request, string initiatingState)
+        {
+            return await _apiClient.PatchAsync<AddEventRequest, MatchResApiResponse>($"matches/{matchId}/disposition", request, () =>
+            {
+                return new List<(string, string)>
+                    {
+                        ("X-Initiating-State", initiatingState)
+                    };
+            });
         }
     }
 }

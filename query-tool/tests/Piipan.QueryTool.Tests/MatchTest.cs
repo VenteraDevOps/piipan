@@ -77,6 +77,27 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
+        public async Task TestValidMatchId_Post()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+            var result = await pageModel.OnPost(caseid);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(caseid, pageModel.Match.Data.MatchId);
+            Assert.Equal("ea", pageModel.Match.Data.Initiator);
+            Assert.Equal(MatchRecordStatus.Open, pageModel.Match.Data.Status);
+            Assert.Empty(pageModel.Match.Data.Dispositions);
+            Assert.Empty(pageModel.Match.Data.Participants);
+            Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
+        }
+
+        [Fact]
         public async Task TestValidMatchId_Get()
         {
             // arrange
@@ -177,7 +198,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Equal(new List<ServerError> { new("Query.MatchId", expectedError) },
@@ -199,7 +220,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Empty(pageModel.RequestErrors);
@@ -219,7 +240,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Empty(pageModel.RequestErrors);
@@ -244,7 +265,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Equal(new List<ServerError> { new("", "There was an error running your search. Please try again.") }, pageModel.RequestErrors);

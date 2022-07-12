@@ -80,26 +80,29 @@
       <div class="usa-form ">
         <form id="snap-resolution-fields-form" method="post" novalidate="" >
           <fieldset class="usa-fieldset">
-            <div diff:ignore> //Ignoring Vulnerable Invalid Component
+            <input type="hidden" name="__RequestVerificationToken" >
+            <div diff:ignore> //ignoreing Vulnerable Invalid Component
             </div>
             <div >
-          <h5 class="InitalActionHeader" >Initial Action</h5>
-          <div class="usa-form-group ">
-            <label class="usa-label" for="DispositionData_InitialActionTaken">Initial Action Taken</label>
-            <select class="usa-select usa-input "  id="DispositionData_InitialActionTaken" name="DispositionData.InitialActionTaken" style="" value=""  >
-              <option value="">- Select -</option>
-              <option value="Notice Sent">Notice Sent</option>
-              <option value="Client Provided Required Verification">Client Provided Required Verification</option>
-            </select>
-          </div>
-          <div class="usa-form-group ">
-            <label class="usa-label" for="DispositionData_InitialActionAt">Inital Action Date</label>
-            <input  id="DispositionData_InitialActionAt" name="DispositionData.InitialActionAt" style="width: 180px;" type="date" class="usa-input  valid" value=""  >
-          </div>
-        </div>
-            <div diff:ignore> //Ignoring Final Disposition Component
+              <h5 class="InitalActionHeader" >Initial Action</h5>
+              <div class="ResolutionFieldsDropdownWidth" >
+                <div class="usa-form-group ">
+                  <label class="usa-label" for="DispositionData_InitialActionTaken">Initial Action Taken</label>
+                  <select class="usa-select usa-input "  id="DispositionData_InitialActionTaken" name="DispositionData.InitialActionTaken" style="" value=""  >
+                    <option value="">- Select -</option>
+                    <option value="Notice Sent">Notice Sent</option>
+                    <option value="Client Provided Required Verification">Client Provided Required Verification</option>
+                  </select>
+                </div>
+              </div>
+              <div class="usa-form-group ">
+                <label class="usa-label" for="DispositionData_InitialActionAt">Inital Action Date</label>
+                <input  id="DispositionData_InitialActionAt" name="DispositionData.InitialActionAt" style="width: 180px;" type="date" class="usa-input  valid" value=""  >
+              </div>
             </div>
-            <button class="usa-button " >Save Changes</button>
+            <div diff:ignore > //Ignoreing Final Disposition Component
+            </div>
+            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
           </fieldset>
         </form>
       </div>
@@ -126,26 +129,29 @@
       <div class="usa-form ">
         <form id="snap-resolution-fields-form" method="post" novalidate="" >
           <fieldset class="usa-fieldset">
-            <div diff:ignore> //Ignoring Vulnerable Invalid Component
+            <input type="hidden" name="__RequestVerificationToken" >
+            <div diff:ignore> //ignoring Vulnerable Invlid Component
             </div>
             <div >
               <h5 class="InitalActionHeader" >Initial Action</h5>
-              <div class="usa-form-group ">
-                <label class="usa-label" for="DispositionData_InitialActionTaken">Initial Action Taken</label>
-                <select class="usa-select usa-input "  id="DispositionData_InitialActionTaken" name="DispositionData.InitialActionTaken" style="" value=""  >
-                  <option value="">- Select -</option>
-                  <option value="Notice Sent">Notice Sent</option>
-                  <option value="Client Verified Moved Out of State">Client Verified Moved Out of State</option>
-                </select>
+              <div class="ResolutionFieldsDropdownWidth" >
+                <div class="usa-form-group ">
+                  <label class="usa-label" for="DispositionData_InitialActionTaken">Initial Action Taken</label>
+                  <select class="usa-select usa-input "  id="DispositionData_InitialActionTaken" name="DispositionData.InitialActionTaken" style="" value=""  >
+                    <option value="">- Select -</option>
+                    <option value="Notice Sent">Notice Sent</option>
+                    <option value="Client Verified Moved Out of State">Client Verified Moved Out of State</option>
+                  </select>
+                </div>
               </div>
               <div class="usa-form-group ">
                 <label class="usa-label" for="DispositionData_InitialActionAt">Inital Action Date</label>
                 <input  id="DispositionData_InitialActionAt" name="DispositionData.InitialActionAt" style="width: 180px;" type="date" class="usa-input  valid" value=""  >
               </div>
             </div>
-            <div diff:ignore> //Ignoring Final Disposition Component
+            <div diff:ignore > //ignoring Final Dispositon Component
             </div>
-            <button class="usa-button " >Save Changes</button>
+            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
           </fieldset>
         </form>
       </div>
