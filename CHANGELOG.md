@@ -3,6 +3,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0.44] - 2022-07-12
+
+### Changed
+- Made Participant Id a required field for Duplicate Participation API search requests
+
+### Added
+- Vulnerable & Invalid Status component/section to Match Details page
+- Initial Action component/section to Match Details page
+- Final Disposition component/section to the Match Details page
+- Save functionality for Match Detail Resolution fields
+- New API endpoint for retrieving Bulk Upload status details by its upload identifier
+- Validation for Participant Id and Case Id in Duplicate Participation API
+- IAC Environmental support for states.csv file
+- Modal Window Support and Navigation blocking behavior
+
+### Fixed
+- Pulled State Metadata SQL data insertion out of Match specific SQL file
+- Replaced placeholder email addresses with safe-to-use top level testing domain 
+
 ## [1.1.0.43] - 2022-06-28
 
 ### Changed
