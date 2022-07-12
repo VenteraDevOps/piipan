@@ -115,12 +115,12 @@ namespace Piipan.Components.Forms
             if (OnBeforeSubmit != null)
             {
                 await OnBeforeSubmit(currentErrors.Count == 0);
-                if (currentErrors.Count == 0)
-                {
-                    // Form will submit now, so let's mark the form not dirty.
-                    // That way it doesn't get flagged that we're leaving the page without saving
-                    IsDirty = false;
-                }
+            }
+            if (currentErrors.Count == 0)
+            {
+                // Form will submit now, so let's mark the form not dirty.
+                // That way it doesn't get flagged that we're leaving the page without saving
+                IsDirty = false;
             }
         }
 

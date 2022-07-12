@@ -16,91 +16,91 @@
     public MatchDetailTests() : base()
     {
         InitialValues = new Piipan.QueryTool.Client.Components.MatchDetail.MatchDetail()
+        {
+            Match = new ParameterBase<MatchResApiResponse>
+            {
+                Data = new MatchResApiResponse
                 {
-                    Match = new ParameterBase<MatchResApiResponse>
+                    Data = new MatchResRecord
                     {
-                        Data = new MatchResApiResponse
+                        Status = "open",
+                        MatchId = "M123456",
+                        Dispositions = new Disposition[]
+                    {
+                    new Disposition
+                    {
+                        State = "ea",
+                        FinalDisposition = "Benefits Approved",
+                        FinalDispositionDate = DateTime.Parse("02/02/2022"),
+                        VulnerableIndividual = false,
+                        InvalidMatch = false,
+                        InitialActionAt = DateTime.Parse("01/01/2022"),
+                        InitialActionTaken = "Notice Sent"
+                    },
+                    new Disposition
+                    {
+                        State = "eb",
+                        FinalDisposition = "Benefits Terminated",
+                        FinalDispositionDate = DateTime.Parse("02/02/2021"),
+                        VulnerableIndividual = false,
+                        InvalidMatch = false,
+                        InitialActionAt = DateTime.Parse("01/01/2021"),
+                        InitialActionTaken = "Notice Sent"
+                    }
+                    },
+                        Participants = new Participant[]
+                    {
+                    new Participant
+                    {
+                        State = "ea",
+                        CaseId = "c123",
+                        ParticipantId = "p123",
+                        RecentBenefitIssuanceDates = new List<DateRange>
                         {
-                            Data = new MatchResRecord
+                            new DateRange
                             {
-                                Status = "open",
-                                MatchId = "M123456",
-                                Dispositions = new Disposition[]
-                            {
-                            new Disposition
-                            {
-                                State = "ea",
-                                FinalDisposition = "Benefits Approved",
-                                FinalDispositionDate = DateTime.Parse("02/02/2022"),
-                                VulnerableIndividual = false,
-                                InvalidMatch = false,
-                                InitialActionAt = DateTime.Parse("01/01/2022"),
-                                InitialActionTaken = "Notice Sent"
+                                Start = DateTime.Parse("01/01/2022"),
+                                End = DateTime.Parse("02/02/2022")
                             },
-                            new Disposition
+                            new DateRange
                             {
-                                State = "eb",
-                                FinalDisposition = "Benefits Terminated",
-                                FinalDispositionDate = DateTime.Parse("02/02/2021"),
-                                VulnerableIndividual = false,
-                                InvalidMatch = false,
-                                InitialActionAt = DateTime.Parse("01/01/2021"),
-                                InitialActionTaken = "Notice Sent"
-                            }
-                            },
-                                Participants = new Participant[]
-                            {
-                            new Participant
-                            {
-                                State = "ea",
-                                CaseId = "c123",
-                                ParticipantId = "p123",
-                                RecentBenefitIssuanceDates = new List<DateRange>
-                                {
-                                    new DateRange
-                                    {
-                                        Start = DateTime.Parse("01/01/2022"),
-                                        End = DateTime.Parse("02/02/2022")
-                                    },
-                                    new DateRange
-                                    {
-                                        Start = DateTime.Parse("03/03/2022"),
-                                        End = DateTime.Parse("04/04/2022")
-                                    }
-                                }
-                            },
-                            new Participant
-                            {
-                                State = "eb",
-                                CaseId = "c456",
-                                ParticipantId = "p456",
-                                ParticipantClosingDate = DateTime.Parse("01/01/2021"),
-                                RecentBenefitIssuanceDates = new List<DateRange>
-                                {
-                                    new DateRange
-                                    {
-                                        Start = DateTime.Parse("01/01/2021"),
-                                        End = DateTime.Parse("02/02/2021")
-                                    },
-                                    new DateRange
-                                    {
-                                        Start = DateTime.Parse("03/03/2021"),
-                                        End = DateTime.Parse("04/04/2021")
-                                    }
-                                }
-                            }
-                            },
-                                States = new string[] { "ea", "eb" },
-                                Initiator = "ea"
+                                Start = DateTime.Parse("03/03/2022"),
+                                End = DateTime.Parse("04/04/2022")
                             }
                         }
                     },
-                    StateInfo = new ParameterBase<StatesInfoResponse>
+                    new Participant
                     {
-                        Data = new StatesInfoResponse
+                        State = "eb",
+                        CaseId = "c456",
+                        ParticipantId = "p456",
+                        ParticipantClosingDate = DateTime.Parse("01/01/2021"),
+                        RecentBenefitIssuanceDates = new List<DateRange>
                         {
-                            Results = new List<StateInfoResponseData>
-                        {
+                            new DateRange
+                            {
+                                Start = DateTime.Parse("01/01/2021"),
+                                End = DateTime.Parse("02/02/2021")
+                            },
+                            new DateRange
+                            {
+                                Start = DateTime.Parse("03/03/2021"),
+                                End = DateTime.Parse("04/04/2021")
+                            }
+                        }
+                    }
+                    },
+                        States = new string[] { "ea", "eb" },
+                        Initiator = "ea"
+                    }
+                }
+            },
+            StateInfo = new ParameterBase<StatesInfoResponse>
+            {
+                Data = new StatesInfoResponse
+                {
+                    Results = new List<StateInfoResponseData>
+                    {
                         new StateInfoResponseData
                         {
                             State = "Echo Alpha",
@@ -115,10 +115,10 @@
                             Email = "eb-test@usda.gov",
                             Phone = "123-456-7890"
                         }
-                        }
-                        }
                     }
-                };
+                }
+            }
+        };
     }
 
     /// <summary>
@@ -131,7 +131,7 @@
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetail>(
-    @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo">
+    @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse">
     </MatchDetail>
     );
     }
@@ -225,8 +225,8 @@
       </div>
     </div>
   </div>
-</div>
-        );
+        </div>
+    );
     }
 
     /// <summary>
@@ -256,6 +256,30 @@
 
         // Assert
         Assert.True(tag.ClassList.Contains(TagThemeGrayClass));
+    }
+
+    /// <summary>
+    /// Verify the match detail shows the save success notification when set and dismisses when the close button is clicked
+    /// </summary>
+    [Fact]
+    public void Match_Detail_Shows_Save_Success_And_Dismissable()
+    {
+        // Arrange
+        InitialValues.SaveResponse = new MatchDetailSaveResponseData
+        {
+            SaveSuccess = true
+        };
+        CreateTestComponent();
+        var saveSuccessElement = Component!.Find($".match-detail-save-success");
+
+        // Assert
+        Assert.NotNull(saveSuccessElement);
+
+        // Act - Dismiss the alert
+        saveSuccessElement.QuerySelector(".usa-button").Click();
+
+        // Assert
+        Assert.Empty(Component!.FindAll($".match-detail-save-success"));
     }
 
     #endregion

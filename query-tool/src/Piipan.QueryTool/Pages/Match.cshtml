@@ -3,6 +3,7 @@
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
+<link rel="stylesheet" href="app.css" type="text/css" />
 @inject IAntiforgery antiforgery
 @model Piipan.QueryTool.Pages.MatchModel
 @{
@@ -17,6 +18,7 @@
         param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)"
         param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"
         param-LoggedInUsersState="Model.UserState"
+        param-SaveResponse="Model.MatchDetailSaveResponse"
         param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"/>
     </div>
 }
