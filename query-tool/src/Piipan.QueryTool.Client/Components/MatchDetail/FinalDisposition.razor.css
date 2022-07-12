@@ -33,3 +33,7 @@
 .FinalDispositionSelect {
     margin-top: 6px;
 }
+
+.ResolutionFieldsDropdownWidth {
+    max-width: 296px;
+}

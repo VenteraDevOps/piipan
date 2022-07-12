@@ -22,6 +22,12 @@
         },
         "uploadPolicyXml": {
             "type": "String"
+        },
+        "uploadByIdPolicyXml": {
+            "type": "String"
+        },
+        "allUploadOperationsPolicyXml": {
+            "type": "String"
         }
     },
     "variables": {
@@ -30,6 +36,7 @@
         },
         "apimUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.azure-api.us', '.azure-api.net')]",
         "uploadUriBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.blob.core.usgovcloudapi.net/', '.blob.core.windows.net/')]",
+        "etlAzureFunctionBase": "[if(equals(parameters('cloudName'), 'AzureUSGovernment'), '.azurewebsites.us/api', '.azurewebsites.net/api')]",
         "uploadDisplayName": "Bulk upload API",
         "uploadSetName": "bulk",
         "uploadStatesList": "[split(toLower(parameters('uploadStates')), ' ')]",
@@ -44,6 +51,12 @@
                 "name": "uploadAccountNames",
                 "count": "[length(variables('uploadStatesList'))]",
                 "input": "[concat(parameters('prefix'), 'st', variables('uploadStatesList')[copyIndex('uploadAccountNames')], 'upload', parameters('env'))]"
+            },
+            // Generate etl azure function urls based on naming convention: {prefix}-func-{state-abbr}etl-{env}
+            {
+                "name": "etlFunctionFunctionNames",
+                "count": "[length(variables('uploadStatesList'))]",
+                "input": "[concat(parameters('prefix'), '-func-', variables('uploadStatesList')[copyIndex('etlFunctionFunctionNames')], 'etl-', parameters('env'))]"
             }
         ]
     },
@@ -93,7 +106,7 @@
               "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
           ],
           "properties": {
-              "value": "[replace(parameters('uploadPolicyXml'), '{storageResourceId}', concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase')))]",
+              "value": "[replace(parameters('allUploadOperationsPolicyXml'), '{storageResourceId}', concat('https://', variables('uploadAccountNames')[copyIndex()], variables('uploadUriBase')))]",
               "format": "rawxml"
           },
           "copy": {
@@ -161,6 +174,67 @@
                   {
                       "name": "filename",
                       "description": "User-provided CSV filename",
+                      "type": "string",
+                      "required": true
+                  }
+              ],
+              "responses": []
+          },
+          "copy": {
+              "name": "per-state-upload-ops",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/put-upload/policy')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('uploadApiNames')[copyIndex()], 'put-upload')]",
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "value": "[parameters('uploadPolicyXml')]",
+              "format": "rawxml"
+          },
+          "copy": {
+              "name": "per-state-upload-ops",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/get-upload-by-id/policy')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis/operations', parameters('apiName'), variables('uploadApiNames')[copyIndex()], 'get-upload-by-id')]",
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "value": "[replace(parameters('uploadByIdPolicyXml'), '{getUploadByIdUrl}', concat('https://', variables('etlFunctionFunctionNames')[copyIndex()], variables('etlAzureFunctionBase')))]",
+              "format": "rawxml"
+          },
+          "copy": {
+              "name": "per-state-upload-ops",
+              "count": "[length(variables('uploadStatesList'))]"
+          }
+      },
+      {
+          "type": "Microsoft.ApiManagement/service/apis/operations",
+          "apiVersion": "2020-06-01-preview",
+          "name": "[concat(parameters('apiName'), '/', variables('uploadApiNames')[copyIndex()], '/get-upload-by-id')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiName'), variables('uploadApiNames')[copyIndex()])]"
+          ],
+          "properties": {
+              "displayName": "Get Upload By Id",
+              "method": "GET",
+              "urlTemplate": "/uploads/{uploadIdentifier}",
+              "description": "Retrieves upload details for desired upload identifier",
+              "templateParameters": [
+                  {
+                      "name": "uploadIdentifier",
+                      "description": "Id of the desired upload",
                       "type": "string",
                       "required": true
                   }

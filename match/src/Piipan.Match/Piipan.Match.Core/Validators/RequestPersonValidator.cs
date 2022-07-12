@@ -12,8 +12,11 @@ namespace Piipan.Match.Core.Validators
         public RequestPersonValidator()
         {
             const string HashRegex = "^[a-z0-9]{128}$";
+            const string AlphanumericRegex = "^[A-Za-z0-9]+$";
 
             RuleFor(q => q.LdsHash).Matches(HashRegex);
+            RuleFor(q => q.ParticipantId).Matches(AlphanumericRegex);
+            RuleFor(q => q.ParticipantId).MaximumLength(20).WithName("Participant Id");
             RuleFor(x => x.SearchReason).IsEnumName(typeof(ValidSearchReasons));
         }
     }

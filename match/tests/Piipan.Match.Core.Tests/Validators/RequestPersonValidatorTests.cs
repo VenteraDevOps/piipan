@@ -44,5 +44,25 @@ namespace Piipan.Match.Core.Tests.Validators
             var result = Validator().TestValidate(model);
             result.ShouldHaveValidationErrorFor(person => person.SearchReason);
         }
+        [Fact]
+        public void ReturnsErrorWhenParticipantIdEmpty()
+        {
+            var model = new RequestPerson()
+            {
+                ParticipantId = ""
+            };
+            var result = Validator().TestValidate(model);
+            result.ShouldHaveValidationErrorFor(person => person.ParticipantId);
+        }
+        [Fact]
+        public void ReturnsErrorWhenParticipantIdLengthExceed()
+        {
+            var model = new RequestPerson()
+            {
+                ParticipantId = "1234567890098765432101"
+            };
+            var result = Validator().TestValidate(model);
+            result.ShouldHaveValidationErrorFor(person => person.ParticipantId);
+        }
     }
 }

@@ -1,9 +1,6 @@
 ﻿@using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
 
-@inject NavigationManager NavigationManager
-
-
 @code {
     [Parameter] public MatchSearchRequest Query { get; set; }
     [Parameter] public ParameterBase<List<MatchResApiResponse>> QueryResult { get; set; }
