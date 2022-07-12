@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - New API endpoint for retrieving Bulk Upload status details by its upload identifier
 - Validation for Participant Id and Case Id in Duplicate Participation API
 - IAC Environmental support for states.csv file
+- Radio, Radio Group, Radio Group Input, and Select Components
 - Modal Window Support and Navigation blocking behavior
 
 ### Fixed
