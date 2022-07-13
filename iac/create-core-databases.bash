@@ -71,7 +71,6 @@ main () {
 
   echo "Creating $COLLAB_DB_NAME database and applying DDL"
   db_init "$COLLAB_DB_NAME" "$SUPERUSER"
-
   liquibase --changeLogFile=database/collaboration/master-changelog.xml \
       --username=$PGUSER \
       --password=$PGPASSWORD \
