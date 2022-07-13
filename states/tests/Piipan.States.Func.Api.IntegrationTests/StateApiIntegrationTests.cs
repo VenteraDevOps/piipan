@@ -88,7 +88,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var match = new StateInfoDbo()
             {
                 Id = "1",
-                Email = "ea-test@usda.gov",
+                Email = "ea-test@usda.example",
                 State = "Echo Alpha",
                 StateAbbreviation = "EA",
                 Phone = "123-123-1234",
@@ -98,7 +98,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var match2 = new StateInfoDbo()
             {
                 Id = "2",
-                Email = "eb-test@usda.gov",
+                Email = "eb-test@usda.example",
                 State = "Echo Bravo",
                 StateAbbreviation = "EB",
                 Phone = "123-123-1234",
@@ -116,7 +116,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             Assert.Equal(200, response.StatusCode);
             Assert.Equal(2, responseRecords.Count());
             // Assert Participant Data
-            var expected = "{\"data\":[{\"id\":\"1\",\"state\":\"Echo Alpha\",\"state_abbreviation\":\"EA\",\"email\":\"ea-test@usda.gov\",\"phone\":\"123-123-1234\",\"region\":\"TEST\"},{\"id\":\"2\",\"state\":\"Echo Bravo\",\"state_abbreviation\":\"EB\",\"email\":\"eb-test@usda.gov\",\"phone\":\"123-123-1234\",\"region\":\"TEST\"}]}";
+            var expected = "{\"data\":[{\"id\":\"1\",\"state\":\"Echo Alpha\",\"state_abbreviation\":\"EA\",\"email\":\"ea-test@usda.example\",\"phone\":\"123-123-1234\",\"region\":\"TEST\"},{\"id\":\"2\",\"state\":\"Echo Bravo\",\"state_abbreviation\":\"EB\",\"email\":\"eb-test@usda.example\",\"phone\":\"123-123-1234\",\"region\":\"TEST\"}]}";
             Assert.Equal(expected, resString);
         }
     }
