@@ -221,10 +221,10 @@ setup_enviroment () {
   # FILENAME=$2
   FILE=$ENV_CONFIG/config.bash
   
-  if [ -f "$(dirname "$0")$FILE" ]; then
+  if [ -f "$FILE" ]; then
       echo "Setting up environment configuration $FILE."
       # shellcheck source=./iac/env/tts/dev/config.bash
-      source "$(dirname "$0")$ENV_CONFIG/config.bash"
+      source "$FILE" $ENV_CONFIG
   else 
       echo "No environment configuration found at $FILE."
   fi
