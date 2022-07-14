@@ -21,7 +21,7 @@ main () {
 
   ENV_NAME=$1
 
-  safe_copy "$ENV_CONFIG/insert-state-info.sql" ../match/dml/insert-state-info.sql
+  safe_copy "$ENV_NAME/insert-state-info.sql" ../match/dml/insert-state-info.sql
 
 }
 
