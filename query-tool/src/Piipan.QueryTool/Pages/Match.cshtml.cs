@@ -52,7 +52,7 @@ namespace Piipan.QueryTool.Pages
 
         private RedirectToPageResult RedirectToNotFoundMatch()
         {
-            return RedirectToPage("Error", new { message = "MatchId not found" });
+            return RedirectToPage("Error", new { message = "Requested Match Not Found" });
         }
 
         public async Task<IActionResult> OnGet([FromRoute] string id)
