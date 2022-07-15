@@ -50,7 +50,7 @@ namespace Piipan.QueryTool.Tests
                 {
                     new StateInfoResponseData
                     {
-                        Email = "ea-test@usda.gov",
+                        Email = "ea-test@usda.example",
                         Phone = "123-123-1234",
                         State = "Echo Alpha",
                         StateAbbreviation = "EA"

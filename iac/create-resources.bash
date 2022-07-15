@@ -93,6 +93,7 @@ main () {
   source "$(dirname "$0")"/iac-common.bash
 
   verify_cloud
+  setup_enviroment "$(dirname "$0")"/env/"${azure_env}"
   verify_file env/"${azure_env}"/ states.csv
   set_constants
 

@@ -17,7 +17,7 @@ namespace Piipan.States.Client.Tests
                 {
                     new StateInfoResponseData
                     {
-                        Email = "ea-test@usda.gov",
+                        Email = "ea-test@usda.example",
                         Phone = "123-456-7890",
                         Id = "123",
                         Region = "MWO",
