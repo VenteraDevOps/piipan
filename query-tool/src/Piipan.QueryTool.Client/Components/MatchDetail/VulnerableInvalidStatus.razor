@@ -2,7 +2,7 @@
 
 
 @code {
-    [Parameter] public Disposition DispositionData { get; set; }
+    [Parameter] public DispositionModel DispositionData { get; set; }
     private (string,string)[] DropdownOptions = new (string,string)[] {("Incorrect Client Information", "Incorrect Client Information"), ("System Error", "System Error"), ("Potential Identity Theft", "Potential Identity Theft"), ("Other", "Other")};
     
 }

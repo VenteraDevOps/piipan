@@ -1,7 +1,7 @@
 ﻿@using Piipan.Match.Api.Models.Resolution
 @code {
     [Parameter] public bool InitiatingState { get; set; }
-    [Parameter] public Disposition DispositionData { get; set; }
+    [Parameter] public DispositionModel DispositionData { get; set; }
 
     private (string,string)[] DropdownOptionsOne = new (string,string)[] {("Benefits Approved", "Benefits Approved"), ("Benefits Denied", "Benefits Denied")};
     private (string,string)[] DropdownOptionsTwo = new (string, string)[] { ("Benefits Terminated", "Benefits Terminated"), ("Benefits Unchanged", "Benefits Unchanged") };

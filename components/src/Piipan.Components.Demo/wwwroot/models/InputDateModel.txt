@@ -1,6 +1,6 @@
-﻿using Piipan.Components.Validation;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Piipan.Components.Validation;
 
 namespace Piipan.Components.Demo.Models
 {
@@ -12,7 +12,7 @@ namespace Piipan.Components.Demo.Models
         [Display(Name = "Optional Date")]
         public DateTime? NotRequiredDate { get; set; }
 
-        [UsaRequired]
+        [UsaRequired(nameof(NotRequiredDate))]
         [Display(Name = "Required Date")]
         public DateTime? RequiredDate { get; set; }
     }

@@ -1,6 +1,6 @@
-﻿using Piipan.Components.Validation;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Piipan.Components.Validation;
 
 namespace Piipan.Components.Demo.Models
 {

@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Piipan.Components.Helpers;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Piipan.Components.Enums;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Piipan.Components.Helpers;
+using Piipan.Components.Validation;
 
 namespace Piipan.Components.Forms
 {
@@ -36,6 +33,12 @@ namespace Piipan.Components.Forms
             base.OnInitialized();
             FormGroup.PreverificationChecks = PreverificationChecks;
             FormGroup.FieldIdentifier = this.FieldIdentifier;
+            string sourceProperty = ValueExpression.GetAttribute<T, UsaRequiredIfAttribute>()?.SourceProperty;
+            if (!string.IsNullOrEmpty(sourceProperty))
+            {
+                FormGroup.FieldDependencies.Add(sourceProperty);
+            }
+
             FormGroup.Label = ValueExpression.GetAttribute<T, DisplayAttribute>()?.Name ?? ValueExpression.Name;
             FormGroup.Required = ValueExpression.HasAttribute<T, RequiredAttribute>();
             Id = ValueExpression.GetExpressionName();
@@ -57,7 +60,7 @@ namespace Piipan.Components.Forms
         {
             if (FormGroup != null)
             {
-                await FormGroup.GetValidationErrorsAsync(EditContext);
+                await FormGroup.GetValidationErrorsAsync(EditContext, true);
                 StateHasChanged();
             }
         }

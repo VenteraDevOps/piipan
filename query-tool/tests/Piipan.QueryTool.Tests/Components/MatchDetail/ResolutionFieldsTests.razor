@@ -14,7 +14,21 @@
     /// </summary>
     public ResolutionFieldsTests() : base()
     {
-        
+        InitialValues = new ResolutionFields()
+        {
+            DispositionData = new DispositionModel()
+            {
+                InitialActionAt = null,
+                InitialActionTaken = "",
+                InvalidMatch = false,
+                InvalidMatchReason = "",
+                OtherReasoningForInvalidMatch = "",
+                FinalDisposition = "",
+                FinalDispositionDate = null,
+                VulnerableIndividual = null,
+                State = "EA"
+            }
+        };
     }
 
 
@@ -27,21 +41,11 @@
             JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
-        Disposition disp = new Disposition
-            {
-                InitialActionAt = null,
-                InitialActionTaken = "",
-                InvalidMatch = false,
-                InvalidMatchReason = "",
-                OtherReasoningForInvalidMatch = "",
-                FinalDisposition = "",
-                FinalDispositionDate = null,
-                VulnerableIndividual = null,
-                State = "EA"
-            };
         Component = Render<ResolutionFields>(
-    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
-    </ResolutionFields>
+            @<Piipan.Components.Forms.UsaForm Model="InitialValues.DispositionData">
+                <ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@InitialValues.DispositionData">
+                </ResolutionFields>
+            </Piipan.Components.Forms.UsaForm>
         );
     }
 
@@ -58,14 +62,11 @@
 
         // Assert
         Component!.MarkupMatches(
-    @<div >
+    @<text >
       <h3 >Update information about this match for Echo Bravo</h3>
       <p class="infoSavedText" >After the information is saved, it will appear in the
         <b >match information</b>
         panel.</p>
-      <div class="usa-form ">
-        <form id="snap-resolution-fields-form" method="post" novalidate="" >
-          <fieldset class="usa-fieldset">
           <input type="hidden" name="__RequestVerificationToken" >
             <div diff:ignore> //Ignoring Vulnerable Invalid Component
             </div>
@@ -73,11 +74,157 @@
             </div>
             <div diff:ignore> //Ignoring Final Disposition Component
             </div>
-            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
-          </fieldset>
-        </form>
-      </div>
-    </div>);
+        </text>
+    );
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchTrue_DisablesInitialAction_WhenInitialActionNotSet()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        // Selct the Invalid Match Yes radio button
+        Component.Find("[name=\"DispositionData.InvalidMatch\"]").Change("True");
+
+        // Assert
+        VerifyDisabledInitialActionSection();
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchFalse_EnablesInitialAction_WhenInitialActionNotSet()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Act
+        // Selct the Invalid Match No radio button
+        Component.Find("[name=\"DispositionData.InvalidMatch\"]").Change("False");
+
+        // Assert
+        VerifyEnabledInitialActionSection();
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchNull_EnablesInitialAction_WhenInitialActionNotSet()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        VerifyEnabledInitialActionSection();
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchTrue_InitialActionEnabled_WhenInitialActionAtSet()
+    {
+        // Arrange
+        InitialValues.DispositionData.InitialActionAt = DateTime.Now;
+        CreateTestComponent();
+
+        // Act
+        // Selct the Invalid Match Yes radio button
+        Component.Find("[name=\"DispositionData.InvalidMatch\"]").Change("True");
+
+        // Assert
+        VerifyEnabledInitialActionSection();
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchTrue_InitialActionEnabled_WhenInitialActionTakenSet()
+    {
+        // Arrange
+        InitialValues.DispositionData.InitialActionTaken = "Notice Sent";
+        CreateTestComponent();
+
+        // Act
+        // Selct the Invalid Match Yes radio button
+        Component.Find("[name=\"DispositionData.InvalidMatch\"]").Change("True");
+
+        // Assert
+        VerifyEnabledInitialActionSection();
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchTrue_InitialActionDisabled_WhenInitialActionTakenSetAndThenCleared()
+    {
+        // Arrange
+        InitialValues.DispositionData.InitialActionTaken = "Notice Sent";
+        CreateTestComponent();
+
+        // Act
+        // Selct the Invalid Match Yes radio button
+        Component.Find("[name=\"DispositionData.InvalidMatch\"]").Change("True");
+        Component.Find("[name=\"DispositionData.InitialActionTaken\"]").Change("");
+
+        // Assert
+        VerifyDisabledInitialActionSection();
+    }
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void InvalidMatchTrue_InitialActionDisabled_WhenInitialActionAtSetAndThenCleared()
+    {
+        // Arrange
+        InitialValues.DispositionData.InitialActionAt = DateTime.Now;
+        CreateTestComponent();
+
+        // Act
+        // Selct the Invalid Match Yes radio button
+        Component.Find("[name=\"DispositionData.InvalidMatch\"]").Change("True");
+        Component.Find("[name=\"DispositionData.InitialActionAt\"]").Change("");
+
+        // Assert
+        VerifyDisabledInitialActionSection();
+    }
+
+    private void VerifyDisabledInitialActionSection()
+    {
+        var initialActionSection = Component.Find("#initial-action-section");
+
+        // Assert
+        Assert.True(initialActionSection.ClassList.Contains("disabled-area"));
+        var inputs = initialActionSection.QuerySelectorAll("input,select");
+        Assert.Equal(2, inputs.Count());
+        foreach (var input in inputs)
+        {
+            Assert.True(input.HasAttribute("disabled"));
+        }
+    }
+
+    private void VerifyEnabledInitialActionSection()
+    {
+        var initialActionSection = Component.Find("#initial-action-section");
+
+        // Assert
+        Assert.False(initialActionSection.ClassList.Contains("disabled-area"));
+        var inputs = initialActionSection.QuerySelectorAll("input,select");
+        Assert.Equal(2, inputs.Count());
+        foreach (var input in inputs)
+        {
+            Assert.False(input.HasAttribute("disabled"));
+        }
     }
 
     #endregion

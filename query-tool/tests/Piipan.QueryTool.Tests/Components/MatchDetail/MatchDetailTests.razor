@@ -149,84 +149,86 @@
 
         // Assert
         Component!.MarkupMatches(
-    @<div class="grid-container" >
-  <h1 >
-    <span class="usa-tag usa-tag--green usa-tag--round" >open</span>
-    <span >Match ID: M123456</span>
-  </h1>
-  <div class="grid-row matchInfoDiv" >
-    <dl >
-      <div >
-        <dt >Match Record Created:</dt>
-        <dd >
-          <span style="color:#6E6E6E" >( days since match)</span>
-        </dd>
-      </div>
-      <div >
-        <dt >Match Query By:</dt>
-        <dd >Echo Alpha (EA)</dd>
-      </div>
-      <div >
-        <dd >All NAC matches are based on an exact match of Last Name, Date of Birth, and Social Security Number.</dd>
-      </div>
-    </dl>
-  </div>
-  <div class="grid-row" >
-    <div class="grid-col-4" >
-      <div diff:ignore> //Ignoring Resolution Fields Component
-      </div>
-    </div>
-    <div class="grid-col-8" >
-      <div style="max-width: 860px" >
-        <div class="usa-accordion" aria-multiselectable="false">
-          <h4 class="usa-accordion__heading" >
-            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >SNAP Participant Information</button>
-          </h4>
-          <div id:ignore class="usa-accordion__content usa-prose" >
-            <div class="two-state-grid" >
-              <div diff:ignore > //Ignoring State Participant Information Component
-              </div>
-              <div diff:ignore> //Ignoring State Participant Information Component
-              </div>
-            </div>
+        @<div class="grid-container" >
+          <h1 >
+            <span class="usa-tag usa-tag--green usa-tag--round" >open</span>
+            <span >Match ID: M123456</span>
+          </h1>
+          <div class="usa-form ">
+            <form id="snap-resolution-fields-form" method="post" novalidate="" >
+              <fieldset class="usa-fieldset">
+                  <div class="grid-row matchInfoDiv" >
+                    <dl >
+                      <div >
+                        <dt >Match Record Created:</dt>
+                        <dd >
+                          <span style="color:#6E6E6E" >( days since match)</span>
+                        </dd>
+                      </div>
+                      <div >
+                        <dt >Match Query By:</dt>
+                        <dd >Echo Alpha (EA)</dd>
+                      </div>
+                      <div >
+                        <dd >All NAC matches are based on an exact match of Last Name, Date of Birth, and Social Security Number.</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div class="match-detail-grid" >
+                    <div diff:ignore>  //Ignoring Resolution Fields Component
+                    </div>
+                    <div>
+                        <div class="usa-accordion" aria-multiselectable="false">
+                          <h4 class="usa-accordion__heading" >
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >SNAP Participant Information</button>
+                          </h4>
+                          <div id:ignore class="usa-accordion__content usa-prose" >
+                            <div class="two-state-grid" >
+                              <div diff:ignore > //Ignoring State Participant Information Component
+                              </div>
+                              <div diff:ignore> //Ignoring State Participant Information Component
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="usa-accordion" aria-multiselectable="false">
+                          <h4 class="usa-accordion__heading" >
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >Match Information</button>
+                          </h4>
+                          <div id:ignore class="usa-accordion__content usa-prose" >
+                            <p >Each state's most recent updates are displayed below.</p>
+                            <div class="two-state-grid" >
+                              <div diff:ignore> //Ignoring State Disposition Information Component
+                              </div>
+                              <div diff:ignore> //Ignoring State Disposition Information Component
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="usa-accordion" aria-multiselectable="false">
+                          <h4 class="usa-accordion__heading" >
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >State Agency Contact Information</button>
+                          </h4>
+                          <div id:ignore class="usa-accordion__content usa-prose" >
+                            <ul >
+                              <li >Use this information if you need to contact the other state in regards to this match</li>
+                              <li >Do not exchange PII about the participant by email; use their state’s Participant ID</li>
+                            </ul>
+                            <div class="two-state-grid" >
+                              <div diff:ignore> //Ignoring State Contact Information Component
+                              </div>
+                              <div diff:ignore> //Ignoring State Contact Information Component
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+              </fieldset>
+              </form>
           </div>
-        </div>
-        <div class="usa-accordion" aria-multiselectable="false">
-          <h4 class="usa-accordion__heading" >
-            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >Match Information</button>
-          </h4>
-          <div id:ignore class="usa-accordion__content usa-prose" >
-            <p >Each state's most recent updates are displayed below.</p>
-            <div class="two-state-grid" >
-              <div diff:ignore> //Ignoring State Disposition Information Component
-              </div>
-              <div diff:ignore> //Ignoring State Disposition Information Component
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="usa-accordion" aria-multiselectable="false">
-          <h4 class="usa-accordion__heading" >
-            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >State Agency Contact Information</button>
-          </h4>
-          <div id:ignore class="usa-accordion__content usa-prose" >
-            <ul >
-              <li >Use this information if you need to contact the other state in regards to this match</li>
-              <li >Do not exchange PII about the participant by email; use their state’s Participant ID</li>
-            </ul>
-            <div class="two-state-grid" >
-              <div diff:ignore> //Ignoring State Contact Information Component
-              </div>
-              <div diff:ignore> //Ignoring State Contact Information Component
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-        </div>
-    );
+         </div>
+        );
     }
 
     /// <summary>

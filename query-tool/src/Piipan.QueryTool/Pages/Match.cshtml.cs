@@ -81,14 +81,12 @@ namespace Piipan.QueryTool.Pages
         }
 
         [BindProperty]
-        public Disposition DispositionData { get; set; } = new Disposition();
+        public DispositionModel DispositionData { get; set; } = new DispositionModel();
 
         public async Task<IActionResult> OnPost([FromRoute] string id)
         {
             if (String.IsNullOrEmpty(id))
             {
-
-
                 if (ModelState.IsValid)
                 {
                     try
@@ -121,27 +119,60 @@ namespace Piipan.QueryTool.Pages
             }
             else
             {
-                AddEventRequest addEventRequest = new AddEventRequest
+                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false };
+                // Remove binding errors from anything binding other than DispositionData (namely the Query property)
+                foreach (var modelStateKey in ModelState.Keys)
                 {
-                    Data = new AddEventRequestData
+                    if (!modelStateKey.Contains(nameof(DispositionData)))
                     {
-                        FinalDisposition = DispositionData.FinalDisposition,
-                        FinalDispositionDate = DispositionData.FinalDispositionDate,
-                        InitialActionAt = DispositionData.InitialActionAt,
-                        InitialActionTaken = DispositionData.InitialActionTaken,
-                        InvalidMatch = DispositionData.InvalidMatch,
-                        InvalidMatchReason = DispositionData.InvalidMatchReason,
-                        OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
-                        VulnerableIndividual = DispositionData.VulnerableIndividual
+                        ModelState[modelStateKey].Errors.Clear();
+                        ModelState[modelStateKey].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
                     }
-                };
-                await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                }
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        AddEventRequest addEventRequest = new AddEventRequest
+                        {
+                            Data = new AddEventRequestData
+                            {
+                                FinalDisposition = DispositionData.FinalDisposition,
+                                FinalDispositionDate = DispositionData.FinalDispositionDate,
+                                InitialActionAt = DispositionData.InitialActionAt,
+                                InitialActionTaken = DispositionData.InitialActionTaken,
+                                InvalidMatch = DispositionData.InvalidMatch,
+                                InvalidMatchReason = DispositionData.InvalidMatchReason,
+                                OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
+                                VulnerableIndividual = DispositionData.VulnerableIndividual
+                            }
+                        };
+                        await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                        MatchDetailSaveResponse.SaveSuccess = true;
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.LogError(exception, exception.Message);
+                        RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                    }
+                }
+                else
+                {
+                    var keys = ModelState.Keys;
+                    foreach (var key in keys)
+                    {
+                        if (ModelState[key]?.Errors?.Count > 0)
+                        {
+                            var error = ModelState[key].Errors[0];
+                            RequestErrors.Add(new(key, error.ErrorMessage));
+                        }
+                    }
+                }
                 Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                 if (Match == null)
                 {
                     return RedirectToPage("Error", new { message = "MatchId not found" });
                 }
-                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = true };
             }
             return Page();
         }

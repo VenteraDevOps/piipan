@@ -268,7 +268,6 @@ namespace Piipan.QueryTool.Tests.Components
             bool isFormValid = false;
             await form.InvokeAsync(async () =>
             {
-
                 isFormValid = await form.Instance.ValidateForm();
             });
             await form.InvokeAsync(async () =>
