@@ -1,6 +1,7 @@
 ﻿@using Piipan.Components.Alerts
 @using Piipan.Components.Enums
 @using System.Linq.Expressions
+@using Piipan.Components.Forms
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
 @using Piipan.QueryTool.Client.Models
@@ -10,6 +11,7 @@
 @inherits BaseComponentTest<MatchDetail>
 
 @code {
+    private IRenderedComponent<UsaForm> usaForm;
     /// <summary>
     /// Set the default initial values for this test component
     /// </summary>
@@ -131,9 +133,11 @@
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetail>(
-    @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse">
-    </MatchDetail>
-    );
+            @<MatchDetail Match="InitialValues.Match" ServerErrors="InitialValues.ServerErrors" 
+                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse">
+            </MatchDetail>
+        );
+        usaForm = Component.FindComponent<UsaForm>();
     }
 
     #region Tests
@@ -227,8 +231,8 @@
               </fieldset>
               </form>
           </div>
-         </div>
-        );
+        </div>
+    );
     }
 
     /// <summary>
@@ -279,6 +283,92 @@
 
         // Act - Dismiss the alert
         saveSuccessElement.QuerySelector(".usa-button").Click();
+
+        // Assert
+        Assert.Empty(Component!.FindAll($".match-detail-save-success"));
+    }
+
+    /// <summary>
+    /// Verify the match detail shows server errors
+    /// </summary>
+    [Fact]
+    public async Task MatchDetail_ShowsServerErrors()
+    {
+        // Arrange
+        InitialValues.ServerErrors = new List<ServerError>()
+        {
+            new ServerError("", "An error has occurred")
+        };
+        CreateTestComponent();
+
+        // Assert
+        await ResolutionFieldsTestHelper.VerifyErrors(usaForm, 1, new List<string>
+        {
+            "An error has occurred"
+        }, false, 0);
+    }
+
+    /// <summary>
+    /// Verify that when a valid match detail is saved, the button changes to "Saving Changes..."
+    /// </summary>
+    [Fact]
+    public async Task SubmitButtonShouldSay_SavingChanges_AndBeDisabled_UponSubmissionOfForm()
+    {
+        // Arrange
+        CreateTestComponent();
+        var saveButton = usaForm.Find(".ResolutionFieldsSave");
+
+        // Assert
+        Assert.Equal("Save Changes", saveButton.TextContent);
+        Assert.False(saveButton.HasAttribute("disabled"));
+
+        // Act
+        bool isFormValid = false;
+        await usaForm.InvokeAsync(async () =>
+        {
+            isFormValid = await usaForm.Instance.ValidateForm();
+        });
+        await usaForm.InvokeAsync(async () =>
+        {
+            await usaForm.Instance.OnBeforeSubmit(isFormValid);
+        });
+
+        // Assert
+        Assert.Equal("Saving Changes...", saveButton.TextContent);
+        Assert.True(saveButton.HasAttribute("disabled"));
+    }
+
+    /// <summary>
+    /// Verify that when an invalid match tries to save after a successful one is saved, the save notification goes away
+    /// </summary>
+    [Fact]
+    public async Task SaveSuccessNotification_DisappearsWhen_SavingInvalidForm()
+    {
+        // Arrange
+        InitialValues.SaveResponse = new MatchDetailSaveResponseData
+        {
+            SaveSuccess = true
+        };
+        CreateTestComponent();
+        var saveSuccessElement = Component!.Find($".match-detail-save-success");
+
+        // Assert
+        Assert.NotNull(saveSuccessElement);
+
+        // Act
+        var initActionTaken = Component.Find("[name=\"DispositionData.InitialActionAt\"]");
+        initActionTaken.Change("");
+        initActionTaken.Blur();
+
+        bool isFormValid = false;
+        await usaForm.InvokeAsync(async () =>
+        {
+            isFormValid = await usaForm.Instance.ValidateForm();
+        });
+        await usaForm.InvokeAsync(async () =>
+        {
+            await usaForm.Instance.OnBeforeSubmit(isFormValid);
+        });
 
         // Assert
         Assert.Empty(Component!.FindAll($".match-detail-save-success"));
