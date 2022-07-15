@@ -50,6 +50,11 @@ namespace Piipan.QueryTool.Pages
             }
         }
 
+        private RedirectToPageResult RedirectToNotFoundMatch()
+        {
+            return RedirectToPage("Error", new { message = "MatchId not found" });
+        }
+
         public async Task<IActionResult> OnGet([FromRoute] string id)
         {
             if (!string.IsNullOrWhiteSpace(id))
@@ -63,13 +68,13 @@ namespace Piipan.QueryTool.Pages
                     //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                     if (id.Length != 7)
                     {
-                        return RedirectToPage("Error", new { message = "MatchId not found" });
+                        return RedirectToNotFoundMatch();
                     }
 
                     Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                     if (Match == null)
                     {
-                        return RedirectToPage("Error", new { message = "MatchId not found" });
+                        return RedirectToNotFoundMatch();
                     }
                 }
                 else
@@ -171,7 +176,7 @@ namespace Piipan.QueryTool.Pages
                 Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                 if (Match == null)
                 {
-                    return RedirectToPage("Error", new { message = "MatchId not found" });
+                    return RedirectToNotFoundMatch();
                 }
             }
             return Page();

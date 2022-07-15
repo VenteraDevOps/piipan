@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -77,7 +76,7 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
-        public async Task TestValidMatchId_Post()
+        public async Task TestValidMatch_Post()
         {
             // arrange
             var pageModel = SetupMatchModel();
@@ -85,7 +84,96 @@ namespace Piipan.QueryTool.Tests
 
             // act
             var caseid = ValidMatchId;
+
+            pageModel.Query = new MatchSearchRequest
+            {
+                MatchId = null
+            };
+            pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
+            pageModel.DispositionData = new DispositionModel
+            {
+                VulnerableIndividual = true
+            };
+            pageModel.BindModel(pageModel.DispositionData, nameof(MatchModel.DispositionData));
+
             var result = await pageModel.OnPost(caseid);
+
+            Assert.True(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.Empty(pageModel.RequestErrors);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(caseid, pageModel.Match.Data.MatchId);
+            Assert.Equal("ea", pageModel.Match.Data.Initiator);
+            Assert.Equal(MatchRecordStatus.Open, pageModel.Match.Data.Status);
+            Assert.Empty(pageModel.Match.Data.Dispositions);
+            Assert.Empty(pageModel.Match.Data.Participants);
+            Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
+        }
+
+        [Fact]
+        public async Task TestInvalidMatch_Post()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+
+            pageModel.Query = new MatchSearchRequest
+            {
+                MatchId = null
+            };
+            pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
+            pageModel.DispositionData = new DispositionModel
+            {
+                InitialActionAt = DateTime.Now,
+            };
+            pageModel.BindModel(pageModel.DispositionData, nameof(MatchModel.DispositionData));
+
+            var result = await pageModel.OnPost(caseid);
+
+            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.NotEmpty(pageModel.RequestErrors);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(caseid, pageModel.Match.Data.MatchId);
+            Assert.Equal("ea", pageModel.Match.Data.Initiator);
+            Assert.Equal(MatchRecordStatus.Open, pageModel.Match.Data.Status);
+            Assert.Empty(pageModel.Match.Data.Dispositions);
+            Assert.Empty(pageModel.Match.Data.Participants);
+            Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
+        }
+
+        [Fact]
+        public async Task TestValidMatch_PostException()
+        {
+            // arrange
+            var matchResApiMock = SetupMatchResolutionApi();
+            matchResApiMock.Setup(n => n.AddMatchResEvent(It.IsAny<string>(), It.IsAny<AddEventRequest>(), It.IsAny<string>())).Throws(new Exception());
+            var pageModel = SetupMatchModel(matchResApiMock);
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+
+            pageModel.Query = new MatchSearchRequest
+            {
+                MatchId = null
+            };
+            pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
+            pageModel.DispositionData = new DispositionModel
+            {
+                VulnerableIndividual = true
+            };
+            pageModel.BindModel(pageModel.DispositionData, nameof(MatchModel.DispositionData));
+
+            var result = await pageModel.OnPost(caseid);
+
+            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.NotEmpty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
             Assert.IsType<PageResult>(result);
@@ -141,7 +229,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.Match = new MatchResApiResponse();
 
             var results = new List<States.Api.Models.StateInfoResponseData>();
-            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EA", State="Echo Alpha" });
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EA", State = "Echo Alpha" });
             results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EB", State = "Echo Bravo" });
 
             pageModel.StateInfo = new States.Api.Models.StatesInfoResponse();

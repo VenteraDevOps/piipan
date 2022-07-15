@@ -12,7 +12,7 @@ namespace Piipan.Components.Demo.Models
         [Display(Name = "Optional Date")]
         public DateTime? NotRequiredDate { get; set; }
 
-        [UsaRequired(nameof(NotRequiredDate))]
+        [UsaRequired]
         [Display(Name = "Required Date")]
         public DateTime? RequiredDate { get; set; }
     }
