@@ -6,6 +6,7 @@
 @using Piipan.Components.Alerts
 @using Piipan.Match.Api.Models
 @using Piipan.QueryTool.Client.Models
+@using Piipan.Shared.API.Enums
 @using static Piipan.Components.Forms.FormConstants
 @inject NavigationManager NavigationManager
 
@@ -77,6 +78,16 @@
         <UsaFormGroup>
             <UsaInputText @bind-Value="QueryFormData.Query.CaseId" Width="143" />
         </UsaFormGroup>
+        <UsaRadioGroup @bind-Value="QueryFormData.Query.SearchReason">
+            <ChildContent>
+                @{
+                    foreach (ValidSearchReasons val in  Enum.GetValues(typeof(ValidSearchReasons)))
+                    {
+                        <UsaRadio Value="val.ToString()">@EnumHelper.GetDisplayName(val)</UsaRadio>
+                    }
+            }
+            </ChildContent>
+        </UsaRadioGroup>
         <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@(searching || !canPerformSearch)">@(searching ? "Searching..." : "Search")</button>
     </UsaForm>
 }

@@ -10,8 +10,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
-using Piipan.Match.Core.Enums;
 using Piipan.Shared.Cryptography;
+using Piipan.Shared.API.Enums;
 
 namespace Piipan.Match.Core.Tests.Services
 {

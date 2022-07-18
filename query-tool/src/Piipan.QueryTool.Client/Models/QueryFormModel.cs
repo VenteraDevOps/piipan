@@ -5,7 +5,7 @@ namespace Piipan.QueryTool.Client.Models
 {
     public class QueryFormModel
     {
-        public PiiRecord Query { get; set; } = new();
+        public PiiQuery Query { get; set; } = new();
 
         /// <summary>
         /// The search response that is collected after the user hits "Search" and an API call is made

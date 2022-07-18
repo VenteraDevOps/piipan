@@ -8,7 +8,7 @@ namespace Piipan.QueryTool.Client.Models
     /// <summary>
     /// Represents form input from user for a match query
     /// </summary>
-    public class PiiRecord
+    public class PiiQuery
     {
         [UsaRequired]
         [UsaName]
@@ -38,5 +38,10 @@ namespace Piipan.QueryTool.Client.Models
         [Display(Name = "Case Number")]
         [JsonPropertyName("case_id")]
         public string CaseId { get; set; }
+
+        [UsaRequired]
+        [Display(Name = "Search Reason")]
+        [JsonPropertyName("search_reason")]
+        public String SearchReason { get; set; }
     }
 }

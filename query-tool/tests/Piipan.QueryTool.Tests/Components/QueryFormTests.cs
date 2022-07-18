@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
 using Bunit;
+using Microsoft.AspNetCore.Components.Forms;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
 using Piipan.Match.Api.Models;
@@ -18,9 +20,10 @@ namespace Piipan.QueryTool.Tests.Components
     {
         #region Tests
         IRenderedComponent<QueryForm> queryForm = null;
-        PiiRecord model = new PiiRecord();
+        PiiQuery model = new PiiQuery();
         bool invalidDateInput = false;
         ComponentParameterCollectionBuilder<QueryForm> parameters = new ComponentParameterCollectionBuilder<QueryForm>();
+        IElement? inputElement = null;
 
         public QueryFormTests()
         {
@@ -46,6 +49,7 @@ namespace Piipan.QueryTool.Tests.Components
             queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
             queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
             queryForm.Find("#QueryFormData_Query_CaseId").Change("456");
+            inputElement.Change("recertification");
 
             // Assert
             Assert.Equal("Name", model.LastName);
@@ -53,6 +57,7 @@ namespace Piipan.QueryTool.Tests.Components
             Assert.Equal("550-01-6981", model.SocialSecurityNum);
             Assert.Equal("123", model.ParticipantId);
             Assert.Equal("456", model.CaseId);
+            Assert.Equal("recertification", model.SearchReason);
         }
 
         /// <summary>
@@ -158,6 +163,7 @@ namespace Piipan.QueryTool.Tests.Components
             queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
             queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
             queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
+            inputElement.Change("other");
             bool isFormValid = false;
             await form.InvokeAsync(async () =>
             {
@@ -280,15 +286,16 @@ namespace Piipan.QueryTool.Tests.Components
 
             // Assert
             Assert.False(isFormValid);
-            Assert.Equal(4, alertBoxErrors.Count);
-            Assert.Equal(4, inputErrorMessages.Count);
+            Assert.Equal(5, alertBoxErrors.Count);
+            Assert.Equal(5, inputErrorMessages.Count);
 
             List<string> errors = new List<string>
             {
                 "Last Name is required",
                 "Date of Birth is required",
                 "Social Security Number is required",
-                "Participant ID is required"
+                "Participant ID is required",
+                "Search Reason is required"
             };
 
             for (int i = 0; i < alertBoxErrors.Count; i++)
@@ -325,6 +332,7 @@ namespace Piipan.QueryTool.Tests.Components
                 builder.Add(n => n.QueryFormData, InitialValues.QueryFormData);
             });
             queryForm = componentFragment;
+            inputElement = componentFragment.Find($".{InputRadioClass}");
         }
 
 
