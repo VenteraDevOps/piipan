@@ -17,6 +17,7 @@ using Piipan.Shared.Claims;
 using Piipan.Shared.Deidentification;
 using Piipan.Shared.Locations;
 using Piipan.Shared.Logging;
+using Piipan.Shared.Roles;
 using Piipan.States.Client.Extensions;
 
 namespace Piipan.QueryTool
@@ -37,6 +38,7 @@ namespace Piipan.QueryTool
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<LocationOptions>(Configuration.GetSection(LocationOptions.SectionName));
+            services.Configure<RoleOptions>(Configuration.GetSection(RoleOptions.SectionName));
             services.Configure<ClaimsOptions>(Configuration.GetSection(ClaimsOptions.SectionName));
 
 
@@ -66,6 +68,7 @@ namespace Piipan.QueryTool
 
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
             services.AddTransient<ILocationsProvider, LocationsProvider>();
+            services.AddTransient<IRolesProvider, RolesProvider>();
 
             services.AddSingleton<INameNormalizer, NameNormalizer>();
             services.AddSingleton<IDobNormalizer, DobNormalizer>();
