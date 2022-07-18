@@ -12,7 +12,7 @@ namespace Piipan.Shared.Tests.Roles
         };
 
         /// <summary>
-        /// Get the
+        /// Make sure the RolesProvider is returning back the acceptable roles for editing a match
         /// </summary>
         [Fact]
         public void GetEditMatchRoles()

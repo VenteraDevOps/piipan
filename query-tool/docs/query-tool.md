@@ -62,6 +62,8 @@ For the "Search for Snap Participants" screen, you need to have a user that has 
 
 Any users that are authenticated but not authorized to view the page will be redirected to a "Not Authenticated" page to let them know their role or location is not valid for the page.
 
+Additionally, certain areas of the app will require certain roles. For example, that edit section of the Match Details page is only available to users that have a role that can edit a match. The valid roles are set up in the appsettings "Roles" section. Each area takes in an array of roles that can perform the action, and as long as you contain any of these roles you have permission to use the functionality.
+
 ## Testing
 
 Tests will be run on the continuous integration server, but
