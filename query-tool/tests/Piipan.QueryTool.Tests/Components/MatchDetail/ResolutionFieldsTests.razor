@@ -9,12 +9,27 @@
 @inherits BaseComponentTest<ResolutionFields>
 
 @code {
+    private IRenderedComponent<UsaForm> usaForm;
     /// <summary>
     /// Set the default initial values for this test component
     /// </summary>
     public ResolutionFieldsTests() : base()
     {
-        
+        InitialValues = new ResolutionFields()
+        {
+            DispositionData = new DispositionModel()
+            {
+                InitialActionAt = null,
+                InitialActionTaken = "",
+                InvalidMatch = false,
+                InvalidMatchReason = "",
+                OtherReasoningForInvalidMatch = "",
+                FinalDisposition = "",
+                FinalDispositionDate = null,
+                VulnerableIndividual = null,
+                State = "EA"
+            }
+        };
     }
 
 
@@ -27,22 +42,13 @@
             JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
-        Disposition disp = new Disposition
-            {
-                InitialActionAt = null,
-                InitialActionTaken = "",
-                InvalidMatch = false,
-                InvalidMatchReason = "",
-                OtherReasoningForInvalidMatch = "",
-                FinalDisposition = "",
-                FinalDispositionDate = null,
-                VulnerableIndividual = null,
-                State = "EA"
-            };
-        Component = Render<ResolutionFields>(
-    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
-    </ResolutionFields>
+        usaForm = Render<UsaForm>(
+            @<Piipan.Components.Forms.UsaForm Model="InitialValues.DispositionData">
+                <ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@InitialValues.DispositionData">
+                </ResolutionFields>
+            </Piipan.Components.Forms.UsaForm>
         );
+        Component = usaForm.FindComponent<ResolutionFields>();
     }
 
     #region Tests
@@ -58,14 +64,11 @@
 
         // Assert
         Component!.MarkupMatches(
-    @<div >
+    @<text >
       <h3 >Update information about this match for Echo Bravo</h3>
       <p class="infoSavedText" >After the information is saved, it will appear in the
         <b >match information</b>
         panel.</p>
-      <div class="usa-form ">
-        <form id="snap-resolution-fields-form" method="post" novalidate="" >
-          <fieldset class="usa-fieldset">
           <input type="hidden" name="__RequestVerificationToken" >
             <div diff:ignore> //Ignoring Vulnerable Invalid Component
             </div>
@@ -73,12 +76,11 @@
             </div>
             <div diff:ignore> //Ignoring Final Disposition Component
             </div>
-            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
-          </fieldset>
-        </form>
-      </div>
-    </div>);
+        </text>
+    );
     }
+
+    
 
     #endregion
 }

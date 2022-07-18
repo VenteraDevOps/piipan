@@ -17,6 +17,7 @@ namespace Piipan.Components.Forms
 
         public List<string> ValidationMessages { get; set; } = new List<string>();
         public Func<Task<List<string>>> PreverificationChecks { get; set; } = null;
+        public List<string> FieldDependencies { get; set; } = new List<string>();
         protected bool HasErrors => ValidationMessages.Count > 0;
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace Piipan.Components.Forms
         /// </summary>
         /// <param name="editContext"></param>
         /// <returns></returns>
-        public async Task GetValidationErrorsAsync(EditContext editContext)
+        public async Task GetValidationErrorsAsync(EditContext editContext, bool refreshDependencies = false)
         {
             List<string> preverficiationErrors = PreverificationChecks == null ? null : (await PreverificationChecks());
             if (preverficiationErrors?.Count > 0)
@@ -36,8 +37,16 @@ namespace Piipan.Components.Forms
                 editContext.Validate();
                 ValidationMessages = editContext.GetValidationMessages(FieldIdentifier).ToList();
             }
-            this.StateHasChanged();
+            if (refreshDependencies)
+            {
+                var formGroupsToRefresh = Form.FormGroups.Where(n => n.FieldDependencies.Contains(FieldIdentifier.FieldName)).ToList();
+                foreach (var group in formGroupsToRefresh)
+                {
+                    await group.GetValidationErrorsAsync(editContext, false);
+                }
+            }
             Status = HasErrors ? InputStatus.Error : InputStatus.None;
+            this.StateHasChanged();
             Form.UpdateState();
         }
 
