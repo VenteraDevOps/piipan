@@ -22,7 +22,7 @@ namespace Piipan.Shared.Roles
         /// <returns></returns>
         public string[] GetMatchEditRoles()
         {
-            return _options.EditMatch ?? Array.Empty<string>();
+            return _options?.EditMatch ?? Array.Empty<string>();
         }
     }
 }

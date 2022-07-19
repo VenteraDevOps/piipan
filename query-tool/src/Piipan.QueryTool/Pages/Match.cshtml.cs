@@ -134,7 +134,7 @@ namespace Piipan.QueryTool.Pages
                 if (!_rolesProvider.GetMatchEditRoles().Contains(Role))
                 {
                     _logger.LogError($"User {Email} does not have permissions to edit match details.");
-                    RequestErrors.Add(new("", "You lack the necessary role to save match details."));
+                    RequestErrors.Add(new("", "You do not have the role and permissions to edit match details."));
                 }
                 else
                 {
