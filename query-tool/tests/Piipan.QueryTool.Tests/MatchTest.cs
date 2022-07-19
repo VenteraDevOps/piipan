@@ -112,6 +112,42 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
+        public async Task TestValidMatch_PostFails_WhenInvalidRole()
+        {
+            // arrange
+            var pageModel = SetupMatchModel(role: "SomeOtherRole");
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+
+            pageModel.Query = new MatchSearchRequest
+            {
+                MatchId = null
+            };
+            pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
+            pageModel.DispositionData = new DispositionModel
+            {
+                VulnerableIndividual = true
+            };
+            pageModel.BindModel(pageModel.DispositionData, nameof(MatchModel.DispositionData));
+
+            var result = await pageModel.OnPost(caseid);
+
+            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.NotEmpty(pageModel.RequestErrors);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(caseid, pageModel.Match.Data.MatchId);
+            Assert.Equal("ea", pageModel.Match.Data.Initiator);
+            Assert.Equal(MatchRecordStatus.Open, pageModel.Match.Data.Status);
+            Assert.Empty(pageModel.Match.Data.Dispositions);
+            Assert.Empty(pageModel.Match.Data.Participants);
+            Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
+        }
+
+        [Fact]
         public async Task TestInvalidMatch_Post()
         {
             // arrange
@@ -359,10 +395,10 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal(new List<ServerError> { new("", "There was an error running your search. Please try again.") }, pageModel.RequestErrors);
         }
 
-        private MatchModel SetupMatchModel(Mock<IMatchResolutionApi> mockMatchApi = null, IServiceProvider mockServiceProvider = null)
+        private MatchModel SetupMatchModel(Mock<IMatchResolutionApi> mockMatchApi = null, IServiceProvider mockServiceProvider = null, string role = "Worker")
         {
             // arrange
-            mockServiceProvider ??= serviceProviderMock();
+            mockServiceProvider ??= serviceProviderMock(role: role);
             mockMatchApi ??= SetupMatchResolutionApi();
             var pageModel = new MatchModel(
                 new NullLogger<MatchModel>(),

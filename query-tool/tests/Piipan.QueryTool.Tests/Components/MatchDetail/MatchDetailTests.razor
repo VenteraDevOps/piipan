@@ -119,7 +119,9 @@
                         }
                     }
                 }
-            }
+            },
+            Role = "Worker",
+            RequiredRolesToEdit = new string[] { "Worker" }
         };
     }
 
@@ -134,7 +136,8 @@
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetail>(
             @<MatchDetail Match="InitialValues.Match" ServerErrors="InitialValues.ServerErrors" 
-                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse">
+                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse"
+                Role="@InitialValues.Role" RequiredRolesToEdit="@InitialValues.RequiredRolesToEdit">
             </MatchDetail>
         );
         usaForm = Component.FindComponent<UsaForm>();
@@ -233,6 +236,20 @@
           </div>
         </div>
     );
+    }
+
+    /// <summary>
+    /// Verify that the resolution fields section should not exist when the user is not the correct role
+    /// </summary>
+    [Fact]
+    public void ResolutionFields_ShouldNotExist_WhenUserIsNotCorrectRole()
+    {
+        // Arrange
+        InitialValues.Role = "SomeOtherRole";
+        CreateTestComponent();
+
+        // Assert
+        Assert.Empty(Component.FindComponents<ResolutionFields>());
     }
 
     /// <summary>

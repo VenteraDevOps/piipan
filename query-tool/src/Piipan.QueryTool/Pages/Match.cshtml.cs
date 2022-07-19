@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
+using Piipan.Shared.Roles;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -16,6 +19,7 @@ namespace Piipan.QueryTool.Pages
 
         private readonly ILogger<MatchModel> _logger;
         private readonly IMatchResolutionApi _matchResolutionApi;
+        private readonly IRolesProvider _rolesProvider;
 
         [BindProperty]
         public MatchSearchRequest Query { get; set; } = new MatchSearchRequest();
@@ -25,6 +29,7 @@ namespace Piipan.QueryTool.Pages
         public List<ServerError> RequestErrors { get; private set; } = new();
         public MatchDetailSaveResponseData MatchDetailSaveResponse { get; set; }
         public string UserState { get; set; } = "";
+        public string[] RequiredRolesToEdit => _rolesProvider.GetMatchEditRoles();
 
         public MatchModel(ILogger<MatchModel> logger
                            , IMatchResolutionApi matchResolutionApi
@@ -34,6 +39,7 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _matchResolutionApi = matchResolutionApi;
+            _rolesProvider = serviceProvider.GetRequiredService<IRolesProvider>();
         }
 
         public void InitializeUserState()
@@ -125,54 +131,63 @@ namespace Piipan.QueryTool.Pages
             else
             {
                 MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false };
-                // Remove binding errors from anything binding other than DispositionData (namely the Query property)
-                foreach (var modelStateKey in ModelState.Keys)
+                if (!_rolesProvider.GetMatchEditRoles().Contains(Role))
                 {
-                    if (!modelStateKey.Contains(nameof(DispositionData)))
-                    {
-                        ModelState[modelStateKey].Errors.Clear();
-                        ModelState[modelStateKey].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
-                    }
-                }
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        AddEventRequest addEventRequest = new AddEventRequest
-                        {
-                            Data = new AddEventRequestData
-                            {
-                                FinalDisposition = DispositionData.FinalDisposition,
-                                FinalDispositionDate = DispositionData.FinalDispositionDate,
-                                InitialActionAt = DispositionData.InitialActionAt,
-                                InitialActionTaken = DispositionData.InitialActionTaken,
-                                InvalidMatch = DispositionData.InvalidMatch,
-                                InvalidMatchReason = DispositionData.InvalidMatchReason,
-                                OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
-                                VulnerableIndividual = DispositionData.VulnerableIndividual
-                            }
-                        };
-                        await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
-                        MatchDetailSaveResponse.SaveSuccess = true;
-                    }
-                    catch (Exception exception)
-                    {
-                        _logger.LogError(exception, exception.Message);
-                        RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
-                    }
+                    _logger.LogError($"User {Email} does not have permissions to edit match details.");
+                    RequestErrors.Add(new("", "You do not have the role and permissions to edit match details."));
                 }
                 else
                 {
-                    var keys = ModelState.Keys;
-                    foreach (var key in keys)
+                    // Remove binding errors from anything binding other than DispositionData (namely the Query property)
+                    foreach (var modelStateKey in ModelState.Keys)
                     {
-                        if (ModelState[key]?.Errors?.Count > 0)
+                        if (!modelStateKey.Contains(nameof(DispositionData)))
                         {
-                            var error = ModelState[key].Errors[0];
-                            RequestErrors.Add(new(key, error.ErrorMessage));
+                            ModelState[modelStateKey].Errors.Clear();
+                            ModelState[modelStateKey].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
+                        }
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        try
+                        {
+                            AddEventRequest addEventRequest = new AddEventRequest
+                            {
+                                Data = new AddEventRequestData
+                                {
+                                    FinalDisposition = DispositionData.FinalDisposition,
+                                    FinalDispositionDate = DispositionData.FinalDispositionDate,
+                                    InitialActionAt = DispositionData.InitialActionAt,
+                                    InitialActionTaken = DispositionData.InitialActionTaken,
+                                    InvalidMatch = DispositionData.InvalidMatch,
+                                    InvalidMatchReason = DispositionData.InvalidMatchReason,
+                                    OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
+                                    VulnerableIndividual = DispositionData.VulnerableIndividual
+                                }
+                            };
+                            await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                            MatchDetailSaveResponse.SaveSuccess = true;
+                        }
+                        catch (Exception exception)
+                        {
+                            _logger.LogError(exception, exception.Message);
+                            RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                        }
+                    }
+                    else
+                    {
+                        var keys = ModelState.Keys;
+                        foreach (var key in keys)
+                        {
+                            if (ModelState[key]?.Errors?.Count > 0)
+                            {
+                                var error = ModelState[key].Errors[0];
+                                RequestErrors.Add(new(key, error.ErrorMessage));
+                            }
                         }
                     }
                 }
+
                 Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                 if (Match == null)
                 {
