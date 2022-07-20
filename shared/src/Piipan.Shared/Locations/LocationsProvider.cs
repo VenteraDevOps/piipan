@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace Piipan.Shared.Locations
@@ -15,12 +14,16 @@ namespace Piipan.Shared.Locations
 
         public string[] GetStates(string location)
         {
-            var stateArray = _options.Map?.FirstOrDefault(n => n.Name == location)?.States?.ToArray();
-            if (stateArray == null && !string.IsNullOrEmpty(location))
+            if (location == _options.NationalOfficeValue)
+            {
+                return new string[] { "*" };
+            }
+            // TODO: Fetch states from State Func API and cache. Return string[] with the states matching our region
+            if (!string.IsNullOrEmpty(location))
             {
                 return new string[] { location };
             }
-            return stateArray ?? Array.Empty<string>();
+            return Array.Empty<string>();
         }
     }
 }

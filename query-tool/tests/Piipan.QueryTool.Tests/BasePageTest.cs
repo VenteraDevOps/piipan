@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
-using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
+using Piipan.States.Api;
+using Piipan.States.Api.Models;
 
 namespace Piipan.QueryTool.Tests
 {
@@ -36,8 +31,33 @@ namespace Piipan.QueryTool.Tests
             var locationProviderMock = new Mock<ILocationsProvider>();
             locationProviderMock.Setup(c => c.GetStates(It.IsAny<string>())).Returns(states ?? new string[] { location });
 
+            var statesApiMock = new Mock<IStatesApi>();
+
+            // declare it as object so MemoryCache setup works.
+            object stateInfoResponse = new StatesInfoResponse
+            {
+                Results = new System.Collections.Generic.List<StateInfoResponseData>
+                {
+                    new StateInfoResponseData
+                    {
+                        Email = "ea-test@usda.gov",
+                        Phone = "123-123-1234",
+                        State = "Echo Alpha",
+                        StateAbbreviation = "EA"
+                    }
+                }
+            };
+
+            statesApiMock.Setup(c => c.GetStates()).ReturnsAsync(stateInfoResponse as StatesInfoResponse);
+
+            var mockMemoryCache = new Mock<IMemoryCache>();
+            mockMemoryCache.Setup(n => n.TryGetValue("StateInfo", out stateInfoResponse))
+                .Returns(true);
+
             serviceProviderMock.Setup(c => c.GetService(typeof(IClaimsProvider))).Returns(claimsProviderMock.Object);
             serviceProviderMock.Setup(c => c.GetService(typeof(ILocationsProvider))).Returns(locationProviderMock.Object);
+            serviceProviderMock.Setup(c => c.GetService(typeof(IStatesApi))).Returns(statesApiMock.Object);
+            serviceProviderMock.Setup(c => c.GetService(typeof(IMemoryCache))).Returns(mockMemoryCache.Object);
             return serviceProviderMock.Object;
         }
 
@@ -60,30 +80,6 @@ namespace Piipan.QueryTool.Tests
             context.Setup(m => m.Response).Returns(defaultHttpContext.Response);
 
             return context.Object;
-        }
-
-        protected PageHandlerExecutingContext GetPageHandlerExecutingContext<T>(T pageModel, string methodName) where T : BasePageModel
-        {
-            pageModel.PageContext.HttpContext = contextMock();
-
-            var pageContext = new PageContext(new ActionContext(
-                pageModel.PageContext.HttpContext,
-                new RouteData(),
-                new PageActionDescriptor(),
-                new ModelStateDictionary()));
-            var model = new Mock<PageModel>();
-
-            var pageHandlerExecutingContext = new PageHandlerExecutingContext(
-               pageContext,
-               Array.Empty<IFilterMetadata>(),
-               new HandlerMethodDescriptor() { MethodInfo = typeof(T).GetMethod(methodName) },
-               new Dictionary<string, object>(),
-               model.Object);
-
-            pageModel.OnPageHandlerExecuting(pageHandlerExecutingContext);
-
-            return pageHandlerExecutingContext;
-
         }
     }
 }

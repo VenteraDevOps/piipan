@@ -3,13 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.1] - 2022-06-30
+## [1.1.0.42] - 2022-06-15
 
 ### Changed
-- Added support for capturing participant upload status and start/completion timestamps in the Metrics database.
+- Improved documentation for Duplicate Participation API
+- Moved location & role authorization logic from page level to application
+- Updated IAC scripts to support Azure US Gov & Azure CLI 2.37
 
 ### Added
-- Added AES encryption for columns containing sensitive PII values in Postgres
+- Added column encryption support for sensitive PII values in Postgres
+- Added internal support and API for State Metadata
+- Added basic email notification support/infrastructure
+- Added match status, disposition information, state contact information, and participant information to the Match Details page
 
 ## [1.1.0] - 2022-05-31
 
@@ -289,7 +294,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Duplicate participation API for PPRL approach
   - base URL is now `/match/v2`
   - `query` renamed to `find_matches` which takes de-identified PII
-  - `participant_id` and `case_id` is now required in match esponses
+  - `participant_id` and `case_id` is now required in match responses
 - Bulk upload API for PPRL approach
   - base URL is now `/bulk/v2`
   - `first`, `middle`, `last`, `dob`, and `ssn` columns in CSV replaced with `lds_hash`
@@ -326,7 +331,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - duplicate participation API to allow an entire household to be queried for
 - App Service instances to use Windows under-the-hood
-- query tool to remove lookup API feature and accomodate query API changes
+- query tool to remove lookup API feature and accommodate query API changes
 - Front Door to use a designated public file in dashboard and query tool for health check
 - duplicate participation Function Apps so they do not hibernate
 - Orchestrator Function App so that network egress is through a VNet

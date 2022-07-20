@@ -115,6 +115,11 @@ updates:
     interval: daily
     time: "09:00"
 - package-ecosystem: nuget
+  directory: "/shared/src/Piipan.Shared.Notifications"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
   directory: "/shared/src/Piipan.Shared.Cryptography"
   schedule:
     interval: daily
@@ -130,6 +135,11 @@ updates:
   schedule:
     interval: daily
     time: "09:00"   
+- package-ecosystem: nuget
+  directory: "/shared/tests/Piipan.Shared.Notifications.Tests"
+  schedule:
+    interval: daily
+    time: "09:00" 
 - package-ecosystem: nuget
   directory: "/shared/tests/Piipan.Shared.Cryptography.Tests"
   schedule:
@@ -167,6 +177,26 @@ updates:
     time: "09:00"
 - package-ecosystem: nuget
   directory: "/participants/tests/Piipan.Participants.Core.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/src/Piipan.States/Piipan.States.Api"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/src/Piipan.States/Piipan.States.Core"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/tests/Piipan.States.Core.Integration.Tests"
+  schedule:
+    interval: daily
+    time: "09:00"
+- package-ecosystem: nuget
+  directory: "/states/tests/Piipan.States.Core.Tests"
   schedule:
     interval: daily
     time: "09:00"
