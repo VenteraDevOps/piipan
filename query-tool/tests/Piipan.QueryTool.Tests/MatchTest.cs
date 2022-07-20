@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -223,39 +222,6 @@ namespace Piipan.QueryTool.Tests
 
             // assert
             Assert.Equal(new List<ServerError> { new("", "There was an error running your search. Please try again.") }, pageModel.RequestErrors);
-        }
-
-        [Theory]
-        [InlineData(nameof(MatchModel.OnGet), null, null, false)]
-        [InlineData(nameof(MatchModel.OnGet), "IA", null, false)]
-        [InlineData(nameof(MatchModel.OnGet), null, "Worker", false)]
-        [InlineData(nameof(MatchModel.OnGet), "IA", "Worker", true)]
-        [InlineData(nameof(MatchModel.OnPost), null, null, false)]
-        [InlineData(nameof(MatchModel.OnPost), "IA", null, false)]
-        [InlineData(nameof(MatchModel.OnPost), null, "Worker", false)]
-        [InlineData(nameof(MatchModel.OnPost), "IA", "Worker", true)]
-        public void IsAccessibleWhenRolesExist(string method, string role, string location, bool isAuthorized)
-        {
-            var mockClaimsProvider = serviceProviderMock(location: location, role: role);
-
-            var pageHandlerExecutingContext = GetPageHandlerExecutingContext(mockClaimsProvider, method);
-
-            if (!isAuthorized)
-            {
-                Assert.Equal(403, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
-                Assert.IsType<RedirectToPageResult>(pageHandlerExecutingContext.Result);
-            }
-            else
-            {
-                Assert.Equal(200, pageHandlerExecutingContext.HttpContext.Response.StatusCode);
-            }
-        }
-
-        private PageHandlerExecutingContext GetPageHandlerExecutingContext(IServiceProvider serviceProvider, string methodName)
-        {
-            var pageModel = SetupMatchModel(mockServiceProvider: serviceProvider);
-
-            return base.GetPageHandlerExecutingContext(pageModel, methodName);
         }
 
         private MatchModel SetupMatchModel(Mock<IMatchResolutionApi> mockMatchApi = null, IServiceProvider mockServiceProvider = null)

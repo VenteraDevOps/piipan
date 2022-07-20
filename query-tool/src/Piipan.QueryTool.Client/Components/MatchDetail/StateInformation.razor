@@ -1,0 +1,29 @@
+﻿@using Piipan.Match.Api.Models.Resolution
+@using static Piipan.QueryTool.Client.Helpers.ValueToDisplayHelper
+@using Piipan.QueryTool.Client.Helpers
+@code {
+    [Parameter] public List<DisplayInfo> StateInfo { get; set; }
+    [Parameter] public RenderFragment Header { get; set; }
+
+}
+
+<div>
+    @Header
+    <dl>
+        @foreach (var info in StateInfo)
+        {
+            var displayValue = GetDisplayValue(info.Value);
+            RenderFragment format = @<text>@displayValue</text>;
+
+            if (info.Value != null && info.DisplayType == DisplayInfoType.Email)
+            {
+                format = @<a href="mailto:@(displayValue)">@displayValue</a>;
+            }
+
+            <div>
+                <dt>@(info.Label):</dt>
+                <dd>@format</dd>
+            </div>
+        }
+    </dl>
+</div>

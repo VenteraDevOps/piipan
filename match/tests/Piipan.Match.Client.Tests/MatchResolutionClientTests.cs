@@ -1,9 +1,9 @@
-﻿using Moq;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Moq;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.Shared.Http;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Piipan.Match.Client.Tests

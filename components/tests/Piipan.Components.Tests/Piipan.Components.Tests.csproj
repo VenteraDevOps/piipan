@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <None Include="Layout\UsaCardTests.razor" />
+    <None Include="Tag\UsaTagTests.razor" />
   </ItemGroup>
 
   <ItemGroup>

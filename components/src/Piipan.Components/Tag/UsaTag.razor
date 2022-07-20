@@ -1,0 +1,9 @@
+﻿@code {
+    [Parameter] public TagTheme Theme { get; set; } = TagTheme.Green;
+    [Parameter] public BorderType BorderType { get; set; } = BorderType.Round;
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}
+
+<span class="usa-tag usa-tag--@(Theme.ToString().ToLower()) usa-tag--@(BorderType.ToString().ToLower())">
+    @ChildContent
+</span>
