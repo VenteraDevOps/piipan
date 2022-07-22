@@ -204,7 +204,6 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             {
                 MatchId = matchId,
                 Initiator = "ea",
-                CreatedAt = DateTime.Parse("2022-07-01"),
                 States = new string[] { "ea", "eb" },
                 Hash = "foo",
                 HashType = "ldshash",
@@ -222,7 +221,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             };
             InsertMatchResEvent(matchResEvent);
 
-            var mockRequest = MockRequest("{ \"data\": { \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"bar\", \"final_disposition_date\": \"2022-07-20T00:00:02\" } }");
+            var mockRequest = MockRequest("{ \"data\": { \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"bar\", \"final_disposition_date\": \"" + System.DateTime.UtcNow.AddDays(2).ToString("s") + "\" } }");
             var mockLogger = new Mock<ILogger>();
             var api = Construct();
 
