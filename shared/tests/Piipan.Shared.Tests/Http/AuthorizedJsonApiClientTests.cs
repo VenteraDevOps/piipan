@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Piipan.Shared.Authentication;
-using Piipan.Shared.Http;
 using Moq;
 using Moq.Protected;
+using Piipan.Shared.Authentication;
+using Piipan.Shared.Http;
 using Xunit;
-using System.Text.Json;
 
 namespace Piipan.Shared.Tests.Http
 {
@@ -36,8 +36,8 @@ namespace Piipan.Shared.Tests.Http
             var httpMessageHandler = new Mock<HttpMessageHandler>();
             httpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync", 
-                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Post && m.RequestUri.ToString() == "https://tts.test/path"), 
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Post && m.RequestUri.ToString() == "https://tts.test/path"),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(httpResponse);
 
@@ -50,7 +50,7 @@ namespace Piipan.Shared.Tests.Http
             clientFactory
                 .Setup(m => m.CreateClient(typeof(AuthorizedJsonApiClientTests).Name))
                 .Returns(client);
-            
+
             var tokenProvider = new Mock<ITokenProvider<AuthorizedJsonApiClientTests>>();
             var apiClient = new AuthorizedJsonApiClient<AuthorizedJsonApiClientTests>(
                 clientFactory.Object,
@@ -61,7 +61,7 @@ namespace Piipan.Shared.Tests.Http
             {
                 RequestMessage = "this is a request message"
             };
-            
+
             // Act
             var response = await apiClient.PostAsync<FakeRequestType, FakeResponseType>("/path", body);
 
@@ -81,9 +81,9 @@ namespace Piipan.Shared.Tests.Http
             var httpMessageHandler = new Mock<HttpMessageHandler>();
             httpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync", 
-                    ItExpr.Is<HttpRequestMessage>(m => 
-                        m.Method == HttpMethod.Post && 
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(m =>
+                        m.Method == HttpMethod.Post &&
                         m.RequestUri.ToString() == "https://tts.test/path" &&
                         m.Headers.Contains("added-header")),
                     ItExpr.IsAny<CancellationToken>())
@@ -98,7 +98,7 @@ namespace Piipan.Shared.Tests.Http
             clientFactory
                 .Setup(m => m.CreateClient(typeof(AuthorizedJsonApiClientTests).Name))
                 .Returns(client);
-            
+
             var tokenProvider = new Mock<ITokenProvider<AuthorizedJsonApiClientTests>>();
             var apiClient = new AuthorizedJsonApiClient<AuthorizedJsonApiClientTests>(
                 clientFactory.Object,
@@ -109,7 +109,7 @@ namespace Piipan.Shared.Tests.Http
             {
                 RequestMessage = "this is a request message"
             };
-            
+
             // Act
             var response = await apiClient.PostAsync<FakeRequestType, FakeResponseType>("/path", body, () =>
             {
@@ -174,8 +174,8 @@ namespace Piipan.Shared.Tests.Http
             });
 
             // Assert
-            Assert.IsType<FakeResponseType>(response);
-            Assert.Equal("this is a response message", response.ResponseMessage);
+            Assert.IsType<(FakeResponseType, string)>(response);
+            Assert.Equal("this is a response message", response.SuccessResponse.ResponseMessage);
         }
 
         [Fact]
@@ -190,8 +190,8 @@ namespace Piipan.Shared.Tests.Http
             var httpMessageHandler = new Mock<HttpMessageHandler>();
             httpMessageHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync", 
-                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Get && m.RequestUri.ToString() == "https://tts.test/path"), 
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(m => m.Method == HttpMethod.Get && m.RequestUri.ToString() == "https://tts.test/path"),
                     ItExpr.IsAny<CancellationToken>())
                 .ReturnsAsync(httpResponse);
 
@@ -204,13 +204,13 @@ namespace Piipan.Shared.Tests.Http
             clientFactory
                 .Setup(m => m.CreateClient(typeof(AuthorizedJsonApiClientTests).Name))
                 .Returns(client);
-            
+
             var tokenProvider = new Mock<ITokenProvider<AuthorizedJsonApiClientTests>>();
             var apiClient = new AuthorizedJsonApiClient<AuthorizedJsonApiClientTests>(
                 clientFactory.Object,
                 tokenProvider.Object
             );
-            
+
             // Act
             var response = await apiClient.GetAsync<FakeResponseType>("/path");
 
