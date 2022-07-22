@@ -204,7 +204,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             {
                 MatchId = matchId,
                 Initiator = "ea",
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Parse("2022-07-01"),
                 States = new string[] { "ea", "eb" },
                 Hash = "foo",
                 HashType = "ldshash",
