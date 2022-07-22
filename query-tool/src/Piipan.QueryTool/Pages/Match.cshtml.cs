@@ -49,7 +49,7 @@ namespace Piipan.QueryTool.Pages
                         return RedirectToPage("Error", new { message = "MatchId not found" });
                     }
 
-                    Match = await _matchResolutionApi.GetMatch(id);
+                    Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                     if (Match == null)
                     {
                         return RedirectToPage("Error", new { message = "MatchId not found" });
@@ -70,7 +70,7 @@ namespace Piipan.QueryTool.Pages
                 try
                 {
                     AvailableMatches = new List<MatchResApiResponse>();
-                    var match = await _matchResolutionApi.GetMatch(Query.MatchId);
+                    var match = await _matchResolutionApi.GetMatch(Query.MatchId, IsNationalOffice ? "*" : Location);
                     if (match != null)
                     {
                         AvailableMatches.Add(match);

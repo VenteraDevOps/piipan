@@ -8,6 +8,8 @@
 @inherits BaseComponentTest<StateDispositionInformation>
 
 @code {
+
+    public DateTime testMatchDate = DateTime.Parse("06/19/2022");
     /// <summary>
     /// Set the default initial values for this test component
     /// </summary>
@@ -35,12 +37,68 @@
     protected override void CreateTestComponent()
     {
         Component = Render<StateDispositionInformation>(
-            @<StateDispositionInformation InitiatingState="InitialValues.InitiatingState" Disposition="InitialValues.Disposition">
+            @<StateDispositionInformation InitiatingState="InitialValues.InitiatingState" Disposition="InitialValues.Disposition" InitiatingStateName="Echo Alpha" InitiatingStateAbbr="EA">
+        </StateDispositionInformation>
+    );
+    }
+
+    /// <summary>
+    /// Create a StateParticipantInformation component
+    /// </summary>
+    protected void CreateTestComponent_withMatchDate()
+    {
+        Component = Render<StateDispositionInformation>(
+            @<StateDispositionInformation InitiatingState="InitialValues.InitiatingState" Disposition="InitialValues.Disposition" InitiatingStateName="Echo Alpha" InitiatingStateAbbr="EA" MatchDate=testMatchDate>
             </StateDispositionInformation>
         );
     }
 
     #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the state disposition information
+    /// </summary>
+    [Fact]
+    public void State_Contact_Info_Should_Exist_And_Have_Correct_Markup_With_Match_Date()
+    {
+        // Arrange
+        CreateTestComponent_withMatchDate();
+        DateTime currentDate = DateTime.Today;                
+        string daysSinceMatch = (currentDate - testMatchDate).TotalDays.ToString();
+
+        // Assert
+        Component!.MarkupMatches(
+            @<div>
+                <h5>Echo Alpha <span>(Initiating State)</span></h5>
+                <dl>
+                    <div>
+                        <dt>Vulnerable Individual:</dt>
+                        <dd>No</dd>
+                    </div>
+                    <div>
+                        <dt>Invalid Match:</dt>
+                        <dd>No</dd>
+                    </div>
+                    <div>
+                        <dt>Initial Action Taken:</dt>
+                        <dd>Notice Sent</dd>
+                    </div>
+                    <div>
+                        <dt>Initial Action Date:</dt>
+                        <dd>01/01/2022</dd>
+                    </div>
+                    <div>
+                        <dt>Final Disposition Taken:</dt>
+                        <dd>Benefits Approved</dd>
+                    </div>
+                    <div>
+                        <dt>Benefits Start Date:</dt>
+                        <dd>02/02/2022</dd>
+                    </div>
+                </dl>
+            </div>
+        );
+    }
 
     /// <summary>
     /// Verify the default markup of the state disposition information

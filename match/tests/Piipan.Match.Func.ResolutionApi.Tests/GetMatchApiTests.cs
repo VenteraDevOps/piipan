@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -12,6 +13,8 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Shared.Http;
+using Piipan.States.Core.DataAccessObjects;
+using Piipan.States.Core.Models;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.Tests
@@ -24,25 +27,52 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecordDao = new Mock<IMatchRecordDao>();
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
+            var mockStatesDao = new Mock<IStateInfoDao>();
+
             var api = new GetMatchApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
-                matchResAggregator.Object
+                matchResAggregator.Object,
+                mockStatesDao.Object,
+                MockMemoryCache().Object
             );
             return api;
         }
 
-        static Mock<HttpRequest> MockGetRequest(string matchId = "foo")
+        static Mock<HttpRequest> MockGetRequest(string matchId = "foo", string requestLocation = "EA")
         {
             var mockRequest = new Mock<HttpRequest>();
             var headers = new HeaderDictionary(new Dictionary<String, StringValues>
             {
-                { "From", "foobar"},
-                { "X-Initiating-State", "ea"}
+                { "Ocp-Apim-Subscription-Name", "sub-name" },
+                { "X-Request-Location", requestLocation}
             }) as IHeaderDictionary;
             mockRequest.Setup(x => x.Headers).Returns(headers);
 
             return mockRequest;
+        }
+
+        static Mock<IMemoryCache> MockMemoryCache()
+        {
+            var mockMemoryCache = new Mock<IMemoryCache>();
+            object states = new List<StateInfoDbo>
+            {
+                new StateInfoDbo
+                {
+                    State = "Echo Alpha",
+                    StateAbbreviation = "EA",
+                    Region = "Test"
+                },
+                new StateInfoDbo
+                {
+                    State = "Echo Bravo",
+                    StateAbbreviation = "EB",
+                    Region = "Test"
+                }
+            };
+            mockMemoryCache.Setup(n => n.TryGetValue(GetMatchApi.StateInfoCacheName, out states))
+                .Returns(true);
+            return mockMemoryCache;
         }
 
         [Fact]
@@ -51,12 +81,6 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             // Arrange
             var api = Construct();
             var mockRequest = MockGetRequest();
-            mockRequest
-                .Setup(x => x.Headers)
-                .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
-                {
-                    { "Ocp-Apim-Subscription-Name", "sub-name" }
-                }));
             var logger = new Mock<ILogger>();
 
             // Act
@@ -77,12 +101,6 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
         {
             // Arrange
             var mockRequest = MockGetRequest();
-            mockRequest
-                .Setup(x => x.Headers)
-                .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
-                {
-                    { "Ocp-Apim-Subscription-Name", "sub-name" }
-                }));
             var logger = new Mock<ILogger>();
             // Mocks
             var matchRecord = new MatchRecordDbo();
@@ -93,11 +111,14 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
 
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
+            var mockStatesDao = new Mock<IStateInfoDao>();
 
             var api = new GetMatchApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
-                matchResAggregator.Object
+                matchResAggregator.Object,
+                mockStatesDao.Object,
+                MockMemoryCache().Object
             );
 
             // Act
@@ -114,24 +135,23 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             Assert.Contains("NotFoundException", errorResponse.Errors[0].Title);
         }
 
-        [Fact]
-        public async Task GetMatch_ReturnsIfFound()
+        [Theory]
+        [InlineData("EA", true, "ea", "eb")] // state permissions
+        [InlineData("EA", false, "ec", "eb")] // state permissions
+        [InlineData("TEST", true, "ec", "eb")] // region permissions
+        [InlineData("TEST2", false, "ec", "eb")] // region permissions
+        [InlineData("*", true, "ec", "eb")] // national office permissions
+        public async Task GetMatch_ReturnsOnlyIfFoundAndLocationMatches(string location, bool expectResult, params string[] states)
         {
             // Arrange
-            var mockRequest = MockGetRequest();
-            mockRequest
-                .Setup(x => x.Headers)
-                .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
-                {
-                    { "Ocp-Apim-Subscription-Name", "sub-name" }
-                }));
+            var mockRequest = MockGetRequest(requestLocation: location);
             var logger = new Mock<ILogger>();
 
             // Mock Dao response
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
-                .ReturnsAsync(new MatchRecordDbo());
+                .ReturnsAsync(new MatchRecordDbo() { States = states, MatchId = "m123456" });
             var mock = new Mock<IMatchResEventDao>();
             var matchResEventDao = new Mock<IMatchResEventDao>();
             matchResEventDao
@@ -147,23 +167,50 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 {
                     Status = "open"
                 });
+            var mockStatesDao = new Mock<IStateInfoDao>();
+
 
             var api = new GetMatchApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
-                matchResAggregator.Object
+                matchResAggregator.Object,
+                mockStatesDao.Object,
+                MockMemoryCache().Object
             );
 
             // Act
-            var response = await api.GetMatch(mockRequest.Object, "foo", logger.Object) as JsonResult;
+            var response = await api.GetMatch(mockRequest.Object, "m123456", logger.Object);
 
-            //Assert
-            Assert.NotNull(response);
-            Assert.Equal(200, response.StatusCode);
+            if (expectResult)
+            {
+                var jsonResult = response as JsonResult;
+                //Assert
+                Assert.NotNull(jsonResult);
+                Assert.Equal(200, jsonResult.StatusCode);
 
-            var resBody = response.Value as MatchResApiResponse;
-            Assert.NotNull(resBody);
-            Assert.Equal("open", resBody.Data.Status);
+                var resBody = jsonResult.Value as MatchResApiResponse;
+                Assert.NotNull(resBody);
+                Assert.Equal("open", resBody.Data.Status);
+
+            }
+            else
+            {
+                var notFoundResult = response as NotFoundObjectResult;
+                //Assert
+                Assert.NotNull(notFoundResult);
+                Assert.Equal(404, notFoundResult.StatusCode);
+
+                var resBody = notFoundResult.Value as MatchResApiResponse;
+                Assert.Null(resBody);
+
+                logger.Verify(x => x.Log(
+                    It.Is<LogLevel>(l => l == LogLevel.Information),
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("(NOTAUTHORIZEDMATCH) user (null) did not have access to match id m123456")),
+                    It.IsAny<Exception>(),
+                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
+                ));
+            }
         }
     }
 }

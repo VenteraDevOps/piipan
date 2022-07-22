@@ -1,10 +1,5 @@
 ﻿using Piipan.States.Api.Models;
 using Piipan.Shared.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Piipan.States.Core.Models;
 using Dapper;
 
@@ -22,7 +17,7 @@ namespace Piipan.States.Core.DataAccessObjects
             _dbConnectionFactory = dbConnectionFactory;
         }
         /// <summary>
-        /// Get all state info and searches off of state's name
+        /// Get all state info and searches off of state's id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -47,10 +42,10 @@ namespace Piipan.States.Core.DataAccessObjects
             
         }
         /// <summary>
-        /// Get all state info and searches off of state's id
+        /// Get all state info and searches off of state's name
         /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
+        /// <param name="state">State name</param>
+        /// <returns>Returns matching StateInfoDbo record</returns>
         public async Task<IState> GetStateByName(string state)
         {
             try
@@ -74,7 +69,7 @@ namespace Piipan.States.Core.DataAccessObjects
         /// <summary>
         /// Get all state info for all states
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Enumerable of StateInfoDbo Records</returns>
         public async Task<IEnumerable<IState>> GetStates()
         {
             using (var connection = await _dbConnectionFactory.Build())

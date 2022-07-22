@@ -4,6 +4,9 @@
 @code {
     [Parameter] public Disposition Disposition { get; set; }
     [Parameter] public bool InitiatingState { get; set; }
+    [Parameter] public DateTime? MatchDate { get; set; }
+    [Parameter] public string InitiatingStateAbbr { get; set; }
+    [Parameter] public string InitiatingStateName { get; set; }
 
     RenderFragment header =>
         @<h5>@StateHelper.GetStateName(Disposition.State) <span>(@(InitiatingState ? "Initiating" : "Matching") State)</span></h5>

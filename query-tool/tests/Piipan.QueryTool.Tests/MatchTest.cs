@@ -124,10 +124,10 @@ namespace Piipan.QueryTool.Tests
             };
             var mockMatchApi = new Mock<IMatchResolutionApi>();
             mockMatchApi
-                .Setup(n => n.GetMatch(ValidMatchId))
+                .Setup(n => n.GetMatch(ValidMatchId, "EA"))
                 .ReturnsAsync(apiReturnValue);
             mockMatchApi
-                .Setup(n => n.GetMatch(It.IsNotIn(ValidMatchId)))
+                .Setup(n => n.GetMatch(It.IsNotIn(ValidMatchId), "EA"))
                 .ReturnsAsync((MatchResApiResponse)null);
             return mockMatchApi;
         }
@@ -205,7 +205,7 @@ namespace Piipan.QueryTool.Tests
         {
             var mockMatchApi = new Mock<IMatchResolutionApi>();
             mockMatchApi
-                .Setup(n => n.GetMatch(ValidMatchId))
+                .Setup(n => n.GetMatch(ValidMatchId, "EA"))
                 .ThrowsAsync(new System.Exception("Test Error"));
             var pageModel = SetupMatchModel(mockMatchApi);
 

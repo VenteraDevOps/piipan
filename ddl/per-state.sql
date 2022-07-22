@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS participants(
 );
 
 COMMENT ON TABLE participants IS 'Program participant';
-COMMENT ON COLUMN participants.lds_hash IS 'Participant''s deidentified data as hex value';
-COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier';
-COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier';
+COMMENT ON COLUMN participants.lds_hash IS 'Participant''s deidentified data as encrypted value';
+COMMENT ON COLUMN participants.case_id IS 'Participant''s state-specific case identifier as encrypted value';
+COMMENT ON COLUMN participants.participant_id IS 'Participant''s state-specific identifier as encrypted value';
 COMMENT ON COLUMN participants.participant_closing_date   IS 'Date when the Participant''s case will close. This will be the last date the participate is eligible to receive benefits.';
 COMMENT ON COLUMN participants.recent_benefit_issuance_dates IS 'Participant''s recent benefit months issuances date ranges.';
 COMMENT ON COLUMN participants.vulnerable_individual IS 'Participant''s vulnerability status';

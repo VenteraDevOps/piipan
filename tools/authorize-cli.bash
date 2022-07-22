@@ -34,7 +34,10 @@ main () {
   # For references to hard-coded ID see:
   # - https://docs.microsoft.com/en-us/azure-stack/user/azure-stack-rest-api-use?view=azs-2008#example-1
   # - https://github.com/Azure/azure-cli/blob/24e0b9ef8716e16b9e38c9bb123a734a6cf550eb/src/azure-cli-core/azure/cli/core/_profile.py#L65
-  cli_id="04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+  azure_cli_client_id="04b07795-8ddb-461a-bbee-02f9e1bf7b46"
+  visual_studio_client_id="872cd9fa-d31f-45e0-9eab-6e460a02d1f1"
+  #powershell_client_id="1950a258-227b-4e31-a9cf-717495945fc2"
+  
   domain=$(graph_host_suffix)
   object_id=$(\
     az ad app list \
@@ -42,14 +45,18 @@ main () {
       --query "[0].id" \
       -o tsv)
 
-  # Add user_impersonation scope
+  # Use the Azure Cli Client Id as the unique identifier for the oauth2PermissionScope applications require
+  # - https://docs.microsoft.com/en-us/graph/api/resources/preauthorizedapplication?view=graph-rest-1.0#properties
+  permission_scope_id=$azure_cli_client_id
+
+  echo "Adding user_impersonation scope"
   # shellcheck disable=SC2016
   json="{
     \"api\": {
       \"oauth2PermissionScopes\": [{
         \"adminConsentDescription\":\"Allow the application to access ${func} on behalf of the signed-in user.\",
         \"adminConsentDisplayName\":\"Access ${func}\",
-        \"id\":\"${cli_id}\",
+        \"id\":\"${permission_scope_id}\",
         \"isEnabled\":true,
         \"type\":\"User\",
         \"userConsentDescription\":\"Allow the application to access ${func} on your behalf.\",
@@ -65,13 +72,18 @@ main () {
     --headers 'Content-Type=application/json' \
     --body "${json}"
 
-  # Add Azure CLI as Pre-Authorized Application
+  echo "Register Azure CLI and Visual Studio as Pre-Authorized Applications"
+    
   # shellcheck disable=SC2016
   json="{
       \"api\": {
         \"preAuthorizedApplications\": [{
-          \"appId\":\"${cli_id}\",
-          \"delegatedPermissionIds\":[\"${cli_id}\"]
+          \"appId\":\"${azure_cli_client_id}\",
+          \"delegatedPermissionIds\":[\"${permission_scope_id}\"]
+        },
+        {
+          \"appId\":\"${visual_studio_client_id}\",
+          \"delegatedPermissionIds\":[\"${permission_scope_id}\"]
         }]
       }
     }"

@@ -4,7 +4,6 @@
 @code {
     [Parameter] public List<DisplayInfo> StateInfo { get; set; }
     [Parameter] public RenderFragment Header { get; set; }
-
 }
 
 <div>
@@ -17,7 +16,8 @@
 
             if (info.Value != null && info.DisplayType == DisplayInfoType.Email)
             {
-                format = @<a href="mailto:@(displayValue)">@displayValue</a>;
+                format = @<a href="mailto:@(displayValue)">@displayValue</a>
+        ;
             }
 
             <div>

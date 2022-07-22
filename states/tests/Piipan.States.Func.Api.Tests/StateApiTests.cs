@@ -41,12 +41,6 @@ namespace Piipan.States.Func.Api.Tests
             // Arrange
             var api = Construct();
             var mockRequest = MockGetRequest();
-            mockRequest
-                .Setup(x => x.Headers)
-                .Returns(new HeaderDictionary(new Dictionary<string, StringValues>
-                {
-                    { "Ocp-Apim-Subscription-Name", "sub-name" }
-                }));
             var logger = new Mock<ILogger>();
 
             // Act
@@ -56,7 +50,7 @@ namespace Piipan.States.Func.Api.Tests
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Information),
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Using APIM subscription sub-name")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Executing request from user")),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
             ));

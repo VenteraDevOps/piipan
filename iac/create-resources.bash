@@ -707,7 +707,7 @@ main () {
         --source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${stor_name}" \
         -o tsv \
         --query id)
-  
+
     # Create Function endpoint before setting up event subscription
     try_run "func azure functionapp publish ${func_app} --dotnet" 7 "../etl/src/Piipan.Etl/Piipan.Etl.Func.BulkUpload"
   
@@ -737,6 +737,14 @@ main () {
         }
       ]'
   done < states.csv
+
+
+  update_bu_metrics_topic_name=evgt-update-bu-metrics-$ENV
+
+  az eventgrid topic create \
+    --location "$LOCATION" \
+    --name "$update_bu_metrics_topic_name" \
+    --resource-group "$RESOURCE_GROUP" 
 
   # Create App Service resources for query tool app.
   # This needs to happen after the orchestrator is created in order for

@@ -65,12 +65,6 @@ namespace Piipan.States.Func.Api
         {
             logger.LogInformation("Executing request from user {User}", request.HttpContext?.User.Identity.Name);
 
-            string subscription = request.Headers["Ocp-Apim-Subscription-Name"];
-            if (subscription != null)
-            {
-                logger.LogInformation("Using APIM subscription {Subscription}", subscription);
-            }
-
             string username = request.Headers["From"];
             if (username != null)
             {
