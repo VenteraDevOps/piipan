@@ -57,9 +57,9 @@ namespace Piipan.Participants.Core.DataAccessObjects
                 )
                 .MapBoolean("vulnerable_individual", p => p.VulnerableIndividual);
 
-            _logger.LogDebug("Bulk inserting participant records");
+            _logger.LogInformation("Bulk inserting participant records");
             var result = await copyHelper.SaveAllAsync(connection, participants);
-            _logger.LogDebug("Completed bulk insert of {0} participant records", result);
+            _logger.LogInformation("Completed bulk insert of {0} participant records", result);
 
             return result;
         }

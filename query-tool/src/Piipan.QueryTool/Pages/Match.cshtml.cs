@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Match.Api;
@@ -10,6 +12,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
 using Piipan.Shared.Http;
+using Piipan.Shared.Roles;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -18,6 +21,7 @@ namespace Piipan.QueryTool.Pages
 
         private readonly ILogger<MatchModel> _logger;
         private readonly IMatchResolutionApi _matchResolutionApi;
+        private readonly IRolesProvider _rolesProvider;
 
         [BindProperty]
         public MatchSearchRequest Query { get; set; } = new MatchSearchRequest();
@@ -27,6 +31,7 @@ namespace Piipan.QueryTool.Pages
         public List<ServerError> RequestErrors { get; private set; } = new();
         public MatchDetailSaveResponseData MatchDetailSaveResponse { get; set; }
         public string UserState { get; set; } = "";
+        public string[] RequiredRolesToEdit => _rolesProvider.GetMatchEditRoles();
 
         public MatchModel(ILogger<MatchModel> logger
                            , IMatchResolutionApi matchResolutionApi
@@ -36,6 +41,7 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _matchResolutionApi = matchResolutionApi;
+            _rolesProvider = serviceProvider.GetRequiredService<IRolesProvider>();
         }
 
         public void InitializeUserState()
@@ -127,6 +133,11 @@ namespace Piipan.QueryTool.Pages
             else
             {
                 MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false, FailedDispositionModel = DispositionData };
+                if (!_rolesProvider.GetMatchEditRoles().Contains(Role))
+                {
+                    _logger.LogError($"User {Email} does not have permissions to edit match details.");
+                    RequestErrors.Add(new("", "You do not have the role and permissions to edit match details."));
+                }
                 // Remove binding errors from anything binding other than DispositionData (namely the Query property)
                 foreach (var modelStateKey in ModelState.Keys)
                 {
@@ -194,6 +205,7 @@ namespace Piipan.QueryTool.Pages
                         }
                     }
                 }
+
                 Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                 if (Match == null)
                 {

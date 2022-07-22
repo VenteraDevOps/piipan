@@ -14,10 +14,13 @@
     [Parameter] public string Token { get; set; }
     [Parameter] public MatchDetailSaveResponseData SaveResponse { get; set; }
     [Parameter] public List<ServerError> ServerErrors { get; set; }
+    [Parameter] public string Role { get; set; }
+    [Parameter] public string[] RequiredRolesToEdit { get; set; }
 
     private DispositionModel model;
 
     private bool saving = false;
+    private bool CanEditFields => RequiredRolesToEdit.Contains(Role);
     List<(string Property, string Error)> serverErrorList;
 
 
@@ -124,11 +127,14 @@
         </dl>
     </div>
     <!-- \match header -->
-    <div class="match-detail-grid">
-        <div>
-            <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@model"/>
-            <button class="usa-button ResolutionFieldsSave" disabled="@saving">@(saving ? "Saving Changes..." : "Save Changes")</button>
-        </div>
+    <div class="match-detail-grid @(CanEditFields ? "" : "one-col")">
+        @if (CanEditFields)
+        {
+            <div>
+                <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@model"/>
+                <button class="usa-button ResolutionFieldsSave" disabled="@saving">@(saving ? "Saving Changes..." : "Save Changes")</button>
+            </div>
+        }
         <div>
             <UsaAccordion>
                 <UsaAccordionItem StartsExpanded="true">

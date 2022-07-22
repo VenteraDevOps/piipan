@@ -114,9 +114,13 @@ namespace Piipan.Match.Func.ResolutionApi
                     Actor = req.Headers["From"].ToString() ?? UserActor,
                     Delta = JsonConvert.SerializeObject(reqObj.Data)
                 };
-                await _matchResEventDao.AddEvent(newEvent);
+                var successfulEventAdd = await _matchResEventDao.AddEvent(newEvent);
+                var updatedMatchResEvents = matchResEvents.Result.ToList();
+                if (successfulEventAdd != 0) {
+                    updatedMatchResEvents.Add(newEvent);
+                }
                 // determine if match should be closed
-                await DetermineClosure(reqObj, match.Result, matchResEvents.Result);
+                await DetermineClosure(reqObj, match.Result, updatedMatchResEvents);
                 return new OkResult();
             }
             catch (StreamParserException ex)
@@ -150,7 +154,7 @@ namespace Piipan.Match.Func.ResolutionApi
             if (String.IsNullOrEmpty(reqObj.Data.FinalDisposition)) return;
 
             var dispositions = GetFinalDispositions(matchResEvents);
-            if (dispositions.Count() == (match.States.Count() - 1))
+            if (dispositions.Count() == (match.States.Count()))
             {
                 var closedEvent = new MatchResEventDbo()
                 {
@@ -166,11 +170,17 @@ namespace Piipan.Match.Func.ResolutionApi
             IEnumerable<IMatchResEvent> matchResEvents
         )
         {
+            List<String> statesWithFinalDisposition = new List<String>();
             return matchResEvents.Where(e =>
             {
                 AddEventRequestData? delta = JsonConvert.DeserializeObject<AddEventRequestData>(e.Delta);
-                return !String.IsNullOrEmpty(delta?.FinalDisposition);
-            });
+                if (!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate!= null && !statesWithFinalDisposition.Contains(e.ActorState))
+                {
+                    statesWithFinalDisposition.Add(e.ActorState);
+                    return true;
+                }
+                return false;
+            }).ToList();
         }
 
 

@@ -218,11 +218,11 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 MatchId = matchId,
                 Actor = "user",
                 ActorState = "eb",
-                Delta = "{ \"final_disposition\": \"foo\" }"
+                Delta = "{ \"final_disposition\": \"foo\", \"final_disposition_date\": \"2022-07-20T00:00:02\" }"
             };
             InsertMatchResEvent(matchResEvent);
 
-            var mockRequest = MockRequest("{ \"data\": { \"final_disposition\": \"bar\" } }");
+            var mockRequest = MockRequest("{ \"data\": { \"final_disposition\": \"bar\", \"final_disposition_date\": \"2022-07-20T00:00:02\" } }");
             var mockLogger = new Mock<ILogger>();
             var api = Construct();
 

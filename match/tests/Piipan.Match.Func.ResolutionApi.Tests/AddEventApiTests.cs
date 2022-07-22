@@ -339,7 +339,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var events = new List<IMatchResEvent>() {
                 new MatchResEventDbo() {
-                    Delta = "{ \"final_disposition\": \"foo\" }",
+                    Delta = "{ \"final_disposition\": \"foo\", \"final_disposition_date\": \"2022-07-20T00:00:02\" }",
                     ActorState = "eb"
                 }
             };
@@ -349,6 +349,11 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                     It.IsAny<bool>()
                 ))
                 .ReturnsAsync(events);
+            matchResEventDao
+             .Setup(r => r.AddEvent(
+                 It.IsAny<MatchResEventDbo>()
+             ))
+             .ReturnsAsync(1);
             var matchResAggregator = new Mock<IMatchResAggregator>();
             matchResAggregator
                 .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
@@ -366,7 +371,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 matchResAggregator.Object,
                 requestParser
             );
-            var mockRequest = MockRequest("{ \"data\": { \"final_disposition\": \"bar\" } }"); // coming form state ea
+            var mockRequest = MockRequest("{ \"data\": { \"final_disposition\": \"bar\", \"final_disposition_date\": \"2022-07-20T00:00:01\" } }"); // coming form state ea
             var logger = new Mock<ILogger>();
 
             // Act

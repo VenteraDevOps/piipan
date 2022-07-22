@@ -27,6 +27,13 @@ set_constants () {
   # Metrics API Info
   API_APP_FILEPATH=Piipan.Metrics.Func.Api
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
+
+  # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
+  # for our default resource group
+  DEFAULT_PROVIDERS="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers"
+
+  # Function apps need an Event Hub authorization rule ID for log streaming
+  EH_RULE_ID="${DEFAULT_PROVIDERS}/Microsoft.EventHub/namespaces/${EVENT_HUB_NAME}/authorizationRules/RootManageSharedAccessKey"
 }
 
 # Generate the eventgrid key string for the corresponding
@@ -45,7 +52,7 @@ eventgrid_endpoint () {
 eventgrid_key_string () {
   group=$1
   name=$2
-  
+
   az eventgrid topic key list \
     --name "$name" \
     --resource-group "$group" \
@@ -131,18 +138,12 @@ main () {
       -g "$RESOURCE_GROUP" \
       -o tsv \
       --query id)
-  hub_rule_id=$(\
-    az eventhubs namespace authorization-rule list \
-      --resource-group "$RESOURCE_GROUP" \
-      --namespace-name "$EVENT_HUB_NAME" \
-      --query "[?name == 'RootManageSharedAccessKey'].id" \
-      -o tsv)
 
   az monitor diagnostic-settings create \
     --name "stream-logs-to-event-hub" \
     --resource "$metrics_collect_function_id" \
     --event-hub "logs" \
-    --event-hub-rule "$hub_rule_id" \
+    --event-hub-rule "${EH_RULE_ID}" \
     --logs '[
       {
         "category": "FunctionAppLogs",
@@ -207,7 +208,7 @@ main () {
           --subject-begins-with /blobServices/default/containers/upload/blobs/
 
       func_app=$PREFIX-func-${abbr}etl-$ENV
-      
+
       az functionapp config appsettings set \
         --resource-group "$RESOURCE_GROUP" \
         --name "$func_app" \
@@ -283,18 +284,12 @@ main () {
       -g "$RESOURCE_GROUP" \
       -o tsv \
       --query id)
-  hub_rule_id=$(\
-    az eventhubs namespace authorization-rule list \
-      --resource-group "$RESOURCE_GROUP" \
-      --namespace-name "$EVENT_HUB_NAME" \
-      --query "[?name == 'RootManageSharedAccessKey'].id" \
-      -o tsv)
 
   az monitor diagnostic-settings create \
     --name "stream-logs-to-event-hub" \
     --resource "$metrics_api_function_id" \
     --event-hub "logs" \
-    --event-hub-rule "$hub_rule_id" \
+    --event-hub-rule "${EH_RULE_ID}" \
     --logs '[
       {
         "category": "FunctionAppLogs",
