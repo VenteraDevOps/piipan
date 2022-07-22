@@ -138,70 +138,73 @@ namespace Piipan.QueryTool.Pages
                     _logger.LogError($"User {Email} does not have permissions to edit match details.");
                     RequestErrors.Add(new("", "You do not have the role and permissions to edit match details."));
                 }
-                // Remove binding errors from anything binding other than DispositionData (namely the Query property)
-                foreach (var modelStateKey in ModelState.Keys)
+                else
                 {
-                    if (!modelStateKey.Contains(nameof(DispositionData)))
+                    // Remove binding errors from anything binding other than DispositionData (namely the Query property)
+                    foreach (var modelStateKey in ModelState.Keys)
                     {
-                        ModelState[modelStateKey].Errors.Clear();
-                        ModelState[modelStateKey].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
-                    }
-                }
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        AddEventRequest addEventRequest = new AddEventRequest
+                        if (!modelStateKey.Contains(nameof(DispositionData)))
                         {
-                            Data = new AddEventRequestData
-                            {
-                                FinalDisposition = DispositionData.FinalDisposition,
-                                FinalDispositionDate = DispositionData.FinalDispositionDate,
-                                InitialActionAt = DispositionData.InitialActionAt,
-                                InitialActionTaken = DispositionData.InitialActionTaken,
-                                InvalidMatch = DispositionData.InvalidMatch,
-                                InvalidMatchReason = DispositionData.InvalidMatchReason,
-                                OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
-                                VulnerableIndividual = DispositionData.VulnerableIndividual
-                            }
-                        };
-                        var (_, failResponse) = await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
-                        if (string.IsNullOrEmpty(failResponse))
-                        {
-                            MatchDetailSaveResponse.SaveSuccess = true;
-                            MatchDetailSaveResponse.FailedDispositionModel = null;
+                            ModelState[modelStateKey].Errors.Clear();
+                            ModelState[modelStateKey].ValidationState = Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid;
                         }
-                        else
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        try
                         {
-                            ApiErrorResponse apiErrorResponse = JsonConvert.DeserializeObject<ApiErrorResponse>(failResponse);
-                            if (apiErrorResponse.Errors?.Count > 0)
+                            AddEventRequest addEventRequest = new AddEventRequest
                             {
-                                foreach (var error in apiErrorResponse.Errors)
+                                Data = new AddEventRequestData
                                 {
-                                    RequestErrors.Add(new("", error.Detail));
+                                    FinalDisposition = DispositionData.FinalDisposition,
+                                    FinalDispositionDate = DispositionData.FinalDispositionDate,
+                                    InitialActionAt = DispositionData.InitialActionAt,
+                                    InitialActionTaken = DispositionData.InitialActionTaken,
+                                    InvalidMatch = DispositionData.InvalidMatch,
+                                    InvalidMatchReason = DispositionData.InvalidMatchReason,
+                                    OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
+                                    VulnerableIndividual = DispositionData.VulnerableIndividual
                                 }
+                            };
+                            var (_, failResponse) = await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                            if (string.IsNullOrEmpty(failResponse))
+                            {
+                                MatchDetailSaveResponse.SaveSuccess = true;
+                                MatchDetailSaveResponse.FailedDispositionModel = null;
                             }
                             else
                             {
-                                RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                                ApiErrorResponse apiErrorResponse = JsonConvert.DeserializeObject<ApiErrorResponse>(failResponse);
+                                if (apiErrorResponse.Errors?.Count > 0)
+                                {
+                                    foreach (var error in apiErrorResponse.Errors)
+                                    {
+                                        RequestErrors.Add(new("", error.Detail));
+                                    }
+                                }
+                                else
+                                {
+                                    RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                                }
                             }
                         }
-                    }
-                    catch (Exception exception)
-                    {
-                        _logger.LogError(exception, exception.Message);
-                        RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
-                    }
-                }
-                else
-                {
-                    var keys = ModelState.Keys;
-                    foreach (var key in keys)
-                    {
-                        if (ModelState[key]?.Errors?.Count > 0)
+                        catch (Exception exception)
                         {
-                            var error = ModelState[key].Errors[0];
-                            RequestErrors.Add(new(key, error.ErrorMessage));
+                            _logger.LogError(exception, exception.Message);
+                            RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                        }
+                    }
+                    else
+                    {
+                        var keys = ModelState.Keys;
+                        foreach (var key in keys)
+                        {
+                            if (ModelState[key]?.Errors?.Count > 0)
+                            {
+                                var error = ModelState[key].Errors[0];
+                                RequestErrors.Add(new(key, error.ErrorMessage));
+                            }
                         }
                     }
                 }
