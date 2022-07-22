@@ -333,8 +333,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
                 .ReturnsAsync(new MatchRecordDbo()
                 {
-                    States = new string[] { "ea", "eb"
-                }
+                    States = new string[] { "ea", "eb" },
+                    CreatedAt = DateTime.Parse("2022-07-01")
                 });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var events = new List<IMatchResEvent>() {
@@ -382,6 +382,65 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 It.Is<MatchResEventDbo>(m => m.Actor == "system" && m.Delta == api.ClosedDelta)
             ), Times.Once());
             Assert.Equal(200, response.StatusCode);
+        }
+
+        [Fact]
+        public async void AddEvent_CheckIfFinalDispositionDateError()
+        {
+            var matchRecordDao = new Mock<IMatchRecordDao>();
+            matchRecordDao
+                .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
+                .ReturnsAsync(new MatchRecordDbo()
+                {
+                    States = new string[] { "ea", "eb" },
+                    CreatedAt = DateTime.Parse("2022-08-01") // Created At date > Final Disposition Date
+                });
+            var matchResEventDao = new Mock<IMatchResEventDao>();
+            var events = new List<IMatchResEvent>() {
+                new MatchResEventDbo() {
+                    Delta = "{ \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\",  \"final_disposition\": \"foo\", \"final_disposition_date\": \"2022-07-20T00:00:02\" }",
+                    ActorState = "eb"
+                }
+            };
+            matchResEventDao
+                .Setup(r => r.GetEvents(
+                    It.IsAny<string>(),
+                    It.IsAny<bool>()
+                ))
+                .ReturnsAsync(events);
+            matchResEventDao
+             .Setup(r => r.AddEvent(
+                 It.IsAny<MatchResEventDbo>()
+             ))
+             .ReturnsAsync(1);
+            var matchResAggregator = new Mock<IMatchResAggregator>();
+            matchResAggregator
+                .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
+                .Returns(new MatchResRecord()
+                {
+                    Status = "open"
+                });
+            var requestParser = new AddEventRequestParser(
+                new AddEventRequestValidator(),
+                Mock.Of<ILogger<AddEventRequestParser>>()
+            );
+            var api = new AddEventApi(
+                matchRecordDao.Object,
+                matchResEventDao.Object,
+                matchResAggregator.Object,
+                requestParser
+            );
+            var mockRequest = MockRequest("{ \"data\": { \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"bar\", \"final_disposition_date\": \"2022-07-20T00:00:01\" } }"); // coming form state ea
+            var logger = new Mock<ILogger>();
+
+            // Act
+            BadRequestObjectResult response = (BadRequestObjectResult)(await api.AddEvent(mockRequest.Object, "foo", logger.Object));
+
+            // Assert
+            matchResEventDao.Verify(mock => mock.AddEvent(
+                It.Is<MatchResEventDbo>(m => m.Actor == "system" && m.Delta == api.ClosedDelta)
+            ), Times.Never());
+            Assert.Equal(400, response.StatusCode);
         }
     }
 }

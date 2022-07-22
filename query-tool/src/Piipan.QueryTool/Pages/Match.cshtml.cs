@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
+using Piipan.Shared.Helpers;
 using Piipan.Shared.Http;
 using Piipan.Shared.Roles;
 
@@ -175,8 +175,8 @@ namespace Piipan.QueryTool.Pages
                             }
                             else
                             {
-                                ApiErrorResponse apiErrorResponse = JsonConvert.DeserializeObject<ApiErrorResponse>(failResponse);
-                                if (apiErrorResponse.Errors?.Count > 0)
+                                ApiErrorResponse apiErrorResponse = JsonHelper.TryParse<ApiErrorResponse>(failResponse);
+                                if (apiErrorResponse?.Errors?.Count > 0)
                                 {
                                     foreach (var error in apiErrorResponse.Errors)
                                     {
