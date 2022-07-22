@@ -4,10 +4,12 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
+using Piipan.Shared.Http;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -124,7 +126,7 @@ namespace Piipan.QueryTool.Pages
             }
             else
             {
-                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false };
+                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false, FailedDispositionModel = DispositionData };
                 // Remove binding errors from anything binding other than DispositionData (namely the Query property)
                 foreach (var modelStateKey in ModelState.Keys)
                 {
@@ -152,8 +154,27 @@ namespace Piipan.QueryTool.Pages
                                 VulnerableIndividual = DispositionData.VulnerableIndividual
                             }
                         };
-                        await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
-                        MatchDetailSaveResponse.SaveSuccess = true;
+                        var (_, failResponse) = await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                        if (string.IsNullOrEmpty(failResponse))
+                        {
+                            MatchDetailSaveResponse.SaveSuccess = true;
+                            MatchDetailSaveResponse.FailedDispositionModel = null;
+                        }
+                        else
+                        {
+                            ApiErrorResponse apiErrorResponse = JsonConvert.DeserializeObject<ApiErrorResponse>(failResponse);
+                            if (apiErrorResponse.Errors?.Count > 0)
+                            {
+                                foreach (var error in apiErrorResponse.Errors)
+                                {
+                                    RequestErrors.Add(new("", error.Detail));
+                                }
+                            }
+                            else
+                            {
+                                RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                            }
+                        }
                     }
                     catch (Exception exception)
                     {

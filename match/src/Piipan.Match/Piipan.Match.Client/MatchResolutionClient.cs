@@ -52,7 +52,7 @@ namespace Piipan.Match.Client
         /// <summary>
         /// sendsS a patch request to update match res events
         /// </summary>
-        public async Task<MatchResApiResponse> AddMatchResEvent(string matchId, AddEventRequest request, string initiatingState)
+        public async Task<(MatchResApiResponse SuccessResponse, string FailResponse)> AddMatchResEvent(string matchId, AddEventRequest request, string initiatingState)
         {
             return await _apiClient.PatchAsync<AddEventRequest, MatchResApiResponse>($"matches/{matchId}/disposition", request, () =>
             {

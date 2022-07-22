@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -115,13 +112,14 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
-                .ReturnsAsync(new MatchRecordDbo() { States = new string[] { "ea", "bc"}});
+                .ReturnsAsync(new MatchRecordDbo() { States = new string[] { "ea", "bc" } });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
             var requestParser = new Mock<IStreamParser<AddEventRequest>>();
             matchResAggregator
                 .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
-                .Returns(new MatchResRecord(){
+                .Returns(new MatchResRecord()
+                {
                     Status = "closed"
                 });
             var api = new AddEventApi(
@@ -147,7 +145,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
-                .ReturnsAsync(new MatchRecordDbo() { States = new string[] { "bc", "de"}});
+                .ReturnsAsync(new MatchRecordDbo() { States = new string[] { "bc", "de" } });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();
             var requestParser = new Mock<IStreamParser<AddEventRequest>>();
@@ -191,7 +189,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResAggregator = new Mock<IMatchResAggregator>();
             matchResAggregator
                 .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
-                .Returns(new MatchResRecord(){
+                .Returns(new MatchResRecord()
+                {
                     Status = "open"
                 });
             var requestParser = new AddEventRequestParser(
@@ -275,9 +274,11 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
-                .ReturnsAsync(new MatchRecordDbo() {
+                .ReturnsAsync(new MatchRecordDbo()
+                {
                     States = new string[] { "ea", "eb"
-                } });
+                }
+                });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var events = new List<IMatchResEvent>() {
                 new MatchResEventDbo() {
@@ -291,10 +292,12 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                     It.IsAny<bool>()
                 ))
                 .ReturnsAsync(events);
+
             var matchResAggregator = new Mock<IMatchResAggregator>();
             matchResAggregator
                 .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
-                .Returns(new MatchResRecord(){
+                .Returns(new MatchResRecord()
+                {
                     Status = "open"
                 });
             var requestParser = new AddEventRequestParser(
@@ -325,9 +328,11 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchRecordDao = new Mock<IMatchRecordDao>();
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
-                .ReturnsAsync(new MatchRecordDbo() {
+                .ReturnsAsync(new MatchRecordDbo()
+                {
                     States = new string[] { "ea", "eb"
-                } });
+                }
+                });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var events = new List<IMatchResEvent>() {
                 new MatchResEventDbo() {
@@ -344,7 +349,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResAggregator = new Mock<IMatchResAggregator>();
             matchResAggregator
                 .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
-                .Returns(new MatchResRecord(){
+                .Returns(new MatchResRecord()
+                {
                     Status = "open"
                 });
             var requestParser = new AddEventRequestParser(

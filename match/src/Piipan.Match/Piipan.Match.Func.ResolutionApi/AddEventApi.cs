@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -58,6 +59,7 @@ namespace Piipan.Match.Func.ResolutionApi
             {
                 var reqObj = await _requestParser.Parse(req.Body);
                 var match = _matchRecordDao.GetRecordByMatchId(matchId);
+
                 var matchResEvents = _matchResEventDao.GetEvents(matchId);
                 await Task.WhenAll(match, matchResEvents);
                 // If state does not belong to match, return unauthorized
@@ -73,6 +75,23 @@ namespace Piipan.Match.Func.ResolutionApi
                 {
                     return UnauthorizedErrorResponse();
                 }
+
+                // Additional validation here that couldn't be done in the AddEventRequestValidator since we didn't have a match object to compare against
+                if (reqObj.Data.FinalDispositionDate != null && reqObj.Data.FinalDispositionDate.Value < match.Result.CreatedAt?.Date)
+                {
+                    string errorPrefix = reqObj.Data.FinalDisposition switch
+                    {
+
+                        "Benefits Approved" => "Benefits Start Date",
+                        "Benefits Terminated" => "Benefits End Date",
+                        _ => "Final Disposition Date"
+                    };
+                    throw new ValidationException("request validation failed",
+                        new ValidationFailure[] {
+                            new ValidationFailure(nameof(reqObj.Data.FinalDispositionDate), $"{errorPrefix} cannot be before the match date of {match.Result.CreatedAt.Value.ToString("MM/dd/yyyy")}")
+                        });
+                }
+
                 // If last event is same as this event, return not allowed
                 IMatchResEvent? lastEvent = matchResEvents.Result.LastOrDefault();
                 if (lastEvent is IMatchResEvent)

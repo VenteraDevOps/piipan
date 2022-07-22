@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -33,8 +35,8 @@ namespace Piipan.Components.Forms
             base.OnInitialized();
             FormGroup.PreverificationChecks = PreverificationChecks;
             FormGroup.FieldIdentifier = this.FieldIdentifier;
-            string sourceProperty = ValueExpression.GetAttribute<T, UsaRequiredIfAttribute>()?.SourceProperty;
-            if (!string.IsNullOrEmpty(sourceProperty))
+            var sourceProperties = ValueExpression.GetAttribute<T, UsaRequiredIfAttribute>()?.Dependencies.Select(n => n.sourceProperty)?.ToArray() ?? Array.Empty<string>();
+            foreach (var sourceProperty in sourceProperties)
             {
                 FormGroup.FieldDependencies.Add(sourceProperty);
             }

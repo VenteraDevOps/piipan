@@ -23,7 +23,8 @@
 
     protected override void OnInitialized()
     {
-        model = new DispositionModel(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition);
+        model = SaveResponse?.FailedDispositionModel ?? (new DispositionModel(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition));
+        model.MatchDate = Match.Data.Data.CreatedAt;
         if (ServerErrors?.Count > 0)
         {
             serverErrorList = new(ServerErrors.Select(n => (n.Property, n.Error)));

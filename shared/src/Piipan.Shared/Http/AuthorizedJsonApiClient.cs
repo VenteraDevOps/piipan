@@ -70,7 +70,7 @@ namespace Piipan.Shared.Http
             return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
-        public async Task<TResponse> PatchAsync<TRequest, TResponse>(string path, TRequest body, Func<IEnumerable<(string, string)>> headerFactory)
+        public async Task<(TResponse SuccessResponse, string FailResponse)> PatchAsync<TRequest, TResponse>(string path, TRequest body, Func<IEnumerable<(string, string)>> headerFactory)
         {
             var requestMessage = await PrepareRequest(path, HttpMethod.Patch);
 
@@ -83,11 +83,23 @@ namespace Piipan.Shared.Http
 
             var response = await Client().SendAsync(requestMessage);
 
-            response.EnsureSuccessStatusCode();
-
             var responseContentJson = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException)
+            {
+                // If the response content is empty, at least make a new ApiHttpError with the status code.
+                if (string.IsNullOrEmpty(responseContentJson))
+                {
+                    responseContentJson = JsonConvert.SerializeObject(new ApiHttpError() { Status = response.StatusCode.ToString() });
+                }
+                return (default, responseContentJson);
+            }
+
+            return (JsonConvert.DeserializeObject<TResponse>(responseContentJson), default);
         }
 
         public async Task<TResponse> GetAsync<TResponse>(string path)
