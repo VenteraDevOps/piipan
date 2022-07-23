@@ -41,7 +41,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Act
             var numberOfRows =  await dao.AddParticipantSearchRecord(new ParticipantSearchDbo() {
                 State = "ea",
-                SearchReason = It.IsAny<string>(),
+                SearchReason = "Application",
                 SearchFrom = It.IsAny<string>(),
                 MatchCreation = It.IsAny<string>(),
                 MatchCount = It.IsAny<int>(),

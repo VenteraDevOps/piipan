@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS participant_searchs(
     id serial PRIMARY KEY,
     state VARCHAR(50) NOT NULL,
     search_reason VARCHAR(100) NOT NULL,
-    search_from VARCHAR(50) NOT NULL,
-    match_creation VARCHAR(50) NOT NULL,
+    search_from VARCHAR(50) NULL,
+    match_creation VARCHAR(50) NULL,
     match_count int,
     searched_at timestamptz NOT NULL
 );
