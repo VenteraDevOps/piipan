@@ -99,8 +99,8 @@ namespace Piipan.Match.Core.Tests.Services
             {
                 State = "ea",
                 SearchFrom = String.Empty,
-                SearchReason = String.Empty,
-                MatchCreation = String.Empty,
+                SearchReason = null,
+                MatchCreation = "Already Existing Match",
                 MatchCount = 1,
                 SearchedAt = DateTime.UtcNow
             };
@@ -153,7 +153,9 @@ namespace Piipan.Match.Core.Tests.Services
 
            
             participantPublishSearchMetric.Verify(r => r.PublishSearchdMetric(
-               It.Is<ParticipantSearchMetrics>(r => r == searchMetrics)),
+               It.Is<ParticipantSearchMetrics>(r => r.Data.FirstOrDefault().MatchCount == search.MatchCount && 
+                                                    r.Data.FirstOrDefault().MatchCreation == search.MatchCreation &&
+                                                    r.Data.FirstOrDefault().SearchReason == search.SearchReason)),
                Times.Once);
         }
 

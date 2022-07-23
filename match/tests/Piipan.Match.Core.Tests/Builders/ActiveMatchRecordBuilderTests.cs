@@ -60,7 +60,7 @@ namespace Piipan.Match.Core.Tests.Builders
 
             // Assert
             Assert.Equal("{\"lds_hash\":\"foo\",\"participant_id\":\"DEF\",\"case_id\":\"ABC\",\"vulnerable_individual\":null}", record.Input);
-            Assert.Equal("{\"match_id\":null,\"lds_hash\":\"foo\",\"state\":null,\"case_id\":\"XYZ\",\"participant_id\":\"TUV\",\"participant_closing_date\":null,\"recent_benefit_issuance_dates\":[],\"vulnerable_individual\":null,\"match_url\":null}", record.Data);
+            Assert.Equal("{\"match_id\":null,\"lds_hash\":\"foo\",\"state\":null,\"case_id\":\"XYZ\",\"participant_id\":\"TUV\",\"participant_closing_date\":null,\"recent_benefit_issuance_dates\":[],\"vulnerable_individual\":null,\"match_url\":null,\"match_creation\":\"No Match Found\"}", record.Data);
 
         }
 
