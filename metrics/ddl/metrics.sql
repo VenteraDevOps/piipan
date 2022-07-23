@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS participant_uploads(
 
 COMMENT ON TABLE participant_uploads IS 'Participant bulk upload event record';
 
-CREATE TABLE IF NOT EXISTS participant_search(
+CREATE TABLE IF NOT EXISTS participant_searchs(
     id serial PRIMARY KEY,
     state VARCHAR(50) NOT NULL,
     search_reason VARCHAR(100) NOT NULL,

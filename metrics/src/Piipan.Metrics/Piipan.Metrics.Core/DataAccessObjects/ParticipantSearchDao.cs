@@ -39,7 +39,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             using (var connection = await _dbConnectionFactory.Build())
             {
                 return await connection.ExecuteAsync(@"
-                    INSERT INTO participant_search
+                    INSERT INTO participant_searchs
                     (
                         state, 
                         search_reason,
