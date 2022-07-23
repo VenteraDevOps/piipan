@@ -23,5 +23,5 @@ CREATE TABLE IF NOT EXISTS participant_searchs(
     searched_at timestamptz NOT NULL
 );
 
-COMMENT ON TABLE participant_search IS 'Participant search event record';
+COMMENT ON TABLE participant_searchs IS 'Participant search event record';
 COMMIT;
