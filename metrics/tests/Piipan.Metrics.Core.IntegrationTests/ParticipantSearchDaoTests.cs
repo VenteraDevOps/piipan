@@ -32,7 +32,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
         }
 
      
-        [Fact]
+        [Fact(Skip ="For testing")]
         public async Task ParticipantSearch_InsertsRecord()
         {
             // Arrange
