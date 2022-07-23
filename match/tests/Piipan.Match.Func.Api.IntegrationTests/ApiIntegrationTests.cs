@@ -113,7 +113,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Environment.SetEnvironmentVariable("States", "ea");
             Environment.SetEnvironmentVariable("EventGridEndPoint","http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridKeyString","example");
-            
+
+            Environment.SetEnvironmentVariable("EventGridMetricSearchEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridMetricSearchKeyString", "example");
 
             // Mixing cases to verify the enabled states can be used no matter their casing.
             Environment.SetEnvironmentVariable("EnabledStates", "ea,EB");
