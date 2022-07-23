@@ -31,10 +31,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             return factory.Object;
         }
 
-        private string RandomState()
-        {
-            return Guid.NewGuid().ToString().Substring(0, 2);
-        }
+     
         [Fact]
         public async Task ParticipantSearch_InsertsRecord()
         {
