@@ -6,7 +6,9 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.API.Enums;
 using Piipan.Shared.Cryptography;
 
 namespace Piipan.Match.Core.Services
@@ -21,18 +23,21 @@ namespace Piipan.Match.Core.Services
         private readonly IMatchResEventDao _matchResEventDao;
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly ICryptographyClient _cryptographyClient;
+        private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
-            ICryptographyClient cryptographyClientt)
+            ICryptographyClient cryptographyClientt,
+            IParticipantPublishSearchMetric ParticipantPublishSearchMetric)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
             _cryptographyClient = cryptographyClientt;
+            _participantPublishSearchMetric = ParticipantPublishSearchMetric;
         }
 
         /// <summary>
@@ -53,6 +58,23 @@ namespace Piipan.Match.Core.Services
                     initiatingState))))
                 .OrderBy(result => result.Index)
                 .ToList();
+            //Build Search Metrics
+            ParticipantSearchMetrics participantSearchMetrics = new ParticipantSearchMetrics();
+            participantSearchMetrics.Data = new List<ParticipantSearch>();
+            foreach (OrchMatchResult requestPerson in matchResponse.Data.Results)
+            {
+                var participantUploadMetrics = new ParticipantSearch()
+                {
+                    State = initiatingState,
+                    SearchedAt = DateTime.UtcNow,
+                    SearchFrom = String.Empty,//Need to Identify Website/Api call
+                    SearchReason = request.Data.ElementAt(requestPerson.Index).SearchReason,
+                    MatchCreation = String.IsNullOrEmpty( String.Join(",", requestPerson.Matches.Select(p => p.MatchCreation))) ? EnumHelper.GetDisplayName(SearchMatchStatus.MATCHNOTFOUND) : EnumHelper.GetDisplayName(SearchMatchStatus.EXISTINGMATCH),
+                    MatchCount = requestPerson.Matches.Count()
+             };
+                participantSearchMetrics.Data.Add(participantUploadMetrics);
+            }
+            await _participantPublishSearchMetric.PublishSearchdMetric(participantSearchMetrics);
 
             return matchResponse;
         }
@@ -83,13 +105,15 @@ namespace Piipan.Match.Core.Services
             if (existingRecords.Any())
             {
                 participantMatchRecord = await Reconcile(match, record, existingRecords);
+                participantMatchRecord.MatchCreation = EnumHelper.GetDisplayName(SearchMatchStatus.EXISTINGMATCH);
             }
             else
             {
                 // No existing records
                 participantMatchRecord = new ParticipantMatch(match)
                 {
-                    MatchId = await _recordApi.AddRecord(record)
+                    MatchId = await _recordApi.AddRecord(record),
+                    MatchCreation =  EnumHelper.GetDisplayName(SearchMatchStatus.NEWMATCH)   
                 };
             }
             if (participantMatchRecord != null)

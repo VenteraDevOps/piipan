@@ -14,6 +14,8 @@ namespace Piipan.Metrics.Core.Extensions
             serviceCollection.AddTransient<IParticipantUploadReaderApi, ParticipantUploadService>();
             serviceCollection.AddTransient<IParticipantUploadWriterApi, ParticipantUploadService>();
             serviceCollection.AddTransient<IMetaBuilder, MetaBuilder>();
+            serviceCollection.AddTransient<IParticipantSearchDao, ParticipantSearchDao>();
+            serviceCollection.AddTransient<IParticipantSearchWriterApi, ParticipantSearchService>();
         }
     }
 }

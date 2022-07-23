@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
@@ -136,6 +138,16 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 return new BasicPgConnectionFactory<ParticipantsDb>(
                     NpgsqlFactory.Instance,
                     Environment.GetEnvironmentVariable(Startup.DatabaseConnectionString));
+            });
+            services.AddTransient<IParticipantPublishSearchMetric>(b =>
+            {
+                var factory = new Mock<IParticipantPublishSearchMetric>();
+
+                factory.Setup(m => m.PublishSearchdMetric(
+                                        It.IsAny<ParticipantSearchMetrics>()))
+                       .Returns(Task.CompletedTask);
+
+                return factory.Object;
             });
             services.RegisterParticipantsServices();
             services.RegisterMatchServices();

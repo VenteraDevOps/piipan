@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Piipan.Match.Api.Serializers;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.API.Enums;
 using Piipan.Shared.API.Utilities;
 
 namespace Piipan.Match.Api.Models
@@ -38,6 +39,9 @@ namespace Piipan.Match.Api.Models
 
         [JsonProperty("match_url")]
         public string MatchUrl { get; set; }
+
+        [JsonProperty("match_creation")]
+        public string MatchCreation { get; set; } = EnumHelper.GetDisplayName(SearchMatchStatus.MATCHNOTFOUND);
 
         public ParticipantMatch() { }
 
