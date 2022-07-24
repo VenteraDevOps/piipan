@@ -230,5 +230,23 @@ namespace Piipan.Metrics.Core.IntegrationTests
             Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
             Assert.Equal(completedAt, results.ToList()[0].CompletedAt);
         }
+        [Fact]
+        public async Task ParticipantSearch_InsertsRecord()
+        {
+            // Arrange
+            ClearParticipantSearch();
+            var dao = new ParticipantSearchDao(DbConnFactory(), new NullLogger<ParticipantSearchDao>());
+            // Act
+            var numberOfRows = await dao.AddParticipantSearchRecord(new ParticipantSearchDbo()
+            {
+                State = "ea",
+                SearchReason = "Application",
+                SearchFrom = "SearchFrom",
+                MatchCreation = "MatchCreation",
+                MatchCount = 1,
+                SearchedAt = DateTime.UtcNow
+            });
+            Assert.Equal(1, numberOfRows);
+        }
     }
 }
