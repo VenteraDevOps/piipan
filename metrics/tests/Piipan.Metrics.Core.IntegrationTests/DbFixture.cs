@@ -31,7 +31,22 @@ namespace Piipan.Metrics.Core.IntegrationTests
                 conn.Close();
             }
         }
+        protected void ClearParticipantSearch()
+        {
+            var factory = NpgsqlFactory.Instance;
 
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute(
+                    "Truncate Table participant_Searchs"
+                );
+
+                conn.Close();
+            }
+        }
         protected bool Has(string state, DateTime uploadedAt)
         {
             var result = false;

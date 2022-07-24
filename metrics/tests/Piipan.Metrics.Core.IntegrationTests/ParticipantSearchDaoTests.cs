@@ -36,15 +36,15 @@ namespace Piipan.Metrics.Core.IntegrationTests
         public async Task ParticipantSearch_InsertsRecord()
         {
             // Arrange
+            ClearParticipantSearch();
             var dao = new ParticipantSearchDao(DbConnFactory(), new NullLogger<ParticipantSearchDao>());
-           
-            // Act
-            var numberOfRows =  await dao.AddParticipantSearchRecord(new ParticipantSearchDbo() {
+             // Act
+             var numberOfRows =  await dao.AddParticipantSearchRecord(new ParticipantSearchDbo() {
                 State = "ea",
                 SearchReason = "Application",
-                SearchFrom = It.IsAny<string>(),
-                MatchCreation = It.IsAny<string>(),
-                MatchCount = It.IsAny<int>(),
+                SearchFrom = "SearchFrom",
+                MatchCreation = "MatchCreation",
+                MatchCount = 1,
                 SearchedAt = DateTime.UtcNow
             });
             Assert.Equal(1, numberOfRows);
