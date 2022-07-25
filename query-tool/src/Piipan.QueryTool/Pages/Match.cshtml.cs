@@ -153,7 +153,7 @@ namespace Piipan.QueryTool.Pages
                         {
                             AddEventRequest addEventRequest = new AddEventRequest
                             {
-                                Data = new AddEventRequestData
+                                Data = new Disposition
                                 {
                                     FinalDisposition = DispositionData.FinalDisposition,
                                     FinalDispositionDate = DispositionData.FinalDispositionDate,

@@ -11,6 +11,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
@@ -77,9 +78,9 @@ namespace Piipan.Match.Func.ResolutionApi
                 IMatchResEvent? lastEvent = matchResEvents.Result.LastOrDefault();
                 if (lastEvent is IMatchResEvent)
                 {
-                    var deltaObj = JsonConvert.DeserializeObject<AddEventRequestData>(lastEvent.Delta);
+                    var deltaObj = JsonConvert.DeserializeObject<Disposition>(lastEvent.Delta);
                     if (lastEvent.ActorState == state &&
-                        deltaObj is AddEventRequestData &&
+                        deltaObj is Disposition &&
                         JsonConvert.SerializeObject(deltaObj) == JsonConvert.SerializeObject(reqObj.Data))
                     {
                         string message = "Duplicate action not allowed";
@@ -154,7 +155,7 @@ namespace Piipan.Match.Func.ResolutionApi
             List<String> statesWithFinalDisposition = new List<String>();
             return matchResEvents.Where(e =>
             {
-                AddEventRequestData? delta = JsonConvert.DeserializeObject<AddEventRequestData>(e.Delta);
+                Disposition? delta = JsonConvert.DeserializeObject<Disposition>(e.Delta);
                 if (!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate!= null && !statesWithFinalDisposition.Contains(e.ActorState))
                 {
                     statesWithFinalDisposition.Add(e.ActorState);
