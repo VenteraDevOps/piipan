@@ -40,7 +40,7 @@
                                     }
                                     <button class="@ButtonClass @ButtonUnstyledClass"
                                         @onclick="async () => { await FocusElement(errorPair.FormGroup.InputElementId); }">
-                                        @errorPair.FormGroup.Label
+                                        @(errorPair.FormGroup.ErrorPlaceholderOverride ?? errorPair.FormGroup.Label)
                                     </button>
                                     @splitError.Substring(linkPart + 3)
                                 </li>

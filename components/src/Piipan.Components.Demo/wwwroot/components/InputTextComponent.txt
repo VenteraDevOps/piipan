@@ -11,5 +11,8 @@
     <UsaFormGroup>
         <UsaInputText @bind-Value="TextModel.RequiredField" />
     </UsaFormGroup>
+    <UsaFormGroup>
+        <UsaInputText @bind-Value="TextModel.RequiredIfField" />
+    </UsaFormGroup>
     <button class="@ButtonClass">Submit</button>
 </UsaForm>

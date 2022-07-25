@@ -10,6 +10,8 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
+using Piipan.Shared.Helpers;
+using Piipan.Shared.Http;
 using Piipan.Shared.Roles;
 
 namespace Piipan.QueryTool.Pages
@@ -130,7 +132,7 @@ namespace Piipan.QueryTool.Pages
             }
             else
             {
-                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false };
+                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false, FailedDispositionModel = DispositionData };
                 if (!_rolesProvider.GetMatchEditRoles().Contains(Role))
                 {
                     _logger.LogError($"User {Email} does not have permissions to edit match details.");
@@ -165,8 +167,27 @@ namespace Piipan.QueryTool.Pages
                                     VulnerableIndividual = DispositionData.VulnerableIndividual
                                 }
                             };
-                            await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
-                            MatchDetailSaveResponse.SaveSuccess = true;
+                            var (_, failResponse) = await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                            if (string.IsNullOrEmpty(failResponse))
+                            {
+                                MatchDetailSaveResponse.SaveSuccess = true;
+                                MatchDetailSaveResponse.FailedDispositionModel = null;
+                            }
+                            else
+                            {
+                                ApiErrorResponse apiErrorResponse = JsonHelper.TryParse<ApiErrorResponse>(failResponse);
+                                if (apiErrorResponse?.Errors?.Count > 0)
+                                {
+                                    foreach (var error in apiErrorResponse.Errors)
+                                    {
+                                        RequestErrors.Add(new("", error.Detail));
+                                    }
+                                }
+                                else
+                                {
+                                    RequestErrors.Add(new("", "There was an error saving your data. Please try again."));
+                                }
+                            }
                         }
                         catch (Exception exception)
                         {

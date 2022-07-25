@@ -27,7 +27,7 @@ namespace Piipan.Shared.Http
         /// <param name="path">path portion of the API endpoint</param>
         /// <param name="body">object to be sent as request body</param>
         /// <param name="headerFactory">callback which supplies additional headers to be included in the outbound request</param>
-        Task<TResponse> PatchAsync<TRequest, TResponse>(string path, TRequest body, Func<IEnumerable<(string, string)>> headerFactory);
+        Task<(TResponse SuccessResponse, string FailResponse)> PatchAsync<TRequest, TResponse>(string path, TRequest body, Func<IEnumerable<(string, string)>> headerFactory);
 
         /// <summary>
         /// Send an asynchronous GET request to an API endpoint
