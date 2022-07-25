@@ -1,5 +1,6 @@
 ﻿using FluentValidation.TestHelper;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Validators;
 using Xunit;
 
@@ -35,7 +36,7 @@ namespace Piipan.Match.Core.Tests.Validators
             // Setup
             var model = new AddEventRequest()
             {
-                Data = new AddEventRequestData
+                Data = new Disposition
                 {
                     InitialActionTaken = "Notice Sent"
                 }
@@ -52,7 +53,7 @@ namespace Piipan.Match.Core.Tests.Validators
             // Setup
             var model = new AddEventRequest()
             {
-                Data = new AddEventRequestData
+                Data = new Disposition
                 {
                     FinalDisposition = "Benefits Denied"
                 }
@@ -71,7 +72,7 @@ namespace Piipan.Match.Core.Tests.Validators
             // Setup
             var model = new AddEventRequest()
             {
-                Data = new AddEventRequestData
+                Data = new Disposition
                 {
                     InitialActionAt = System.DateTime.Now
                 }
@@ -88,7 +89,7 @@ namespace Piipan.Match.Core.Tests.Validators
             // Setup
             var model = new AddEventRequest()
             {
-                Data = new AddEventRequestData
+                Data = new Disposition
                 {
                     FinalDisposition = "Benefits Denied"
                 }
@@ -106,7 +107,7 @@ namespace Piipan.Match.Core.Tests.Validators
             // Setup
             var model = new AddEventRequest()
             {
-                Data = new AddEventRequestData
+                Data = new Disposition
                 {
                     FinalDisposition = "Benefits Denied"
                 }
@@ -124,7 +125,7 @@ namespace Piipan.Match.Core.Tests.Validators
             // Setup
             var model = new AddEventRequest()
             {
-                Data = new AddEventRequestData
+                Data = new Disposition
                 {
                     FinalDispositionDate = System.DateTime.Now
                 }
