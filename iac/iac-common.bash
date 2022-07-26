@@ -68,6 +68,10 @@ STATE_STR_KEY=State
 EVENTGRID_CONN_STR_ENDPOINT=EventGridEndPoint
 EVENTGRID_CONN_STR_KEY=EventGridKeyString
 
+# Event Grid for Search Metrics
+EVENTGRID_CONN_METRICS_SEARCH_STR_ENDPOINT=EventGridMetricSearchEndPoint
+EVENTGRID_CONN_METRICS_SEARCH_STR_KEY=EventGridMetricSearchKeyString
+
 # In the States.csv file, the state is enabled if they have the ENABLED text in column 3. Disabled if they have DISABLED text in column 3.
 # Defaults to disabled, so any text other than ENABLED is disabled.
 STATE_ENABLED_KEY=ENABLED
@@ -130,6 +134,9 @@ STATES_FUNC_APP_STORAGE_NAME=${PREFIX}ststates${ENV}
 
 # Names of apps authenticated by OIDC
 OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
+
+#Search Metric Event grid
+CREATE_SEARCH_METRICS_TOPIC_NAME=evgt-create-search-metrics-$ENV
 
 ### END Constants
 
@@ -460,4 +467,27 @@ get_oidc_secret () {
     --output tsv
 }
 
+# Generate the eventgrid key string for the corresponding
+eventgrid_endpoint () {
+  group=$1
+  name=$2
+
+  az eventgrid topic show \
+  --name "$name" \
+  -g "$group" \
+  --query "endpoint" \
+  -o tsv
+}
+
+# Generate the eventgrid key string for the corresponding
+eventgrid_key_string () {
+  group=$1
+  name=$2
+
+  az eventgrid topic key list \
+    --name "$name" \
+    --resource-group "$group" \
+    --query "key2" \
+    -o tsv
+}
 ### END Functions
