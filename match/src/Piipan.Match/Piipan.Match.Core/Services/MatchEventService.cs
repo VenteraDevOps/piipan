@@ -40,15 +40,15 @@ namespace Piipan.Match.Core.Services
             _participantPublishSearchMetric = ParticipantPublishSearchMetric;
         }
 
-            /// <summary>
-            /// Evaluates each new match in the incoming `matchRespone` against any existing matching records.
-            /// If an open match record for the match exists, it is reused. Else, a new match record is created.
-            /// Each match is subsequently updated to include the resulting `match_id`.
-            /// </summary>
-            /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
-            /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
-            /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
-            /// <returns>The updated `matchResponse` object with `match_id`s</returns>
+        /// <summary>
+        /// Evaluates each new match in the incoming `matchRespone` against any existing matching records.
+        /// If an open match record for the match exists, it is reused. Else, a new match record is created.
+        /// Each match is subsequently updated to include the resulting `match_id`.
+        /// </summary>
+        /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
+        /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
+        /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
+        /// <returns>The updated `matchResponse` object with `match_id`s</returns>
         public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
         {
             matchResponse.Data.Results = (await Task.WhenAll(matchResponse.Data.Results.Select(result =>
@@ -69,7 +69,7 @@ namespace Piipan.Match.Core.Services
                     SearchedAt = DateTime.UtcNow,
                     SearchFrom = String.Empty,//Need to Identify Website/Api call
                     SearchReason = request.Data.ElementAt(requestPerson.Index).SearchReason,
-                    MatchCreation = string.Join(",", requestPerson.Matches.Select(p => p.MatchCreation)) ?? EnumHelper.GetDisplayName(SearchMatchStatus.MATCHNOTFOUND),
+                    MatchCreation = String.IsNullOrEmpty(String.Join(",", requestPerson.Matches.Select(p => p.MatchCreation))) ? EnumHelper.GetDisplayName(SearchMatchStatus.MATCHNOTFOUND) : String.Join(",", requestPerson.Matches.Select(p => p.MatchCreation)),
                     MatchCount = requestPerson.Matches.Count()
                 };
                 participantSearchMetrics.Data.Add(participantUploadMetrics);
@@ -100,7 +100,8 @@ namespace Piipan.Match.Core.Services
         private async Task<ParticipantMatch> ResolveSingleMatch(IParticipant match, IMatchRecord record)
         {
             var existingRecords = await _recordApi.GetRecords(record);
-            ParticipantMatch participantMatchRecord;
+            ParticipantMatch participantMatchRecord = new ParticipantMatch();
+            participantMatchRecord.MatchCreation = EnumHelper.GetDisplayName(SearchMatchStatus.MATCHNOTFOUND);
             if (existingRecords.Any())
             {
                 participantMatchRecord = await Reconcile(match, record, existingRecords);
