@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared.TestFixtures\Piipan.Shared.TestFixtures.csproj" />
+    <ProjectReference Include="..\..\src\Piipan.Metrics\Piipan.Metrics.Func.Collect\Piipan.Metrics.Func.Collect.csproj" />
   </ItemGroup>
 
 </Project>

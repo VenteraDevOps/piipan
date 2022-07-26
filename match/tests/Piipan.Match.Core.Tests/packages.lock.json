@@ -88,6 +88,16 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
+      "Azure.Messaging.EventGrid": {
+        "type": "Transitive",
+        "resolved": "4.11.0",
+        "contentHash": "WZK5NEF5xlrr/ewKcTbDR0B5rl1sratY4Fba+utWPkuanBhsPTvdcAv0xm+BP3JixbHhw+mpD+0yNbqIzgSGRw==",
+        "dependencies": {
+          "Azure.Core": "1.25.0",
+          "System.Memory.Data": "1.0.2",
+          "System.Text.Json": "4.7.2"
+        }
+      },
       "Azure.Security.KeyVault.Keys": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -1659,6 +1669,7 @@
       "piipan.match.core": {
         "type": "Project",
         "dependencies": {
+          "Azure.Messaging.EventGrid": "4.11.0",
           "Dapper": "2.0.123",
           "FluentValidation": "11.1.0",
           "Microsoft.Extensions.Logging": "6.0.0",
@@ -1666,9 +1677,16 @@
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.5",
           "Piipan.Match.Api": "1.0.0",
+          "Piipan.Metrics.Api": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "Piipan.Shared.Cryptography": "1.0.0"
+        }
+      },
+      "piipan.metrics.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "piipan.participants.api": {

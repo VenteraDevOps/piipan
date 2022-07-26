@@ -62,6 +62,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Open();
 
                 conn.Execute("DROP TABLE IF EXISTS participant_uploads");
+                conn.Execute("DROP TABLE IF EXISTS participant_searches");
 
                 conn.Close();
             }
@@ -78,6 +79,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.Open();
 
                 conn.Execute("DROP TABLE IF EXISTS participant_uploads");
+                conn.Execute("DROP TABLE IF EXISTS participant_searches");
                 conn.Execute(sqltext);
 
                 conn.Close();

@@ -11,8 +11,10 @@ namespace Piipan.Metrics.Core.Extensions
         public static void RegisterCoreServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<IParticipantUploadDao, ParticipantUploadDao>();
+            serviceCollection.AddTransient<IParticipantSearchDao, ParticipantSearchDao>();
             serviceCollection.AddTransient<IParticipantUploadReaderApi, ParticipantUploadService>();
             serviceCollection.AddTransient<IParticipantUploadWriterApi, ParticipantUploadService>();
+            serviceCollection.AddTransient<IParticipantSearchWriterApi, ParticipantSearchService>();
             serviceCollection.AddTransient<IMetaBuilder, MetaBuilder>();
         }
     }

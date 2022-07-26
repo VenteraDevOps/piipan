@@ -6,7 +6,9 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Api.Models;
+using Piipan.Shared.API.Enums;
 using Piipan.Shared.Cryptography;
 
 namespace Piipan.Match.Core.Services
@@ -21,29 +23,32 @@ namespace Piipan.Match.Core.Services
         private readonly IMatchResEventDao _matchResEventDao;
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly ICryptographyClient _cryptographyClient;
+        private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
-            ICryptographyClient cryptographyClientt)
+            ICryptographyClient cryptographyClientt,
+            IParticipantPublishSearchMetric ParticipantPublishSearchMetric)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
             _cryptographyClient = cryptographyClientt;
+            _participantPublishSearchMetric = ParticipantPublishSearchMetric;
         }
 
-        /// <summary>
-        /// Evaluates each new match in the incoming `matchRespone` against any existing matching records.
-        /// If an open match record for the match exists, it is reused. Else, a new match record is created.
-        /// Each match is subsequently updated to include the resulting `match_id`.
-        /// </summary>
-        /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
-        /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
-        /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
-        /// <returns>The updated `matchResponse` object with `match_id`s</returns>
+            /// <summary>
+            /// Evaluates each new match in the incoming `matchRespone` against any existing matching records.
+            /// If an open match record for the match exists, it is reused. Else, a new match record is created.
+            /// Each match is subsequently updated to include the resulting `match_id`.
+            /// </summary>
+            /// <param name="request">The OrchMatchRequest instance derived from the incoming match request</param>
+            /// <param name="matchResponse">The OrchMatchResponse instance returned from the match API</param>
+            /// <param name="initiatingState">The two-letter postal abbreviation for the state initiating the match request</param>
+            /// <returns>The updated `matchResponse` object with `match_id`s</returns>
         public async Task<OrchMatchResponse> ResolveMatches(OrchMatchRequest request, OrchMatchResponse matchResponse, string initiatingState)
         {
             matchResponse.Data.Results = (await Task.WhenAll(matchResponse.Data.Results.Select(result =>
@@ -53,7 +58,23 @@ namespace Piipan.Match.Core.Services
                     initiatingState))))
                 .OrderBy(result => result.Index)
                 .ToList();
-
+            //Build Search Metrics
+            ParticipantSearchMetrics participantSearchMetrics = new ParticipantSearchMetrics();
+            participantSearchMetrics.Data = new List<ParticipantSearch>();
+            foreach (OrchMatchResult requestPerson in matchResponse.Data.Results)
+            {
+                var participantUploadMetrics = new ParticipantSearch()
+                {
+                    State = initiatingState,
+                    SearchedAt = DateTime.UtcNow,
+                    SearchFrom = String.Empty,//Need to Identify Website/Api call
+                    SearchReason = request.Data.ElementAt(requestPerson.Index).SearchReason,
+                    MatchCreation = string.Join(",", requestPerson.Matches.Select(p => p.MatchCreation)) ?? EnumHelper.GetDisplayName(SearchMatchStatus.MATCHNOTFOUND),
+                    MatchCount = requestPerson.Matches.Count()
+                };
+                participantSearchMetrics.Data.Add(participantUploadMetrics);
+            }
+            await _participantPublishSearchMetric.PublishSearchdMetric(participantSearchMetrics);
             return matchResponse;
         }
 
@@ -83,13 +104,15 @@ namespace Piipan.Match.Core.Services
             if (existingRecords.Any())
             {
                 participantMatchRecord = await Reconcile(match, record, existingRecords);
+                participantMatchRecord.MatchCreation = EnumHelper.GetDisplayName(SearchMatchStatus.EXISTINGMATCH);
             }
             else
             {
                 // No existing records
                 participantMatchRecord = new ParticipantMatch(match)
                 {
-                    MatchId = await _recordApi.AddRecord(record)
+                    MatchId = await _recordApi.AddRecord(record),
+                    MatchCreation = EnumHelper.GetDisplayName(SearchMatchStatus.NEWMATCH)
                 };
             }
             if (participantMatchRecord != null)

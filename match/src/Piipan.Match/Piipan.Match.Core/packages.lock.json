@@ -2,6 +2,17 @@
   "version": 1,
   "dependencies": {
     "net6.0": {
+      "Azure.Messaging.EventGrid": {
+        "type": "Direct",
+        "requested": "[4.11.0, )",
+        "resolved": "4.11.0",
+        "contentHash": "WZK5NEF5xlrr/ewKcTbDR0B5rl1sratY4Fba+utWPkuanBhsPTvdcAv0xm+BP3JixbHhw+mpD+0yNbqIzgSGRw==",
+        "dependencies": {
+          "Azure.Core": "1.25.0",
+          "System.Memory.Data": "1.0.2",
+          "System.Text.Json": "4.7.2"
+        }
+      },
       "Dapper": {
         "type": "Direct",
         "requested": "[2.0.123, )",
@@ -1519,6 +1530,12 @@
         "dependencies": {
           "Newtonsoft.Json": "13.0.1",
           "Piipan.Participants.Api": "1.0.0"
+        }
+      },
+      "piipan.metrics.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "piipan.participants.api": {
