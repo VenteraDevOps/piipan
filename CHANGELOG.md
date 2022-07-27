@@ -3,6 +3,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1.45] - 2022-07-27
+
+### Changed
+- Initial Action Date is now defaulted when Initial Action is chosen on Match Detail page.
+- Initial Action section is now disabled on Match Detail page when the match is marked Invalid
+- Final Disposition Date is now defaulted in some cases when Final Disposition is chosen on Match Detail page.
+- Final Disposition section is now disabled on Match Detail page when Initial Action is not yet chosen.
+- When a user who does not have permission to edit a match goes to the Match Detail page, they now see a read-only view.
+
+### Added
+- Search Reason added to "Search for SNAP Participants" page
+- Initial Action and Initial Action Date validation added to Match Detail page & Match Res API.
+- Final Disposition and Final Disposition Date validation added to Match Detail page & Match Res API.
+- Duplicate Participant searches are now captured and saved to the Metrics database.
+
+### Fixed
+- Removed the use of the Azure CLI to get the Event Hub authorization rule ID.
+- Match Resolution API's Add Event endpoint now closes the match when Final Disposition is set on both states.
+- Participation Bulk Insert now logs information correctly instead of only to the debugger.
+- Removed duplicate code relating to Match Disposition
+
 ## [1.1.1.44] - 2022-07-12
 
 ### Changed
