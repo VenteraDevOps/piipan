@@ -216,7 +216,7 @@ main () {
           $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str" \
         --output none
 
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
 
   # Create Metrics API Function App in Azure
 

@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
+using Piipan.Components.Modals;
+using Piipan.Components.Routing;
 using Piipan.Match.Client.Extensions;
 using Piipan.QueryTool.Binders;
 using Piipan.Shared.Authorization;
@@ -70,6 +72,9 @@ namespace Piipan.QueryTool
             services.AddSingleton<ISsnNormalizer, SsnNormalizer>();
             services.AddSingleton<ILdsHasher, LdsHasher>();
             services.AddSingleton<ILdsDeidentifier, LdsDeidentifier>();
+
+            services.AddModalManager();
+            services.AddPiipanNavigationManager();
 
             services.AddHttpContextAccessor();
             services.AddEasyAuth();

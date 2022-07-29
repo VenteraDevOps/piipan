@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Piipan.Match.Api;
+using Piipan.Match.Api.Models;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Models;
 
@@ -22,6 +23,8 @@ namespace Piipan.QueryTool.Pages
         public MatchResApiResponse Match { get; set; } = null;
         public List<MatchResApiResponse> AvailableMatches { get; set; } = null;
         public List<ServerError> RequestErrors { get; private set; } = new();
+        public MatchDetailSaveResponseData MatchDetailSaveResponse { get; set; }
+        public string UserState { get; set; } = "";
 
         public MatchModel(ILogger<MatchModel> logger
                            , IMatchResolutionApi matchResolutionApi
@@ -31,6 +34,20 @@ namespace Piipan.QueryTool.Pages
         {
             _logger = logger;
             _matchResolutionApi = matchResolutionApi;
+        }
+
+        public void InitializeUserState()
+        {
+            if (Match != null)
+            {
+                foreach (var state in StateInfo.Results)
+                {
+                    if (state.StateAbbreviation == Location)
+                    {
+                        UserState = state.State;
+                    }
+                }
+            }
         }
 
         public async Task<IActionResult> OnGet([FromRoute] string id)
@@ -63,38 +80,71 @@ namespace Piipan.QueryTool.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPost()
+        [BindProperty]
+        public Disposition DispositionData { get; set; } = new Disposition();
+
+        public async Task<IActionResult> OnPost([FromRoute] string id)
         {
-            if (ModelState.IsValid)
+            if (String.IsNullOrEmpty(id))
             {
-                try
+
+
+                if (ModelState.IsValid)
                 {
-                    AvailableMatches = new List<MatchResApiResponse>();
-                    var match = await _matchResolutionApi.GetMatch(Query.MatchId, IsNationalOffice ? "*" : Location);
-                    if (match != null)
+                    try
                     {
-                        AvailableMatches.Add(match);
+                        AvailableMatches = new List<MatchResApiResponse>();
+                        var match = await _matchResolutionApi.GetMatch(Query.MatchId, IsNationalOffice ? "*" : Location);
+                        if (match != null)
+                        {
+                            AvailableMatches.Add(match);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.LogError(exception, exception.Message);
+                        RequestErrors.Add(new("", "There was an error running your search. Please try again."));
                     }
                 }
-                catch (Exception exception)
+                else
                 {
-                    _logger.LogError(exception, exception.Message);
-                    RequestErrors.Add(new("", "There was an error running your search. Please try again."));
+                    var keys = ModelState.Keys;
+                    foreach (var key in keys)
+                    {
+                        if (ModelState[key]?.Errors?.Count > 0)
+                        {
+                            var error = ModelState[key].Errors[0];
+                            RequestErrors.Add(new(key, error.ErrorMessage));
+                        }
+                    }
                 }
             }
             else
             {
-                var keys = ModelState.Keys;
-                foreach (var key in keys)
+                AddEventRequest addEventRequest = new AddEventRequest
                 {
-                    if (ModelState[key]?.Errors?.Count > 0)
+                    Data = new AddEventRequestData
                     {
-                        var error = ModelState[key].Errors[0];
-                        RequestErrors.Add(new(key, error.ErrorMessage));
+                        FinalDisposition = DispositionData.FinalDisposition,
+                        FinalDispositionDate = DispositionData.FinalDispositionDate,
+                        InitialActionAt = DispositionData.InitialActionAt,
+                        InitialActionTaken = DispositionData.InitialActionTaken,
+                        InvalidMatch = DispositionData.InvalidMatch,
+                        InvalidMatchReason = DispositionData.InvalidMatchReason,
+                        OtherReasoningForInvalidMatch = DispositionData.OtherReasoningForInvalidMatch,
+                        VulnerableIndividual = DispositionData.VulnerableIndividual
                     }
+                };
+                await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
+                Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
+                if (Match == null)
+                {
+                    return RedirectToPage("Error", new { message = "MatchId not found" });
                 }
+                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = true };
             }
             return Page();
         }
+
     }
 }

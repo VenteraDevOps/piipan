@@ -88,7 +88,7 @@ get_state_abbrs () {
   while IFS=, read -r abbr _; do
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
     state_abbrs+=("${abbr}")
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
 
   echo "${state_abbrs[*]}"
 }
@@ -123,8 +123,14 @@ main () {
   uploadallparticipants_policy_path=$(dirname "$0")/apim-uploadallparticipants-policy.xml
   uploadallparticipants_policy_xml=$(< "$uploadallparticipants_policy_path")
 
-  upload_policy_path=$(dirname "$0")/apim-bulkupload-policy.xml
+  upload_policy_path=$(dirname "$0")/apim-upload-policy.xml
   upload_policy_xml=$(< "$upload_policy_path")
+
+  get_upload_by_id_policy_path=$(dirname "$0")/apim-getuploadbyid-policy.xml
+  get_upload_by_id_policy_xml=$(< "$get_upload_by_id_policy_path")
+  
+  all_upload_operations_policy_path=$(dirname "$0")/apim-all-bulkupload-operations-policy.xml
+  all_upload_operations_policy_xml=$(< "$all_upload_operations_policy_path")
 
   apim_policy_path=$(dirname "$0")/apim-policy.xml
   apim_policy_xml=$(< "$apim_policy_path")
@@ -210,7 +216,9 @@ main () {
       prefix="${PREFIX}" \
       uploadAllParticipantsPolicyXml="${uploadallparticipants_policy_xml}" \
       uploadStates="${state_abbrs}" \
-      uploadPolicyXml="${upload_policy_xml}"
+      uploadPolicyXml="${upload_policy_xml}" \
+      uploadByIdPolicyXml="${get_upload_by_id_policy_xml}" \
+      allUploadOperationsPolicyXml="${all_upload_operations_policy_xml}" 
 
   echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))

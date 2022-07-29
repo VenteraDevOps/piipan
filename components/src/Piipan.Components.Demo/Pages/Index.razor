@@ -18,11 +18,15 @@
         [Display(Name = "Input Date")]
         public DateTime? InputDateField { get; set; }
 
+        [Display(Name = "Input Radio")]
+        public string InputRadioField { get; set; }
+
         [UsaSSN]
         [Display(Name = "Input SSN")]
         public string InputSSNField { get; set; }
     }
-
+    private string firstExample = "Saved First Value";
+    private string secondExample = "Saved Second Value";
     private IndexModel indexModel = new IndexModel();
 }
 
@@ -55,6 +59,17 @@
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-date"))" class="@ButtonClass">View Input Date</button></FooterContent>
         </UsaCard>
+        <UsaCard Header="Input Radio">
+            <BodyContent>
+                <p>A radio button group allows a user to select one option from the available choices</p>
+                <UsaRadioGroup @bind-Value="indexModel.InputRadioField">
+                    <UsaRadio Value="@firstExample">First Display Text</UsaRadio>
+                    <UsaRadio Value="@secondExample">Second Display Text</UsaRadio>
+                </UsaRadioGroup>
+                <p>Current value is @indexModel.InputRadioField</p>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-radio"))" class="@ButtonClass">View Input Radio</button></FooterContent>
+        </UsaCard>
         <UsaCard Header="Input SSN">
             <BodyContent>
                 <p>Use an Input SSN (Social Security Number) whenever you need to request someone's social security number on a form.</p>
@@ -84,6 +99,13 @@
                 </UsaFormGroup>
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-text-area"))" class="@ButtonClass">View Input Text Area</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Modal">
+            <BodyContent>
+                <p>A modal disables page content and focuses the user’s attention on a single task or message.</p>
+                <ModalComponent />
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/modal"))" class="@ButtonClass">View Modal</button></FooterContent>
         </UsaCard>
         <UsaCard Header="Tag">
             <BodyContent>

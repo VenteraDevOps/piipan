@@ -75,7 +75,7 @@ The [ETL subsystem](../etl) is responsible for anything related to uploading par
 
 #### Steps
 
-1. [Choose which state](../iac/states.csv) you’d like to perform the upload for
+1. [Choose which state](../iac/env/tts/dev/states.csv) you’d like to perform the upload for, it is required to have a states.csv file for your enviroment in `/iac/env`, for example `iac\env\tts\dev\states.csv`.
 1. Ensure that an APIM subscription exists for the state you’d like to query as
     - If not, create a subscription for the Bulk Upload API for this state using [these instructions](../match/docs/duplicate-participation-api.md#managing-api-keys).
 1. Perform the request. You can use [the curl example](./openapi/generated/bulk-api/openapi.md#upload-a-file) from the docs, or your own request method.

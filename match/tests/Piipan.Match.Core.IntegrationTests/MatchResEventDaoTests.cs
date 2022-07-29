@@ -58,7 +58,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 var record = new MatchResEventDbo
                 {
                     MatchId = matchId,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{}"
                 };
@@ -104,14 +104,14 @@ namespace Piipan.Match.Core.IntegrationTests
                 var record1 = new MatchResEventDbo
                 {
                     MatchId = matchId,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{\"status\": \"open\"}"
                 };
                 var record2 = new MatchResEventDbo
                 {
                     MatchId = matchId,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{\"status\": \"closed\"}"
                 };
@@ -163,14 +163,14 @@ namespace Piipan.Match.Core.IntegrationTests
                 var record1 = new MatchResEventDbo
                 {
                     MatchId = matchId,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{\"status\": \"open\"}"
                 };
                 var record2 = new MatchResEventDbo
                 {
                     MatchId = matchId,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{\"status\": \"closed\"}"
                 };
@@ -250,7 +250,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 var mre = new MatchResEventDbo
                 {
                     MatchId = matchId,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{\"status\": \"open\"}"
                 };
@@ -263,7 +263,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 var results = await dao.GetEvents(matchId, false);
                 var result = results.First();
                 Assert.Equal(matchId, result.MatchId);
-                Assert.Equal("noreply@example.com", result.Actor);
+                Assert.Equal("noreply@email.example", result.Actor);
                 Assert.Equal("ea", result.ActorState);
                 Assert.Equal("{\"status\": \"open\"}", result.Delta);
                 Assert.True(new DateTime() < result.InsertedAt); // greater than default datetime (1/1/0001 12:00:00 AM)
@@ -303,7 +303,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 var mres = matchIds.Select(id => new MatchResEventDbo
                 {
                     MatchId = id,
-                    Actor = "noreply@example.com",
+                    Actor = "noreply@email.example",
                     ActorState = "ea",
                     Delta = "{\"status\": \"open\"}"
                 });
@@ -324,7 +324,7 @@ namespace Piipan.Match.Core.IntegrationTests
                 foreach (var result in results)
                 {
                     Assert.Contains(matchIds, id => result.MatchId == id);
-                    Assert.Equal("noreply@example.com", result.Actor);
+                    Assert.Equal("noreply@email.example", result.Actor);
                     Assert.Equal("ea", result.ActorState);
                     Assert.Equal("{\"status\": \"open\"}", result.Delta);
                     Assert.True(new DateTime() < result.InsertedAt); // greater than default datetime (1/1/0001 12:00:00 AM)

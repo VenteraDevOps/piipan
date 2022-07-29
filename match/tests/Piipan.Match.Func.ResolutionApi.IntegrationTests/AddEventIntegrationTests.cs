@@ -187,7 +187,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             Assert.Single(events);
             Assert.Equal(matchId, lastEvent.MatchId);
             Assert.Equal("ea", lastEvent.ActorState);
-            Assert.Equal("{\"invalid_match\": true}", lastEvent.Delta);
+            Assert.Equal("{\"invalid_match\": true, \"initial_action_taken\": null, \"invalid_match_reason\": null, \"final_disposition_date\": null, \"other_reasoning_for_invalid_match\": null}", lastEvent.Delta);
             Assert.Equal(200, response.StatusCode);
         }
 

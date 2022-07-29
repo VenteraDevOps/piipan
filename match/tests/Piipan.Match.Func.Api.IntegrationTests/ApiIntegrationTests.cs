@@ -167,7 +167,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var record = FullRecord();
             var recordEncrypted = EncryptedFullRecord(record);
             var logger = Mock.Of<ILogger>();
-            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
+            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, ParticipantId = "participant1", SearchReason = "other" } };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
             var state = Environment.GetEnvironmentVariable("States").Split(",");
@@ -202,7 +202,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             // Arrange
             var record = FullRecord();
             var logger = Mock.Of<ILogger>();
-            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
+            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, ParticipantId = "participant1", SearchReason = "other" } };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
 
@@ -224,7 +224,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var record = FullRecord();
             var recordEncrypted = EncryptedFullRecord(record);
             var logger = Mock.Of<ILogger>();
-            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
+            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, ParticipantId = "participant1", SearchReason = "other" } };
             InitiatingState = "ec"; // set to a state that is disabled
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
@@ -259,8 +259,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             recordB.LdsHash = "foo";
             var logger = Mock.Of<ILogger>();
             var body = new object[] {
-                new RequestPerson { LdsHash = recordA.LdsHash, SearchReason = "other" },
-                new RequestPerson {LdsHash = recordB.LdsHash, SearchReason = "other" }
+                new RequestPerson { LdsHash = recordA.LdsHash, ParticipantId = "participant1", SearchReason = "other" },
+                new RequestPerson {LdsHash = recordB.LdsHash, ParticipantId = "participant1", SearchReason = "other" }
             };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
@@ -292,8 +292,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var recordEncryptedB = EncryptedFullRecord(recordB);
             var logger = Mock.Of<ILogger>();
             var body = new object[] {
-                new RequestPerson { LdsHash = recordA.LdsHash, SearchReason = "other" },
-                new RequestPerson {LdsHash = recordB.LdsHash, SearchReason = "other" }
+                new RequestPerson { LdsHash = recordA.LdsHash, ParticipantId = "participant1", SearchReason = "other" },
+                new RequestPerson {LdsHash = recordB.LdsHash, ParticipantId = "participant1", SearchReason = "other" }
             };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
@@ -325,7 +325,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var record = FullRecord();
             var recordEncrypted = EncryptedFullRecord(record);
             var logger = Mock.Of<ILogger>();
-            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, SearchReason = "other" } };
+            var body = new object[] { new RequestPerson { LdsHash = record.LdsHash, ParticipantId = "participant1", SearchReason = "other" } };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();
             var state = Environment.GetEnvironmentVariable("States").Split(",");
@@ -356,8 +356,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             var recordEncryptedB = EncryptedFullRecord(recordB);
             var logger = Mock.Of<ILogger>();
             var body = new object[] {
-                new RequestPerson { LdsHash = recordA.LdsHash, SearchReason = "other" },
-                new RequestPerson { LdsHash = recordB.LdsHash, SearchReason = "other" },
+                new RequestPerson { LdsHash = recordA.LdsHash, ParticipantId = "participant1", SearchReason = "other" },
+                new RequestPerson { LdsHash = recordB.LdsHash, ParticipantId = "participant1", SearchReason = "other" },
             };
             var mockRequest = MockRequest(JsonBody(body));
             var api = Construct();

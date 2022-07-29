@@ -158,3 +158,79 @@ To perform this operation, you must be authenticated by means of one of the foll
 ApiKeyAuth
 </aside>
 
+## Get Upload Details
+
+<a id="opIdGet Upload Details"></a>
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET /bulk/{stateAbbr}/v2/uploads/{uploadIdentifier} \
+  -H 'Accept: application/json' \
+  -H 'From: string' \
+  -H 'Ocp-Apim-Subscription-Key: API_KEY'
+
+```
+
+`GET /uploads/{uploadIdentifier}`
+
+*Get Upload Details*
+
+Get details regarding a bulk upload
+
+<h3 id="get-upload-details-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|From|header|string|true|As in the HTTP/1.1 RFC, used for logging purposes as a means for identifying the source of invalid or unwanted requests. The interpretation of this field is that the request is being performed on behalf of the state government-affiliated person whose email address (or username) is specified here. It is not used for authentication or authorization.|
+|upload_identifier|path|string|true|The Upload ID retrieved from a bulk upload|
+
+<h3 id="get-upload-details-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Success|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Access denied|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Not Found|None|
+
+<h3 id="get-upload-details-responseschema">Response Schema</h3>
+
+Status Code **200**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» data|object|false|none|The response payload representing upload data.|
+|»» id|string|true|none|Id|
+|»» upload_identifier|string|true|none|The unique identifier for the upload|
+|»» created_at|string|true|none|The timestamp when the requested upload was performed.|
+|»» publisher|string|true|none|The publisher of an upload|
+|»» participants_uploaded|integer|false|none|The number or participants uploaded into the NAC|
+|»» error_message|string|false|none|Error details as to why an upload failed|
+|»» completed_at|string|false|none|The timestamp when the requested upload was completed.|
+|»» status|string|true|none|The Upload's status|
+
+### Response Examples
+
+> 200 Response
+
+```json
+{
+  "data": {
+    "id": "36",
+    "upload_identifier": "0x8DA63770FEF1551",
+    "created_at": "2022-07-11T19:54:27.903811Z",
+    "publisher": "open",
+    "participants_uploaded": 50,
+    "error_message": "Exception of type 'CsvHelper.FieldValidationException' was thrown.",
+    "completed_at": "2022-07-11T19:54:28.303961Z",
+    "status": "COMPLETE"
+  }
+}
+```
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+ApiKeyAuth
+</aside>
+

@@ -24,6 +24,7 @@ namespace Piipan.Match.Api.Models
         public string LdsHash { get; set; }
 
         [JsonProperty("participant_id",
+            Required = Required.Always,
             NullValueHandling = NullValueHandling.Ignore)]
         public string ParticipantId { get; set; }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -76,6 +77,27 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
+        public async Task TestValidMatchId_Post()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+            var result = await pageModel.OnPost(caseid);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(caseid, pageModel.Match.Data.MatchId);
+            Assert.Equal("ea", pageModel.Match.Data.Initiator);
+            Assert.Equal(MatchRecordStatus.Open, pageModel.Match.Data.Status);
+            Assert.Empty(pageModel.Match.Data.Dispositions);
+            Assert.Empty(pageModel.Match.Data.Participants);
+            Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
+        }
+
+        [Fact]
         public async Task TestValidMatchId_Get()
         {
             // arrange
@@ -109,6 +131,31 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.IsType<RedirectToPageResult>(result);
             Assert.Equal("Error", (result as RedirectToPageResult).PageName);
+        }
+
+        [Fact]
+        public void TestInitializeUserState()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            pageModel.Match = new MatchResApiResponse();
+
+            var results = new List<States.Api.Models.StateInfoResponseData>();
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EA", State="Echo Alpha" });
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EB", State = "Echo Bravo" });
+
+            pageModel.StateInfo = new States.Api.Models.StatesInfoResponse();
+            pageModel.StateInfo.Results = results;
+
+            pageModel.PageContext.HttpContext = contextMock();
+
+            Assert.True(string.IsNullOrEmpty(pageModel.UserState));
+
+            // act
+            pageModel.InitializeUserState();
+
+            // assert
+            Assert.Equal("Echo Alpha", pageModel.UserState);
         }
 
         private Mock<IMatchResolutionApi> SetupMatchResolutionApi()
@@ -151,7 +198,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Equal(new List<ServerError> { new("Query.MatchId", expectedError) },
@@ -173,7 +220,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Empty(pageModel.RequestErrors);
@@ -193,7 +240,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Empty(pageModel.RequestErrors);
@@ -218,7 +265,7 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            Assert.IsType<PageResult>(await pageModel.OnPost());
+            Assert.IsType<PageResult>(await pageModel.OnPost(null));
 
             // assert
             Assert.Equal(new List<ServerError> { new("", "There was an error running your search. Please try again.") }, pageModel.RequestErrors);

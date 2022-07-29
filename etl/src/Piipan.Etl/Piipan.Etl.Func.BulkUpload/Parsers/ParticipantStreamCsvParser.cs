@@ -28,14 +28,14 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
                 return match.Success;
             });
 
-            Map(m => m.CaseId).Name("case_id").Validate(field =>
+            base.Map(m => m.CaseId).Name("case_id").Validate(field =>
             {
-                return !string.IsNullOrEmpty(field.Field);
+                return ValidateAlphaNumericWithLength(field);
             });
 
             Map(m => m.ParticipantId).Name("participant_id").Validate(field =>
             {
-                return !string.IsNullOrEmpty(field.Field);
+                return ValidateAlphaNumericWithLength(field);
             });
 
             Map(m => m.ParticipantClosingDate)
@@ -92,6 +92,13 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             Map(m => m.VulnerableIndividual).Name("vulnerable_individual")
                 .TypeConverterOption.NullValues(string.Empty).Optional();
 
+            static bool ValidateAlphaNumericWithLength(ValidateArgs field)
+            {
+                Match match = Regex.Match(field.Field, "^[A-Za-z0-9]+$");
+                if (!match.Success) return false;
+                if (field.Field.Length > 20) return false;
+                return true;
+            }
         }
     }
 

@@ -8,16 +8,22 @@ SET search_path=piipan,public;
 CREATE TABLE IF NOT EXISTS uploads(
 	id serial PRIMARY KEY,
 	created_at timestamptz NOT NULL,
+	completed_at  timestamptz,
 	publisher text NOT NULL,
 	upload_identifier text NOT NULL,
-	status text
+	status text NOT NULL,
+	participants_uploaded bigint,
+    error_message text
 );
 
 COMMENT ON TABLE uploads IS 'Bulk PII upload events';
 COMMENT ON COLUMN uploads.created_at IS 'Date/time the records were uploaded in bulk';
+COMMENT ON COLUMN uploads.completed_at IS 'Date/time the upload completed';
 COMMENT ON COLUMN uploads.publisher IS 'User or service account that performed the upload';
 COMMENT ON COLUMN uploads.upload_identifier IS 'Unique ID for uploads for status inquiries';
 COMMENT ON COLUMN uploads.status IS 'Current status for upload processing';
+COMMENT ON COLUMN uploads.participants_uploaded IS 'Number of participants uploaded';
+COMMENT ON COLUMN uploads.error_message IS 'Error message details if errors were encountered during upload processing';
 
 CREATE TABLE IF NOT EXISTS participants(
 	id serial PRIMARY KEY,

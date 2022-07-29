@@ -32,7 +32,7 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     az login
 ```
 
-5. If deploying to TEST environment, update states.csv to enable all states.
+5. If deploying to TEST environment, update states.csv to enable all states. It is required to have an states.csv file configured for your enviroment under `iac/env` for example `iac/env/tts/dev/states.csv`
 
 6. Run `create-resources`, which deploys Azure Resource Manager (ARM) templates and runs associated scripts, specifying the [name of the deployment environment](#deployment-environments). Once this step is completed, all the infrastructure components will be provisioned.
 ```
@@ -158,7 +158,7 @@ az resource list  --tag SysType=PerStateMatchApi --query "[? resourceGroup == 'r
 ```
 
 ## Notes
-- `iac/states.csv` contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory. The third field notes whether the state is Enabled or Disabled for the Match API. If they are disabled, a match will still be created, but will not be returned to the user.
+- `iac/env/{enviroment}/states.csv` (for example, `iac/env/tts/dev/states.csv`) contains the comma-delimited records of participating states/territories. The first field is the [two-letter postal abbreviation](https://pe.usps.com/text/pub28/28apb.htm); the second field is the name of the state/territory. The third field notes whether the state is Enabled or Disabled for the Match API. If they are disabled, a match will still be created, but will not be returned to the user.
 - For development, dummy state/territories are used (e.g., the state of `Echo Alpha`, with an abbreviation of `EA`).
 - If you forget to connect to a trusted network and `create-resources` fails, connect to the network, then re-run the script.
 - If you have recently deleted all the Piipan resource groups and are re-creating the infrastructure from scratch, you will need to explicitly purge resource types that are initially soft-deleted. Be sure to **perform these commands against the correct subscription/resource groups** as they will cause **irreversible data loss**.

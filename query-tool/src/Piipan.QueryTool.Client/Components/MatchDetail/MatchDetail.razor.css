@@ -43,8 +43,8 @@ dl {
 dt {
     display: inline-block;
     font-weight: 700;
-    font-size: 1rem;
-    line-height: 1.6875;
+    font-size: 16px;
+    line-height: 24px;
     margin: 0;
     margin-right: 5px;
 }
@@ -52,8 +52,17 @@ dt {
 dd {
     display: inline-block;
     margin: 0;
-    font-size: 1rem;
-    line-height: 1.6875;
+    font-size: 16px;
+    line-height: 24px;
     vertical-align: top;
     white-space: pre;
+}
+
+.matchInfoDiv {
+    max-width: 910px;
+    margin-bottom: 24px;
+}
+
+.match-detail-save-success {
+    margin-top: 24px;
 }

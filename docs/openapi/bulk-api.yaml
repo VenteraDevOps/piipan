@@ -17,6 +17,8 @@ paths:
     $ref: './../../etl/docs/openapi/uploadAllParticipants.yaml'
   '/upload/{filename}':
     $ref: './../../etl/docs/openapi/upload.yaml'
+  '/uploads/{uploadIdentifier}':
+    $ref: './../../etl/docs/openapi/getUploadById.yaml'
 security:
   - ApiKeyAuth: []
 components:

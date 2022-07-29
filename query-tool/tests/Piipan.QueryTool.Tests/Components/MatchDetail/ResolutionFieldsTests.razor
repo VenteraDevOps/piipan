@@ -1,0 +1,84 @@
+﻿@using Piipan.Components.Alerts
+@using Piipan.Components.Forms
+@using System.Linq.Expressions
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.MatchDetail
+@using Piipan.QueryTool.Client.Models
+@using Piipan.Shared.API.Utilities
+@using static Piipan.Components.Alerts.AlertConstants
+@inherits BaseComponentTest<ResolutionFields>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public ResolutionFieldsTests() : base()
+    {
+        
+    }
+
+
+    /// <summary>
+    /// Create a StateParticipantInformation component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
+            JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+            JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
+            JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
+        Disposition disp = new Disposition
+            {
+                InitialActionAt = null,
+                InitialActionTaken = "",
+                InvalidMatch = false,
+                InvalidMatchReason = "",
+                OtherReasoningForInvalidMatch = "",
+                FinalDisposition = "",
+                FinalDispositionDate = null,
+                VulnerableIndividual = null,
+                State = "EA"
+            };
+        Component = Render<ResolutionFields>(
+    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
+    </ResolutionFields>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the default markup of the state contact information
+    /// </summary>
+    [Fact]
+    public void Resolution_Fields_status_markup()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Component!.MarkupMatches(
+    @<div >
+      <h3 >Update information about this match for Echo Bravo</h3>
+      <p class="infoSavedText" >After the information is saved, it will appear in the
+        <b >match information</b>
+        panel.</p>
+      <div class="usa-form ">
+        <form id="snap-resolution-fields-form" method="post" novalidate="" >
+          <fieldset class="usa-fieldset">
+          <input type="hidden" name="__RequestVerificationToken" >
+            <div diff:ignore> //Ignoring Vulnerable Invalid Component
+            </div>
+            <div diff:ignore> //Ignoring Initial Action Component
+            </div>
+            <div diff:ignore> //Ignoring Final Disposition Component
+            </div>
+            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
+          </fieldset>
+        </form>
+      </div>
+    </div>);
+    }
+
+    #endregion
+}

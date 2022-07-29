@@ -93,6 +93,7 @@ main () {
   source "$(dirname "$0")"/iac-common.bash
 
   verify_cloud
+  verify_file env/"${azure_env}"/ states.csv
   set_constants
 
   echo "Creating Resource Groups"
@@ -204,7 +205,7 @@ main () {
         subnet="$FUNC_SUBNET_NAME" \
         sku="$STORAGE_SKU" \
         eventHubNamespace="$EVENT_HUB_NAME"
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
   
   # Avoid echoing passwords in a manner that may show up in process listing,
   # or storing it in a temp file that may be read, or appearing in a CI/CD log.
@@ -258,7 +259,7 @@ main () {
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       identity=$(state_managed_id_name "$abbr" "$ENV")
       az identity create -g "$RESOURCE_GROUP" -n "$identity"
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
   configure_azure_profile
   
   exists=$(az ad group member check \
@@ -293,14 +294,14 @@ main () {
   # template either. Instead, we access the PostgreSQL server from a trusted
   # network (as established by its ARM template firewall variable), and apply
   # various Data Definition (DDL) scripts for each state.
-  ./create-databases.bash "$RESOURCE_GROUP"
+  ./create-databases.bash "$RESOURCE_GROUP" "$azure_env"
   
   # Apply DDL shared between the ETL and match API subsystems.
   # XXX This should be moved out of IaC, which is not run in CI/CD,
   #     to a continuously deployable workflow that accomodates schema
   #     changes over time.
   pushd ../ddl
-  ./apply-ddl.bash
+  ./apply-ddl.bash "$azure_env"
   popd
   
   # This is a subscription-level resource provider
@@ -337,7 +338,7 @@ main () {
     if [ "$enable_matches" = $STATE_ENABLED_KEY ]; then
         state_enabled_matches+=",${abbr}"
     fi
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
   state_abbrs=${state_abbrs:1}
   if [[ -n "$state_enabled_matches" ]]; then
     state_enabled_matches=${state_enabled_matches:1}
@@ -736,7 +737,7 @@ main () {
           "enabled": true
         }
       ]'
-  done < states.csv
+  done < env/"${azure_env}"/states.csv
 
 
   update_bu_metrics_topic_name=evgt-update-bu-metrics-$ENV

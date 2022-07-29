@@ -39,7 +39,7 @@ namespace Piipan.Participants.Core.IntegrationTests
             }
         }
 
-        public void InsertUpload()
+        public void InsertUpload(string uploadId)
         {
             var factory = NpgsqlFactory.Instance;
             
@@ -47,7 +47,7 @@ namespace Piipan.Participants.Core.IntegrationTests
             {
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
-                conn.Execute("INSERT INTO uploads(created_at, publisher,upload_identifier, status) VALUES(now() at time zone 'utc', current_user ,'test-etag', 'COMPLETE')");
+                conn.Execute($"INSERT INTO uploads(created_at, publisher,upload_identifier, status) VALUES(now() at time zone 'utc', current_user ,'{uploadId}', 'COMPLETE')");
                 conn.Close();
             }
         }
