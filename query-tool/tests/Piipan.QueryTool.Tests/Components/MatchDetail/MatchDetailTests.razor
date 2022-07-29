@@ -2,6 +2,7 @@
 @using Piipan.Components.Enums
 @using System.Linq.Expressions
 @using Piipan.Components.Forms
+@using Piipan.Components.Tag
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
 @using Piipan.QueryTool.Client.Models
@@ -236,6 +237,35 @@
           </div>
         </div>
     );
+    }
+
+    /// <summary>
+    /// Verify that a closed case does not have the match resolution fields
+    /// </summary>
+    [Fact]
+    public void ResolutionFields_ShouldNotExist_WhenMatchIsClosed()
+    {
+        // Arrange
+        InitialValues.Match.Data.Data.Status = "closed";
+        CreateTestComponent();
+
+        // Assert
+        Assert.Empty(Component.FindComponents<ResolutionFields>());
+    }
+
+    /// <summary>
+    /// Verify that a case with a vulnerable individual and invalid match has the appropriate tags
+    /// </summary>
+    [Fact]
+    public void TagsShouldExist_WhenInvalidAndVulnerable()
+    {
+        // Arrange
+        InitialValues.Match.Data.Data.Dispositions[0].VulnerableIndividual = true;
+        InitialValues.Match.Data.Data.Dispositions[0].InvalidMatch = true;
+        CreateTestComponent();
+
+        // Assert
+        Assert.Equal(3, Component.FindComponents<UsaTag>().Count()); //open tag, vulnerable tag, and invalid tag
     }
 
     /// <summary>

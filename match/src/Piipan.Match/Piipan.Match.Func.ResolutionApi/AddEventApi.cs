@@ -152,7 +152,7 @@ namespace Piipan.Match.Func.ResolutionApi
             IEnumerable<IMatchResEvent> matchResEvents
         )
         {
-            if (String.IsNullOrEmpty(reqObj.Data.FinalDisposition)) return;
+            if (String.IsNullOrEmpty(reqObj.Data.FinalDisposition) && reqObj.Data.InvalidMatch != true) return;
 
             var dispositions = GetFinalDispositions(matchResEvents);
             if (dispositions.Count() == (match.States.Count()))
@@ -171,13 +171,13 @@ namespace Piipan.Match.Func.ResolutionApi
             IEnumerable<IMatchResEvent> matchResEvents
         )
         {
-            List<String> statesWithFinalDisposition = new List<String>();
+            List<String> statesReadyToClose = new List<String>();
             return matchResEvents.Where(e =>
             {
                 Disposition? delta = JsonConvert.DeserializeObject<Disposition>(e.Delta);
-                if (!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate!= null && !statesWithFinalDisposition.Contains(e.ActorState))
+                if (((!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate!= null) || delta?.InvalidMatch == true) && !statesReadyToClose.Contains(e.ActorState))
                 {
-                    statesWithFinalDisposition.Add(e.ActorState);
+                    statesReadyToClose.Add(e.ActorState);
                     return true;
                 }
                 return false;

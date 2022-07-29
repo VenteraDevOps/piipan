@@ -25,6 +25,7 @@
             { TagTheme.Green, TagThemeGreenClass },
             { TagTheme.Gray, TagThemeGrayClass },
             { TagTheme.Purple, TagThemePurpleClass },
+            { TagTheme.Orange, TagThemeOrangeClass }
         };
 
     /// <summary>
@@ -64,9 +65,10 @@
     /// Verify the tag can change theme on the fly
     /// </summary>
     [Theory]
-    [InlineData(TagTheme.Green, TagTheme.Gray)]
+    [InlineData(TagTheme.Green, TagTheme.Orange)]
     [InlineData(TagTheme.Gray, TagTheme.Purple)]
     [InlineData(TagTheme.Purple, TagTheme.Green)]
+    [InlineData(TagTheme.Orange, TagTheme.Gray)]
     public void Tag_Should_Be_Able_To_Change_Theme_Before_And_After_Created(TagTheme startingTheme, TagTheme endingTheme)
     {
         // Arrange
@@ -105,6 +107,13 @@
         // Assert Updated Values
         Assert.True(element!.ClassList.Contains(TagBorderRoundClass));
         Assert.False(element.ClassList.Contains(TagBorderSquareClass));
+
+        // Act
+        UpdateParameter(p => p.BorderType, BorderType.RoundedSquare);
+
+        // Assert Updated Values
+        Assert.True(element!.ClassList.Contains(TagBorderRoundedSquareClass));
+        Assert.False(element.ClassList.Contains(TagBorderRoundClass));
     }
 
     /// <summary>

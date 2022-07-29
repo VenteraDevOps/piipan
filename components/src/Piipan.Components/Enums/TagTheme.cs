@@ -4,6 +4,7 @@
     {
         Green,
         Gray,
-        Purple
+        Purple,
+        Orange
     }
 }

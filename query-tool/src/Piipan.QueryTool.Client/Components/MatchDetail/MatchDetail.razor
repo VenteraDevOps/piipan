@@ -22,6 +22,7 @@
     private bool saving = false;
     private bool CanEditFields => RequiredRolesToEdit.Contains(Role);
     List<(string Property, string Error)> serverErrorList;
+    private bool MatchIsOpen => Match.Data.Data.Status.ToLower() == "open";
 
 
     protected override void OnInitialized()
@@ -41,6 +42,26 @@
             "open" => TagTheme.Green,
             _ => TagTheme.Gray
         };
+    }
+    private bool IsMatchVulnerable()
+    {
+        return Match.Data.Data.Dispositions.Any(n => n.VulnerableIndividual == true);
+    }
+    private bool IsMatchValid()
+    {
+
+        for (int i = 0; i < Match.Data.Data.Dispositions.Count(); i++)
+        {
+            if (Match.Data.Data.Dispositions[i].InvalidMatch == true)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    private bool TagNeeded()
+    {
+        return IsMatchValid() || IsMatchVulnerable();
     }
     private Task SubmitForm(bool valid)
     {
@@ -109,6 +130,23 @@
     }
     <!-- Match header -->
     <h1><UsaTag Theme="StatusTheme()">@Match.Data.Data.Status</UsaTag><span>Match ID: @Match.Data.Data.MatchId</span></h1>
+    @if (TagNeeded())
+    {
+        <div style="margin-bottom: 24px">
+            @if(IsMatchVulnerable())
+            {
+                
+                <UsaTag style="margin-right: 17px" Theme="TagTheme.Purple" BorderType="BorderType.RoundedSquare">Vulnerable Individual</UsaTag>
+                
+            }
+            @if (IsMatchValid())
+            {
+                <UsaTag Theme="TagTheme.Orange" BorderType="BorderType.RoundedSquare">Invalid Match</UsaTag>
+            }
+
+        </div>
+        
+    }
     <UsaForm Id="snap-resolution-fields-form" InitialErrors="serverErrorList" Model="model" method="post" OnBeforeSubmit="SubmitForm">
         <Piipan.QueryTool.Client.Modals.ConfirmModalWrapper>
     <div class="grid-row matchInfoDiv">
@@ -127,8 +165,8 @@
         </dl>
     </div>
     <!-- \match header -->
-    <div class="match-detail-grid @(CanEditFields ? "" : "one-col")">
-        @if (CanEditFields)
+    <div class="match-detail-grid @((CanEditFields && MatchIsOpen)  ? "" : "one-col")">
+        @if (CanEditFields && MatchIsOpen)
         {
             <div>
                 <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@model"/>
