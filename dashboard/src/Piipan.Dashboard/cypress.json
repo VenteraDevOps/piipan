@@ -1,7 +1,0 @@
-{
-    "viewportHeight": 1000,
-    "viewportWidth": 1280,
-    "screenshotOnRunFailure": true,
-    "video": true,
-    "baseUrl": "https://localhost:5001"
-}
