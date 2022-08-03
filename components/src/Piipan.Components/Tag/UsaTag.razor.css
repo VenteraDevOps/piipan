@@ -29,6 +29,12 @@
     border-color: #7A00A9;
 }
 
+.usa-tag.usa-tag--orange {
+    background: #F4E3DB;
+    color: #BA3A08;
+    border-color: #BA3A08;
+}
+
 .usa-tag.usa-tag--round {
     border-radius: 100px;
     padding: 3px 12px;
@@ -36,4 +42,8 @@
 
 .usa-tag.usa-tag--square {
     border-radius: 0;
+}
+
+.usa-tag.usa-tag--roundedsquare {
+    border-radius: 3px;
 }

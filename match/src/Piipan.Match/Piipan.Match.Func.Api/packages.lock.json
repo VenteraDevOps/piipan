@@ -2236,6 +2236,7 @@
       "piipan.match.core": {
         "type": "Project",
         "dependencies": {
+          "Azure.Messaging.EventGrid": "4.11.0",
           "Dapper": "2.0.123",
           "FluentValidation": "11.1.0",
           "Microsoft.Extensions.Logging": "6.0.0",
@@ -2243,6 +2244,7 @@
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.5",
           "Piipan.Match.Api": "1.0.0",
+          "Piipan.Metrics.Api": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "Piipan.Shared.Cryptography": "1.0.0"

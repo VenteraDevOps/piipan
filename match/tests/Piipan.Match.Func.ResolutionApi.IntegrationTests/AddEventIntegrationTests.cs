@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +17,6 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Validators;
 using Piipan.Shared.Database;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -187,8 +187,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             Assert.Single(events);
             Assert.Equal(matchId, lastEvent.MatchId);
             Assert.Equal("ea", lastEvent.ActorState);
-            Assert.Equal("{\"invalid_match\": true, \"initial_action_taken\": null, \"invalid_match_reason\": null, \"final_disposition_date\": null, \"other_reasoning_for_invalid_match\": null}", lastEvent.Delta);
-            Assert.Equal(200, response.StatusCode);
+            Assert.Equal("{\"state\": null, \"invalid_match\": true, \"initial_action_taken\": null, \"invalid_match_reason\": null, \"final_disposition_date\": null, \"other_reasoning_for_invalid_match\": null}", lastEvent.Delta);
+            Assert.Equal(200, response.StatusCode); 
         }
 
         [Fact]
@@ -204,7 +204,6 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             {
                 MatchId = matchId,
                 Initiator = "ea",
-                CreatedAt = DateTime.UtcNow,
                 States = new string[] { "ea", "eb" },
                 Hash = "foo",
                 HashType = "ldshash",
@@ -218,11 +217,11 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 MatchId = matchId,
                 Actor = "user",
                 ActorState = "eb",
-                Delta = "{ \"final_disposition\": \"foo\" }"
+                Delta = "{ \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"foo\", \"final_disposition_date\": \"2022-07-20T00:00:02\" }"
             };
             InsertMatchResEvent(matchResEvent);
 
-            var mockRequest = MockRequest("{ \"data\": { \"final_disposition\": \"bar\" } }");
+            var mockRequest = MockRequest("{ \"data\": { \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"bar\", \"final_disposition_date\": \"" + System.DateTime.UtcNow.AddDays(2).ToString("s") + "\" } }");
             var mockLogger = new Mock<ILogger>();
             var api = Construct();
 

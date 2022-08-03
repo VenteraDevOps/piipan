@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
+using Piipan.Metrics.Api;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
@@ -111,7 +113,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Environment.SetEnvironmentVariable("States", "ea");
             Environment.SetEnvironmentVariable("EventGridEndPoint","http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridKeyString","example");
-            
+            Environment.SetEnvironmentVariable("EventGridMetricSearchEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridMetricSearchKeyString", "example");
+
 
             // Mixing cases to verify the enabled states can be used no matter their casing.
             Environment.SetEnvironmentVariable("EnabledStates", "ea,EB");
@@ -136,6 +140,16 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                 return new BasicPgConnectionFactory<ParticipantsDb>(
                     NpgsqlFactory.Instance,
                     Environment.GetEnvironmentVariable(Startup.DatabaseConnectionString));
+            });
+            services.AddTransient<IParticipantPublishSearchMetric>(b =>
+            {
+                var factory = new Mock<IParticipantPublishSearchMetric>();
+
+                factory.Setup(m => m.PublishSearchdMetric(
+                                        It.IsAny<ParticipantSearchMetrics>()))
+                       .Returns(Task.CompletedTask);
+
+                return factory.Object;
             });
             services.RegisterParticipantsServices();
             services.RegisterMatchServices();

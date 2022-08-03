@@ -162,7 +162,7 @@ main () {
     sleep 120
   fi
 
-  # Create event hub and assign role to app registration
+   # Create event hub and assign role to app registration
   az deployment group create \
    --name monitoring \
    --resource-group "$RESOURCE_GROUP" \
@@ -345,6 +345,16 @@ main () {
   fi
   echo "Enabled States: ${state_enabled_matches}"
 
+ echo "Create Event grid for Search Metrics" 
+
+  az eventgrid topic create \
+    --location "$LOCATION" \
+    --name "${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
+    --resource-group "$RESOURCE_GROUP"
+  eventgrid_search_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+  eventgrid_search_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+
+
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
   # restrictions for the function app and storage account are added
@@ -421,7 +431,9 @@ main () {
       ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
       QueryToolUrl="${QUERY_TOOL_URL}" \
       WEBSITE_CONTENTOVERVNET=1 \
-      WEBSITE_VNET_ROUTE_ALL=1
+      WEBSITE_VNET_ROUTE_ALL=1 \
+      $EVENTGRID_CONN_METRICS_SEARCH_STR_ENDPOINT="$eventgrid_search_endpoint" \
+      $EVENTGRID_CONN_METRICS_SEARCH_STR_KEY="$eventgrid_search_key_string" \
 
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"

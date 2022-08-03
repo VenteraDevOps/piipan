@@ -3,7 +3,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.0.44] - 2022-07-12
+## [1.1.1.45] - 2022-07-27
+
+### Changed
+- Initial Action Date is now defaulted when Initial Action is chosen on Match Detail page.
+- Initial Action section is now disabled on Match Detail page when the match is marked Invalid
+- Final Disposition Date is now defaulted in some cases when Final Disposition is chosen on Match Detail page.
+- Final Disposition section is now disabled on Match Detail page when Initial Action is not yet chosen.
+- When a user who does not have permission to edit a match goes to the Match Detail page, they now see a read-only view.
+
+### Added
+- Search Reason added to "Search for SNAP Participants" page
+- Initial Action and Initial Action Date validation added to Match Detail page & Match Res API.
+- Final Disposition and Final Disposition Date validation added to Match Detail page & Match Res API.
+- Duplicate Participant searches are now captured and saved to the Metrics database.
+
+### Fixed
+- Removed the use of the Azure CLI to get the Event Hub authorization rule ID.
+- Match Resolution API's Add Event endpoint now closes the match when Final Disposition is set on both states.
+- Participation Bulk Insert now logs information correctly instead of only to the debugger.
+- Removed duplicate code relating to Match Disposition
+
+## [1.1.1.44] - 2022-07-12
 
 ### Changed
 - Made Participant Id a required field for Duplicate Participation API search requests
@@ -23,10 +44,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Pulled State Metadata SQL data insertion out of Match specific SQL file
 - Replaced placeholder email addresses with safe-to-use top level testing domain 
 
-## [1.1.0.43] - 2022-06-28
+## [1.1.1.43] - 2022-06-28
 
 ### Changed
-- Added support for capturing participant upload status and start/completion timestamps in the Metrics database
+- Added support for capturing participant upload status and start/completion timestamps in the Metrics database (retroactively included in v1.1.1)
 
 ### Added
 - State API internal documentation
@@ -40,7 +61,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Moved Match Resolution documenation out of Duplicate Participation API documentation to internal Match Resolution API documentation.
 - Cypress tests failures caused by States API
 
-## [1.1.0.42] - 2022-06-15
+## [1.1.1.42] - 2022-06-15
 
 ### Changed
 - Improved documentation for Duplicate Participation API
@@ -48,10 +69,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Updated IAC scripts to support Azure US Gov & Azure CLI 2.37
 
 ### Added
-- Added column encryption support for sensitive PII values in Postgres
+- Added column encryption support for sensitive PII values in Postgres (retroactively included in v1.1.1)
 - Added internal support and API for State Metadata
 - Added basic email notification support/infrastructure
 - Added match status, disposition information, state contact information, and participant information to the Match Details page
+
+## [1.1.1] - 2022-06-30
+
+### Changed
+- Added support for capturing participant upload status and start/completion timestamps in the Metrics database.
+
+### Added
+- Added AES encryption for columns containing sensitive PII values in Postgres
 
 ## [1.1.0] - 2022-05-31
 
@@ -421,6 +450,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Initial APIs for use by group 1A state integrators.
 
+[1.1.1.44]: https://github.com/18F/piipan/releases/tag/v1.1.1.44
+[1.1.1.43]: https://github.com/18F/piipan/releases/tag/v1.1.1.43
+[1.1.1.42]: https://github.com/18F/piipan/releases/tag/v1.1.0.42
+[1.1.1]: https://github.com/18F/piipan/releases/tag/v1.1.1
+[1.1.0]: https://github.com/18F/piipan/releases/tag/v1.1.0
+[1.0.1.40]: https://github.com/18F/piipan/releases/tag/v1.0.1.40
+[1.0.1.39]: https://github.com/18F/piipan/releases/tag/v1.0.1.39
+[1.0.1.38]: https://github.com/18F/piipan/releases/tag/v1.0.1.38
+[1.0.1.37]: https://github.com/18F/piipan/releases/tag/v1.0.1.37
+[1.0.1.36]: https://github.com/18F/piipan/releases/tag/v1.0.1.36
+[1.0.1]: https://github.com/18F/piipan/releases/tag/v1.0.1
+[1.0.0.34]: https://github.com/18F/piipan/releases/tag/v1.0.0.34
 [1.0.0.33]: https://github.com/18F/piipan/releases/tag/v1.0.0.33
 [1.0]: https://github.com/18F/piipan/releases/tag/v1.0
 [0.97]: https://github.com/18F/piipan/releases/tag/v0.97

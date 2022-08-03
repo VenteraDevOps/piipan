@@ -23,10 +23,12 @@ set_constants () {
   COLLECT_STORAGE_NAME=${PREFIX}st${METRICS_COLLECT_APP_ID}${ENV}
   COLLECT_NEW_BULKUPLOAD_FUNC=CreateBulkUploadMetrics
   COLLECT_UPDATED_BULKUPLOAD_FUNC=UpdateBulkUploadMetricsStatus
+  COLLECT_NEW_SEARCH_METRICS_FUNC=CreateSearchMetrics
 
   # Metrics API Info
   API_APP_FILEPATH=Piipan.Metrics.Func.Api
   API_APP_STORAGE_NAME=${PREFIX}st${METRICS_API_APP_ID}${ENV}
+ 
 
   # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
   # for our default resource group
@@ -34,30 +36,6 @@ set_constants () {
 
   # Function apps need an Event Hub authorization rule ID for log streaming
   EH_RULE_ID="${DEFAULT_PROVIDERS}/Microsoft.EventHub/namespaces/${EVENT_HUB_NAME}/authorizationRules/RootManageSharedAccessKey"
-}
-
-# Generate the eventgrid key string for the corresponding
-eventgrid_endpoint () {
-  group=$1
-  name=$2
-
-  az eventgrid topic show \
-  --name "$name" \
-  -g "$group" \
-  --query "endpoint" \
-  -o tsv
-}
-
-# Generate the eventgrid key string for the corresponding
-eventgrid_key_string () {
-  group=$1
-  name=$2
-
-  az eventgrid topic key list \
-    --name "$name" \
-    --resource-group "$group" \
-    --query "key2" \
-    -o tsv
 }
 
 main () {
@@ -165,11 +143,15 @@ main () {
 
   update_bu_metrics_topic_name=evgt-update-bu-metrics-$ENV
   update_bu_metrics_custom_topic=evgs-update-bu-metrics-$ENV
-
+ 
+ 
   echo "configure settings"
   db_conn_str=$(pg_connection_string "$DB_SERVER_NAME" "$DB_NAME" "${METRICS_COLLECT_APP_NAME//-/_}")
   eventgrid_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "$update_bu_metrics_topic_name")
   eventgrid_key_str=$(eventgrid_key_string "$RESOURCE_GROUP" "$update_bu_metrics_topic_name")
+  eventgrid_search_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+  eventgrid_search_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+
   az functionapp config appsettings set \
     --resource-group "$RESOURCE_GROUP" \
     --name "$METRICS_COLLECT_APP_NAME" \
@@ -178,6 +160,8 @@ main () {
       $CLOUD_NAME_STR_KEY="$CLOUD_NAME" \
       $EVENTGRID_CONN_STR_ENDPOINT="$eventgrid_endpoint" \
       $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str" \
+      $EVENTGRID_CONN_METRICS_SEARCH_STR_ENDPOINT="${eventgrid_search_endpoint}" \
+      $EVENTGRID_CONN_METRICS_SEARCH_STR_KEY="${eventgrid_search_key_string}" \
     --output none
 
   # publish the function app
@@ -188,6 +172,13 @@ main () {
     --source-resource-id "${METRICS_PROVIDERS}/Microsoft.EventGrid/topics/${update_bu_metrics_topic_name}" \
     --name "$update_bu_metrics_custom_topic" \
     --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_UPDATED_BULKUPLOAD_FUNC}" \
+    --endpoint-type azurefunction
+
+  # Create a Subscription to upload events that get routed to Function
+  az eventgrid event-subscription create \
+    --source-resource-id "${METRICS_PROVIDERS}/Microsoft.EventGrid/topics/${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
+    --name "${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
+    --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_NEW_SEARCH_METRICS_FUNC}" \
     --endpoint-type azurefunction
 
   while IFS=, read -r abbr name ; do

@@ -8,6 +8,6 @@ namespace Piipan.Match.Api
     {
         Task<MatchResApiResponse> GetMatch(string matchId, string requestLocation);
         Task<MatchResListApiResponse> GetMatches();
-        Task<MatchResApiResponse> AddMatchResEvent(string matchId, AddEventRequest request, string initiatingState);
+        Task<(MatchResApiResponse SuccessResponse, string FailResponse)> AddMatchResEvent(string matchId, AddEventRequest request, string initiatingState);
     }
 }

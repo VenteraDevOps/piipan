@@ -6,33 +6,51 @@
     private (string,string)[] DropdownOptionsOne = new (string,string)[] {("Benefits Approved", "Benefits Approved"), ("Benefits Denied", "Benefits Denied")};
     private (string,string)[] DropdownOptionsTwo = new (string, string)[] { ("Benefits Terminated", "Benefits Terminated"), ("Benefits Unchanged", "Benefits Unchanged") };
 
-    private RenderFragment GetDispositonLabel()
+    private string DispositonLabelString => DispositionData.FinalDisposition switch
     {
-        return @<text> @(DispositionData.FinalDisposition switch
+
+        "Benefits Approved" => "Benefits Start Date",
+        "Benefits Terminated" => "Benefits End Date",
+        _ => "Final Disposition Date"
+    };
+    private RenderFragment DispositionLabel => @<text>@DispositonLabelString</text>;
+
+    private void FinalDispositionChanged(string value)
+    {
+        DispositionData.FinalDisposition = value;
+        if (!string.IsNullOrEmpty(value) && DispositionData.FinalDispositionDate == null && 
+            (DispositionData.FinalDisposition == "Benefits Unchanged" || DispositionData.FinalDisposition == "Benefits Denied"))
         {
-
-            "Benefits Approved" => "Benefits Start Date",
-            "Benefits Terminated" => "Benefits End Date",
-            _ => "Final Disposition Date"
-
-        })</text>;
-
+            DispositionData.FinalDispositionDate = DateTime.Now.Date;
+        }
     }
+    protected override void OnInitialized()
+    {
+        DispositionData.InitialActionChanged += InitialActionChangedHandler;
+    }
+    public void Dispose()
+    {
+        DispositionData.InitialActionChanged -= InitialActionChangedHandler;
+    }
+    private void InitialActionChangedHandler() => InvokeAsync(StateHasChanged);
+    private bool disableInputs => string.IsNullOrEmpty(DispositionData.InitialActionTaken) && string.IsNullOrEmpty(DispositionData.FinalDisposition) && DispositionData.FinalDispositionDate == null;
 }
-<div class="FinalDispositionDiv">
+<div id="final-disposition-section"  class="FinalDispositionDiv @(disableInputs ? "disabled-area" : "")">
     <h5 class="FinalDispositionHeader">Final Disposition</h5>
     <p class="FinalDispositionText">Final Disposition information can be added once the initial Action has been selected.</p>
     <div class="ResolutionFieldsDropdownWidth">
         <UsaFormGroup>
-            <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsOne : DropdownOptionsTwo)" @bind-Value="DispositionData.FinalDisposition" />
+            <UsaSelect DropdownOptions="@(InitiatingState ? DropdownOptionsOne : DropdownOptionsTwo)" 
+            Value="@DispositionData.FinalDisposition" ValueChanged="(value => FinalDispositionChanged(value))"
+            ValueExpression="() => DispositionData.FinalDisposition" disabled="@disableInputs" />
         </UsaFormGroup>
     </div>
         
 
-        @if (!String.IsNullOrEmpty(DispositionData.FinalDisposition) || DispositionData.FinalDispositionDate != null)
+    @if (!String.IsNullOrEmpty(DispositionData.FinalDisposition) || DispositionData.FinalDispositionDate != null)
     {
-        <UsaFormGroup LabelOverride="@GetDispositonLabel()">
-            <UsaInputDate @bind-Value="DispositionData.FinalDispositionDate" />
+        <UsaFormGroup LabelOverride="DispositionLabel" ErrorPlaceholderOverride="@DispositonLabelString">
+            <UsaInputDate @bind-Value="DispositionData.FinalDispositionDate" disabled="@disableInputs" />
         </UsaFormGroup>
     }
 </div>

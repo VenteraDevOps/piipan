@@ -4,6 +4,7 @@
 @code {
     [CascadingParameter] public UsaForm Form { get; set; }
     [Parameter] public RenderFragment LabelOverride { get; set; }
+    [Parameter] public string ErrorPlaceholderOverride { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public RenderFragment HintContent { get; set; }
 
@@ -34,7 +35,7 @@
                     var splitMessages = message.Split('\n');
                     @foreach (var splitMessage in splitMessages)
                     {
-                        @splitMessage.Replace(ValidationFieldPlaceholder, Label)
+                        @splitMessage.Replace(ValidationFieldPlaceholder, (ErrorPlaceholderOverride ?? Label))
                         <br />
                     }
                 }

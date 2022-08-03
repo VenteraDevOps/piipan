@@ -1,4 +1,5 @@
-﻿@using Piipan.Match.Api.Models.Resolution
+﻿@using Piipan.Components.Forms
+@using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
 @using Piipan.QueryTool.Client.Models
 @inherits BaseComponentTest<ResolutionFields>
@@ -14,7 +15,7 @@
             DispositionData = new DispositionModel
             {
                 InitialActionAt = null,
-                InitialActionTaken = "",
+                InitialActionTaken = "Notice Sent",
                 InvalidMatch = false,
                 InvalidMatchReason = "",
                 OtherReasoningForInvalidMatch = "",
@@ -27,7 +28,8 @@
             InitiatingState = true
         };
     }
-
+    private IRenderedComponent<FinalDisposition> finalDispositionComponent;
+    private IRenderedComponent<UsaForm> usaForm;
 
     /// <summary>
     /// Create a StateParticipantInformation component
@@ -39,12 +41,14 @@
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         
-        Component = Render<ResolutionFields>(
+        usaForm = Render<UsaForm>(
             @<Piipan.Components.Forms.UsaForm Model="InitialValues.DispositionData">
                 <ResolutionFields State="@InitialValues.State" InitiatingState="InitialValues.InitiatingState" DispositionData="@InitialValues.DispositionData">
                 </ResolutionFields>
             </Piipan.Components.Forms.UsaForm>
         );
+        Component = usaForm.FindComponent<ResolutionFields>();
+        finalDispositionComponent = Component.FindComponent<FinalDisposition>();
     }
 
     #region Tests
@@ -69,7 +73,7 @@
             </div>
             <div diff:ignore> //Ignoring Initial Action Component
             </div>
-            <div class="FinalDispositionDiv" >
+            <div id="final-disposition-section" class="FinalDispositionDiv" >
               <h5 class="FinalDispositionHeader" >Final Disposition</h5>
               <p class="FinalDispositionText" >Final Disposition information can be added once the initial Action has been selected.</p>
               <div class="ResolutionFieldsDropdownWidth" >
@@ -108,7 +112,7 @@
         </div>
         <div diff:ignore> //Ignoring Initial Action Component
         </div>
-        <div class="FinalDispositionDiv" >
+        <div id="final-disposition-section" class="FinalDispositionDiv" >
             <h5 class="FinalDispositionHeader" >Final Disposition</h5>
             <p class="FinalDispositionText" >Final Disposition information can be added once the initial Action has been selected.</p>
             <div class="ResolutionFieldsDropdownWidth" >
@@ -122,8 +126,144 @@
                 </div>
             </div>
         </div>
-    </text>
-        );
+        </text>
+    );
+    }
+
+    /// <summary>
+    /// Verify the action date gets correctly defaulted when it's supposed to be
+    /// </summary>
+    [Theory]
+    [InlineData("Benefits Unchanged", true)]
+    [InlineData("Benefits Denied", true)]
+    [InlineData("Benefits Approved", false)]
+    [InlineData("Benefits Terminated", false)]
+    public void FinalDispositionDate_DefaultedWhen_FinalDispositionSet_AndDateIsNull(string finalDispositionValue, bool shouldDefault)
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.Null(finalDispositionComponent.Instance.DispositionData.FinalDispositionDate);
+
+        // Act
+        Component.Find("[name=\"DispositionData.FinalDisposition\"]").Change(finalDispositionValue);
+
+        // Assert
+        if (shouldDefault)
+        {
+            Assert.Equal(DateTime.Now.Date, finalDispositionComponent.Instance.DispositionData.FinalDispositionDate);
+        }
+        else
+        {
+            Assert.Null(finalDispositionComponent.Instance.DispositionData.FinalDispositionDate);
+        }
+    }
+
+    /// <summary>
+    /// Verify the action date gets correctly defaulted when it's supposed to be
+    /// </summary>
+    [Theory]
+    [InlineData("Benefits Unchanged")]
+    [InlineData("Benefits Denied")]
+    [InlineData("Benefits Approved")]
+    [InlineData("Benefits Terminated")]
+    public void FinalDispositionDate_NotDefaultedWhen_FinalDispositionSet_AndDateIsNotNull(string finalDispositionValue)
+    {
+        // Arrange
+        InitialValues.DispositionData.FinalDispositionDate = DateTime.Now.AddDays(-1).Date;
+        CreateTestComponent();
+
+        // Assert
+        Assert.Equal(DateTime.Now.AddDays(-1).Date, finalDispositionComponent.Instance.DispositionData.FinalDispositionDate);
+
+        // Act
+        Component.Find("[name=\"DispositionData.FinalDisposition\"]").Change(finalDispositionValue);
+
+        // Assert
+        Assert.Equal(DateTime.Now.AddDays(-1).Date, finalDispositionComponent.Instance.DispositionData.FinalDispositionDate);
+    }
+
+    /// <summary>
+    /// Verify an error is shown when the date is set and the action is not
+    /// </summary>
+    [Fact]
+    public void FinalDispositionDate_HiddenWhen_FinalDispositionIsNull()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        Assert.Empty(Component.FindAll("[name=\"DispositionData.FinalDispositionDate\"]"));
+
+        // Act
+        Component.Find("[name=\"DispositionData.FinalDisposition\"]").Change("Benefits Terminated");
+
+        // Assert
+        Assert.NotEmpty(Component.FindAll("[name=\"DispositionData.FinalDispositionDate\"]"));
+
+        // Act - Change Final Disposition Back to empty
+        Component.Find("[name=\"DispositionData.FinalDisposition\"]").Change("");
+
+        // Assert
+        Assert.Empty(Component.FindAll("[name=\"DispositionData.FinalDispositionDate\"]"));
+    }
+
+    /// <summary>
+    /// Verify the initial action section is disabed when invalid match is true
+    /// but initial action date was previously set, and then it is cleared
+    /// </summary>
+    [Fact]
+    public void FinalDispositionDisabled_WhenInitialActionNotSet()
+    {
+        // Arrange
+        InitialValues.DispositionData.InitialActionTaken = "";
+        CreateTestComponent();
+
+        // Assert
+        VerifyDisabledFinalDispositionSection();
+    }
+
+    /// <summary>
+    /// Verify the initial action section is disabed when invalid match is true
+    /// but initial action date was previously set, and then it is cleared
+    /// </summary>
+    [Fact]
+    public void FinalDispositionEnabled_WhenInitialActionSet()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        VerifyEnabledFinalDispositionSection();
+    }
+
+    private void VerifyDisabledFinalDispositionSection()
+    {
+        var initialActionSection = Component.Find("#final-disposition-section");
+
+        // Assert
+        Assert.True(initialActionSection.ClassList.Contains("disabled-area"));
+        var inputs = initialActionSection.QuerySelectorAll("select");
+        Assert.Equal(1, inputs.Count());
+        foreach (var input in inputs)
+        {
+            Assert.True(input.HasAttribute("disabled"));
+        }
+    }
+
+    private void VerifyEnabledFinalDispositionSection()
+    {
+        var initialActionSection = Component.Find("#final-disposition-section");
+
+        // Assert
+        Assert.False(initialActionSection.ClassList.Contains("disabled-area"));
+        var inputs = initialActionSection.QuerySelectorAll("select");
+        Assert.Equal(1, inputs.Count());
+        foreach (var input in inputs)
+        {
+            Assert.False(input.HasAttribute("disabled"));
+        }
     }
     #endregion
 }

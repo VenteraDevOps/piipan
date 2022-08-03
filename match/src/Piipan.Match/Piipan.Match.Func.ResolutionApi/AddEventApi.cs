@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -11,6 +12,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Match.Api.Models;
+using Piipan.Match.Api.Models.Resolution;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
@@ -58,6 +60,7 @@ namespace Piipan.Match.Func.ResolutionApi
             {
                 var reqObj = await _requestParser.Parse(req.Body);
                 var match = _matchRecordDao.GetRecordByMatchId(matchId);
+
                 var matchResEvents = _matchResEventDao.GetEvents(matchId);
                 await Task.WhenAll(match, matchResEvents);
                 // If state does not belong to match, return unauthorized
@@ -73,13 +76,30 @@ namespace Piipan.Match.Func.ResolutionApi
                 {
                     return UnauthorizedErrorResponse();
                 }
+
+                // Additional validation here that couldn't be done in the AddEventRequestValidator since we didn't have a match object to compare against
+                if (reqObj.Data.FinalDispositionDate != null && reqObj.Data.FinalDispositionDate.Value < match.Result.CreatedAt?.Date)
+                {
+                    string errorPrefix = reqObj.Data.FinalDisposition switch
+                    {
+
+                        "Benefits Approved" => "Benefits Start Date",
+                        "Benefits Terminated" => "Benefits End Date",
+                        _ => "Final Disposition Date"
+                    };
+                    throw new ValidationException("request validation failed",
+                        new ValidationFailure[] {
+                            new ValidationFailure(nameof(reqObj.Data.FinalDispositionDate), $"{errorPrefix} cannot be before the match date of {match.Result.CreatedAt.Value.ToString("MM/dd/yyyy")}")
+                        });
+                }
+
                 // If last event is same as this event, return not allowed
                 IMatchResEvent? lastEvent = matchResEvents.Result.LastOrDefault();
                 if (lastEvent is IMatchResEvent)
                 {
-                    var deltaObj = JsonConvert.DeserializeObject<AddEventRequestData>(lastEvent.Delta);
+                    var deltaObj = JsonConvert.DeserializeObject<Disposition>(lastEvent.Delta);
                     if (lastEvent.ActorState == state &&
-                        deltaObj is AddEventRequestData &&
+                        deltaObj is Disposition &&
                         JsonConvert.SerializeObject(deltaObj) == JsonConvert.SerializeObject(reqObj.Data))
                     {
                         string message = "Duplicate action not allowed";
@@ -95,9 +115,13 @@ namespace Piipan.Match.Func.ResolutionApi
                     Actor = req.Headers["From"].ToString() ?? UserActor,
                     Delta = JsonConvert.SerializeObject(reqObj.Data)
                 };
-                await _matchResEventDao.AddEvent(newEvent);
+                var successfulEventAdd = await _matchResEventDao.AddEvent(newEvent);
+                var updatedMatchResEvents = matchResEvents.Result.ToList();
+                if (successfulEventAdd != 0) {
+                    updatedMatchResEvents.Add(newEvent);
+                }
                 // determine if match should be closed
-                await DetermineClosure(reqObj, match.Result, matchResEvents.Result);
+                await DetermineClosure(reqObj, match.Result, updatedMatchResEvents);
                 return new OkResult();
             }
             catch (StreamParserException ex)
@@ -128,10 +152,10 @@ namespace Piipan.Match.Func.ResolutionApi
             IEnumerable<IMatchResEvent> matchResEvents
         )
         {
-            if (String.IsNullOrEmpty(reqObj.Data.FinalDisposition)) return;
+            if (String.IsNullOrEmpty(reqObj.Data.FinalDisposition) && reqObj.Data.InvalidMatch != true) return;
 
             var dispositions = GetFinalDispositions(matchResEvents);
-            if (dispositions.Count() == (match.States.Count() - 1))
+            if (dispositions.Count() == (match.States.Count()))
             {
                 var closedEvent = new MatchResEventDbo()
                 {
@@ -147,11 +171,17 @@ namespace Piipan.Match.Func.ResolutionApi
             IEnumerable<IMatchResEvent> matchResEvents
         )
         {
+            List<String> statesReadyToClose = new List<String>();
             return matchResEvents.Where(e =>
             {
-                AddEventRequestData? delta = JsonConvert.DeserializeObject<AddEventRequestData>(e.Delta);
-                return !String.IsNullOrEmpty(delta?.FinalDisposition);
-            });
+                Disposition? delta = JsonConvert.DeserializeObject<Disposition>(e.Delta);
+                if (((!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate!= null) || delta?.InvalidMatch == true) && !statesReadyToClose.Contains(e.ActorState))
+                {
+                    statesReadyToClose.Add(e.ActorState);
+                    return true;
+                }
+                return false;
+            }).ToList();
         }
 
 
