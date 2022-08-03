@@ -11,9 +11,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress-audit": "^1.1.0",
     "autoprefixer": "^10.4.8",
-    "cypress": "^9.7.0",
+    "cypress": "^10.4.0",
+    "cypress-audit": "^1.1.0",
     "gulp": "^4.0.2",
     "gulp-postcss": "^9.0.1",
     "gulp-replace": "^1.1.3",
