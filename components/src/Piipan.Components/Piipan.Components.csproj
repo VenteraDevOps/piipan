@@ -14,6 +14,7 @@
   <ItemGroup>
     <None Include="Alerts\UsaAlertBox.razor" />
     <None Include="Tag\UsaTag.razor" />
+    <None Include="Tooltips\UsaTooltip.razor" />
   </ItemGroup>
 
 

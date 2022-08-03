@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using System.ComponentModel.DataAnnotations
 @using Piipan.Components.Alerts
+@using Piipan.Components.Tooltips
 @using Piipan.Components.Validation
 @using Piipan.Components.Tag
 @using static Piipan.Components.Layout.LayoutConstants
@@ -113,6 +114,13 @@
                 <UsaTag>Some Tag</UsaTag>
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/tag"))" class="@ButtonClass">View Tag</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Tooltip">
+            <BodyContent>
+                <p>A tooltip is a short descriptive message that appears when a user hovers or focuses on an element.</p>
+                <UsaTooltip TooltipText="Some Tooltip Text">Some Tooltip</UsaTooltip>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/tooltip"))" class="@ButtonClass">View Tooltip</button></FooterContent>
         </UsaCard>
     </UsaCardGroup>
 </UsaForm>
