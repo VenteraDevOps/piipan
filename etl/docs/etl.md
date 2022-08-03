@@ -1,4 +1,4 @@
-# Extract-Transform-Load process for PII bulk import
+# Extract-Transform-Load process for de-identified PII bulk import
 
 ## Prerequisites
 - [Azure Command Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -7,11 +7,13 @@
 
 ## Summary
 
-An initial approach for the bulk import of PII records into piipan has been implemented:
-1. Begin with a state-specific CSV of PII records, in our [bulk import format](bulk-import.md).
+An initial approach for the bulk import of de-identified PII records into piipan has been implemented:
+1. Begin with a state-specific CSV of de-identified PII records, in our [bulk import format](bulk-import.md).
 1. The CSV is uploaded to a per-state storage account, in a container named `upload`.
-1. An Event Grid blob creation event triggers a function named `BulkUpload` in a per-state Function App.
-1. The function extracts the CSV records, performs basic validation, and inserts into a table in a per-state database. Any error in the CSV file will abort the entire upload.
+1. An Event Grid blob creation event stores a message in the per-state storage account, in a queue named `upload`.
+1. The queue message triggers a function named `BulkUpload` in a per-state Function App.
+1. The function extracts the CSV records, performs basic validation, encrypts sensitive fields, and inserts into a table in a per-state database. Any error in the CSV file will abort the entire upload.
+1. The function deletes the CSV from the per-state storage account.
 
 While all states have separate storage accounts, function apps, and databases, the function code is identical across each state.
 
@@ -24,6 +26,9 @@ The following environment variables are required by `BulkUpload` and are set by 
 | `DatabaseConnectionString` | [details](../../docs/iac.md#\:\~\:text=DatabaseConnectionString) |
 | `BlobStorageConnectionString` | [details](../../docs/iac.md#\:\~\:text=BlobStorageConnectionString) |
 | `CloudName` | [details](../../docs/iac.md#\:\~\:text=CloudName) |
+| `ColumnEncryptionKey` | [details](../../docs/iac.md#\:\~\:text=ColumnEncryptionKey) |
+| `UploadPayloadKey` | [details](../../docs/iac.md#\:\~\:text=UploadPayloadKey) |
+| `UploadPayloadKeySHA` | [details](../../docs/iac.md#\:\~\:text=UploadPayloadKeySHA) |
 
 ## Local development
 
