@@ -154,20 +154,22 @@ EOF
 db_grant_read () {
   local db=$1
   local func=$2
+  local table=${3-'ALL TABLES'}
   local role=${func//-/_}
 
   psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT ON ALL TABLES IN SCHEMA public TO $role;
+    GRANT SELECT ON $table IN SCHEMA public TO $role;
 EOF
 }
 
 db_grant_readwrite () {
-  db=$1
-  func=$2
+  local db=$1
+  local func=$2
+  local table=${3-'ALL TABLES'}
   role=${func//-/_}
 
   psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO $role;
+    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON $table IN SCHEMA public TO $role;
     GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $role;
 EOF
 }
