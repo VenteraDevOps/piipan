@@ -151,6 +151,7 @@
                 "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan'))]"
             ],
             "properties": {
+                "httpsOnly": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan'))]",
                 "siteConfig": "[variables('baseSiteConfig')]",
                 "resources": [
