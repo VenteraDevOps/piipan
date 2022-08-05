@@ -306,8 +306,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
                 .ReturnsAsync(new MatchRecordDbo()
                 {
-                    States = new string[] { "ea", "eb"
-                }
+                    States = new string[] { "ea", "eb" },
+                    MatchId = "foo"
                 });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var events = new List<IMatchResEvent>() {
@@ -329,7 +329,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 .Returns(new MatchResRecord()
                 {
                     Status = "open",
-                    MatchId = It.IsAny<string>()
+                    MatchId = "foo",
+                    States = new string[] { "ea", "eb" }
                 });
             var requestParser = new AddEventRequestParser(
                 new AddEventRequestValidator(),
@@ -355,7 +356,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             // Assert
             matchResEventDao.Verify(mock => mock.AddEvent(It.IsAny<MatchResEventDbo>()), Times.Once());
             matchResEventDao.Verify(mock => mock.AddEvent(It.Is<MatchResEventDbo>(m => m.ActorState == "ea")), Times.Once());
-            publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Once());
+            publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo")), Times.Once());
             Assert.Equal(200, response.StatusCode);
         }
 
