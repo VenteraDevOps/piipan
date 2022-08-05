@@ -454,7 +454,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 .ReturnsAsync(new MatchRecordDbo()
                 {
                     States = new string[] { "ea", "eb" },
-                    CreatedAt = DateTime.Parse("2022-07-01")
+                    CreatedAt = DateTime.Parse("2022-07-01"),
+                    MatchId = "foo"
                 });
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var events = new List<IMatchResEvent>() {
@@ -476,16 +477,24 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
              .ReturnsAsync(1);
             var matchResAggregator = new Mock<IMatchResAggregator>();
             matchResAggregator
-                .Setup(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
+                .SetupSequence(r => r.Build(It.IsAny<IMatchRecord>(), It.IsAny<IEnumerable<IMatchResEvent>>()))
                 .Returns(new MatchResRecord()
                 {
                     Status = "open"
+                })
+                .Returns(new MatchResRecord()
+                {
+                    Status = "closed",
+                    States = new string[] { "ea", "eb" },
+                    MatchId = "foo"
                 });
             var requestParser = new AddEventRequestParser(
                 new AddEventRequestValidator(),
                 Mock.Of<ILogger<AddEventRequestParser>>()
             );
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            publishMatchMetrics.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
+                 .Returns(Task.CompletedTask);
             var api = new AddEventApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
@@ -497,14 +506,14 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var logger = new Mock<ILogger>();
 
             // Act
-            var test = await api.AddEvent(mockRequest.Object, "foo", logger.Object);
-            OkResult response = (OkResult)(test);
+            OkResult response = (OkResult)(await api.AddEvent(mockRequest.Object, "foo", logger.Object));
 
             // Assert
             matchResEventDao.Verify(mock => mock.AddEvent(
                 It.Is<MatchResEventDbo>(m => m.Actor == "system" && m.Delta == api.ClosedDelta)
             ), Times.Once());
             Assert.Equal(200, response.StatusCode);
+            publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo" && m.Status == "closed")), Times.Once());
         }
 
         [Fact]
