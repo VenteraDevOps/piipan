@@ -28,7 +28,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         static AddEventApi Construct()
         {
             Environment.SetEnvironmentVariable("States", "ea");
-
+            Environment.SetEnvironmentVariable("EventGridMetricMatchEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
             var services = new ServiceCollection();
             services.AddLogging();
 
