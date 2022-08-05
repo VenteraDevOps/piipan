@@ -257,7 +257,8 @@ namespace Piipan.Metrics.Core.IntegrationTests
             {
                 MatchId = "foo",
                 InitState = "ea",
-                MatchingState = "ec"
+                MatchingState = "ec",
+                Status = "open"
             });
             Assert.Equal(1, numberOfRows);
         }
@@ -270,7 +271,8 @@ namespace Piipan.Metrics.Core.IntegrationTests
             {
                 MatchId = "foo",
                 InitState = "ea",
-                MatchingState = "ec"
+                MatchingState = "ec",
+                Status = "open"
             };
             var numberOfRows = await dao.AddParticipantMatchRecord(participantMatchDbo);
 
