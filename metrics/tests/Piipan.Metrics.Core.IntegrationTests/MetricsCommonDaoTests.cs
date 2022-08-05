@@ -255,7 +255,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Act
             var numberOfRows = await dao.AddParticipantMatchRecord(new ParticipantMatchDbo()
             {
-                MatchId = "foo",
+                MatchId = "foo_1",
                 InitState = "ea",
                 MatchingState = "ec",
                 Status = "open"
