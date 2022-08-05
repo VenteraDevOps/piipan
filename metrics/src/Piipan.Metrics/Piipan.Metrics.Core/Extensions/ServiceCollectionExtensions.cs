@@ -12,9 +12,11 @@ namespace Piipan.Metrics.Core.Extensions
         {
             serviceCollection.AddTransient<IParticipantUploadDao, ParticipantUploadDao>();
             serviceCollection.AddTransient<IParticipantSearchDao, ParticipantSearchDao>();
+            serviceCollection.AddTransient<IParticipantMatchDao, ParticipantMatchDao>();
             serviceCollection.AddTransient<IParticipantUploadReaderApi, ParticipantUploadService>();
             serviceCollection.AddTransient<IParticipantUploadWriterApi, ParticipantUploadService>();
             serviceCollection.AddTransient<IParticipantSearchWriterApi, ParticipantSearchService>();
+            serviceCollection.AddTransient<IParticipantMatchWriterApi, ParticipantMatchService>();
             serviceCollection.AddTransient<IMetaBuilder, MetaBuilder>();
         }
     }

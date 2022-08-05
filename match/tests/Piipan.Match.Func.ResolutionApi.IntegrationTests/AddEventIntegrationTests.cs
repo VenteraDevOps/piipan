@@ -15,6 +15,7 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Shared.Database;
 using Xunit;
@@ -36,6 +37,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             services.AddTransient<IMatchResAggregator, MatchResAggregator>();
             services.AddTransient<IValidator<AddEventRequest>, AddEventRequestValidator>();
             services.AddTransient<IStreamParser<AddEventRequest>, AddEventRequestParser>();
+            services.AddTransient<IParticipantPublishMatchMetric, ParticipantPublishMatchMetric>();
 
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
@@ -50,7 +52,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 provider.GetService<IMatchRecordDao>(),
                 provider.GetService<IMatchResEventDao>(),
                 provider.GetService<IMatchResAggregator>(),
-                provider.GetService<IStreamParser<AddEventRequest>>()
+                provider.GetService<IStreamParser<AddEventRequest>>(),
+                provider.GetService<IParticipantPublishMatchMetric>()
             );
 
             return api;
@@ -183,12 +186,18 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var events = await GetEvents(matchId);
             var lastEvent = events.Last();
 
+            //Metrics
+
+            var metrics = await GetMatchMetrics(matchId);
+
             // Assert
             Assert.Single(events);
             Assert.Equal(matchId, lastEvent.MatchId);
             Assert.Equal("ea", lastEvent.ActorState);
             Assert.Equal("{\"state\": null, \"invalid_match\": true, \"initial_action_taken\": null, \"invalid_match_reason\": null, \"final_disposition_date\": null, \"other_reasoning_for_invalid_match\": null}", lastEvent.Delta);
-            Assert.Equal(200, response.StatusCode); 
+            Assert.Equal(200, response.StatusCode);
+            Assert.Equal(match.Initiator, metrics.ToList()[0].InitState);
+            Assert.Equal(true, metrics.ToList()[0].InitStateInvalidMatch);
         }
 
         [Fact]
@@ -230,12 +239,16 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             var events = await GetEvents(matchId);
             var lastEvent = events.Last();
 
+            var metrics = await GetMatchMetrics(matchId);
+
             // Assert
             Assert.Equal(3, events.Count());
             Assert.Equal(matchId, lastEvent.MatchId);
             Assert.Equal(api.SystemActor, lastEvent.Actor);
             Assert.Equal(api.ClosedDelta, lastEvent.Delta);
             Assert.Equal(200, response.StatusCode);
+            Assert.Equal("Notice Sent", metrics.ToList()[0].MatchingStateInitialActionTaken);
+            Assert.Equal("bar", metrics.ToList()[0].MatchingStateFinalDisposition);
         }
     }
 }

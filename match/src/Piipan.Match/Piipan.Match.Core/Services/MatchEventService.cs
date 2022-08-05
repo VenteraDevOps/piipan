@@ -24,20 +24,23 @@ namespace Piipan.Match.Core.Services
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly ICryptographyClient _cryptographyClient;
         private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
+        private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
             ICryptographyClient cryptographyClientt,
-            IParticipantPublishSearchMetric ParticipantPublishSearchMetric)
+            IParticipantPublishSearchMetric participantPublishSearchMetric,
+            IParticipantPublishMatchMetric participantPublishMatchMetric)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
             _cryptographyClient = cryptographyClientt;
-            _participantPublishSearchMetric = ParticipantPublishSearchMetric;
+            _participantPublishSearchMetric = participantPublishSearchMetric;
+            _participantPublishMatchMetric = participantPublishMatchMetric;
         }
 
         /// <summary>
@@ -115,6 +118,18 @@ namespace Piipan.Match.Core.Services
                     MatchId = await _recordApi.AddRecord(record),
                     MatchCreation = EnumHelper.GetDisplayName(SearchMatchStatus.NEWMATCH)
                 };
+                // New Match is created.  Create new Match entry in the Metrics database
+                //Build Search Metrics
+                var participantMatchMetrics = new ParticipantMatchMetrics()
+                {
+                    MatchId = participantMatchRecord.MatchId,
+                    InitState = record.Initiator,
+                    MatchingState = match.State,
+                    MatchingStateVulnerableIndividual = match.VulnerableIndividual,
+                    Status = MatchRecordStatus.Open
+
+                };
+                await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
             }
             if (participantMatchRecord != null)
             {

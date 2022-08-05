@@ -24,4 +24,29 @@ CREATE TABLE IF NOT EXISTS participant_searches(
 );
 
 COMMENT ON TABLE participant_searches IS 'Participant search event record';
+
+CREATE TABLE IF NOT EXISTS participant_matches(
+    id serial PRIMARY KEY,
+    match_id text UNIQUE NOT NULL,
+    match_created_at timestamptz NOT NULL,
+    init_state VARCHAR(50) NOT NULL,
+    init_state_invalid BOOLEAN NULL,
+    init_state_invalid_match_reason VARCHAR(250) NULL,
+    init_state_initial_action_taken  VARCHAR(250) NULL,
+    init_state_initial_action_at  timestamptz NULL,
+    init_state_final_disposition VARCHAR(250) NULL,
+    init_state_final_disposition_date timestamptz NULL,
+    init_state_vulnerable_individual BOOLEAN NULL,
+    matching_state VARCHAR(50) NOT NULL,
+    matching_state_invalid BOOLEAN NULL,
+    matching_state_invalid_match_reason VARCHAR(250) NULL,
+    matching_state_initial_action_taken  VARCHAR(250) NULL,
+    matching_state_initial_action_at  timestamptz NULL,
+    matching_state_final_disposition VARCHAR(250) NULL,
+    matching_state_final_disposition_date timestamptz NULL,
+    matching_state_vulnerable_individual BOOLEAN NULL,
+    match_status VARCHAR(50) NOT NULL
+    );
+COMMENT ON TABLE participant_matches IS 'Participant match event record for reporting purpose';
+
 COMMIT;

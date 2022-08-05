@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Dapper;
 using Npgsql;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Models;
-using Piipan.Match.Core.DataAccessObjects;
+using Piipan.Metrics.Api;
 using Piipan.Shared.TestFixtures;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -159,7 +157,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                     match_id=@MatchId
                 ORDER BY inserted_at asc
                 ;";
-            var parameters = new {
+            var parameters = new
+            {
                 MatchId = matchId,
             };
             var factory = NpgsqlFactory.Instance;
@@ -170,6 +169,50 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 conn.ConnectionString = ConnectionString;
                 conn.Open();
                 result = await conn.QueryAsync<MatchResEventDbo>(sql, parameters);
+                conn.Close();
+            }
+            return result;
+        }
+        public async Task<IEnumerable<ParticipantMatchMetrics>> GetMatchMetrics(string matchId)
+        {
+            const string sql = @"
+               SELECT
+                        match_id,
+                        match_created_at,
+                        init_state,
+                        init_state_invalid,
+                        init_state_invalid_match_reason,
+                        init_state_initial_action_taken,
+                        init_state_initial_action_at,
+                        init_state_final_disposition,
+                        init_state_final_disposition_date,
+                        init_state_vulnerable_individual,
+                        matching_state,
+                        matching_state_invalid,
+                        matching_state_invalid_match_reason,
+                        matching_state_initial_action_taken,
+                        matching_state_initial_action_at,
+                        matching_state_final_disposition,
+                        matching_state_final_disposition_date,
+                        matching_state_vulnerable_individual,
+                        match_status
+                 FROM
+                    participant_matches
+                 WHERE
+                    match_id = @MatchId
+                ;";
+            var parameters = new
+            {
+                MatchId = matchId,
+            };
+            var factory = NpgsqlFactory.Instance;
+            IEnumerable<ParticipantMatchMetrics> result;
+
+            using (var conn = factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+                result = await conn.QueryAsync<ParticipantMatchMetrics>(sql, parameters);
                 conn.Close();
             }
             return result;
