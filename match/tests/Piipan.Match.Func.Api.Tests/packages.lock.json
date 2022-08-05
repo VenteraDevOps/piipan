@@ -48,9 +48,9 @@
       },
       "Npgsql": {
         "type": "Direct",
-        "requested": "[6.0.5, )",
-        "resolved": "6.0.5",
-        "contentHash": "a11H5/b5yNTuFN0Ycjvb920oI6vQHadt6KhEMmcC7DfvsSHH8Z3wBam+CHmyWcfDxJJaxamcdBb8XA3BvqS4Kw==",
+        "requested": "[6.0.6, )",
+        "resolved": "6.0.6",
+        "contentHash": "IIwnoJp0sFkhAydT/KKe/0NhlJKhYPIrXSE95AuU/2dqHNI9alxvjClJSGL+QE8NGqq1SFn+NenxVtm/JYsrJg==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
@@ -923,11 +923,11 @@
       },
       "Npgsql.NodaTime": {
         "type": "Transitive",
-        "resolved": "6.0.5",
-        "contentHash": "7rF+at3dd2tmVLqQq94Iv/OUT9m+MM0k8qNyNUquWpFWHZ9sCV9Ju4gZvY5V8M8sEJjk5ePZsr4qpk18A4fX+g==",
+        "resolved": "6.0.6",
+        "contentHash": "UoSvRBWBHvTxqMzR4ucsNyRcqOaL/oieVM9NkeoNaviyvVMDgMohDu82vQ3/rx3S0TzB3Oeglg+2Ygd/U+06aw==",
         "dependencies": {
           "NodaTime": "3.0.9",
-          "Npgsql": "6.0.5"
+          "Npgsql": "6.0.6"
         }
       },
       "NuGet.Frameworks": {
@@ -2380,7 +2380,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.5",
+          "Npgsql": "6.0.6",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Metrics.Api": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
@@ -2400,7 +2400,7 @@
           "Microsoft.NET.Sdk.Functions": "4.1.1",
           "Nanoid": "2.1.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.5",
+          "Npgsql": "6.0.6",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Match.Core": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
@@ -2439,7 +2439,7 @@
           "Microsoft.Extensions.DependencyInjection": "6.0.0",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Newtonsoft.Json": "13.0.1",
-          "Npgsql.NodaTime": "6.0.5",
+          "Npgsql.NodaTime": "6.0.6",
           "Piipan.Metrics.Api": "1.0.0",
           "Piipan.Metrics.Core": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
@@ -2461,7 +2461,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.5"
+          "Npgsql": "6.0.6"
         }
       },
       "piipan.shared.api": {
