@@ -11,6 +11,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Metrics.Api;
+using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.Cryptography;
 using Xunit;
@@ -139,6 +140,7 @@ namespace Piipan.Match.Core.Tests.Services
 
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+            var participantApi = Mock.Of<IParticipantApi>();
 
             var service = new MatchEventService(
                 recordBuilder.Object,
@@ -147,7 +149,8 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                participantApi
             );
 
             // Act
@@ -208,7 +211,7 @@ namespace Piipan.Match.Core.Tests.Services
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-
+            var participantApi = Mock.Of<IParticipantApi>();
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -216,7 +219,8 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                participantApi
             );
 
             // Act
@@ -265,7 +269,7 @@ namespace Piipan.Match.Core.Tests.Services
 
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-
+            var participantApi = Mock.Of<IParticipantApi>();
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -273,7 +277,8 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                participantApi
             );
 
             // Act
@@ -329,7 +334,7 @@ namespace Piipan.Match.Core.Tests.Services
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-
+            var participantApi = Mock.Of<IParticipantApi>();
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -337,7 +342,8 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                participantApi
             );
 
             // Act
@@ -388,7 +394,7 @@ namespace Piipan.Match.Core.Tests.Services
 
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-
+            var participantApi = Mock.Of<IParticipantApi>();
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -396,7 +402,8 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                participantApi
             );
 
             // Act
@@ -462,7 +469,7 @@ namespace Piipan.Match.Core.Tests.Services
 
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-
+            var participantApi = Mock.Of<IParticipantApi>();
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -470,7 +477,8 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                participantApi
             );
 
             // Act

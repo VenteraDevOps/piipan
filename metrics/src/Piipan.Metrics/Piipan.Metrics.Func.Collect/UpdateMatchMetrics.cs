@@ -33,7 +33,6 @@ namespace Piipan.Metrics.Func.Collect
             try
             {
                 ParticipantMatchMetrics newParticipantSearch = JsonConvert.DeserializeObject<ParticipantMatchMetrics>(eventGridEvent.Data.ToString());
-                //  CheckParticipantSearch(newParticipantSearch);
                 int nRows = await _participantMatchWriterApi.UpdateMatchMetrics(newParticipantSearch);
 
                 log.LogInformation(String.Format("Number of rows updated={0}", nRows));

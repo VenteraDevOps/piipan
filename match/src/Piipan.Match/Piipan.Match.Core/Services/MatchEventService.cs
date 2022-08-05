@@ -7,6 +7,7 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
+using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.API.Enums;
 using Piipan.Shared.Cryptography;
@@ -25,6 +26,7 @@ namespace Piipan.Match.Core.Services
         private readonly ICryptographyClient _cryptographyClient;
         private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
         private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
+        private readonly IParticipantApi _participantApi;
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
@@ -32,7 +34,8 @@ namespace Piipan.Match.Core.Services
             IMatchResAggregator matchResAggregator,
             ICryptographyClient cryptographyClientt,
             IParticipantPublishSearchMetric participantPublishSearchMetric,
-            IParticipantPublishMatchMetric participantPublishMatchMetric)
+            IParticipantPublishMatchMetric participantPublishMatchMetric,
+            IParticipantApi participantApi)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
@@ -41,6 +44,7 @@ namespace Piipan.Match.Core.Services
             _cryptographyClient = cryptographyClientt;
             _participantPublishSearchMetric = participantPublishSearchMetric;
             _participantPublishMatchMetric = participantPublishMatchMetric;
+            _participantApi = participantApi;
         }
 
         /// <summary>
@@ -126,6 +130,7 @@ namespace Piipan.Match.Core.Services
                     InitState = record.Initiator,
                     MatchingState = match.State,
                     MatchingStateVulnerableIndividual = match.VulnerableIndividual,
+                    InitStateVulnerableIndividual = _participantApi.GetParticipants(record.Initiator, match.LdsHash).Result.FirstOrDefault().VulnerableIndividual, // getting VulnerableIndividual from iniator 
                     Status = MatchRecordStatus.Open
 
                 };
