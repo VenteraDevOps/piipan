@@ -114,7 +114,6 @@ namespace Piipan.Metrics.Core.DataAccessObjects
                 return await connection.ExecuteAsync(@"
                     UPDATE participant_matches
                     SET  	
-                        match_created_at= @CreatedAt,
                         init_state= @InitState,
                         init_state_invalid= @InitStateInvalidMatch,
                         init_state_invalid_match_reason=@InitStateInvalidMatchReason,
