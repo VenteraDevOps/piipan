@@ -140,7 +140,18 @@ namespace Piipan.Match.Core.Tests.Services
 
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-            var participantApi = Mock.Of<IParticipantApi>();
+            var participantApi = new Mock<IParticipantApi>();
+            participantApi
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string> { "ea", "eb" });
+
+            participantApi
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new List<ParticipantMatch>
+                {
+                    new ParticipantMatch { ParticipantId = "p1" },
+                    new ParticipantMatch { ParticipantId = "p2" }
+                });
 
             var service = new MatchEventService(
                 recordBuilder.Object,
@@ -150,7 +161,7 @@ namespace Piipan.Match.Core.Tests.Services
                 cryptographyClient,
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
-                participantApi
+                participantApi.Object
             );
 
             // Act
@@ -211,7 +222,18 @@ namespace Piipan.Match.Core.Tests.Services
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-            var participantApi = Mock.Of<IParticipantApi>();
+            var participantApi = new Mock<IParticipantApi>();
+            participantApi
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string> { "ea", "eb" });
+
+            participantApi
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new List<ParticipantMatch>
+                {
+                    new ParticipantMatch { ParticipantId = "p1" },
+                    new ParticipantMatch { ParticipantId = "p2" }
+                });
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -220,7 +242,7 @@ namespace Piipan.Match.Core.Tests.Services
                 cryptographyClient,
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
-                participantApi
+                participantApi.Object
             );
 
             // Act
@@ -269,7 +291,19 @@ namespace Piipan.Match.Core.Tests.Services
 
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
-            var participantApi = Mock.Of<IParticipantApi>();
+            var participantApi = new Mock<IParticipantApi>();
+            participantApi
+                .Setup(m => m.GetStates())
+                .ReturnsAsync(new List<string> { "ea", "eb" });
+
+            participantApi
+                .Setup(m => m.GetParticipants(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new List<ParticipantMatch>
+                {
+                    new ParticipantMatch { ParticipantId = "p1" },
+                    new ParticipantMatch { ParticipantId = "p2" }
+                });
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -278,7 +312,7 @@ namespace Piipan.Match.Core.Tests.Services
                 cryptographyClient,
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
-                participantApi
+                participantApi.Object
             );
 
             // Act
