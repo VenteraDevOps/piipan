@@ -124,14 +124,14 @@ namespace Piipan.Match.Core.Services
                 };
                 // New Match is created.  Create new Match entry in the Metrics database
                 //Build Search Metrics
-                var initStateVulnerableIndividual = _participantApi.GetParticipants(record.Initiator, match.LdsHash)?.Result?.FirstOrDefault();
+                //   var initStateVulnerableIndividual = _participantApi.GetParticipants(record.Initiator, match.LdsHash)?.Result?.FirstOrDefault();
                 var participantMatchMetrics = new ParticipantMatchMetrics()
                 {
                     MatchId = participantMatchRecord.MatchId,
                     InitState = record.Initiator,
                     MatchingState = match.State,
                     MatchingStateVulnerableIndividual = match.VulnerableIndividual,
-                    InitStateVulnerableIndividual = initStateVulnerableIndividual?.VulnerableIndividual, // getting VulnerableIndividual from iniator 
+                    InitStateVulnerableIndividual = null,//initStateVulnerableIndividual?.VulnerableIndividual, // getting VulnerableIndividual from iniator 
                     Status = MatchRecordStatus.Open
 
                 };
