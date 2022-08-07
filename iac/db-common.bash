@@ -151,40 +151,24 @@ EOF
 }
 
 # Database access controls
-# Example grant access to all tables
-#   db_grant_read "DB_Name" "APP_Name"
-# Example grant access to some tables
-#   db_grant_read "DB_Name" "APP_Name" "table1, table2"
-# Example grant access a table
-#   db_grant_read "DB_Name" "APP_Name" "tableName"
-
 db_grant_read () {
   local db=$1
   local func=$2
-  local table=${3-'ALL TABLES IN SCHEMA public'}
   local role=${func//-/_}
 
   psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT ON $table TO $role;
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO $role;
 EOF
 }
 
-# Database readwrite access control
-# Example grant access to all tables
-#   db_grant_readwrite "DB_Name" "APP_Name"
-# Example grant access to some tables
-#   db_grant_readwrite "DB_Name" "APP_Name" "table1, table2"
-# Example grant access a table
-#   db_grant_readwrite "DB_Name" "APP_Name" "tableName"
 db_grant_readwrite () {
-  local db=$1
-  local func=$2
-  local table=${3-'ALL TABLES IN SCHEMA public'}
+  db=$1
+  func=$2
   role=${func//-/_}
 
   psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON $table TO $role;
-    GRANT USAGE, SELECT ON ALL SEQUENCES ON $table TO $role;
+    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ALL TABLES IN SCHEMA public TO $role;
+    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $role;
 EOF
 }
 
