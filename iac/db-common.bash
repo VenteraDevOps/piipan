@@ -184,7 +184,7 @@ db_grant_readwrite () {
 
   psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
     GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON $table TO $role;
-    GRANT USAGE, SELECT ON ALL SEQUENCES TO $role;
+    GRANT USAGE, SELECT ON ALL SEQUENCES ON $table TO $role;
 EOF
 }
 
