@@ -126,13 +126,21 @@ namespace Piipan.Match.Core.Services
                 //Build Search Metrics
                 var initStateParticipant = _participantApi.GetParticipants(record.Initiator, match.LdsHash);
                 bool? initStateVulnerableIndividual = null;
-                if (initStateParticipant?.Result != null)
+                string str = string.Empty;
+                try
                 {
-                    if (initStateParticipant.Result.Any())
+                    if (initStateParticipant?.Result != null)
                     {
-                        initStateVulnerableIndividual = initStateParticipant?.Result?.FirstOrDefault().VulnerableIndividual;
-                    }
+                        if (initStateParticipant.Result.Any())
+                        {
+                            initStateVulnerableIndividual = initStateParticipant?.Result?.FirstOrDefault().VulnerableIndividual;
+                        }
 
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
                 }
 
                 var participantMatchMetrics = new ParticipantMatchMetrics()
