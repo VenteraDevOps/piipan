@@ -24,6 +24,7 @@ set_constants () {
   COLLECT_NEW_BULKUPLOAD_FUNC=CreateBulkUploadMetrics
   COLLECT_UPDATED_BULKUPLOAD_FUNC=UpdateBulkUploadMetricsStatus
   COLLECT_NEW_SEARCH_METRICS_FUNC=CreateSearchMetrics
+  COLLECT_CREATE_UPDATE_MATCH_METRICS_FUNC=PublishMatchMetrics
 
   # Metrics API Info
   API_APP_FILEPATH=Piipan.Metrics.Func.Api
@@ -151,6 +152,8 @@ main () {
   eventgrid_key_str=$(eventgrid_key_string "$RESOURCE_GROUP" "$update_bu_metrics_topic_name")
   eventgrid_search_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
   eventgrid_search_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+  eventgrid_match_metrics_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_MATCH_METRICS_TOPIC_NAME}")
+  eventgrid_match_metrics_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_MATCH_METRICS_TOPIC_NAME}")
 
   az functionapp config appsettings set \
     --resource-group "$RESOURCE_GROUP" \
@@ -162,6 +165,8 @@ main () {
       $EVENTGRID_CONN_STR_KEY="$eventgrid_key_str" \
       $EVENTGRID_CONN_METRICS_SEARCH_STR_ENDPOINT="${eventgrid_search_endpoint}" \
       $EVENTGRID_CONN_METRICS_SEARCH_STR_KEY="${eventgrid_search_key_string}" \
+      $EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT="${eventgrid_match_metrics_endpoint}" \
+      $EVENTGRID_CONN_METRICS_MATCH_STR_KEY="${eventgrid_match_metrics_key_string}" \
     --output none
 
   # publish the function app
@@ -179,6 +184,13 @@ main () {
     --source-resource-id "${METRICS_PROVIDERS}/Microsoft.EventGrid/topics/${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
     --name "${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
     --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_NEW_SEARCH_METRICS_FUNC}" \
+    --endpoint-type azurefunction
+
+  # Create a Subscription to upload events that get routed to Function
+  az eventgrid event-subscription create \
+    --source-resource-id "${METRICS_PROVIDERS}/Microsoft.EventGrid/topics/${CREATE_MATCH_METRICS_TOPIC_NAME}" \
+    --name "${CREATE_MATCH_METRICS_TOPIC_NAME}" \
+    --endpoint "${METRICS_PROVIDERS}/Microsoft.Web/sites/${METRICS_COLLECT_APP_NAME}/functions/${COLLECT_CREATE_UPDATE_MATCH_METRICS_FUNC}" \
     --endpoint-type azurefunction
 
   while IFS=, read -r abbr name ; do

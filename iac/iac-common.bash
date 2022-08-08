@@ -72,6 +72,10 @@ EVENTGRID_CONN_STR_KEY=EventGridKeyString
 EVENTGRID_CONN_METRICS_SEARCH_STR_ENDPOINT=EventGridMetricSearchEndPoint
 EVENTGRID_CONN_METRICS_SEARCH_STR_KEY=EventGridMetricSearchKeyString
 
+# Event Grid for Match Metrics
+EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT=EventGridMetricMatchEndPoint
+EVENTGRID_CONN_METRICS_MATCH_STR_KEY=EventGridMetricMatchKeyString
+
 # In the States.csv file, the state is enabled if they have the ENABLED text in column 3. Disabled if they have DISABLED text in column 3.
 # Defaults to disabled, so any text other than ENABLED is disabled.
 STATE_ENABLED_KEY=ENABLED
@@ -137,6 +141,9 @@ OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 
 #Search Metric Event grid
 CREATE_SEARCH_METRICS_TOPIC_NAME=evgt-create-search-metrics-$ENV
+
+#Match Metric Event grid
+CREATE_MATCH_METRICS_TOPIC_NAME=evgt-publish-match-metrics-$ENV
 
 ### END Constants
 
