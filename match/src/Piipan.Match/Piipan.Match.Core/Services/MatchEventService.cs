@@ -127,7 +127,7 @@ namespace Piipan.Match.Core.Services
                 var initStateParticipant = await _participantApi.GetParticipants(record.Initiator, match.LdsHash);
                 bool? vulnerableIndividual = null;
                 if(initStateParticipant != null)
-                    initStateParticipant?.FirstOrDefault()?.VulnerableIndividual
+                    initStateParticipant?.FirstOrDefault()?.VulnerableIndividual;
 
                 var participantMatchMetrics = new ParticipantMatchMetrics()
                 {
