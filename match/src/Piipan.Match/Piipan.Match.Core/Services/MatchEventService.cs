@@ -125,6 +125,9 @@ namespace Piipan.Match.Core.Services
                 // New Match is created.  Create new Match entry in the Metrics database
                 //Build Search Metrics
                 var initStateParticipant = await _participantApi.GetParticipants(record.Initiator, match.LdsHash);
+                bool? vulnerableIndividual = null;
+                if(initStateParticipant != null)
+                    initStateParticipant?.FirstOrDefault()?.VulnerableIndividual
 
                 var participantMatchMetrics = new ParticipantMatchMetrics()
                 {
@@ -132,7 +135,7 @@ namespace Piipan.Match.Core.Services
                     InitState = record.Initiator,
                     MatchingState = match.State,
                     MatchingStateVulnerableIndividual = match.VulnerableIndividual,
-                    InitStateVulnerableIndividual = initStateParticipant?.FirstOrDefault()?.VulnerableIndividual, // getting VulnerableIndividual from iniator 
+                    InitStateVulnerableIndividual = vulnerableIndividual, // getting VulnerableIndividual from iniator 
                     Status = MatchRecordStatus.Open
 
                 };
