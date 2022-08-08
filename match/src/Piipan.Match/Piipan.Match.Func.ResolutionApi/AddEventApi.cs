@@ -17,6 +17,8 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
+using Piipan.Metrics.Api;
 using Piipan.Shared.Http;
 
 #nullable enable
@@ -32,6 +34,7 @@ namespace Piipan.Match.Func.ResolutionApi
         private readonly IMatchResEventDao _matchResEventDao;
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly IStreamParser<AddEventRequest> _requestParser;
+        private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
         public readonly string UserActor = "user";
         public readonly string SystemActor = "system";
         public readonly string ClosedDelta = "{\"status\": \"closed\"}";
@@ -40,12 +43,14 @@ namespace Piipan.Match.Func.ResolutionApi
             IMatchRecordDao matchRecordDao,
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
-            IStreamParser<AddEventRequest> requestParser)
+            IStreamParser<AddEventRequest> requestParser,
+            IParticipantPublishMatchMetric participantPublishMatchMetric)
         {
             _matchRecordDao = matchRecordDao;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
             _requestParser = requestParser;
+            _participantPublishMatchMetric = participantPublishMatchMetric;
         }
 
         [FunctionName("AddEvent")]
@@ -117,11 +122,41 @@ namespace Piipan.Match.Func.ResolutionApi
                 };
                 var successfulEventAdd = await _matchResEventDao.AddEvent(newEvent);
                 var updatedMatchResEvents = matchResEvents.Result.ToList();
-                if (successfulEventAdd != 0) {
+                if (successfulEventAdd != 0)
+                {
                     updatedMatchResEvents.Add(newEvent);
                 }
                 // determine if match should be closed
                 await DetermineClosure(reqObj, match.Result, updatedMatchResEvents);
+                // Update the latest record to the Metrics database.
+                var matchResEventsAfterUpdate = _matchResEventDao.GetEvents(matchId);
+                await Task.WhenAll(match, matchResEventsAfterUpdate);
+                var matchResRecordAfterUpdate = _matchResAggregator.Build(match.Result, matchResEventsAfterUpdate.Result);
+
+                //Build Search Metrics
+                var participantMatchMetrics = new ParticipantMatchMetrics()
+                {
+                    MatchId = matchResRecordAfterUpdate.MatchId,
+                    InitState = matchResRecordAfterUpdate.Initiator,
+                    MatchingState = matchResRecordAfterUpdate.States[1],
+                    CreatedAt = matchResRecordAfterUpdate.CreatedAt,
+                    Status = matchResRecordAfterUpdate.Status,
+                    InitStateInvalidMatch = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.InvalidMatch).FirstOrDefault(),
+                    InitStateInvalidMatchReason = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.InvalidMatchReason).FirstOrDefault(),
+                    InitStateInitialActionAt = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.InitialActionAt).FirstOrDefault(),
+                    InitStateInitialActionTaken = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.InitialActionTaken).FirstOrDefault(),
+                    InitStateFinalDisposition = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.FinalDisposition).FirstOrDefault(),
+                    InitStateFinalDispositionDate = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.FinalDispositionDate).FirstOrDefault(),
+                    InitStateVulnerableIndividual = matchResRecordAfterUpdate.Dispositions.Where(r => r.State == matchResRecordAfterUpdate.Initiator).Select(r => r.VulnerableIndividual).FirstOrDefault(),
+                    MatchingStateInvalidMatch = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.InvalidMatch).FirstOrDefault(),
+                    MatchingStateInvalidMatchReason = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.InvalidMatchReason).FirstOrDefault(),
+                    MatchingStateInitialActionAt = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.InitialActionAt).FirstOrDefault(),
+                    MatchingStateInitialActionTaken = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.InitialActionTaken).FirstOrDefault(),
+                    MatchingStateFinalDisposition = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.FinalDisposition).FirstOrDefault(),
+                    MatchingStateFinalDispositionDate = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.FinalDispositionDate).FirstOrDefault(),
+                    MatchingStateVulnerableIndividual = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.VulnerableIndividual).FirstOrDefault(),
+                };
+                await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
                 return new OkResult();
             }
             catch (StreamParserException ex)
@@ -175,7 +210,7 @@ namespace Piipan.Match.Func.ResolutionApi
             return matchResEvents.Where(e =>
             {
                 Disposition? delta = JsonConvert.DeserializeObject<Disposition>(e.Delta);
-                if (((!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate!= null) || delta?.InvalidMatch == true) && !statesReadyToClose.Contains(e.ActorState))
+                if (((!String.IsNullOrEmpty(delta?.FinalDisposition) && delta?.FinalDispositionDate != null) || delta?.InvalidMatch == true) && !statesReadyToClose.Contains(e.ActorState))
                 {
                     statesReadyToClose.Add(e.ActorState);
                     return true;

@@ -24,13 +24,16 @@ namespace Piipan.Match.Core.Services
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly ICryptographyClient _cryptographyClient;
         private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
+        private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
+
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
             ICryptographyClient cryptographyClientt,
-            IParticipantPublishSearchMetric ParticipantPublishSearchMetric)
+            IParticipantPublishSearchMetric ParticipantPublishSearchMetric,
+            IParticipantPublishMatchMetric participantPublishMatchMetric)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
@@ -38,6 +41,8 @@ namespace Piipan.Match.Core.Services
             _matchResAggregator = matchResAggregator;
             _cryptographyClient = cryptographyClientt;
             _participantPublishSearchMetric = ParticipantPublishSearchMetric;
+            _participantPublishMatchMetric = participantPublishMatchMetric;
+
         }
 
         /// <summary>
@@ -85,6 +90,7 @@ namespace Piipan.Match.Core.Services
                 new
                 {
                     match,
+                    person,
                     record = _recordBuilder
                                 .SetMatch(person, match)
                                 .SetStates(initiatingState, match.State)
@@ -92,12 +98,12 @@ namespace Piipan.Match.Core.Services
                 });
 
             result.Matches = (await Task.WhenAll(
-                pairs.Select(pair => ResolveSingleMatch(pair.match, pair.record))));
+                pairs.Select(pair => ResolveSingleMatch(pair.match, pair.record, pair.person))));
 
             return result;
         }
 
-        private async Task<ParticipantMatch> ResolveSingleMatch(IParticipant match, IMatchRecord record)
+        private async Task<ParticipantMatch> ResolveSingleMatch(IParticipant match, IMatchRecord record, RequestPerson person)
         {
             var existingRecords = await _recordApi.GetRecords(record);
             ParticipantMatch participantMatchRecord = new ParticipantMatch();
@@ -115,6 +121,19 @@ namespace Piipan.Match.Core.Services
                     MatchId = await _recordApi.AddRecord(record),
                     MatchCreation = EnumHelper.GetDisplayName(SearchMatchStatus.NEWMATCH)
                 };
+                // New Match is created.  Create new Match entry in the Metrics database
+                //Build Search Metrics
+                var participantMatchMetrics = new ParticipantMatchMetrics()
+                {
+                    MatchId = participantMatchRecord.MatchId,
+                    InitState = record.Initiator,
+                    MatchingState = match.State,
+                    MatchingStateVulnerableIndividual = match.VulnerableIndividual,
+                    InitStateVulnerableIndividual = person.VulnerableIndividual, // getting VulnerableIndividual from iniator 
+                    Status = MatchRecordStatus.Open
+
+                };
+                await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
             }
             if (participantMatchRecord != null)
             {

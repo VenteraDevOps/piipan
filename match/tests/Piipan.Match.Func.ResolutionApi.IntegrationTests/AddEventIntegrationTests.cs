@@ -15,6 +15,7 @@ using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
+using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Shared.Database;
 using Xunit;
@@ -27,7 +28,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         static AddEventApi Construct()
         {
             Environment.SetEnvironmentVariable("States", "ea");
-
+            Environment.SetEnvironmentVariable("EventGridMetricMatchEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
             var services = new ServiceCollection();
             services.AddLogging();
 
@@ -36,7 +38,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             services.AddTransient<IMatchResAggregator, MatchResAggregator>();
             services.AddTransient<IValidator<AddEventRequest>, AddEventRequestValidator>();
             services.AddTransient<IStreamParser<AddEventRequest>, AddEventRequestParser>();
-
+            services.AddTransient<IParticipantPublishMatchMetric, ParticipantPublishMatchMetric>();
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
                 return new BasicPgConnectionFactory<CollaborationDb>(
@@ -50,7 +52,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 provider.GetService<IMatchRecordDao>(),
                 provider.GetService<IMatchResEventDao>(),
                 provider.GetService<IMatchResAggregator>(),
-                provider.GetService<IStreamParser<AddEventRequest>>()
+               provider.GetService<IStreamParser<AddEventRequest>>(),
+                provider.GetService<IParticipantPublishMatchMetric>()
             );
 
             return api;
@@ -182,13 +185,13 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             OkResult response = (OkResult)(await api.AddEvent(mockRequest.Object, matchId, mockLogger.Object));
             var events = await GetEvents(matchId);
             var lastEvent = events.Last();
-
             // Assert
             Assert.Single(events);
             Assert.Equal(matchId, lastEvent.MatchId);
             Assert.Equal("ea", lastEvent.ActorState);
             Assert.Equal("{\"state\": null, \"invalid_match\": true, \"initial_action_taken\": null, \"invalid_match_reason\": null, \"final_disposition_date\": null, \"other_reasoning_for_invalid_match\": null}", lastEvent.Delta);
-            Assert.Equal(200, response.StatusCode); 
+            Assert.Equal(200, response.StatusCode);
+
         }
 
         [Fact]
@@ -229,7 +232,6 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             OkResult response = (OkResult)(await api.AddEvent(mockRequest.Object, matchId, mockLogger.Object));
             var events = await GetEvents(matchId);
             var lastEvent = events.Last();
-
             // Assert
             Assert.Equal(3, events.Count());
             Assert.Equal(matchId, lastEvent.MatchId);

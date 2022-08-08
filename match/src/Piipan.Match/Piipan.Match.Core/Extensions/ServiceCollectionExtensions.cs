@@ -16,6 +16,7 @@ namespace Piipan.Match.Core.Extensions
             serviceCollection.AddTransient<IMatchRecordDao, MatchRecordDao>();
             serviceCollection.AddTransient<IMatchRecordApi, MatchRecordService>();
             serviceCollection.AddTransient<IParticipantPublishSearchMetric, ParticipantPublishSearchMetric>();
+            serviceCollection.AddTransient<IParticipantPublishMatchMetric, ParticipantPublishMatchMetric>();
             serviceCollection.AddTransient<IMatchEventService, MatchEventService>();
 
         }

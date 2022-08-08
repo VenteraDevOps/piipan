@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Piipan.Match.Api;
@@ -24,7 +22,7 @@ namespace Piipan.Match.Core.Tests.Services
         private const string QueryToolUrl = "https://tts.test";
         private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
         private ICryptographyClient cryptographyClient;
-                
+
         public MatchEventServiceTests()
         {
             Environment.SetEnvironmentVariable("QueryToolUrl", QueryToolUrl);
@@ -69,7 +67,22 @@ namespace Piipan.Match.Core.Tests.Services
 
             return mock;
         }
+        private Mock<IParticipantPublishSearchMetric> ParticipantPublishSearchMetricMock()
+        {
+            var mock = new Mock<IParticipantPublishSearchMetric>();
+            mock.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
+                  .Returns(Task.CompletedTask);
 
+            return mock;
+        }
+        private Mock<IParticipantPublishMatchMetric> ParticipantPublishMatchMetricMock()
+        {
+            var mock = new Mock<IParticipantPublishMatchMetric>();
+            mock.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
+                  .Returns(Task.CompletedTask);
+
+            return mock;
+        }
         private Mock<IMatchResAggregator> MatchResAggregatorMock(
             MatchResRecord result
         )
@@ -123,16 +136,18 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                   .Returns(Task.CompletedTask);
+
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object
             );
 
             // Act
@@ -147,11 +162,17 @@ namespace Piipan.Match.Core.Tests.Services
                     r.States.SequenceEqual(record.States))),
                 Times.Once);
 
-            participantPublishSearchMetric.Verify(r => r.PublishSearchdMetric(
+            publishSearchMetrics.Verify(r => r.PublishSearchdMetric(
               It.Is<ParticipantSearchMetrics>(r => r.Data.First().MatchCount == search.MatchCount &&
                                                    r.Data.First().MatchCreation == search.MatchCreation &&
                                                    r.Data.First().SearchReason == search.SearchReason)),
                                                    Times.Once);
+
+            publishMatchMetrics.Verify(r => r.PublishMatchMetric(
+             It.Is<ParticipantMatchMetrics>(r => r.MatchId == "foo" &&
+                                                  r.InitState == record.Initiator
+                                                 )),
+                                                  Times.Once);
         }
 
         [Fact]
@@ -185,16 +206,17 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                   .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object
             );
 
             // Act
@@ -241,16 +263,18 @@ namespace Piipan.Match.Core.Tests.Services
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
 
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object
             );
 
             // Act
@@ -304,22 +328,23 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object
             );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
-            
+
             // Assert
             Assert.Equal($"{QueryToolUrl}/match/{openMatchId}", firstMatch.MatchUrl);
             Assert.Equal(openMatchId, firstMatch.MatchId);
@@ -362,17 +387,17 @@ namespace Piipan.Match.Core.Tests.Services
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
 
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object
             );
 
             // Act
@@ -431,13 +456,13 @@ namespace Piipan.Match.Core.Tests.Services
             response.Data.Results.Add(result);
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
-            var aggDao = MatchResAggregatorMock(new MatchResRecord(){
+            var aggDao = MatchResAggregatorMock(new MatchResRecord()
+            {
                 Status = MatchRecordStatus.Closed
             });
 
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
             var service = new MatchEventService(
                 recordBuilder.Object,
@@ -445,7 +470,8 @@ namespace Piipan.Match.Core.Tests.Services
                 mreDao.Object,
                 aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object
             );
 
             // Act
@@ -456,7 +482,7 @@ namespace Piipan.Match.Core.Tests.Services
             Assert.Equal($"{QueryToolUrl}/match/{newId}", firstMatch.MatchUrl);
             Assert.Equal(newId, firstMatch.MatchId);
 
-            participantPublishSearchMetric.Verify(r => r.PublishSearchdMetric(
+            publishSearchMetrics.Verify(r => r.PublishSearchdMetric(
              It.Is<ParticipantSearchMetrics>(r => r.Data.First().MatchCount == search.MatchCount &&
                                                   r.Data.First().MatchCreation == search.MatchCreation &&
                                                   r.Data.First().SearchReason == search.SearchReason)),
