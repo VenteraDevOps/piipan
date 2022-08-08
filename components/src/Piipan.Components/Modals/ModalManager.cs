@@ -22,6 +22,7 @@ namespace Piipan.Components.Modals
                 .Where(prop => prop.IsDefined(typeof(ParameterAttribute), false));
 
             modalInfo ??= new ModalInfo();
+            modalInfo.ModalId ??= typeof(T).Name;
             modalInfo.RenderFragment = new RenderFragment(n =>
             {
                 n.OpenComponent<T>(1);

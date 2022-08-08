@@ -482,6 +482,7 @@
 
         // Assert
         var modalManager = Services.GetService<IModalManager>();
+        Assert.True(modalManager.OpenModals.First().ForceAction);
         Assert.Equal(1, modalManager.OpenModals.Count);
     }
 
@@ -498,6 +499,7 @@
 
         // Assert
         var modalManager = Services.GetService<IModalManager>();
+        Assert.True(modalManager.OpenModals.First().ForceAction);
         Assert.Equal(1, modalManager.OpenModals.Count);
     }
 

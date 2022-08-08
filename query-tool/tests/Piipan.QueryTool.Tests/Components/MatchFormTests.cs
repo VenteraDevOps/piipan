@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
@@ -271,6 +272,7 @@ namespace Piipan.QueryTool.Tests.Components
 
             // Assert
             var modalManager = Services.GetService<IModalManager>();
+            Assert.True(modalManager.OpenModals.First().ForceAction);
             Assert.Equal(1, modalManager.OpenModals.Count);
         }
 
