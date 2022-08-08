@@ -19,10 +19,10 @@
     }
 
     /// <summary>
-    /// Verify the default markup of the modal wrapper
+    /// Verify the default markup of the vulnerable individual modal
     /// </summary>
     [Fact]
-    public void ConfirmModal_ShouldExist_And_HaveCorrectMarkup()
+    public void VulnerableIndividualModal_ShouldExist_And_HaveCorrectMarkup()
     {
         // Arrange
         CreateTestComponent();
@@ -70,8 +70,45 @@
                   </div>
                 </div>
               </div>
-            </div>
+        </div>
+    );
+    }
+
+    /// <summary>
+    /// Verify the default markup of the modal wrapper
+    /// </summary>
+    [Fact]
+    public void VulnerableIndividualModal_ShouldClose_WhenContinueIsClicked()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        bool continueClicked = false;
+
+        // Act
+        var modalManager = Services.GetService<IModalManager>();
+        modalManager.Show<VulnerableIndividualModal>(
+            new VulnerableIndividualModal()
+            {
+                ContinueCallback = () =>
+                {
+                    continueClicked = true; // Something happens when continue button is clicked. For this test, just set a variable to verify it was called.
+                }
+            },
+            new ModalInfo
+            {
+                ForceAction = true
+            }
         );
+
+        var continueButton = Component.Find(".usa-button");
+       
+        // Act
+        continueButton.Click();
+        
+        // Assert modal is closed and continueClicked is true
+        Component.MarkupMatches(@<text></text>);
+        Assert.True(continueClicked);
     }
 
     /// <summary>
