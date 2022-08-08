@@ -132,7 +132,7 @@ namespace Piipan.Match.Core.Services
                     InitState = record.Initiator,
                     MatchingState = match.State,
                     MatchingStateVulnerableIndividual = match.VulnerableIndividual,
-                    InitStateVulnerableIndividual = initStateParticipant?.Result?.FirstOrDefault()?.VulnerableIndividual, // getting VulnerableIndividual from iniator 
+                    //  InitStateVulnerableIndividual = initStateParticipant?.Result?.FirstOrDefault()?.VulnerableIndividual, // getting VulnerableIndividual from iniator 
                     Status = MatchRecordStatus.Open
 
                 };
