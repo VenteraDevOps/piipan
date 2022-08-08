@@ -1,7 +1,8 @@
 EA,Echo Alpha,ENABLED
 EB,Echo Bravo,ENABLED
-EC,Echo Charlie,DISABLED
-IA,Iowa,DISABLED
-LA,Louisiana,DISABLED
-MA,Massachusetts,DISABLED
-MT,Montana,DISABLED
+EC,Echo Charlie,ENABLED
+IA,Iowa,ENABLED
+LA,Louisiana,ENABLED
+MA,Massachusetts,ENABLED
+MO,Missouri,ENABLED
+MT,Montana,ENABLED
