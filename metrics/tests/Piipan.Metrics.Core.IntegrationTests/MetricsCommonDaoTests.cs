@@ -251,6 +251,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
         public async Task ParticipantMatch_InsertsRecord()
         {
             // Arrange
+            ClearParticipantMatchesMetrics();
             var dao = new ParticipantMatchDao(DbConnFactory(), new NullLogger<ParticipantMatchDao>());
             // Act
             var numberOfRows = await dao.AddParticipantMatchRecord(new ParticipantMatchDbo()
@@ -266,6 +267,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
         public async Task ParticipantMatch_UpdateRecord()
         {
             // Arrange
+            ClearParticipantMatchesMetrics();
             var dao = new ParticipantMatchDao(DbConnFactory(), new NullLogger<ParticipantMatchDao>());
             ParticipantMatchDbo participantMatchDbo = new ParticipantMatchDbo()
             {

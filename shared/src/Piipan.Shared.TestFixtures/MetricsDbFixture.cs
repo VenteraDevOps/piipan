@@ -63,6 +63,7 @@ namespace Piipan.Shared.TestFixtures
 
                 conn.Execute("DROP TABLE IF EXISTS participant_uploads");
                 conn.Execute("DROP TABLE IF EXISTS participant_searches");
+                conn.Execute("DROP TABLE IF EXISTS participant_matches");
 
                 conn.Close();
             }
@@ -80,7 +81,20 @@ namespace Piipan.Shared.TestFixtures
 
                 conn.Execute("DROP TABLE IF EXISTS participant_uploads");
                 conn.Execute("DROP TABLE IF EXISTS participant_searches");
+                conn.Execute("DROP TABLE IF EXISTS participant_matches");
                 conn.Execute(sqltext);
+
+                conn.Close();
+            }
+        }
+        public void ClearParticipantMatchesMetrics()
+        {
+            using (var conn = Factory.CreateConnection())
+            {
+                conn.ConnectionString = ConnectionString;
+                conn.Open();
+
+                conn.Execute("DELETE FROM participant_matches");
 
                 conn.Close();
             }
