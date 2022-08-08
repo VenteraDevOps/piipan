@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Bunit;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
+using Piipan.Components.Modals;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Components;
 using Piipan.QueryTool.Client.Models;
@@ -226,6 +227,96 @@ namespace Piipan.QueryTool.Tests.Components
                 error = Regex.Replace(error, @"\s+", " ");
                 Assert.Contains(errors[i], error);
             }
+        }
+
+        /// <summary>
+        /// Verify that if we have results that has a vulnerable individual, clicking it shows the vulnerable match modal
+        /// </summary>
+        [Fact]
+        public void Verify_VulnerableModal_ShownWhenClicked_VulnerableMatch()
+        {
+            // Arrange
+
+            // Add a result with no matches
+            InitialValues.QueryResult = new()
+            {
+                Data = new List<MatchResApiResponse>()
+                {
+                    new MatchResApiResponse()
+                    {
+                        Data = new MatchResRecord
+                        {
+                            States = new[] { "ea", "eb" },
+                            Dispositions = new[]
+                            {
+                                new Disposition
+                                {
+                                    State = "ea",
+                                    VulnerableIndividual = true
+                                },
+                                new Disposition
+                                {
+                                    State = "eb",
+                                    VulnerableIndividual = false
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            CreateTestComponent();
+
+            var queryResults = queryForm.FindComponent<MatchResults>();
+            queryResults.Find("a").Click();
+
+            // Assert
+            var modalManager = Services.GetService<IModalManager>();
+            Assert.Equal(1, modalManager.OpenModals.Count);
+        }
+
+        /// <summary>
+        /// Verify that if we have results that has do not have a vulnerable individual, clicking it does NOT show the vulnerable match modal
+        /// </summary>
+        [Fact]
+        public void Verify_VulnerableModal_NotShownWhenClicked_NotVulnerableMatch()
+        {
+            // Arrange
+
+            // Add a result with no matches
+            InitialValues.QueryResult = new()
+            {
+                Data = new List<MatchResApiResponse>()
+                {
+                    new MatchResApiResponse()
+                    {
+                        Data = new MatchResRecord
+                        {
+                            States = new[] { "ea", "eb" },
+                            Dispositions = new[]
+                            {
+                                new Disposition
+                                {
+                                    State = "ea",
+                                    VulnerableIndividual = false
+                                },
+                                new Disposition
+                                {
+                                    State = "eb",
+                                    VulnerableIndividual = false
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            CreateTestComponent();
+
+            var queryResults = queryForm.FindComponent<MatchResults>();
+            queryResults.Find("a").Click();
+
+            // Assert
+            var modalManager = Services.GetService<IModalManager>();
+            Assert.Empty(modalManager.OpenModals);
         }
 
         #endregion Tests

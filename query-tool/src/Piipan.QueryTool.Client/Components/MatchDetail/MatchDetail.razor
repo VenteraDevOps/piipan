@@ -1,18 +1,25 @@
 ﻿@using Newtonsoft.Json
+@using Piipan.Components.Modals
+@using Piipan.Components.Routing
 @using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Helpers
+@using Piipan.QueryTool.Client.Modals
 @using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
 @using Piipan.Components.Layout
 @using Piipan.Components.Tag
+@using static Piipan.Components.Shared.CommonConstants
+@inject IModalManager ModalManager
+@inject PiipanNavigationManager NavigationManager
+
 
 @code {
     [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
     [Parameter] public ParameterBase<StatesInfoResponse> StateInfo { get; set; }
     [Parameter] public string LoggedInUsersState { get; set; }
     [Parameter] public string Token { get; set; }
-    [Parameter] public MatchDetailSaveResponseData SaveResponse { get; set; }
+    [Parameter] public MatchDetailData MatchDetailInfo { get; set; }
     [Parameter] public List<ServerError> ServerErrors { get; set; }
     [Parameter] public string Role { get; set; }
     [Parameter] public string[] RequiredRolesToEdit { get; set; }
@@ -27,11 +34,31 @@
 
     protected override void OnInitialized()
     {
-        model = SaveResponse?.FailedDispositionModel ?? (new DispositionModel(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition));
+        model = MatchDetailInfo?.FailedDispositionModel ?? (new DispositionModel(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition));
+        model.MatchDetailReferralPage = MatchDetailInfo.ReferralPage;
         model.MatchDate = Match.Data.Data.CreatedAt;
         if (ServerErrors?.Count > 0)
         {
             serverErrorList = new(ServerErrors.Select(n => (n.Property, n.Error)));
+        }
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Show the Vulnerable Individual modal when referral page is other and this wasn't a save.
+        if (firstRender && MatchDetailInfo?.ReferralPage == MatchDetailReferralPage.Other && MatchDetailInfo.SaveSuccess == null)
+        {
+            if (Match.Data.Data.Dispositions.Any(n => n.VulnerableIndividual == true))
+            {
+                ModalManager.Show<VulnerableIndividualModal>(
+                    new VulnerableIndividualModal()
+                    {
+                    },
+                    new ModalInfo
+                    {
+                        ForceAction = true
+                    }
+                );
+            }
         }
     }
 
@@ -120,7 +147,7 @@
     private bool saveNotificationDismissed = false;
 }
 <div class="grid-container">
-    @if (!saveNotificationDismissed && SaveResponse?.SaveSuccess == true)
+    @if (!saveNotificationDismissed && MatchDetailInfo?.SaveSuccess == true)
     {
         <div class="match-detail-save-success">
             <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Success" Dismissable="true" Dismissed="() => { saveNotificationDismissed = true; StateHasChanged(); }" >
@@ -128,8 +155,26 @@
             </UsaAlertBox>
         </div>
     }
+    @{
+        (string link, string linkText) = MatchDetailInfo.ReferralPage switch
+        {
+            MatchDetailReferralPage.Query => ("/", "Back to Search for SNAP Participants"),
+            MatchDetailReferralPage.MatchSearch => ("/match", "Back to Find a Match Record"),
+            _ => (null, null)
+        };
+        
+        if (link != null)
+        {
+            <a href="@link" class="usa-button--unstyled usa-button back-button">
+            <svg class="@IconClass" aria-hidden="true" focusable="false" role="img">
+                <use xlink:href="/images/sprite.svg#chevron_left"></use>
+            </svg>@linkText</a>    
+        }
+    }
+
     <!-- Match header -->
     <h1><UsaTag Theme="StatusTheme()">@Match.Data.Data.Status</UsaTag><span>Match ID: @Match.Data.Data.MatchId</span></h1>
+
     @if (TagNeeded())
     {
         <div style="margin-bottom: 24px">
@@ -169,6 +214,7 @@
         @if (CanEditFields && MatchIsOpen)
         {
             <div>
+                <input type="hidden" name="DispositionData.MatchDetailReferralPage" value="@model.MatchDetailReferralPage" />
                 <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@model"/>
                 <button class="usa-button ResolutionFieldsSave" disabled="@saving">@(saving ? "Saving Changes..." : "Save Changes")</button>
             </div>

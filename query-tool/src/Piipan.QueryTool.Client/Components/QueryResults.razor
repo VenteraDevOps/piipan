@@ -1,7 +1,12 @@
-﻿@using Piipan.Match.Api.Models
+﻿@using Piipan.Components.Modals
+@using Piipan.Components.Routing
+@using Piipan.Match.Api.Models
 @using Piipan.QueryTool.Client.Helpers
+@using Piipan.QueryTool.Client.Modals
 @using Piipan.QueryTool.Client.Models
 @inject IJSRuntime JSRuntime
+@inject IModalManager ModalManager
+@inject PiipanNavigationManager NavigationManager
 @code {
     [Parameter] public OrchMatchResponseData QueryResult { get; set; }
 
@@ -12,6 +17,30 @@
             await JSRuntime.InvokeVoidAsync("piipan.utilities.scrollToElement", "query-results-area");
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+    private void ResultClicked(ParticipantMatch record)
+    {
+        void Navigate()
+        {
+            NavigationManager.NavigateTo($"/match/{record.MatchId}", true);
+        }
+        if (record.VulnerableIndividual == true)
+        {
+            ModalManager.Show<VulnerableIndividualModal>(
+                new VulnerableIndividualModal()
+                {
+                    ContinueCallback = Navigate
+                },
+                new ModalInfo
+                {
+                    ForceAction = true
+                }
+            );
+        }
+        else
+        {
+            Navigate();
+        }
     }
 }
 
@@ -31,7 +60,7 @@
             @foreach (var record in result.Matches)
                 {
                     <tr>
-                        <td><a href="/match/@record.MatchId">@record.MatchId</a></td>
+                        <td><a href="/match/@record.MatchId" @onclick="@(() => ResultClicked(record))" @onclick:preventDefault>@record.MatchId</a></td>
                         <td>@(StateHelper.GetStateName(record.State))</td>
                     </tr>
                 }

@@ -1,7 +1,12 @@
-﻿@using Piipan.Match.Api.Models
+﻿@using Piipan.Components.Modals
+@using Piipan.Components.Routing
+@using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Helpers
+@using Piipan.QueryTool.Client.Modals
 @inject IJSRuntime JSRuntime
+@inject IModalManager ModalManager
+@inject PiipanNavigationManager NavigationManager
 
 @code {
     [Parameter] public List<MatchResApiResponse> QueryResult { get; set; }
@@ -13,6 +18,31 @@
             await JSRuntime.InvokeVoidAsync("piipan.utilities.scrollToElement", "match-results-area");
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void ResultClicked(MatchResApiResponse record)
+    {
+        void Navigate()
+        {
+            NavigationManager.NavigateTo($"/match/{record.Data.MatchId}", true);
+        }
+        if (record.Data.Dispositions.Any(n => n.VulnerableIndividual == true))
+        {
+            ModalManager.Show<VulnerableIndividualModal>(
+                new VulnerableIndividualModal()
+                {
+                    ContinueCallback = Navigate
+                },
+                new ModalInfo
+                {
+                    ForceAction = true
+                }
+            );
+        }
+        else
+        {
+            Navigate();
+        }
     }
 }
 
@@ -30,7 +60,7 @@
         @foreach (var result in QueryResult)
         {
             <tr>
-                <td><a href="/match/@result.Data.MatchId">@result.Data.MatchId</a></td>
+                <td><a href="/match/@result.Data.MatchId" @onclick="@(() => ResultClicked(result))" @onclick:preventDefault>@result.Data.MatchId</a></td>
                 <td>@(string.Join(", ", result.Data.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state))))</td>
             </tr>
         }

@@ -86,8 +86,10 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
         {
 
             var matchRecordDao = new Mock<IMatchRecordDao>();
+
             matchRecordDao
                 .Setup(r => r.GetRecordByMatchId(It.IsAny<string>()))
+
                 .ThrowsAsync(new InvalidOperationException("not found error"));
             var matchResEventDao = new Mock<IMatchResEventDao>();
             var matchResAggregator = new Mock<IMatchResAggregator>();

@@ -2,9 +2,11 @@
 @using Piipan.Components.Enums
 @using System.Linq.Expressions
 @using Piipan.Components.Forms
+@using Piipan.Components.Modals
 @using Piipan.Components.Tag
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
+@using Piipan.QueryTool.Client.Modals
 @using Piipan.QueryTool.Client.Models
 @using Piipan.States.Api.Models
 @using Piipan.Shared.API.Utilities
@@ -122,7 +124,8 @@
                 }
             },
             Role = "Worker",
-            RequiredRolesToEdit = new string[] { "Worker" }
+            RequiredRolesToEdit = new string[] { "Worker" },
+            MatchDetailInfo = new MatchDetailData() { ReferralPage = MatchDetailReferralPage.Self }
         };
     }
 
@@ -136,8 +139,8 @@
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetail>(
-            @<MatchDetail Match="InitialValues.Match" ServerErrors="InitialValues.ServerErrors" 
-                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse"
+            @<MatchDetail Match="InitialValues.Match" ServerErrors="InitialValues.ServerErrors" MatchDetailInfo="InitialValues.MatchDetailInfo"
+                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo"
                 Role="@InitialValues.Role" RequiredRolesToEdit="@InitialValues.RequiredRolesToEdit">
             </MatchDetail>
         );
@@ -318,7 +321,7 @@
     public void Match_Detail_Shows_Save_Success_And_Dismissable()
     {
         // Arrange
-        InitialValues.SaveResponse = new MatchDetailSaveResponseData
+        InitialValues.MatchDetailInfo = new MatchDetailData
         {
             SaveSuccess = true
         };
@@ -392,7 +395,7 @@
     public async Task SaveSuccessNotification_DisappearsWhen_SavingInvalidForm()
     {
         // Arrange
-        InitialValues.SaveResponse = new MatchDetailSaveResponseData
+        InitialValues.MatchDetailInfo = new MatchDetailData
         {
             SaveSuccess = true
         };
@@ -421,5 +424,113 @@
         Assert.Empty(Component!.FindAll($".match-detail-save-success"));
     }
 
+    /// <summary>
+    /// Verify that the back button exists when coming from the query page and with the right text
+    /// </summary>
+    [Fact]
+    public void BackButton_Exists_WhenFromQueryPage()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.Query };
+        CreateTestComponent();
+
+        // Assert
+        var backButton = Component.Find(".back-button");
+        Assert.Equal("Back to Search for SNAP Participants", backButton.TextContent);
+    }
+
+    /// <summary>
+    /// Verify that the back button exists when coming from the match search page and with the right text
+    /// </summary>
+    [Fact]
+    public void BackButton_Exists_WhenFromMatchSearchPage()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.MatchSearch };
+        CreateTestComponent();
+
+        // Assert
+        var backButton = Component.Find(".back-button");
+        Assert.Equal("Back to Find a Match Record", backButton.TextContent);
+    }
+
+    /// <summary>
+    /// Verify that the back button does NOT exist when coming from other places
+    /// </summary>
+    [Fact]
+    public void BackButton_DoesNotExists_WhenFromOtherPage()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.Other };
+        CreateTestComponent();
+
+        // Assert
+        var backButtons = Component.FindAll(".back-button");
+        Assert.Empty(backButtons);
+    }
+
+    /// <summary>
+    /// Vulnerable Individual modal appears when coming from an other location and the participant is vulnerable in initiating state
+    /// </summary>
+    [Fact]
+    public void VulnerableIndividualModal_AppearsWhen_InitiatingStateVulnerable_AndFromOtherLocation()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.Other };
+        InitialValues.Match.Data.Data.Dispositions[0].VulnerableIndividual = true;
+        CreateTestComponent();
+
+        // Assert
+        var modalManager = Services.GetService<IModalManager>();
+        Assert.Equal(1, modalManager.OpenModals.Count);
+    }
+
+    /// <summary>
+    /// Vulnerable Individual modal appears when coming from an other location and the participant is vulnerable in matching state
+    /// </summary>
+    [Fact]
+    public void VulnerableIndividualModal_AppearsWhen_MatchingStateVulnerable_AndFromOtherLocation()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.Other };
+        InitialValues.Match.Data.Data.Dispositions[1].VulnerableIndividual = true;
+        CreateTestComponent();
+
+        // Assert
+        var modalManager = Services.GetService<IModalManager>();
+        Assert.Equal(1, modalManager.OpenModals.Count);
+    }
+
+    /// <summary>
+    /// Vulnerable Individual modal does NOT appear when coming from an query page, even when vulnerable individual is set (it would have been shown on the query page)
+    /// </summary>
+    [Fact]
+    public void VulnerableIndividualModal_NotAppearsWhen_InitiatingStateVulnerable_AndFromQueryPageLocation()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.Query };
+        InitialValues.Match.Data.Data.Dispositions[0].VulnerableIndividual = true;
+        CreateTestComponent();
+
+        // Assert
+        var modalManager = Services.GetService<IModalManager>();
+        Assert.Empty(modalManager.OpenModals);
+    }
+
+    /// <summary>
+    /// Vulnerable Individual modal does NOT appear when coming from an match search page, even when vulnerable individual is set (it would have been shown on the query page)
+    /// </summary>
+    [Fact]
+    public void VulnerableIndividualModal_NotAppearsWhen_InitiatingStateVulnerable_AndFromMatchSearchLocation()
+    {
+        // Arrange
+        InitialValues.MatchDetailInfo = new MatchDetailData { ReferralPage = MatchDetailReferralPage.MatchSearch };
+        InitialValues.Match.Data.Data.Dispositions[0].VulnerableIndividual = true;
+        CreateTestComponent();
+
+        // Assert
+        var modalManager = Services.GetService<IModalManager>();
+        Assert.Empty(modalManager.OpenModals);
+    }
     #endregion
 }

@@ -12,7 +12,7 @@
     <script src="~/js/uswds-init.min.js" asp-append-version="true"></script>
 </head>
 @{
-    var pageName = Context.Request.Path.ToString().Split('/').Last().ToLower();
+    var pageName = ViewData["SelectedPage"]?.ToString() ?? Context.Request.Path.ToString().Split('/').Last().ToLower();
 }
 <body>
     <div id="inert-area">

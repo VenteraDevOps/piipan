@@ -93,3 +93,13 @@ dd {
     margin-top: 2rem;
     margin-bottom: 2rem;
 }
+
+.back-button {
+    margin-top: 1rem;
+    line-height: 1.5rem;
+    color: #005ea2;
+}
+
+.back-button svg {
+    vertical-align: middle;
+}
