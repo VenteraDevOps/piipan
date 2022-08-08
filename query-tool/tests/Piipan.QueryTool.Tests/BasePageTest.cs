@@ -80,9 +80,9 @@ namespace Piipan.QueryTool.Tests
             return serviceProviderMock.Object;
         }
 
-        protected static HttpContext contextMock()
+        protected static HttpContext contextMock(Mock<HttpRequest> request = null)
         {
-            var request = new Mock<HttpRequest>();
+            request ??= new Mock<HttpRequest>();
             var defaultHttpContext = new DefaultHttpContext();
 
             request
@@ -93,6 +93,9 @@ namespace Piipan.QueryTool.Tests
                 .Setup(m => m.Host)
                 .Returns(new HostString("tts.test"));
 
+            request
+                .Setup(m => m.Headers)
+                .Returns(new HeaderDictionary());
 
             var context = new Mock<HttpContext>();
             context.Setup(m => m.Request).Returns(request.Object);

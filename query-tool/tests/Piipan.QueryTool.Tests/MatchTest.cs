@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -100,7 +101,7 @@ namespace Piipan.QueryTool.Tests
 
             var result = await pageModel.OnPost(caseid);
 
-            Assert.True(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.True(pageModel.MatchDetailData.SaveSuccess);
             Assert.Empty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
@@ -136,7 +137,7 @@ namespace Piipan.QueryTool.Tests
 
             var result = await pageModel.OnPost(caseid);
 
-            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.False(pageModel.MatchDetailData.SaveSuccess);
             Assert.NotEmpty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
@@ -172,7 +173,7 @@ namespace Piipan.QueryTool.Tests
 
             var result = await pageModel.OnPost(caseid);
 
-            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.False(pageModel.MatchDetailData.SaveSuccess);
             Assert.NotEmpty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
@@ -210,7 +211,7 @@ namespace Piipan.QueryTool.Tests
 
             var result = await pageModel.OnPost(caseid);
 
-            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.False(pageModel.MatchDetailData.SaveSuccess);
             Assert.NotEmpty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
@@ -248,7 +249,7 @@ namespace Piipan.QueryTool.Tests
 
             var result = await pageModel.OnPost(caseid);
 
-            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.False(pageModel.MatchDetailData.SaveSuccess);
             Assert.NotEmpty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
@@ -287,7 +288,7 @@ namespace Piipan.QueryTool.Tests
 
             var result = await pageModel.OnPost(caseid);
 
-            Assert.False(pageModel.MatchDetailSaveResponse.SaveSuccess);
+            Assert.False(pageModel.MatchDetailData.SaveSuccess);
             Assert.NotEmpty(pageModel.RequestErrors);
 
             // assert the match was set to the value returned by the match resolution API
@@ -320,6 +321,45 @@ namespace Piipan.QueryTool.Tests
             Assert.Empty(pageModel.Match.Data.Participants);
             Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
             Assert.Equal(new string[] { "Worker" }, pageModel.RequiredRolesToEdit);
+            Assert.Equal(MatchDetailReferralPage.Other, pageModel.MatchDetailData.ReferralPage);
+        }
+
+        [Fact]
+        public async Task MatchSearchReferrer_MatchId_Get()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            var mockRequest = new Mock<HttpRequest>();
+            pageModel.PageContext.HttpContext = contextMock(mockRequest);
+            var headers = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
+            headers.Add("Referer", "https://tts.test/match"); // we're coming from the match search screen
+            mockRequest.Setup(m => m.Headers).Returns(new HeaderDictionary(headers));
+
+            // act
+            var caseid = ValidMatchId;
+            var result = await pageModel.OnGet(caseid);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.Equal(MatchDetailReferralPage.MatchSearch, pageModel.MatchDetailData.ReferralPage);
+        }
+
+        [Fact]
+        public async Task QuerySearchReferrer_MatchId_Get()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            var mockRequest = new Mock<HttpRequest>();
+            pageModel.PageContext.HttpContext = contextMock(mockRequest);
+            var headers = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
+            headers.Add("Referer", "https://tts.test/"); // we're coming from the main participant search screen
+            mockRequest.Setup(m => m.Headers).Returns(new HeaderDictionary(headers));
+
+            // act
+            var caseid = ValidMatchId;
+            var result = await pageModel.OnGet(caseid);
+
+            // assert the match was set to the value returned by the match resolution API
+            Assert.Equal(MatchDetailReferralPage.Query, pageModel.MatchDetailData.ReferralPage);
         }
 
         [Fact]

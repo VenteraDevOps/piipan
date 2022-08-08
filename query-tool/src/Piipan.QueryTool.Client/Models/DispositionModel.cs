@@ -75,6 +75,7 @@ namespace Piipan.QueryTool.Client.Models
         public string State { get; set; }
 
         public DateTime? MatchDate { get; set; }
+        public MatchDetailReferralPage MatchDetailReferralPage { get; set; }
 
         public DispositionModel() { }
         public DispositionModel(Disposition disposition)

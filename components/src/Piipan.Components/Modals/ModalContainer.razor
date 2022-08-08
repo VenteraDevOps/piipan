@@ -65,7 +65,7 @@
 @foreach (var modalInfo in ModalManager.OpenModals) 
 {
     <div class="usa-modal-wrapper is-visible" role="dialog">
-        <div class="usa-modal-overlay" aria-controls="example-modal-1" @onclick="() => ModalOverlayClicked(modalInfo)">
+        <div class="usa-modal-overlay" aria-controls="@modalInfo.ModalId" @onclick="() => ModalOverlayClicked(modalInfo)">
             <CascadingValue Value="modalInfo">
                 <UsaModal>@modalInfo.RenderFragment</UsaModal>
             </CascadingValue>
