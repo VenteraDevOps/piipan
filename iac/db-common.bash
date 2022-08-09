@@ -180,11 +180,12 @@ db_grant_readwrite () {
   local db=$1
   local func=$2
   local table=${3-'ALL TABLES IN SCHEMA public'}
+  local sequence=${3-'ALL SEQUENCES IN SCHEMA public'}
   role=${func//-/_}
 
-  psql "${PSQL_OPTS[@]}" -d "$db" -f - <<EOF
-    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON $table TO $role;
-    GRANT USAGE, SELECT ON ALL SEQUENCES TO $role;
+  psql "${PSQL_OPTS[@]}" -d "${db}" -f - <<EOF
+    GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE ON ${table} TO ${role};
+    GRANT USAGE, SELECT ON ${sequence} TO ${role};
 EOF
 }
 
