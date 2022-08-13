@@ -43,6 +43,19 @@
         },
         "apimPolicyXml": {
             "type": "String"
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Developer",
+            "allowedValues": [
+                "Developer",
+                "Basic",
+                "Standard",
+                "Premium"
+            ],
+            "metadata": {
+                "description": "Specify the pricing tier of this API Management service."
+            }
         }
     },
     "variables": {
@@ -78,7 +91,7 @@
             "location": "[parameters('location')]",
             "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "sku": {
-                "name": "Developer",
+                "name": "[parameters('sku')]",
                 "capacity": 1
             },
             "identity": {

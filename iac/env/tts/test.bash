@@ -39,3 +39,6 @@ SIEM_RECEIVER=$PREFIX-siem-tool-$ENV
 
 # Azure Storage SKU for per-state storage accounts and storage accounts backing function apps
 STORAGE_SKU="Standard_ZRS"
+
+# Azure API Management (APIM) SKU
+APIM_SKU="Developer"
