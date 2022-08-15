@@ -3,11 +3,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bunit;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
 using Piipan.Components.Modals;
 using Piipan.Match.Api.Models.Resolution;
 using Piipan.QueryTool.Client.Components;
+using Piipan.QueryTool.Client.Components.UnauthorizedBanners;
 using Piipan.QueryTool.Client.Models;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
@@ -59,8 +61,7 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
-            Assert.Contains("This Match ID does not have a matching record in any other states.", alertBox.Markup);
+            Assert.True(queryForm.HasComponent<MatchUnauthorizedBanner>());
             Assert.False(queryForm.HasComponent<MatchResults>());
         }
 
@@ -330,10 +331,12 @@ namespace Piipan.QueryTool.Tests.Components
         /// </summary>
         protected override void CreateTestComponent()
         {
+            base.CreateTestComponent();
             JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
             JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
+
             var componentFragment = RenderComponent<MatchForm>((builder) =>
             {
                 builder.Add(n => n.Query, InitialValues.Query);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Moq.Language.Flow;
 using Piipan.QueryTool.Pages;
@@ -44,6 +46,7 @@ namespace Piipan.QueryTool.Tests
 
             var roleProviderMock = new Mock<IRolesProvider>();
             roleProviderMock.Setup(c => c.GetMatchEditRoles()).Returns(new string[] { "Worker" });
+            roleProviderMock.Setup(c => c.GetMatchViewRoles()).Returns(new string[] { "Worker", "Oversight" });
 
             var statesApiMock = new Mock<IStatesApi>();
 
@@ -77,6 +80,17 @@ namespace Piipan.QueryTool.Tests
             serviceProviderMock.Setup(c => c.GetService(typeof(IRolesProvider))).Returns(roleProviderMock.Object);
             serviceProviderMock.Setup(c => c.GetService(typeof(IStatesApi))).Returns(statesApiMock.Object);
             serviceProviderMock.Setup(c => c.GetService(typeof(IMemoryCache))).Returns(new MemoryCache(new MemoryCacheOptions()));
+
+            var inMemorySettings = new Dictionary<string, string> {
+                {"HelpDeskEmail", "test@usda.example"},
+            };
+
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            serviceProviderMock.Setup(c => c.GetService(typeof(IConfiguration))).Returns(configuration);
+
             return serviceProviderMock.Object;
         }
 

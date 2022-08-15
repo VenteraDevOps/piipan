@@ -1,6 +1,7 @@
 ﻿@page "{id?}"
 @using Microsoft.AspNetCore.Antiforgery
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
 @inject IAntiforgery antiforgery
@@ -15,28 +16,37 @@
     };
 }
 
-@if (Model.Match != null)
+@if (!Model.AppData.IsAuthorized)
 {
-    Model.InitializeUserState(); 
-    <div class="grid-container">
-        <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetail)" render-mode="WebAssembly"
-        param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)"
-        param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"
-        param-LoggedInUsersState="Model.UserState"
-        param-MatchDetailInfo="Model.MatchDetailData"
-        param-ServerErrors="Model.RequestErrors"
-        param-Role="Model.Role"
-        param-RequiredRolesToEdit="Model.RequiredRolesToEdit"
-        param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"/>
+    <div class="grid-container" style="padding-top: 24px;">
+        <component type="typeof(MatchUnauthorizedBanner)" render-mode="WebAssembly" />
     </div>
 }
 else
 {
-    <div class="grid-container">
-        <component type="typeof(QueryTool.Client.Components.MatchForm)" render-mode="WebAssembly"
-            param-Query="Model.Query"
-            param-QueryResult="ParameterBase<List<MatchResApiResponse>>.FromObject(Model.AvailableMatches)" 
-            param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
-            param-ServerErrors="Model.RequestErrors" />
-    </div>
+    @if (Model.Match != null)
+    {
+        Model.InitializeUserState(); 
+        <div class="grid-container">
+            <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetail)" render-mode="WebAssembly"
+            param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)"
+            param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"
+            param-LoggedInUsersState="Model.UserState"
+            param-MatchDetailInfo="Model.MatchDetailData"
+            param-ServerErrors="Model.RequestErrors"
+            param-Role="Model.Role"
+            param-RequiredRolesToEdit="Model.RequiredRolesToEdit"
+            param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"/>
+        </div>
+    }
+    else
+    {
+        <div class="grid-container">
+            <component type="typeof(QueryTool.Client.Components.MatchForm)" render-mode="WebAssembly"
+                param-Query="Model.Query"
+                param-QueryResult="ParameterBase<List<MatchResApiResponse>>.FromObject(Model.AvailableMatches)" 
+                param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"
+                param-ServerErrors="Model.RequestErrors" />
+        </div>
+    }
 }

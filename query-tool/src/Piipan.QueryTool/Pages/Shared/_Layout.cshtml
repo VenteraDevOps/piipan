@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Piipan.QueryTool.Client.Components
+@using Piipan.QueryTool.Client.Models
+@model BasePageModel
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -14,6 +18,7 @@
 @{
     var pageName = ViewData["SelectedPage"]?.ToString() ?? Context.Request.Path.ToString().Split('/').Last().ToLower();
 }
+<component type="typeof(AppInitiator)" param-AppData="Model.AppData" render-mode="WebAssembly" />
 <body>
     <div id="inert-area">
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
@@ -106,5 +111,4 @@
     <script src="/_framework/blazor.webassembly.js" asp-append-version="true"></script>
     <script src="/customjs/utilities.js" asp-append-version="true"></script>
 </body>
-
 </html>

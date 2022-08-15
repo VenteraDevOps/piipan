@@ -105,9 +105,14 @@ namespace Piipan.QueryTool.Pages
 
         public string Title { get; private set; } = "";
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
             Title = "NAC Query Tool";
+            if (Location.Length != 2 || States?.Length != 1)
+            {
+                return UnauthorizedResult();
+            }
+            return Page();
         }
     }
 }

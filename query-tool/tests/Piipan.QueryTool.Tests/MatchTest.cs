@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -43,10 +42,10 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m12345")).PageName;
+            await pageModel.OnGet("m12345");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         [Fact]
@@ -57,10 +56,10 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m123456789")).PageName;
+            await pageModel.OnGet("m123456789");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
 
@@ -72,10 +71,10 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m1$23^45")).PageName;
+            await pageModel.OnGet("m1$23^45");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         [Fact]
@@ -118,7 +117,7 @@ namespace Piipan.QueryTool.Tests
         public async Task TestValidMatch_PostFails_WhenInvalidRole()
         {
             // arrange
-            var pageModel = SetupMatchModel(role: "SomeOtherRole");
+            var pageModel = SetupMatchModel(role: "Oversight"); // give view only access
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -373,8 +372,7 @@ namespace Piipan.QueryTool.Tests
             var result = await pageModel.OnGet("m123457");
 
             // assert
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal("Error", (result as RedirectToPageResult).PageName);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         [Fact]

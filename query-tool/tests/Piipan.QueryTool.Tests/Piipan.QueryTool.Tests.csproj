@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Components\UnauthorizedBanners\GenericUnauthorizedBannerTests.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="bunit" Version="1.9.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />

@@ -10,6 +10,7 @@ using Piipan.Components.Forms;
 using Piipan.Components.Modals;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Client.Components;
+using Piipan.QueryTool.Client.Components.UnauthorizedBanners;
 using Piipan.QueryTool.Client.Models;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
@@ -20,7 +21,6 @@ namespace Piipan.QueryTool.Tests.Components
     public class QueryFormTests : BaseComponentTest<QueryForm>
     {
         #region Tests
-        IRenderedComponent<QueryForm> queryForm = null;
         PiiQuery model = new PiiQuery();
         bool invalidDateInput = false;
         ComponentParameterCollectionBuilder<QueryForm> parameters = new ComponentParameterCollectionBuilder<QueryForm>();
@@ -45,11 +45,11 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Act
-            queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
-            queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
-            queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
-            queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
-            queryForm.Find("#QueryFormData_Query_CaseId").Change("456");
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123");
+            Component.Find("#QueryFormData_Query_CaseId").Change("456");
             inputElement.Change("recertification");
 
             // Assert
@@ -77,9 +77,9 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             Assert.Contains("This participant does not have a matching record in any other states.", alertBox.Markup);
-            Assert.False(queryForm.HasComponent<QueryResults>());
+            Assert.False(Component.HasComponent<QueryResults>());
         }
 
         /// <summary>
@@ -105,9 +105,9 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             Assert.Contains("This participant does not have a matching record in any other states.", alertBox.Markup);
-            Assert.False(queryForm.HasComponent<QueryResults>());
+            Assert.False(Component.HasComponent<QueryResults>());
         }
 
         /// <summary>
@@ -140,8 +140,8 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            Assert.True(queryForm.HasComponent<QueryResults>());
-            Assert.False(queryForm.HasComponent<UsaAlertBox>());
+            Assert.True(Component.HasComponent<QueryResults>());
+            Assert.False(Component.HasComponent<UsaAlertBox>());
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Piipan.QueryTool.Tests.Components
             };
             CreateTestComponent();
 
-            var queryResults = queryForm.FindComponent<QueryResults>();
+            var queryResults = Component.FindComponent<QueryResults>();
             queryResults.Find("a").Click();
 
             // Assert
@@ -213,7 +213,7 @@ namespace Piipan.QueryTool.Tests.Components
             };
             CreateTestComponent();
 
-            var queryResults = queryForm.FindComponent<QueryResults>();
+            var queryResults = Component.FindComponent<QueryResults>();
             queryResults.Find("a").Click();
 
             // Assert
@@ -229,18 +229,18 @@ namespace Piipan.QueryTool.Tests.Components
         {
             // Arrange
             CreateTestComponent();
-            var searchButton = queryForm.Find("#query-form-search-btn");
-            var form = queryForm.FindComponent<UsaForm>();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
 
             // Assert
             Assert.Equal("Search", searchButton.TextContent);
             Assert.False(searchButton.HasAttribute("disabled"));
 
             // Act
-            queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
-            queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
-            queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
-            queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123");
             inputElement.Change("other");
             bool isFormValid = false;
             await form.InvokeAsync(async () =>
@@ -265,8 +265,8 @@ namespace Piipan.QueryTool.Tests.Components
         {
             // Arrange
             CreateTestComponent();
-            var searchButton = queryForm.Find("#query-form-search-btn");
-            var form = queryForm.FindComponent<UsaForm>();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
 
             // Assert
             Assert.Equal("Search", searchButton.TextContent);
@@ -293,16 +293,18 @@ namespace Piipan.QueryTool.Tests.Components
         /// Verify that when you don't have a state location that the button is disabled
         /// </summary>
         [Fact]
-        public void Button_Should_Not_Be_Enabled_When_Location_Is_Not_A_State()
+        public void Form_Should_Be_Disabled_When_Not_Authorized()
         {
             // Arrange
-            InitialValues.QueryFormData.Location = "National";
+            AppData.IsAuthorized = false;
             CreateTestComponent();
-            var searchButton = queryForm.Find("#query-form-search-btn");
 
             // Assert
-            Assert.Equal("Search", searchButton.TextContent);
-            Assert.True(searchButton.HasAttribute("disabled"));
+            Assert.True(Component.HasComponent<GenericUnauthorizedBanner>());
+
+            var wrapper = Component.Find("#snap-participants-query-form-wrapper");
+            Assert.True(wrapper.ClassList.Contains("disabled-area"));
+            Assert.True(wrapper.HasAttribute("inert")); // Inert makes it so the fields cannot be entered
         }
 
         /// <summary>
@@ -318,7 +320,7 @@ namespace Piipan.QueryTool.Tests.Components
             };
             CreateTestComponent();
 
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             var alertBoxErrors = alertBox.FindAll("li");
 
             // Assert
@@ -346,7 +348,7 @@ namespace Piipan.QueryTool.Tests.Components
         {
             // Arrange
             CreateTestComponent();
-            var form = queryForm.FindComponent<UsaForm>();
+            var form = Component.FindComponent<UsaForm>();
 
             // Act
             bool isFormValid = false;
@@ -358,7 +360,7 @@ namespace Piipan.QueryTool.Tests.Components
             {
                 await form.Instance.OnBeforeSubmit(isFormValid);
             });
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             var alertBoxErrors = alertBox.FindAll("li");
             var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
 
@@ -400,17 +402,17 @@ namespace Piipan.QueryTool.Tests.Components
         /// </summary>
         protected override void CreateTestComponent()
         {
+            base.CreateTestComponent();
             JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
             JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
             JSInterop.Setup<bool>("piipan.utilities.doesElementHaveInvalidInput", _ => true).SetResult(invalidDateInput);
-            var componentFragment = RenderComponent<QueryForm>((builder) =>
+            Component = RenderComponent<QueryForm>((builder) =>
             {
                 builder.Add(n => n.QueryFormData, InitialValues.QueryFormData);
             });
-            queryForm = componentFragment;
-            inputElement = componentFragment.Find($".{InputRadioClass}");
+            inputElement = Component.Find($".{InputRadioClass}");
         }
 
 

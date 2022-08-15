@@ -1,12 +1,21 @@
 ﻿@page
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.QueryTool.Client.Models
 @model Piipan.QueryTool.Pages.ListModel
 @{
     ViewData["Title"] = "NAC Matches List";
 }
 
-<div class="grid-container">
-    <component type="typeof(QueryTool.Client.Components.MatchesList)" render-mode="WebAssembly"
-        param-Matches="ParameterBase<MatchResListApiResponse>.FromObject(Model.AvailableMatches)" />
-</div>
+@if (!Model.AppData.IsAuthorized)
+{
+    <div class="grid-container" style="padding-top: 24px;">
+        <component type="typeof(GenericUnauthorizedBanner)" render-mode="WebAssembly" />
+    </div>
+}
+else {
+    <div class="grid-container">
+        <component type="typeof(QueryTool.Client.Components.MatchesList)" render-mode="WebAssembly"
+            param-Matches="ParameterBase<MatchResListApiResponse>.FromObject(Model.AvailableMatches)" />
+    </div>
+}

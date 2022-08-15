@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -67,10 +66,10 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = await pageModel.OnGet();
+            await pageModel.OnGet();
 
             // assert
-            Assert.IsType<RedirectToPageResult>(result);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         private Mock<IMatchResolutionApi> SetupMatchResolutionApi()

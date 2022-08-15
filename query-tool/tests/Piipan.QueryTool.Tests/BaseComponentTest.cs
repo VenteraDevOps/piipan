@@ -2,8 +2,11 @@
 using System.Linq.Expressions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Piipan.Components.Modals;
 using Piipan.Components.Routing;
+using Piipan.QueryTool.Client.Helpers;
+using Piipan.QueryTool.Client.Models;
 
 namespace Piipan.QueryTool.Tests
 {
@@ -15,6 +18,7 @@ namespace Piipan.QueryTool.Tests
     public abstract class BaseComponentTest<T> : TestContext where T : IComponent, new()
     {
         protected T InitialValues { get; set; } = new T();
+        protected AppData AppData { get; set; } = new AppData();
 
         protected IRenderedComponent<T> Component { get; set; }
 
@@ -30,6 +34,11 @@ namespace Piipan.QueryTool.Tests
             Services.AddModalManager();
             Services.AddPiipanNavigationManager();
         }
-        protected abstract void CreateTestComponent();
+        protected virtual void CreateTestComponent()
+        {
+            Services.TryAddSingleton<AppData>();
+            var appData = Services.GetService<AppData>();
+            PropertyCopier.CopyPropertiesTo(AppData, appData);
+        }
     }
 }
