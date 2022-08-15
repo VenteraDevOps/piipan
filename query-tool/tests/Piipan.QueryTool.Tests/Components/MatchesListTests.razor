@@ -2,6 +2,7 @@
 @using Piipan.Components.Enums
 @using System.Linq.Expressions
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.QueryTool.Client.Models
 @using static Piipan.Components.Alerts.AlertConstants
 @inherits BaseComponentTest<MatchesList>
@@ -43,6 +44,7 @@
     /// </summary>
     protected override void CreateTestComponent()
     {
+        base.CreateTestComponent();
         Component = Render<MatchesList>(
             @<MatchesList Matches="InitialValues.Matches">
             </MatchesList>
@@ -50,6 +52,17 @@
     }
 
     #region Tests
+
+    [Fact]
+    public void MatchesList_ShouldExist_AndShowUnauuthorizedBanner_WhenNotAuthorized()
+    {
+        // Arrange
+        AppData.IsAuthorized = false;
+        CreateTestComponent();
+
+        // Assert
+        Assert.True(Component.HasComponent<GenericUnauthorizedBanner>());
+    }
 
     /// <summary>
     /// Verify the default markup of the matches list table when there are two items
@@ -87,6 +100,7 @@
                 </table>
             </section>
         );
+        Assert.False(Component.HasComponent<GenericUnauthorizedBanner>());
     }
 
     /// <summary>

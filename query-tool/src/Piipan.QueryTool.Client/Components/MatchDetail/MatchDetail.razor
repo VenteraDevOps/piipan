@@ -3,6 +3,7 @@
 @using Piipan.Components.Routing
 @using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.QueryTool.Client.Helpers
 @using Piipan.QueryTool.Client.Modals
 @using Piipan.States.Api.Models
@@ -12,6 +13,7 @@
 @using static Piipan.Components.Shared.CommonConstants
 @inject IModalManager ModalManager
 @inject PiipanNavigationManager NavigationManager
+@inject AppData AppData
 
 
 @code {
@@ -146,6 +148,7 @@
 
     private bool saveNotificationDismissed = false;
 }
+
 <div class="grid-container">
     @if (!saveNotificationDismissed && MatchDetailInfo?.SaveSuccess == true)
     {
