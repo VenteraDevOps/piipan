@@ -49,6 +49,20 @@ namespace Piipan.QueryTool.Tests
         }
 
         [Fact]
+        public async Task TestNoMatchRole_MatchId_Get()
+        {
+            // arrange
+            var pageModel = SetupMatchModel(role: "Other");
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            await pageModel.OnGet("m123456");
+
+            // assert
+            Assert.False(pageModel.AppData.IsAuthorized);
+        }
+
+        [Fact]
         public async Task TestLongMatchId_Get()
         {
             // arrange
@@ -72,6 +86,33 @@ namespace Piipan.QueryTool.Tests
 
             // act
             await pageModel.OnGet("m1$23^45");
+
+            // assert
+            Assert.False(pageModel.AppData.IsAuthorized);
+        }
+
+        [Fact]
+        public async Task TestUnauthorized_Post()
+        {
+            // arrange
+            var pageModel = SetupMatchModel(role: "Other");
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+
+            pageModel.Query = new MatchSearchRequest
+            {
+                MatchId = null
+            };
+            pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
+            pageModel.DispositionData = new DispositionModel
+            {
+                VulnerableIndividual = true
+            };
+            pageModel.BindModel(pageModel.DispositionData, nameof(MatchModel.DispositionData));
+
+            await pageModel.OnPost(caseid);
 
             // assert
             Assert.False(pageModel.AppData.IsAuthorized);
