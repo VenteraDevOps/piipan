@@ -65,11 +65,6 @@ namespace Piipan.QueryTool.Pages
             return Page();
         }
 
-        protected IActionResult RedirectToUnauthorized()
-        {
-            return RedirectToPage(NotAuthorizedPageName);
-        }
-
         public string Email
         {
             get { return _claimsProvider.GetEmail(User); }
