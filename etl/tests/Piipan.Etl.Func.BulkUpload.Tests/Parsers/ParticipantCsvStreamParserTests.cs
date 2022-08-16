@@ -198,6 +198,44 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         }
 
         [Theory]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,2021-05-15,2021-04-01/2021-04-15 2021-03-01/2021-03-30 2021-02-01/2021-02-28 2021-01-01/2021-01-30,true")] //extra date range
+        public void InvalidDateRanges(String inline)
+        {
+            // Arrange
+            var stream = CsvFixture(new string[] { inline });
+            var parser = new ParticipantCsvStreamParser();
+
+            // Act
+            var records = parser.Parse(stream);
+
+            // Assert
+            Assert.Throws<CsvHelper.FieldValidationException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+        }
+
+        [Theory]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,2021-05-15,2021-04-01/2021-04-15 2021-03-01/2021-03-30 2021-02-01/2021-02-28,true")] //3 date ranges
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,2021-05-15,2021-04-01/2021-04-15 2021-03-01/2021-03-30,true")] //2 date ranges
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId,2021-05-15,2021-04-01/2021-04-15,true")] //1 date range
+        public void ValidDateRanges(String inline)
+        {
+            // Arrange
+            var stream = CsvFixture(new string[] { inline });
+            var parser = new ParticipantCsvStreamParser();
+
+            // Act
+            var records = parser.Parse(stream);
+
+            // Assert
+            Assert.NotNull(records);
+        }
+
+        [Theory]
         [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId,ParticipantId")]
         public void OnlyRequiredColumns(String inline)
         {
