@@ -70,6 +70,9 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./tools/assign-app-role.bash tts/dev tts-func-orchestrator-dev OrchestratorApi.Query
     ./tools/assign-app-role.bash tts/dev tts-func-matchres-dev MatchResolution.Query
     ./tools/assign-app-role.bash tts/dev tts-func-states-dev States.Query
+    ./tools/assign-app-role.bash tts/dev tts-func-eaetl-dev Etl.Query     (repeat for all enabled states.)
+
+
     ```
 
     Use authorize-cli to add the Azure CLI and Visual Studio as authorized client applications for the Function's application registration:
@@ -82,6 +85,7 @@ NOTE: If you are using docker you can skip step 1 to 5 running the following com
     ./tools/authorize-cli.bash tts/dev tts-func-orchestrator-dev
     ./tools/authorize-cli.bash tts/dev tts-func-matchres-dev
     ./tools/authorize-cli.bash tts/dev tts-func-states-dev
+    ./tools/authorize-cli.bash tts/dev tts-func-eaetl-dev   (repeat for all enabled states.)
     ```
 
 10. Time to test your infrastructure
