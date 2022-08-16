@@ -759,6 +759,12 @@ main () {
           "enabled": true
         }
       ]'
+    # Create an Active Directory app registration associated with the app.
+    # Used by subsequent resources to configure auth
+    az ad app create \
+      --display-name "${func_app}" \
+      --sign-in-audience "AzureADMyOrg"
+      
   done < env/"${azure_env}"/states.csv
 
 

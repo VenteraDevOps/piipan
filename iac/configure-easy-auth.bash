@@ -270,6 +270,7 @@ main () {
   METRICS_API_APP_ROLE='Metrics.Read'
   MATCH_RESOLUTION_API_APP_ROLE='MatchResolution.Query'
   STATES_API_APP_ROLE='States.Query'
+  ETL_API_APP_ROLE='Etl.Query'
 
   orch_name=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
 
@@ -282,6 +283,8 @@ main () {
   dp_api_name=$(get_resources "$DUP_PART_API_TAG" "$MATCH_RESOURCE_GROUP")
 
   dashboard_name=$(get_resources "$DASHBOARD_APP_TAG" "$RESOURCE_GROUP")
+
+  etl_function_names=($(get_resources "${PER_STATE_ETL_TAG}" "${RESOURCE_GROUP}"))
 
   metrics_api_name=$METRICS_API_APP_NAME
 
@@ -335,6 +338,16 @@ main () {
     "$states_name" "$RESOURCE_GROUP" \
     "$STATES_API_APP_ROLE" \
     "$query_tool_identity"
+
+  echo "Configure Easy Auth for all States: ETLStatus and QueryApp"
+  for etl_app_name in "${etl_function_names[@]}"
+    do
+      etl_app_name="${etl_app_name/$'\r'/}"
+      configure_easy_auth_pair \
+        "${etl_app_name}" "${RESOURCE_GROUP}" \
+        "${ETL_API_APP_ROLE}" \
+        "${dashboard_identity}"
+    done
 
   script_completed
 }
