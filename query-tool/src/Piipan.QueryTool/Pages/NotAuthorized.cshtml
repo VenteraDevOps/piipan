@@ -1,0 +1,9 @@
+﻿@page
+@model Piipan.QueryTool.Pages.NotAuthorizedModel
+@{
+    Layout = "_EmptyLayout";
+    ViewData["Title"] = "Not Authorized";
+}
+
+<component type="typeof(QueryTool.Client.Components.NotAuthorized)" render-mode="Static"
+        param-HelpDeskEmail="@Model.AppData.HelpDeskEmail" />
