@@ -33,6 +33,7 @@ namespace Piipan.QueryTool.Pages
         public MatchDetailData MatchDetailData { get; set; } = new MatchDetailData();
         public string UserState { get; set; } = "";
         public string[] RequiredRolesToEdit => _rolesProvider.GetMatchEditRoles();
+        public string[] RequiredRolesToView => _rolesProvider.GetMatchViewRoles();
 
         public MatchModel(ILogger<MatchModel> logger
                            , IMatchResolutionApi matchResolutionApi
@@ -59,15 +60,14 @@ namespace Piipan.QueryTool.Pages
             }
         }
 
-        private RedirectToPageResult RedirectToNotFoundMatch()
-        {
-            return RedirectToPage("Error", new { message = "Requested Match Not Found" });
-        }
-
         public async Task<IActionResult> OnGet([FromRoute] string id)
         {
             if (!string.IsNullOrWhiteSpace(id))
             {
+                if (!_rolesProvider.GetMatchViewRoles().Contains(Role))
+                {
+                    return UnauthorizedResult();
+                }
                 var referer = Request.GetTypedHeaders().Referer;
                 MatchDetailData.ReferralPage = MatchDetailReferralPage.Other;
                 if (referer != null)
@@ -92,18 +92,18 @@ namespace Piipan.QueryTool.Pages
                     //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                     if (id.Length != 7)
                     {
-                        return RedirectToNotFoundMatch();
+                        return UnauthorizedResult();
                     }
 
                     Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                     if (Match == null)
                     {
-                        return RedirectToNotFoundMatch();
+                        return UnauthorizedResult();
                     }
                 }
                 else
                 {
-                    return RedirectToPage("Error", new { message = "MatchId not valid" });
+                    return UnauthorizedResult();
                 }
             }
             return Page();
@@ -151,6 +151,10 @@ namespace Piipan.QueryTool.Pages
                 MatchDetailData.SaveSuccess = false;
                 MatchDetailData.FailedDispositionModel = DispositionData;
                 MatchDetailData.ReferralPage = DispositionData.MatchDetailReferralPage;
+                if (!_rolesProvider.GetMatchViewRoles().Contains(Role))
+                {
+                    return UnauthorizedResult();
+                }
                 if (!_rolesProvider.GetMatchEditRoles().Contains(Role))
                 {
                     _logger.LogError($"User {Email} does not have permissions to edit match details.");
@@ -230,7 +234,7 @@ namespace Piipan.QueryTool.Pages
                 Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                 if (Match == null)
                 {
-                    return RedirectToNotFoundMatch();
+                    return UnauthorizedResult();
                 }
             }
             return Page();

@@ -32,7 +32,7 @@ namespace Piipan.QueryTool.Pages
         {
             if (!IsNationalOffice)
             {
-                return RedirectToUnauthorized();
+                return UnauthorizedResult();
             }
             AvailableMatches = await _matchResolutionApi.GetMatches();
 

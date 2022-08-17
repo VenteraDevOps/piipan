@@ -54,16 +54,20 @@ namespace Piipan.QueryTool.Tests
                 mockServiceProvider
             );
             pageModel.PageContext.HttpContext = contextMock();
+            var renderer = SetupRenderingApi();
 
             // act
             await OnPageHandlerExecutionAsync(pageModel, "OnGet");
             pageModel.OnGet();
+            var (page, output) = await renderer.RenderPage("/Pages/Index.cshtml", pageModel);
 
             // assert
             Assert.Equal("NAC Query Tool", pageModel.Title);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
             Assert.NotEmpty(pageModel.StateInfo.Results);
+            Assert.Equal("NAC Participant Search", page.ViewContext.ViewData["Title"]);
+            Assert.Contains("Piipan.QueryTool.Client.Components.QueryForm", output);
         }
 
         [Fact]

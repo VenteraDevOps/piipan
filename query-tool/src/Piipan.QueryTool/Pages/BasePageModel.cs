@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Piipan.QueryTool.Client.Models;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
 using Piipan.States.Api;
@@ -21,6 +23,7 @@ namespace Piipan.QueryTool.Pages
         private readonly ILocationsProvider _locationsProvider;
         private readonly IMemoryCache _memoryCache;
         private readonly IStatesApi _statesApi;
+        private readonly IConfiguration _configuration;
 
         public BasePageModel(IServiceProvider serviceProvider)
         {
@@ -28,6 +31,9 @@ namespace Piipan.QueryTool.Pages
             _locationsProvider = serviceProvider.GetRequiredService<ILocationsProvider>();
             _statesApi = serviceProvider.GetRequiredService<IStatesApi>();
             _memoryCache = serviceProvider.GetRequiredService<IMemoryCache>();
+            _configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
+            AppData.HelpDeskEmail = _configuration.GetValue<string>("HelpDeskEmail");
         }
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
@@ -49,12 +55,14 @@ namespace Piipan.QueryTool.Pages
                     return new StatesInfoResponse { Results = Enumerable.Empty<StateInfoResponseData>() };
                 }
             });
+
             await next();
         }
 
-        protected IActionResult RedirectToUnauthorized()
+        protected IActionResult UnauthorizedResult()
         {
-            return RedirectToPage(NotAuthorizedPageName);
+            AppData.IsAuthorized = false;
+            return Page();
         }
 
         public string Email
@@ -84,5 +92,7 @@ namespace Piipan.QueryTool.Pages
         }
 
         public StatesInfoResponse StateInfo { get; set; }
+
+        public AppData AppData { get; } = new AppData();
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -22,6 +21,11 @@ namespace Piipan.QueryTool.Tests
     public class MatchPageTests : BasePageTest
     {
         private const string ValidMatchId = "m123456";
+        private const string PageName = "/Pages/Match.cshtml";
+        private const string MatchDetailTitle = "NAC Match Detail";
+        private const string MatchSearchTitle = "NAC Match Search";
+        private const string MatchDetailWrapperComponentName = "Piipan.QueryTool.Client.Components.MatchDetail.MatchDetailWrapper";
+        private const string MatchSearchFormComponentName = "Piipan.QueryTool.Client.Components.MatchForm";
 
         [Fact]
         public void TestBeforeOnGet()
@@ -34,6 +38,23 @@ namespace Piipan.QueryTool.Tests
             // assert
             Assert.Equal("noreply@tts.test", pageModel.Email);
         }
+        [Fact]
+        public async Task TestAfterOnGet()
+        {
+            // arrange
+            var pageModel = SetupMatchModel();
+            var renderer = SetupRenderingApi();
+
+            // act
+            await pageModel.OnGet(null);
+            var (page, output) = await renderer.RenderPage(PageName, pageModel);
+
+            // assert
+            Assert.Equal("noreply@tts.test", pageModel.Email);
+            Assert.Equal(MatchSearchTitle, page.ViewContext.ViewData["Title"]);
+            Assert.Contains(MatchSearchFormComponentName, output);
+            Assert.Null(page.ViewContext.ViewData["SelectedPage"]);
+        }
 
         [Fact]
         public async Task TestShortMatchId_Get()
@@ -43,10 +64,24 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m12345")).PageName;
+            await pageModel.OnGet("m12345");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.False(pageModel.AppData.IsAuthorized);
+        }
+
+        [Fact]
+        public async Task TestNoMatchRole_MatchId_Get()
+        {
+            // arrange
+            var pageModel = SetupMatchModel(role: "Other");
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            await pageModel.OnGet("m123456");
+
+            // assert
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         [Fact]
@@ -57,10 +92,10 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m123456789")).PageName;
+            await pageModel.OnGet("m123456789");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
 
@@ -72,10 +107,37 @@ namespace Piipan.QueryTool.Tests
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
-            var result = Assert.IsType<RedirectToPageResult>(await pageModel.OnGet("m1$23^45")).PageName;
+            await pageModel.OnGet("m1$23^45");
 
             // assert
-            Assert.Equal("Error", result);
+            Assert.False(pageModel.AppData.IsAuthorized);
+        }
+
+        [Fact]
+        public async Task TestUnauthorized_Post()
+        {
+            // arrange
+            var pageModel = SetupMatchModel(role: "Other");
+            pageModel.PageContext.HttpContext = contextMock();
+
+            // act
+            var caseid = ValidMatchId;
+
+            pageModel.Query = new MatchSearchRequest
+            {
+                MatchId = null
+            };
+            pageModel.BindModel(pageModel.Query, nameof(MatchModel.Query));
+            pageModel.DispositionData = new DispositionModel
+            {
+                VulnerableIndividual = true
+            };
+            pageModel.BindModel(pageModel.DispositionData, nameof(MatchModel.DispositionData));
+
+            await pageModel.OnPost(caseid);
+
+            // assert
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         [Fact]
@@ -118,7 +180,7 @@ namespace Piipan.QueryTool.Tests
         public async Task TestValidMatch_PostFails_WhenInvalidRole()
         {
             // arrange
-            var pageModel = SetupMatchModel(role: "SomeOtherRole");
+            var pageModel = SetupMatchModel(role: "Oversight"); // give view only access
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -307,10 +369,13 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var pageModel = SetupMatchModel();
             pageModel.PageContext.HttpContext = contextMock();
+            var renderer = SetupRenderingApi();
+
 
             // act
             var caseid = ValidMatchId;
             var result = await pageModel.OnGet(caseid);
+            var (page, output) = await renderer.RenderPage(PageName, pageModel);
 
             // assert the match was set to the value returned by the match resolution API
             Assert.IsType<PageResult>(result);
@@ -322,6 +387,9 @@ namespace Piipan.QueryTool.Tests
             Assert.Equal(new string[] { "ea", "eb" }, pageModel.Match.Data.States);
             Assert.Equal(new string[] { "Worker" }, pageModel.RequiredRolesToEdit);
             Assert.Equal(MatchDetailReferralPage.Other, pageModel.MatchDetailData.ReferralPage);
+            Assert.Equal(MatchDetailTitle, page.ViewContext.ViewData["Title"]);
+            Assert.Contains(MatchDetailWrapperComponentName, output);
+            Assert.Null(page.ViewContext.ViewData["SelectedPage"]);
         }
 
         [Fact]
@@ -334,13 +402,18 @@ namespace Piipan.QueryTool.Tests
             var headers = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
             headers.Add("Referer", "https://tts.test/match"); // we're coming from the match search screen
             mockRequest.Setup(m => m.Headers).Returns(new HeaderDictionary(headers));
+            var renderer = SetupRenderingApi();
 
             // act
             var caseid = ValidMatchId;
             var result = await pageModel.OnGet(caseid);
+            var (page, output) = await renderer.RenderPage(PageName, pageModel);
 
             // assert the match was set to the value returned by the match resolution API
             Assert.Equal(MatchDetailReferralPage.MatchSearch, pageModel.MatchDetailData.ReferralPage);
+            Assert.Equal(MatchDetailTitle, page.ViewContext.ViewData["Title"]);
+            Assert.Contains(MatchDetailWrapperComponentName, output);
+            Assert.Equal("match", page.ViewContext.ViewData["SelectedPage"]);
         }
 
         [Fact]
@@ -353,13 +426,18 @@ namespace Piipan.QueryTool.Tests
             var headers = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
             headers.Add("Referer", "https://tts.test/"); // we're coming from the main participant search screen
             mockRequest.Setup(m => m.Headers).Returns(new HeaderDictionary(headers));
+            var renderer = SetupRenderingApi();
 
             // act
             var caseid = ValidMatchId;
             var result = await pageModel.OnGet(caseid);
+            var (page, output) = await renderer.RenderPage(PageName, pageModel);
 
             // assert the match was set to the value returned by the match resolution API
             Assert.Equal(MatchDetailReferralPage.Query, pageModel.MatchDetailData.ReferralPage);
+            Assert.Equal(MatchDetailTitle, page.ViewContext.ViewData["Title"]);
+            Assert.Contains(MatchDetailWrapperComponentName, output);
+            Assert.Equal("", page.ViewContext.ViewData["SelectedPage"]);
         }
 
         [Fact]
@@ -373,8 +451,7 @@ namespace Piipan.QueryTool.Tests
             var result = await pageModel.OnGet("m123457");
 
             // assert
-            Assert.IsType<RedirectToPageResult>(result);
-            Assert.Equal("Error", (result as RedirectToPageResult).PageName);
+            Assert.False(pageModel.AppData.IsAuthorized);
         }
 
         [Fact]
@@ -383,13 +460,6 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var pageModel = SetupMatchModel();
             pageModel.Match = new MatchResApiResponse();
-
-            var results = new List<States.Api.Models.StateInfoResponseData>();
-            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EA", State = "Echo Alpha" });
-            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EB", State = "Echo Bravo" });
-
-            pageModel.StateInfo = new States.Api.Models.StatesInfoResponse();
-            pageModel.StateInfo.Results = results;
 
             pageModel.PageContext.HttpContext = contextMock();
 
@@ -525,6 +595,12 @@ namespace Piipan.QueryTool.Tests
                 mockMatchApi.Object,
                 mockServiceProvider
             );
+            var results = new List<States.Api.Models.StateInfoResponseData>();
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EA", State = "Echo Alpha" });
+            results.Add(new States.Api.Models.StateInfoResponseData { StateAbbreviation = "EB", State = "Echo Bravo" });
+
+            pageModel.StateInfo = new States.Api.Models.StatesInfoResponse();
+            pageModel.StateInfo.Results = results;
             return pageModel;
         }
     }

@@ -1,40 +1,52 @@
 ﻿@using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.QueryTool.Client.Helpers
-
+@inject AppData AppData
 @code {
     [Parameter] public ParameterBase<MatchResListApiResponse> Matches { get; set; }
 }
 
-<section>
-    <h1>All NAC Matches List</h1>
-    @if (Matches.Data?.Data?.Count() > 0)
-    {
-        <table class="usa-table">
-            <thead>
-                <tr>
-                    <th scope="col">Match ID</th>
-                    <th scope="col">Matching States</th>
-                    <th scope="col">Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var result in Matches.Data.Data)
-            {
-                DateTime? localDateTime = result.CreatedAt?.ToLocalTime();
-                string timeZoneAbbreviation = localDateTime != null ? TimeZoneInfo.Local.IsDaylightSavingTime(localDateTime.Value) ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName : "";
-                <tr>
-                    <td><a href="/match/@result.MatchId">@result.MatchId</a></td>
-                    <td>@(string.Join(", ", result.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state))))</td>
-                    <td>@(result.CreatedAt?.ToLocalTime().ToString("M/d/yyyy h:mm:ss tt").ToUpper() + " " + timeZoneAbbreviation)</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No matches found.</p>
-    }
+@if (!AppData.IsAuthorized)
+{
+    <div style="padding-top: 24px;">
+        <GenericUnauthorizedBanner />
+    </div>
+}
+else
+{
+    <section>
+        <h1>All NAC Matches List</h1>
+        @if (Matches.Data?.Data?.Count() > 0)
+        {
+            <table class="usa-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Match ID</th>
+                        <th scope="col">Matching States</th>
+                        <th scope="col">Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var result in Matches.Data.Data)
+                {
+                    DateTime? localDateTime = result.CreatedAt?.ToLocalTime();
+                    string timeZoneAbbreviation = localDateTime != null ? TimeZoneInfo.Local.IsDaylightSavingTime(localDateTime.Value) ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName : "";
+                    <tr>
+                        <td><a href="/match/@result.MatchId">@result.MatchId</a></td>
+                        <td>@(string.Join(", ", result.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state))))</td>
+                        <td>@(result.CreatedAt?.ToLocalTime().ToString("M/d/yyyy h:mm:ss tt").ToUpper() + " " + timeZoneAbbreviation)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No matches found.</p>
+        }
 
-</section>
+    </section>
+
+}
+

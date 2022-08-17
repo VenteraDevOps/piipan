@@ -1,5 +1,6 @@
 ﻿@using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 
 @code {
     [Parameter] public MatchSearchRequest Query { get; set; }
@@ -38,9 +39,7 @@
 <p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
 @if (QueryResult?.Data?.Count == 0 && showNoResultsAlert)
 {
-    <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Info">
-        <p>This Match ID does not have a matching record in any other states.</p>
-    </UsaAlertBox>
+    <MatchUnauthorizedBanner />
 }
 @if (Query != null)
 {

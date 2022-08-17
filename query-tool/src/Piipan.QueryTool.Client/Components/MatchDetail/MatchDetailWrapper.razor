@@ -1,0 +1,26 @@
+﻿@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
+@using Piipan.States.Api.Models
+@inject AppData AppData 
+
+@code {
+    [Parameter] public ParameterBase<MatchResApiResponse> Match { get; set; }
+    [Parameter] public ParameterBase<StatesInfoResponse> StateInfo { get; set; }
+    [Parameter] public string LoggedInUsersState { get; set; }
+    [Parameter] public string Token { get; set; }
+    [Parameter] public MatchDetailData MatchDetailInfo { get; set; }
+    [Parameter] public List<ServerError> ServerErrors { get; set; }
+    [Parameter] public string Role { get; set; }
+    [Parameter] public string[] RequiredRolesToEdit { get; set; }
+}
+
+@if (!AppData.IsAuthorized)
+{
+    <div style="padding-top: 24px;">
+        <MatchUnauthorizedBanner />
+    </div>
+}
+else {
+    <MatchDetail Match="Match" StateInfo="StateInfo" LoggedInUsersState="LoggedInUsersState" Token="Token"
+        MatchDetailInfo="MatchDetailInfo" ServerErrors="ServerErrors" Role="Role" RequiredRolesToEdit="RequiredRolesToEdit" />
+}

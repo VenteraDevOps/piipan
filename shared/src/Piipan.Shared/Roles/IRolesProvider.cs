@@ -7,5 +7,6 @@
     public interface IRolesProvider
     {
         string[] GetMatchEditRoles();
+        string[] GetMatchViewRoles();
     }
 }

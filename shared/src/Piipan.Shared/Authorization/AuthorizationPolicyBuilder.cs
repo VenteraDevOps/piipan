@@ -45,7 +45,6 @@ namespace Piipan.Shared.Authorization
                     }
                 }
             }
-
             innerBuilder.RequireAuthenticatedUser();
 
             return innerBuilder.Build();
