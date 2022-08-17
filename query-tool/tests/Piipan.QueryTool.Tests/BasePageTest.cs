@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -136,6 +138,23 @@ namespace Piipan.QueryTool.Tests
                model.Object);
 
             await pageModel.OnPageHandlerExecutionAsync(null, () => Task.FromResult(pageHandlerExecutingContext));
+        }
+
+        /// <summary>
+        /// Sets up the server fixture, view engines, razor page activator, etc.
+        /// This will be used to render CSHTML pages and test them.
+        /// </summary>
+        /// <returns></returns>
+        protected ViewRenderer SetupRenderingApi()
+        {
+            var server = new PageTestServerFixture();
+            var serviceProvider = server.GetRequiredService<IServiceProvider>();
+            var viewEngine = server.GetRequiredService<IRazorViewEngine>();
+            var tempDataProvider = server.GetRequiredService<ITempDataProvider>();
+            var razorPageActivator = server.GetRequiredService<IRazorPageActivator>();
+
+            var viewRenderer = new ViewRenderer(viewEngine, tempDataProvider, serviceProvider, razorPageActivator);
+            return viewRenderer;
         }
     }
 }

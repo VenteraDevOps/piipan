@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Piipan.QueryTool.Pages
 {
@@ -9,6 +10,7 @@ namespace Piipan.QueryTool.Pages
     public class NotAuthorizedModel : BasePageModel
     {
         public string Message = "";
+        public RenderMode RenderMode { get; set; } = RenderMode.Static;
 
         public NotAuthorizedModel(IServiceProvider serviceProvider)
                           : base(serviceProvider)
