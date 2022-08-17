@@ -13,6 +13,8 @@ namespace Piipan.QueryTool.Tests
 {
     public class ListPageTests : BasePageTest
     {
+        private const string PageName = "/Pages/List.cshtml";
+        private const string MatchListComponentName = "Piipan.QueryTool.Client.Components.MatchesList";
         private string[] matchIds = new string[] { "m123456", "m654321" };
 
         [Fact]
@@ -39,9 +41,11 @@ namespace Piipan.QueryTool.Tests
             // arrange
             var pageModel = SetupMatchModel("National", new string[] { "*" });
             pageModel.PageContext.HttpContext = contextMock();
+            var renderer = SetupRenderingApi();
 
             // act
             var result = await pageModel.OnGet();
+            var (page, output) = await renderer.RenderPage(PageName, pageModel);
 
             // assert the match was set to the value returned by the match resolution API
             Assert.IsType<PageResult>(result);
@@ -56,6 +60,8 @@ namespace Piipan.QueryTool.Tests
                 Assert.Empty(list[i].Participants);
                 Assert.Equal(new string[] { "ea", "eb" }, list[i].States);
             }
+            Assert.Equal("NAC Matches List", page.ViewContext.ViewData["Title"]);
+            Assert.Contains(MatchListComponentName, output);
         }
 
         [Fact]
