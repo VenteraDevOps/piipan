@@ -20,15 +20,17 @@ namespace Etl.BulkUpload.Performance.TestRunner
 
             var storageAccountName = Environment.GetEnvironmentVariable("AZURE_STORAGE_ACCOUNT");
             var storageAccountKey = Environment.GetEnvironmentVariable("AZURE_STORAGE_KEY");
-            if (string.IsNullOrEmpty(storageAccountName) || string.IsNullOrEmpty(storageAccountKey))
+            string uploadEncryptionKey = Environment.GetEnvironmentVariable("UPLOAD_PAYLOAD_KEY");
+            if (string.IsNullOrEmpty(storageAccountName) || string.IsNullOrEmpty(storageAccountKey) || string.IsNullOrEmpty(uploadEncryptionKey))
             {
                 //If environment variables have not been set, then attempt to use a local appsettings.json file
                 IConfiguration config = InitAppSettingsConfiguration();
                 storageAccountName = storageAccountName ?? config["AZURE_STORAGE_ACCOUNT"];
                 storageAccountKey = storageAccountKey ?? config["AZURE_STORAGE_KEY"];
+                uploadEncryptionKey = uploadEncryptionKey ?? config["UPLOAD_PAYLOAD_KEY"];
             }
 
-            BulkUploadPerfTestRunner testFileCreator = new BulkUploadPerfTestRunner(storageAccountName, storageAccountKey);
+            BulkUploadPerfTestRunner testFileCreator = new BulkUploadPerfTestRunner(storageAccountName, storageAccountKey, uploadEncryptionKey);
             Console.WriteLine($"Starting Test! - {DateTime.Now.ToLongTimeString()}");
 
             await testFileCreator.runTest(numberofParticipantsToUpload);
