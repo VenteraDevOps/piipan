@@ -290,7 +290,7 @@ namespace Piipan.QueryTool.Tests.Components
         }
 
         /// <summary>
-        /// Verify that when you don't have a state location that the button is disabled
+        /// Verify that when you have authorization the form should not be disabled
         /// </summary>
         [Fact]
         public void Form_Should_Be_Enabled_When_Authorized()
@@ -300,7 +300,7 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            Assert.True(Component.HasComponent<GenericUnauthorizedBanner>());
+            Assert.False(Component.HasComponent<GenericUnauthorizedBanner>());
 
             var wrapper = Component.Find("#snap-participants-query-form-wrapper");
             Assert.False(wrapper.ClassList.Contains("disabled-area"));
