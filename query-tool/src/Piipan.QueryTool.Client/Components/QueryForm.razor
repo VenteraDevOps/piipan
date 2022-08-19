@@ -49,7 +49,7 @@
 {
     <GenericUnauthorizedBanner style="margin-bottom: 2rem;" />    
 }
-<div id="snap-participants-query-form-wrapper" class="@(AppData.IsAuthorized ? "" : "disabled-area")" inert>
+<div id="snap-participants-query-form-wrapper" class="@(AppData.IsAuthorized ? "" : "disabled-area")" inert="@(!AppData.IsAuthorized)">
     <p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
     @if (NoResults && showNoResultsAlert)
     {

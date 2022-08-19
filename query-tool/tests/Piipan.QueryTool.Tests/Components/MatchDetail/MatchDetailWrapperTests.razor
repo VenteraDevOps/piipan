@@ -126,7 +126,8 @@
             },
             Role = "Worker",
             RequiredRolesToEdit = new string[] { "Worker" },
-            MatchDetailInfo = new MatchDetailData() { ReferralPage = MatchDetailReferralPage.Self }
+            MatchDetailInfo = new MatchDetailData() { ReferralPage = MatchDetailReferralPage.Self },
+            LoggedInUsersState = "Echo Bravo"
         };
     }
 
@@ -142,10 +143,10 @@
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetailWrapper>(
             @<MatchDetailWrapper Match="InitialValues.Match" ServerErrors="InitialValues.ServerErrors" MatchDetailInfo="InitialValues.MatchDetailInfo"
-                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo"
+                StateInfo="InitialValues.StateInfo" LoggedInUsersState="@InitialValues.LoggedInUsersState"
                 Role="@InitialValues.Role" RequiredRolesToEdit="@InitialValues.RequiredRolesToEdit">
-            </MatchDetailWrapper>
-        );
+        </MatchDetailWrapper>
+    );
         usaForm = Component.HasComponent<UsaForm>() ? Component.FindComponent<UsaForm>() : null;
     }
 
@@ -180,6 +181,27 @@
         // Assert
         Assert.True(Component.HasComponent<MatchDetail>());
         Assert.False(Component.HasComponent<MatchUnauthorizedBanner>());
+    }
+
+    /// <summary>
+    /// Verify values are passed correctly to MatchDetail component
+    /// </summary>
+    [Fact]
+    public void MatchDetail_Parameters_AreCorrect()
+    {
+        // Arrange
+        CreateTestComponent();
+
+        // Assert
+        var matchDetail = Component.FindComponent<MatchDetail>();
+        Assert.Equal(matchDetail.Instance.LoggedInUsersState, InitialValues.LoggedInUsersState);
+        Assert.Equal(matchDetail.Instance.Match, InitialValues.Match);
+        Assert.Equal(matchDetail.Instance.MatchDetailInfo, InitialValues.MatchDetailInfo);
+        Assert.Equal(matchDetail.Instance.RequiredRolesToEdit, InitialValues.RequiredRolesToEdit);
+        Assert.Equal(matchDetail.Instance.Role, InitialValues.Role);
+        Assert.Equal(matchDetail.Instance.ServerErrors, InitialValues.ServerErrors);
+        Assert.Equal(matchDetail.Instance.StateInfo, InitialValues.StateInfo);
+        Assert.Equal(matchDetail.Instance.Token, InitialValues.Token);        
     }
 
     #endregion
