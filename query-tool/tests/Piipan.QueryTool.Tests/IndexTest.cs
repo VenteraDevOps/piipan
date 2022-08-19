@@ -106,12 +106,13 @@ namespace Piipan.QueryTool.Tests
                     }
                 });
 
-            var requestPii = new PiiRecord
+            var requestPii = new PiiQuery
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "887-65-4320",
                 DateOfBirth = new DateTime(1931, 10, 13),
-                ParticipantId = "participantid1"
+                ParticipantId = "participantid1",
+                SearchReason = "application"
             };
 
             var mockServiceProvider = serviceProviderMock();
@@ -161,12 +162,13 @@ namespace Piipan.QueryTool.Tests
                     }
                 });
 
-            var requestPii = new PiiRecord
+            var requestPii = new PiiQuery
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1),
-                ParticipantId = "participantid1"
+                ParticipantId = "participantid1",
+                SearchReason = "new_household_member"
             };
             var mockServiceProvider = serviceProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -195,12 +197,13 @@ namespace Piipan.QueryTool.Tests
         public async Task MatchCapturesInvalidStateErrors()
         {
             // arrange
-            var requestPii = new PiiRecord
+            var requestPii = new PiiQuery
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "000-00-0000", // social security number is invalid 3 times
                 DateOfBirth = new DateTime(2021, 1, 1),
-                ParticipantId = "participantid1"
+                ParticipantId = "participantid1",
+                SearchReason = "other"
             };
             var mockServiceProvider = serviceProviderMock(location: "EA");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -234,12 +237,13 @@ namespace Piipan.QueryTool.Tests
         public async Task MatchCapturesInvalidLocationError()
         {
             // arrange
-            var requestPii = new PiiRecord
+            var requestPii = new PiiQuery
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1),
-                ParticipantId = "participantid1"
+                ParticipantId = "participantid1",
+                SearchReason = "recertification"
             };
             var mockServiceProvider = serviceProviderMock(location: "National");
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -271,12 +275,13 @@ namespace Piipan.QueryTool.Tests
         public async Task MatchCapturesApiError()
         {
             // arrange
-            var requestPii = new PiiRecord
+            var requestPii = new PiiQuery
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1),
-                ParticipantId = "participantid1"
+                ParticipantId = "participantid1",
+                SearchReason = "other"
             };
             var mockServiceProvider = serviceProviderMock();
             var mockLdsDeidentifier = Mock.Of<ILdsDeidentifier>();
@@ -313,12 +318,13 @@ namespace Piipan.QueryTool.Tests
         public async Task InvalidDateFormat(string exceptionMessage, string expectedErrorMessage)
         {
             // Arrange
-            var requestPii = new PiiRecord
+            var requestPii = new PiiQuery
             {
                 LastName = "Farrington",
                 SocialSecurityNum = "111-11-1111",
                 DateOfBirth = new DateTime(2021, 1, 1),
-                ParticipantId = "participantid1"
+                ParticipantId = "participantid1",
+                SearchReason = "application"
             };
             var mockServiceProvider = serviceProviderMock();
             var mockLdsDeidentifier = new Mock<ILdsDeidentifier>();

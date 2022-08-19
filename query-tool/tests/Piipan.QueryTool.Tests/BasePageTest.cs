@@ -14,6 +14,7 @@ using Moq.Language.Flow;
 using Piipan.QueryTool.Pages;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Locations;
+using Piipan.Shared.Roles;
 using Piipan.States.Api;
 using Piipan.States.Api.Models;
 
@@ -41,6 +42,9 @@ namespace Piipan.QueryTool.Tests
             var locationProviderMock = new Mock<ILocationsProvider>();
             locationProviderMock.Setup(c => c.GetStates(It.IsAny<string>())).Returns(states ?? new string[] { location });
 
+            var roleProviderMock = new Mock<IRolesProvider>();
+            roleProviderMock.Setup(c => c.GetMatchEditRoles()).Returns(new string[] { "Worker" });
+
             var statesApiMock = new Mock<IStatesApi>();
 
             // declare it as object so MemoryCache setup works.
@@ -50,7 +54,7 @@ namespace Piipan.QueryTool.Tests
                 {
                     new StateInfoResponseData
                     {
-                        Email = "ea-test@usda.gov",
+                        Email = "ea-test@usda.example",
                         Phone = "123-123-1234",
                         State = "Echo Alpha",
                         StateAbbreviation = "EA"
@@ -70,6 +74,7 @@ namespace Piipan.QueryTool.Tests
 
             serviceProviderMock.Setup(c => c.GetService(typeof(IClaimsProvider))).Returns(claimsProviderMock.Object);
             serviceProviderMock.Setup(c => c.GetService(typeof(ILocationsProvider))).Returns(locationProviderMock.Object);
+            serviceProviderMock.Setup(c => c.GetService(typeof(IRolesProvider))).Returns(roleProviderMock.Object);
             serviceProviderMock.Setup(c => c.GetService(typeof(IStatesApi))).Returns(statesApiMock.Object);
             serviceProviderMock.Setup(c => c.GetService(typeof(IMemoryCache))).Returns(new MemoryCache(new MemoryCacheOptions()));
             return serviceProviderMock.Object;

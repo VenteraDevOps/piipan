@@ -5,7 +5,6 @@ using Piipan.Match.Api;
 using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Extensions;
 using Piipan.Participants.Api;
-using Piipan.Match.Core.Enums;
 using System;
 using Piipan.Shared.Cryptography;
 

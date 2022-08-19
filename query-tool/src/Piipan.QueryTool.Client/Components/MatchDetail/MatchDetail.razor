@@ -1,6 +1,7 @@
 ﻿@using Newtonsoft.Json
 @using Piipan.Match.Api.Models
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Helpers
 @using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
 @using Piipan.Components.Layout
@@ -12,6 +13,26 @@
     [Parameter] public string LoggedInUsersState { get; set; }
     [Parameter] public string Token { get; set; }
     [Parameter] public MatchDetailSaveResponseData SaveResponse { get; set; }
+    [Parameter] public List<ServerError> ServerErrors { get; set; }
+    [Parameter] public string Role { get; set; }
+    [Parameter] public string[] RequiredRolesToEdit { get; set; }
+
+    private DispositionModel model;
+
+    private bool saving = false;
+    private bool CanEditFields => RequiredRolesToEdit.Contains(Role);
+    List<(string Property, string Error)> serverErrorList;
+
+
+    protected override void OnInitialized()
+    {
+        model = SaveResponse?.FailedDispositionModel ?? (new DispositionModel(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition));
+        model.MatchDate = Match.Data.Data.CreatedAt;
+        if (ServerErrors?.Count > 0)
+        {
+            serverErrorList = new(ServerErrors.Select(n => (n.Property, n.Error)));
+        }
+    }
 
     private TagTheme StatusTheme()
     {
@@ -21,21 +42,33 @@
             _ => TagTheme.Gray
         };
     }
-    private string DaysSinceMatch(string matchDateString)
+    private Task SubmitForm(bool valid)
+    {
+        if (valid)
+        {
+            saving = true;
+        }
+        else
+        {
+            saveNotificationDismissed = true;
+        }
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private string DaysSinceMatch(DateTime? matchDate)
     {
         DateTime currentDate = DateTime.Today;
-        DateTime matchDate = new DateTime();
-        bool validDate = DateTime.TryParse(matchDateString, out matchDate);
-        if (validDate)
+        if (matchDate != null)
         {
-            return (currentDate - matchDate).TotalDays.ToString();
+            return (currentDate - matchDate.Value.Date).TotalDays.ToString();
         }
         else
         {
             return "";
         }
 
-    } 
+    }    
 
     private bool IsUserInInitiatingState ()
     {
@@ -76,11 +109,13 @@
     }
     <!-- Match header -->
     <h1><UsaTag Theme="StatusTheme()">@Match.Data.Data.Status</UsaTag><span>Match ID: @Match.Data.Data.MatchId</span></h1>
+    <UsaForm Id="snap-resolution-fields-form" InitialErrors="serverErrorList" Model="model" method="post" OnBeforeSubmit="SubmitForm">
+        <Piipan.QueryTool.Client.Modals.ConfirmModalWrapper>
     <div class="grid-row matchInfoDiv">
         <dl>
             <div>
                 <dt>Match Record Created:</dt>
-                <dd>@Match.Data.Data.CreatedAt?.ToString("d") <span style="color:#6E6E6E">(@DaysSinceMatch(@Match.Data.Data.CreatedAt?.ToString("d")) days since match)</span></dd>
+                <dd>@Match.Data.Data.CreatedAt?.ToString(ValueToDisplayHelper.DateFormat) <span style="color:#6E6E6E">(@DaysSinceMatch(@Match.Data.Data.CreatedAt) days since match)</span></dd>
             </div>
             <div>
                 <dt>Match Query By:</dt>
@@ -92,69 +127,73 @@
         </dl>
     </div>
     <!-- \match header -->
-    <div class="grid-row">
-        <div class="grid-col-4">
-            <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@(IsUserInInitiatingState() ? InitiatingStateDisposition :   MatchingStateDisposition)"/>
-        </div>
-        <div class="grid-col-8">
-            <div style="max-width: 860px">
-                <UsaAccordion>
-                    <UsaAccordionItem StartsExpanded="true">
-                        <HeadingContent>SNAP Participant Information</HeadingContent>
-                        <BodyContent>
-                            <div class="two-state-grid">
-                                @if (InitiatingStateParticipant != null)
-                                {
-                                    <StateParticipantInformation Participant="@InitiatingStateParticipant" InitiatingState="true" />
-                                }
-                                @if (MatchingStateParticipant != null)
-                                {
-                                    <StateParticipantInformation Participant="@MatchingStateParticipant" InitiatingState="false" />
-                                }
-                            </div>
-                        </BodyContent>
-                    </UsaAccordionItem>
-                </UsaAccordion>
-                <UsaAccordion>
-                    <UsaAccordionItem StartsExpanded="true">
-                        <HeadingContent>Match Information</HeadingContent>
-                        <BodyContent>
-                            <p>Each state's most recent updates are displayed below.</p>
-                            <div class="two-state-grid">
-                                @if (InitiatingStateDisposition != null)
-                                {
-                                    <StateDispositionInformation Disposition="@InitiatingStateDisposition" InitiatingState="true" />
-                                }
-                                @if (MatchingStateDisposition != null)
-                                {
-                                    <StateDispositionInformation Disposition="@MatchingStateDisposition" InitiatingState="false" />
-                                }
-                            </div>
-                        </BodyContent>
-                    </UsaAccordionItem>
-                </UsaAccordion>
-                <UsaAccordion>
-                    <UsaAccordionItem StartsExpanded="true">
-                        <HeadingContent>State Agency Contact Information</HeadingContent>
-                        <BodyContent>
-                            <ul>
-                                <li>Use this information if you need to contact the other state in regards to this match</li>
-                                <li>Do not exchange PII about the participant by email; use their state’s Participant ID</li>
-                            </ul>
-                            <div class="two-state-grid">
-                                @if (InitiatingStateContactInfo != null)
-                                {
-                                    <StateContactInformation StateInfo="InitiatingStateContactInfo" InitiatingState="true" />    
-                                }
-                                @if (MatchingStateContactInfo != null)
-                                {
-                                    <StateContactInformation StateInfo="MatchingStateContactInfo" InitiatingState="false" />    
-                                }
-                            </div>
-                        </BodyContent>
-                    </UsaAccordionItem>
-                </UsaAccordion>
+    <div class="match-detail-grid @(CanEditFields ? "" : "one-col")">
+        @if (CanEditFields)
+        {
+            <div>
+                <ResolutionFields State="@LoggedInUsersState" InitiatingState="IsUserInInitiatingState()" Token="@Token" DispositionData="@model"/>
+                <button class="usa-button ResolutionFieldsSave" disabled="@saving">@(saving ? "Saving Changes..." : "Save Changes")</button>
             </div>
+        }
+        <div>
+            <UsaAccordion>
+                <UsaAccordionItem StartsExpanded="true">
+                    <HeadingContent>SNAP Participant Information</HeadingContent>
+                    <BodyContent>
+                        <div class="two-state-grid">
+                            @if (InitiatingStateParticipant != null)
+                            {
+                                <StateParticipantInformation Participant="@InitiatingStateParticipant" InitiatingState="true" />
+                            }
+                            @if (MatchingStateParticipant != null)
+                            {
+                                <StateParticipantInformation Participant="@MatchingStateParticipant" InitiatingState="false" />
+                            }
+                        </div>
+                    </BodyContent>
+                </UsaAccordionItem>
+            </UsaAccordion>
+            <UsaAccordion>
+                <UsaAccordionItem StartsExpanded="true">
+                    <HeadingContent>Match Information</HeadingContent>
+                    <BodyContent>
+                        <p>Each state's most recent updates are displayed below.</p>
+                        <div class="two-state-grid">
+                            @if (InitiatingStateDisposition != null)
+                            {
+                                <StateDispositionInformation Disposition="@InitiatingStateDisposition" InitiatingState="true" />
+                            }
+                            @if (MatchingStateDisposition != null)
+                            {
+                                <StateDispositionInformation Disposition="@MatchingStateDisposition" InitiatingState="false" />
+                            }
+                        </div>
+                    </BodyContent>
+                </UsaAccordionItem>
+            </UsaAccordion>
+            <UsaAccordion>
+                <UsaAccordionItem StartsExpanded="true">
+                    <HeadingContent>State Agency Contact Information</HeadingContent>
+                    <BodyContent>
+                        <ul>
+                            <li>Use this information if you need to contact the other state in regards to this match</li>
+                            <li>Do not exchange PII about the participant by email; use their state’s Participant ID</li>
+                        </ul>
+                        <div class="two-state-grid">
+                            @if (InitiatingStateContactInfo != null)
+                            {
+                                <StateContactInformation StateInfo="InitiatingStateContactInfo" InitiatingState="true" />    
+                            }
+                            @if (MatchingStateContactInfo != null)
+                            {
+                                <StateContactInformation StateInfo="MatchingStateContactInfo" InitiatingState="false" />    
+                            }
+                        </div>
+                    </BodyContent>
+                </UsaAccordionItem>
+            </UsaAccordion>
         </div>
     </div>
+    </Piipan.QueryTool.Client.Modals.ConfirmModalWrapper>
+    </UsaForm>
 </div>

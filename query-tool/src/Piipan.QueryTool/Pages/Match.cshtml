@@ -19,6 +19,9 @@
         param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"
         param-LoggedInUsersState="Model.UserState"
         param-SaveResponse="Model.MatchDetailSaveResponse"
+        param-ServerErrors="Model.RequestErrors"
+        param-Role="Model.Role"
+        param-RequiredRolesToEdit="Model.RequiredRolesToEdit"
         param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken"/>
     </div>
 }

@@ -11,6 +11,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Validators;
+using Piipan.Metrics.Core.Extensions;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Cryptography.Extensions;

@@ -6,15 +6,37 @@
     gap: 1rem;
 }
 
+::deep .usa-form {
+    max-width: unset;
+}
+
 .two-state-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 1rem;
     gap: 1rem;
+    max-width: 860px;
 }
 
 @media (max-width: 40rem) {
     .two-state-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.match-detail-grid {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    grid-gap: 20px;
+    gap: 20px;
+}
+
+.match-detail-grid.one-col {
+    grid-template-columns: 1fr !important;
+}
+
+@media (max-width: 60rem) {
+    .match-detail-grid {
         grid-template-columns: 1fr;
     }
 }
@@ -65,4 +87,9 @@ dd {
 
 .match-detail-save-success {
     margin-top: 24px;
+}
+
+::deep .usa-alert--error {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }

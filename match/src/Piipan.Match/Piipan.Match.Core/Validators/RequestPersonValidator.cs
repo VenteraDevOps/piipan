@@ -1,6 +1,6 @@
 using Piipan.Match.Api.Models;
 using FluentValidation;
-using Piipan.Match.Core.Enums;
+using Piipan.Shared.API.Enums;
 
 namespace Piipan.Match.Core.Validators
 {

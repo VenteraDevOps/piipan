@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Piipan.Match.Api.Models;
-using Newtonsoft.Json;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Piipan.Match.Api.Models;
 
 namespace Piipan.Match.Core.Parsers
 {
@@ -59,6 +59,10 @@ namespace Piipan.Match.Core.Parsers
                 }
 
                 return request;
+            }
+            catch (ValidationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

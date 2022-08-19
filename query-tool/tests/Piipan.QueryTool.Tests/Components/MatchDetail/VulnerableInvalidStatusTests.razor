@@ -1,5 +1,6 @@
 ﻿@using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
+@using Piipan.QueryTool.Client.Models
 @inherits BaseComponentTest<ResolutionFields>
 
 @code {
@@ -8,20 +9,9 @@
     /// </summary>
     public VulnerableInvalidStatusTests() : base()
     {
-
-    }
-
-
-    /// <summary>
-    /// Create a StateParticipantInformation component
-    /// </summary>
-    protected override void CreateTestComponent()
-    {
-        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
-        JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
-        JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
-        Disposition disp = new Disposition
+        InitialValues = new ResolutionFields
+        {
+            DispositionData = new DispositionModel
             {
                 InitialActionAt = null,
                 InitialActionTaken = "",
@@ -32,39 +22,31 @@
                 FinalDispositionDate = null,
                 VulnerableIndividual = null,
                 State = "EA"
-            };
-        Component = Render<ResolutionFields>(
-    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
-    </ResolutionFields>
-        );
+            },
+            State = "Echo Bravo",
+            InitiatingState = true
+        };
     }
 
+
     /// <summary>
-    /// Create a StateParticipantInformation component
+    /// Create a ResolutionFields component
     /// </summary>
-    protected void CreateTestComponentWithInvalidMatch()
+    protected override void CreateTestComponent()
     {
         JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
         JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
         JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
         JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
-        Disposition disp = new Disposition
-            {
-                InitialActionAt = null,
-                InitialActionTaken = "",
-                InvalidMatch = true,
-                InvalidMatchReason = "Other",
-                OtherReasoningForInvalidMatch = "Testing",
-                FinalDisposition = "",
-                FinalDispositionDate = null,
-                VulnerableIndividual = null,
-                State = "EA"
-            };
+        
         Component = Render<ResolutionFields>(
-    @<ResolutionFields State="Echo Bravo" InitiatingState=true DispositionData="@disp">
-    </ResolutionFields>
+            @<Piipan.Components.Forms.UsaForm Model="InitialValues.DispositionData">
+                <ResolutionFields State="@InitialValues.State" InitiatingState=InitialValues.InitiatingState DispositionData="@InitialValues.DispositionData">
+                </ResolutionFields>
+            </Piipan.Components.Forms.UsaForm>
         );
     }
+
 
     /// <summary>
     /// Verify the default markup of the state contact information
@@ -73,18 +55,19 @@
     public void Vulnerable_Invalid_status_markup_with_InvalidStatusTrue()
     {
         // Arrange
-        CreateTestComponentWithInvalidMatch();
+        InitialValues.DispositionData.InvalidMatch = true;
+        InitialValues.DispositionData.InvalidMatchReason = "Other";
+        InitialValues.DispositionData.OtherReasoningForInvalidMatch = "Testing";
+
+        CreateTestComponent();
 
         // Assert
         Component!.MarkupMatches(
-            @<div >
+            @<text >
   <h3 >Update information about this match for Echo Bravo</h3>
   <p class="infoSavedText" >After the information is saved, it will appear in the
     <b >match information</b>
     panel.</p>
-  <div class="usa-form ">
-    <form id="snap-resolution-fields-form" method="post" novalidate="" >
-      <fieldset class="usa-fieldset">
         <input type="hidden" name="__RequestVerificationToken" >
         <div >
           <h5 >Vulnerable &amp; Invalid Status</h5>
@@ -149,11 +132,7 @@
         </div>
         <div diff:ignore > //Ignoring Final Disposition Component
         </div>
-        <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
-      </fieldset>
-    </form>
-  </div>
-</div>
+    </text>
         );
     }
 
@@ -170,14 +149,11 @@
 
         // Assert
         Component!.MarkupMatches(
-            @<div >
+            @<text >
       <h3 >Update information about this match for Echo Bravo</h3>
       <p class="infoSavedText" >After the information is saved, it will appear in the
         <b >match information</b>
         panel.</p>
-      <div class="usa-form ">
-        <form id="snap-resolution-fields-form" method="post" novalidate="" >
-          <fieldset class="usa-fieldset">
           <input type="hidden" name="__RequestVerificationToken" >
             <div >
               <h5 >Vulnerable &amp; Invalid Status</h5>
@@ -224,11 +200,7 @@
             </div>
             <div diff:ignore> //Ignoring Final Disposition Component
             </div>
-            <button class="usa-button ResolutionFieldsSave" >Save Changes</button>
-          </fieldset>
-        </form>
-      </div>
-    </div>
+        </text>
         );
     }
     #endregion

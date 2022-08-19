@@ -7,7 +7,7 @@ namespace Piipan.QueryTool.Client.Helpers
 {
     public static class ValueToDisplayHelper
     {
-        private const string DateFormat = "MM/dd/yyyy";
+        public const string DateFormat = "MM/dd/yyyy";
         public static string GetDisplayValue<T>(T value)
         {
             if (value == null)

@@ -16,7 +16,7 @@
     {
         if (FormGroup != null)
         {
-            await FormGroup.GetValidationErrorsAsync(EditContext);
+            await FormGroup.GetValidationErrorsAsync(EditContext, true);
             StateHasChanged();
         }
     }

@@ -1,5 +1,5 @@
-﻿using Piipan.Components.Validation;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Piipan.Components.Validation;
 
 namespace Piipan.Components.Demo.Models
 {
@@ -14,5 +14,12 @@ namespace Piipan.Components.Demo.Models
         [UsaRequired]
         [Display(Name = "Required Field")]
         public string RequiredField { get; set; }
+
+        [UsaRequiredIf(
+            nameof(RequiredField), null, "@@@ is required when RequiredField has a value",
+            nameof(NotRequiredField), null, "@@@ is required when NotRequiredField has a value"
+        )]
+        [Display(Name = "Required If Field")]
+        public string RequiredIfField { get; set; }
     }
 }

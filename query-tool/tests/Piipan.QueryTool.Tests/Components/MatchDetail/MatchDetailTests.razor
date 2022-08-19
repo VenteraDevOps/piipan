@@ -1,6 +1,7 @@
 ﻿@using Piipan.Components.Alerts
 @using Piipan.Components.Enums
 @using System.Linq.Expressions
+@using Piipan.Components.Forms
 @using Piipan.Match.Api.Models.Resolution
 @using Piipan.QueryTool.Client.Components.MatchDetail
 @using Piipan.QueryTool.Client.Models
@@ -10,6 +11,7 @@
 @inherits BaseComponentTest<MatchDetail>
 
 @code {
+    private IRenderedComponent<UsaForm> usaForm;
     /// <summary>
     /// Set the default initial values for this test component
     /// </summary>
@@ -105,19 +107,21 @@
                         {
                             State = "Echo Alpha",
                             StateAbbreviation = "ea",
-                            Email = "ea-test@usda.gov",
+                            Email = "ea-test@usda.example",
                             Phone = "123-456-7890"
                         },
                         new StateInfoResponseData
                         {
                             State = "Echo Bravo",
                             StateAbbreviation = "eb",
-                            Email = "eb-test@usda.gov",
+                            Email = "eb-test@usda.example",
                             Phone = "123-456-7890"
                         }
                     }
                 }
-            }
+            },
+            Role = "Worker",
+            RequiredRolesToEdit = new string[] { "Worker" }
         };
     }
 
@@ -131,9 +135,12 @@
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
         Component = Render<MatchDetail>(
-    @<MatchDetail Match="InitialValues.Match" StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse">
-    </MatchDetail>
-    );
+            @<MatchDetail Match="InitialValues.Match" ServerErrors="InitialValues.ServerErrors" 
+                StateInfo="InitialValues.StateInfo" LoggedInUsersState="Echo Bravo" SaveResponse="InitialValues.SaveResponse"
+                Role="@InitialValues.Role" RequiredRolesToEdit="@InitialValues.RequiredRolesToEdit">
+            </MatchDetail>
+        );
+        usaForm = Component.FindComponent<UsaForm>();
     }
 
     #region Tests
@@ -149,84 +156,100 @@
 
         // Assert
         Component!.MarkupMatches(
-    @<div class="grid-container" >
-  <h1 >
-    <span class="usa-tag usa-tag--green usa-tag--round" >open</span>
-    <span >Match ID: M123456</span>
-  </h1>
-  <div class="grid-row matchInfoDiv" >
-    <dl >
-      <div >
-        <dt >Match Record Created:</dt>
-        <dd >
-          <span style="color:#6E6E6E" >( days since match)</span>
-        </dd>
-      </div>
-      <div >
-        <dt >Match Query By:</dt>
-        <dd >Echo Alpha (EA)</dd>
-      </div>
-      <div >
-        <dd >All NAC matches are based on an exact match of Last Name, Date of Birth, and Social Security Number.</dd>
-      </div>
-    </dl>
-  </div>
-  <div class="grid-row" >
-    <div class="grid-col-4" >
-      <div diff:ignore> //Ignoring Resolution Fields Component
-      </div>
-    </div>
-    <div class="grid-col-8" >
-      <div style="max-width: 860px" >
-        <div class="usa-accordion" aria-multiselectable="false">
-          <h4 class="usa-accordion__heading" >
-            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >SNAP Participant Information</button>
-          </h4>
-          <div id:ignore class="usa-accordion__content usa-prose" >
-            <div class="two-state-grid" >
-              <div diff:ignore > //Ignoring State Participant Information Component
-              </div>
-              <div diff:ignore> //Ignoring State Participant Information Component
-              </div>
-            </div>
+        @<div class="grid-container" >
+          <h1 >
+            <span class="usa-tag usa-tag--green usa-tag--round" >open</span>
+            <span >Match ID: M123456</span>
+          </h1>
+          <div class="usa-form ">
+            <form id="snap-resolution-fields-form" method="post" novalidate="" >
+              <fieldset class="usa-fieldset">
+                  <div class="grid-row matchInfoDiv" >
+                    <dl >
+                      <div >
+                        <dt >Match Record Created:</dt>
+                        <dd >
+                          <span style="color:#6E6E6E" >( days since match)</span>
+                        </dd>
+                      </div>
+                      <div >
+                        <dt >Match Query By:</dt>
+                        <dd >Echo Alpha (EA)</dd>
+                      </div>
+                      <div >
+                        <dd >All NAC matches are based on an exact match of Last Name, Date of Birth, and Social Security Number.</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div class="match-detail-grid" >
+                    <div diff:ignore>  //Ignoring Resolution Fields Component
+                    </div>
+                    <div>
+                        <div class="usa-accordion" aria-multiselectable="false">
+                          <h4 class="usa-accordion__heading" >
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >SNAP Participant Information</button>
+                          </h4>
+                          <div id:ignore class="usa-accordion__content usa-prose" >
+                            <div class="two-state-grid" >
+                              <div diff:ignore > //Ignoring State Participant Information Component
+                              </div>
+                              <div diff:ignore> //Ignoring State Participant Information Component
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="usa-accordion" aria-multiselectable="false">
+                          <h4 class="usa-accordion__heading" >
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >Match Information</button>
+                          </h4>
+                          <div id:ignore class="usa-accordion__content usa-prose" >
+                            <p >Each state's most recent updates are displayed below.</p>
+                            <div class="two-state-grid" >
+                              <div diff:ignore> //Ignoring State Disposition Information Component
+                              </div>
+                              <div diff:ignore> //Ignoring State Disposition Information Component
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="usa-accordion" aria-multiselectable="false">
+                          <h4 class="usa-accordion__heading" >
+                            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >State Agency Contact Information</button>
+                          </h4>
+                          <div id:ignore class="usa-accordion__content usa-prose" >
+                            <ul >
+                              <li >Use this information if you need to contact the other state in regards to this match</li>
+                              <li >Do not exchange PII about the participant by email; use their state’s Participant ID</li>
+                            </ul>
+                            <div class="two-state-grid" >
+                              <div diff:ignore> //Ignoring State Contact Information Component
+                              </div>
+                              <div diff:ignore> //Ignoring State Contact Information Component
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+              </fieldset>
+              </form>
           </div>
-        </div>
-        <div class="usa-accordion" aria-multiselectable="false">
-          <h4 class="usa-accordion__heading" >
-            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >Match Information</button>
-          </h4>
-          <div id:ignore class="usa-accordion__content usa-prose" >
-            <p >Each state's most recent updates are displayed below.</p>
-            <div class="two-state-grid" >
-              <div diff:ignore> //Ignoring State Disposition Information Component
-              </div>
-              <div diff:ignore> //Ignoring State Disposition Information Component
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="usa-accordion" aria-multiselectable="false">
-          <h4 class="usa-accordion__heading" >
-            <button class="usa-accordion__button" aria-expanded="true" aria-controls:ignore  >State Agency Contact Information</button>
-          </h4>
-          <div id:ignore class="usa-accordion__content usa-prose" >
-            <ul >
-              <li >Use this information if you need to contact the other state in regards to this match</li>
-              <li >Do not exchange PII about the participant by email; use their state’s Participant ID</li>
-            </ul>
-            <div class="two-state-grid" >
-              <div diff:ignore> //Ignoring State Contact Information Component
-              </div>
-              <div diff:ignore> //Ignoring State Contact Information Component
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
         </div>
     );
+    }
+
+    /// <summary>
+    /// Verify that the resolution fields section should not exist when the user is not the correct role
+    /// </summary>
+    [Fact]
+    public void ResolutionFields_ShouldNotExist_WhenUserIsNotCorrectRole()
+    {
+        // Arrange
+        InitialValues.Role = "SomeOtherRole";
+        CreateTestComponent();
+
+        // Assert
+        Assert.Empty(Component.FindComponents<ResolutionFields>());
     }
 
     /// <summary>
@@ -277,6 +300,92 @@
 
         // Act - Dismiss the alert
         saveSuccessElement.QuerySelector(".usa-button").Click();
+
+        // Assert
+        Assert.Empty(Component!.FindAll($".match-detail-save-success"));
+    }
+
+    /// <summary>
+    /// Verify the match detail shows server errors
+    /// </summary>
+    [Fact]
+    public async Task MatchDetail_ShowsServerErrors()
+    {
+        // Arrange
+        InitialValues.ServerErrors = new List<ServerError>()
+        {
+            new ServerError("", "An error has occurred")
+        };
+        CreateTestComponent();
+
+        // Assert
+        await ResolutionFieldsTestHelper.VerifyErrors(usaForm, 1, new List<string>
+        {
+            "An error has occurred"
+        }, false, 0);
+    }
+
+    /// <summary>
+    /// Verify that when a valid match detail is saved, the button changes to "Saving Changes..."
+    /// </summary>
+    [Fact]
+    public async Task SubmitButtonShouldSay_SavingChanges_AndBeDisabled_UponSubmissionOfForm()
+    {
+        // Arrange
+        CreateTestComponent();
+        var saveButton = usaForm.Find(".ResolutionFieldsSave");
+
+        // Assert
+        Assert.Equal("Save Changes", saveButton.TextContent);
+        Assert.False(saveButton.HasAttribute("disabled"));
+
+        // Act
+        bool isFormValid = false;
+        await usaForm.InvokeAsync(async () =>
+        {
+            isFormValid = await usaForm.Instance.ValidateForm();
+        });
+        await usaForm.InvokeAsync(async () =>
+        {
+            await usaForm.Instance.OnBeforeSubmit(isFormValid);
+        });
+
+        // Assert
+        Assert.Equal("Saving Changes...", saveButton.TextContent);
+        Assert.True(saveButton.HasAttribute("disabled"));
+    }
+
+    /// <summary>
+    /// Verify that when an invalid match tries to save after a successful one is saved, the save notification goes away
+    /// </summary>
+    [Fact]
+    public async Task SaveSuccessNotification_DisappearsWhen_SavingInvalidForm()
+    {
+        // Arrange
+        InitialValues.SaveResponse = new MatchDetailSaveResponseData
+        {
+            SaveSuccess = true
+        };
+        CreateTestComponent();
+        var saveSuccessElement = Component!.Find($".match-detail-save-success");
+
+        // Assert
+        Assert.NotNull(saveSuccessElement);
+
+        // Act
+        var initActionTaken = Component.Find("[name=\"DispositionData.InitialActionAt\"]");
+        initActionTaken.Change("");
+        initActionTaken.Blur();
+
+        bool isFormValid = false;
+        await usaForm.InvokeAsync(async () =>
+        {
+            isFormValid = await usaForm.Instance.ValidateForm();
+        });
+        await usaForm.InvokeAsync(async () =>
+        {
+            await usaForm.Instance.OnBeforeSubmit(isFormValid);
+        });
 
         // Assert
         Assert.Empty(Component!.FindAll($".match-detail-save-success"));

@@ -6,7 +6,6 @@ using Piipan.Match.Api.Models;
 using Newtonsoft.Json;
 using FluentValidation;
 using System.Linq;
-using Piipan.Match.Core.Enums;
 
 namespace Piipan.Match.Core.Parsers
 {

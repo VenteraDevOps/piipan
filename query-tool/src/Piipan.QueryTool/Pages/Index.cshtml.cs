@@ -58,7 +58,7 @@ namespace Piipan.QueryTool.Pages
                                 LdsHash = digest,
                                 CaseId = QueryFormData.Query.CaseId,
                                 ParticipantId = QueryFormData.Query.ParticipantId,
-                                SearchReason = "other"
+                                SearchReason = QueryFormData.Query.SearchReason
                             }
                         }
                     };
