@@ -65,6 +65,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
                    string[] formats = { "yyyy-MM-dd", "yyyy-M-dd" };
                    string[] dateRanges = field.Field.Split(' ');
+                   if (dateRanges.Length > 3) return false;
                    foreach (string dateRange in dateRanges)
                    {
                        string[] dates = dateRange.Split('/');
