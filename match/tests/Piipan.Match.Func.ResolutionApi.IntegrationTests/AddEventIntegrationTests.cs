@@ -34,6 +34,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
             Environment.SetEnvironmentVariable("EventGridNotificationEndPoint", "http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridNotificationKeyString", "example");
+            Environment.SetEnvironmentVariable("QueryToolUrl", "http://someendpoint.gov");
             var services = new ServiceCollection();
             services.AddLogging();
 

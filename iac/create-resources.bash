@@ -589,6 +589,7 @@ main () {
       ${COLUMN_ENCRYPT_KEY}="@Microsoft.KeyVault(VaultName=${VAULT_NAME};SecretName=${COLUMN_ENCRYPT_KEY_KV})" \
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1 \
+      QueryToolUrl="${QUERY_TOOL_URL}" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT="$eventgrid_match_metrics_endpoint" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_KEY="$eventgrid_match_metrics_key_string" \
       $EVENTGRID_CONN_NOTIFICATION_STR_ENDPOINT="${eventgrid_notification_endpoint}" \
