@@ -75,7 +75,7 @@ namespace Piipan.Match.Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to publish Publish Participant Match metrics event to EventGrid.");
+                _logger.LogError(ex, "Failed to publich emails to Notificationevent EventGrid.");
                 throw;
             }
             return Task.CompletedTask;
