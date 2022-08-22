@@ -32,6 +32,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             Environment.SetEnvironmentVariable("States", "ea");
             Environment.SetEnvironmentVariable("EventGridMetricMatchEndPoint", "http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
+            Environment.SetEnvironmentVariable("EventGridNotificationEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridNotificationKeyString", "example");
             var services = new ServiceCollection();
             services.AddLogging();
 
@@ -47,7 +49,13 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                     NpgsqlFactory.Instance,
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
             });
-
+            services.AddTransient<IDbConnectionFactory<StateInfoDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<StateInfoDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
+                );
+            });
             var provider = services.BuildServiceProvider();
 
             var api = new AddEventApi(
