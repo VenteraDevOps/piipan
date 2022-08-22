@@ -302,7 +302,7 @@ namespace Piipan.Match.Func.Api.Tests
             var errorResponse = result.Value as ApiErrorResponse;
             Assert.Equal(400, result.StatusCode);
             Assert.Equal("400", errorResponse.Errors[0].Status);
-            Assert.Contains("missing required header: X-Inititating-State", errorResponse.Errors[0].Detail);
+            Assert.Contains("missing required header: X-Initiating-State", errorResponse.Errors[0].Detail);
         }
 
         // Whole thing blows up and returns a top-level error
