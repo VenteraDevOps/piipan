@@ -23,8 +23,6 @@ run_deploy () {
 echo $NOTIFICATIONS_API_TAG 
   for app in "${notifications_function_apps[@]}"
   do
-echo "2"
-echo ${app} 
     echo "Publish ${app} to Azure Environment ${azure_env}"
     pushd ./src/Piipan.Notifications.Func.Api
       func azure functionapp publish "$app" --dotnet

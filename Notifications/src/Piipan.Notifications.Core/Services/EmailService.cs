@@ -20,16 +20,16 @@ namespace Piipan.Notifications.Services
         }
         public async Task<bool> SendEmail(EmailModel emailDetails)
         {
-            try
-            {
-                string toList = String.Join(",", emailDetails.ToList);
-                smtpClient.Send(emailDetails.From, toList, emailDetails.Subject, emailDetails.Body);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception.ToString());
-                return await Task.FromResult(false);
-            }
+            //try
+            //{
+            //    string toList = String.Join(",", emailDetails.ToList);
+            //    smtpClient.Send(emailDetails.From, toList, emailDetails.Subject, emailDetails.Body);
+            //}
+            //catch (Exception exception)
+            //{
+            //    _logger.LogError(exception.ToString());
+            //    return await Task.FromResult(false);
+            //}
             return await Task.FromResult(true);
         }
     }
