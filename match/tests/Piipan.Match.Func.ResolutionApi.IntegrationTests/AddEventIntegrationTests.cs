@@ -57,6 +57,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
                 );
             });
+            services.AddTransient<IStateInfoDao, StateInfoDao>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<INotificationPublish, NotificationPublish>();
             var provider = services.BuildServiceProvider();
 
             var api = new AddEventApi(
@@ -133,8 +136,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         {
             // Arrange
             // clear databases
-            ClearMatchRecords();
             ClearMatchResEvents();
+            ClearMatchRecords();
+
             // insert a match into the database
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()
@@ -174,8 +178,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         {
             // Arrange
             // clear databases
-            ClearMatchRecords();
             ClearMatchResEvents();
+            ClearMatchRecords();
+
             // insert a match into the database
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()
@@ -213,8 +218,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         {
             // Arrange
             // clear databases
-            ClearMatchRecords();
             ClearMatchResEvents();
+            ClearMatchRecords();
             // insert a match into db
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()

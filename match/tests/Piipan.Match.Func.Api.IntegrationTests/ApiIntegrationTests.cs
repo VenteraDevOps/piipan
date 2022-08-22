@@ -165,9 +165,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
                 return factory.Object;
             });
-            services.RegisterParticipantsServices();
-            services.RegisterMatchServices();
-            services.RegisterKeyVaultClientServices();
+
 
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
@@ -183,6 +181,9 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
                 );
             });
+            services.RegisterParticipantsServices();
+            services.RegisterMatchServices();
+            services.RegisterKeyVaultClientServices();
             var provider = services.BuildServiceProvider();
 
             var api = new MatchApi(
