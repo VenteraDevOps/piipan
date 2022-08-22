@@ -17,7 +17,9 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
+using Piipan.Notifications.Services;
 using Piipan.Shared.Database;
+using Piipan.States.Core.DataAccessObjects;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -52,8 +54,11 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 provider.GetService<IMatchRecordDao>(),
                 provider.GetService<IMatchResEventDao>(),
                 provider.GetService<IMatchResAggregator>(),
-               provider.GetService<IStreamParser<AddEventRequest>>(),
-                provider.GetService<IParticipantPublishMatchMetric>()
+                provider.GetService<IStreamParser<AddEventRequest>>(),
+                provider.GetService<IParticipantPublishMatchMetric>(),
+                provider.GetService<IStateInfoDao>(),
+                provider.GetService<INotificationService>()
+
             );
 
             return api;

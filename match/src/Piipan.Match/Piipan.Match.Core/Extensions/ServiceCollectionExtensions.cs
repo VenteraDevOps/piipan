@@ -3,6 +3,8 @@ using Piipan.Match.Api;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Services;
+using Piipan.Notifications.Services;
+using Piipan.States.Core.DataAccessObjects;
 
 namespace Piipan.Match.Core.Extensions
 {
@@ -18,7 +20,9 @@ namespace Piipan.Match.Core.Extensions
             serviceCollection.AddTransient<IParticipantPublishSearchMetric, ParticipantPublishSearchMetric>();
             serviceCollection.AddTransient<IParticipantPublishMatchMetric, ParticipantPublishMatchMetric>();
             serviceCollection.AddTransient<IMatchEventService, MatchEventService>();
-
+            serviceCollection.AddTransient<IStateInfoDao, StateInfoDao>();
+            serviceCollection.AddTransient<INotificationService, NotificationService>();
+            serviceCollection.AddTransient<INotificationPublish, NotificationPublish>();
         }
     }
 }

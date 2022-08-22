@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\metrics\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\Notifications\src\Piipan.Notifications.Core\Piipan.Notifications.Core.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj" />
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.Notifications\Piipan.Shared.Notifications.csproj" />
+    <ProjectReference Include="..\..\..\..\states\src\Piipan.States\Piipan.States.Core\Piipan.States.Core.csproj" />
     <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
     <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />

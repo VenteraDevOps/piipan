@@ -7,9 +7,12 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
+using Piipan.Notifications.Models;
+using Piipan.Notifications.Services;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.API.Enums;
 using Piipan.Shared.Cryptography;
+using Piipan.States.Core.DataAccessObjects;
 
 namespace Piipan.Match.Core.Services
 {
@@ -25,6 +28,8 @@ namespace Piipan.Match.Core.Services
         private readonly ICryptographyClient _cryptographyClient;
         private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
         private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
+        private readonly IStateInfoDao _stateInfoDao;
+        private readonly INotificationService _notificationService;
 
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
@@ -33,7 +38,9 @@ namespace Piipan.Match.Core.Services
             IMatchResAggregator matchResAggregator,
             ICryptographyClient cryptographyClientt,
             IParticipantPublishSearchMetric ParticipantPublishSearchMetric,
-            IParticipantPublishMatchMetric participantPublishMatchMetric)
+            IParticipantPublishMatchMetric participantPublishMatchMetric,
+            IStateInfoDao stateInfoDao,
+            INotificationService notificationService)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
@@ -42,6 +49,8 @@ namespace Piipan.Match.Core.Services
             _cryptographyClient = cryptographyClientt;
             _participantPublishSearchMetric = ParticipantPublishSearchMetric;
             _participantPublishMatchMetric = participantPublishMatchMetric;
+            _stateInfoDao = stateInfoDao;
+            _notificationService = notificationService;
 
         }
 
@@ -134,6 +143,37 @@ namespace Piipan.Match.Core.Services
 
                 };
                 await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
+
+                //Send Notification to both initiating state and Matching State.
+                var states = await _stateInfoDao.GetStates();
+                var initState = states?.Where(n => string.Compare(n.StateAbbreviation, record.Initiator, true) == 0).FirstOrDefault();
+                var matchingState = states?.Where(n => string.Compare(n.StateAbbreviation, match.State, true) == 0).FirstOrDefault();
+                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
+
+                var templateData = new
+                {
+                    MatchId = participantMatchRecord.MatchId,
+                    InitState = initState?.State,
+                    MatchingState = matchingState?.State,
+                    MatchingUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}",
+
+                };
+                var emailTemplateInput = new EmailTemplateInput()
+                {
+                    Topic = "CREATE_MATCH_RES",
+                    TemplateData = new
+                    {
+                        MatchId = participantMatchRecord.MatchId,
+                        InitState = initState?.State,
+                        MatchingState = matchingState?.State,
+                        MatchingUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}",
+
+                    },
+                    EmailTo = initState?.Email
+                };
+                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
+                emailTemplateInput.EmailTo = matchingState?.Email;
+                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
             }
             if (participantMatchRecord != null)
             {

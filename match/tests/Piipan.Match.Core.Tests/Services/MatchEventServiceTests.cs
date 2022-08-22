@@ -11,8 +11,12 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Metrics.Api;
+using Piipan.Notifications.Models;
+using Piipan.Notifications.Services;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.Cryptography;
+using Piipan.States.Core.DataAccessObjects;
+using Piipan.States.Core.Models;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
@@ -83,9 +87,42 @@ namespace Piipan.Match.Core.Tests.Services
 
             return mock;
         }
+        private Mock<INotificationService> NotificationServiceMock()
+        {
+            var emailTemplateInput = new EmailTemplateInput()
+            {
+                Topic = It.IsAny<string>(),
+                TemplateData = new
+                {
+                    MatchId = It.IsAny<string>(),
+                    InitState = It.IsAny<string>(),
+                    MatchingState = It.IsAny<string>(),
+                    MatchingUrl = It.IsAny<string>(),
+
+                },
+                EmailTo = It.IsAny<string>()
+            };
+            var mock = new Mock<INotificationService>();
+            mock.Setup(m => m.CreateMessageFromTemplate(
+                emailTemplateInput)).Returns(Task.FromResult(true));
+            return mock;
+        }
+        private Mock<IStateInfoDao> StateInfoDaoMock()
+        {
+            var matchRecordDao = new Mock<IStateInfoDao>();
+            matchRecordDao
+                .Setup(r => r.GetStates())
+                    .ReturnsAsync(new List<StateInfoDbo>()
+                    {
+                    new StateInfoDbo() { Id = "1", State = "Echo Alpha", StateAbbreviation = "ea" },
+                    new StateInfoDbo() { Id = "2", State = "Echo Bravo", StateAbbreviation = "eb" },
+                    });
+            return matchRecordDao;
+        }
+
         private Mock<IMatchResAggregator> MatchResAggregatorMock(
-            MatchResRecord result
-        )
+                    MatchResRecord result
+                )
         {
             var mock = new Mock<IMatchResAggregator>();
             mock.Setup(r => r.Build(
@@ -140,6 +177,9 @@ namespace Piipan.Match.Core.Tests.Services
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
+            var matchRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -147,7 +187,10 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                matchRecordDao.Object,
+                notificationService.Object
+
             );
 
             // Act
@@ -173,6 +216,9 @@ namespace Piipan.Match.Core.Tests.Services
                                                   r.InitState == record.Initiator
                                                  )),
                                                   Times.Once);
+
+            var topic = "CREATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
         }
 
         [Fact]
@@ -209,6 +255,9 @@ namespace Piipan.Match.Core.Tests.Services
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
+            var matchRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -216,7 +265,10 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                matchRecordDao.Object,
+                notificationService.Object
+
             );
 
             // Act
@@ -267,6 +319,9 @@ namespace Piipan.Match.Core.Tests.Services
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
 
+            var matchRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -274,7 +329,10 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                matchRecordDao.Object,
+                notificationService.Object
+
             );
 
             // Act
@@ -331,6 +389,9 @@ namespace Piipan.Match.Core.Tests.Services
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
+            var matchRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -338,7 +399,10 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                matchRecordDao.Object,
+                notificationService.Object
+
             );
 
             // Act
@@ -390,6 +454,9 @@ namespace Piipan.Match.Core.Tests.Services
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
+            var matchRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -397,7 +464,10 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                matchRecordDao.Object,
+                notificationService.Object
+
             );
 
             // Act
@@ -464,6 +534,9 @@ namespace Piipan.Match.Core.Tests.Services
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
+            var matchRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -471,7 +544,10 @@ namespace Piipan.Match.Core.Tests.Services
                 aggDao.Object,
                 cryptographyClient,
                 publishSearchMetrics.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                matchRecordDao.Object,
+                notificationService.Object
+
             );
 
             // Act
@@ -487,6 +563,8 @@ namespace Piipan.Match.Core.Tests.Services
                                                   r.Data.First().MatchCreation == search.MatchCreation &&
                                                   r.Data.First().SearchReason == search.SearchReason)),
              Times.Once);
+            var topic = "CREATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never);
         }
     }
 }

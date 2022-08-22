@@ -14,6 +14,7 @@ STATES_API_TAG="SysType=StatesApi"
 DASHBOARD_APP_TAG="SysType=DashboardApp"
 QUERY_APP_TAG="SysType=QueryApp"
 DUP_PART_API_TAG="SysType=DupPartApi"
+NOTIFICATIONS_API_TAG="SysType=NotificationsApi"
 
 # The default Azure subscription
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
@@ -76,6 +77,10 @@ EVENTGRID_CONN_METRICS_SEARCH_STR_KEY=EventGridMetricSearchKeyString
 EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT=EventGridMetricMatchEndPoint
 EVENTGRID_CONN_METRICS_MATCH_STR_KEY=EventGridMetricMatchKeyString
 
+# Event Grid for Match Metrics
+EVENTGRID_CONN_NOTIFICATION_STR_ENDPOINT=EventGridNotificationEndPoint
+EVENTGRID_CONN_NOTIFICATION_STR_KEY=EventGridNotificationKeyString
+
 # In the States.csv file, the state is enabled if they have the ENABLED text in column 3. Disabled if they have DISABLED text in column 3.
 # Defaults to disabled, so any text other than ENABLED is disabled.
 STATE_ENABLED_KEY=ENABLED
@@ -136,6 +141,10 @@ MATCH_RES_FUNC_APP_STORAGE_NAME=${PREFIX}stmatchres${ENV}
 STATES_FUNC_APP_NAME=$PREFIX-func-states-$ENV
 STATES_FUNC_APP_STORAGE_NAME=${PREFIX}ststates${ENV}
 
+# Notifications Function App Info
+NOTIFICATIONS_FUNC_APP_NAME=$PREFIX-func-notifications-$ENV
+NOTIFICATIONS_FUNC_APP_STORAGE_NAME=${PREFIX}stnotifications${ENV}
+
 # Names of apps authenticated by OIDC
 OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 
@@ -145,6 +154,8 @@ CREATE_SEARCH_METRICS_TOPIC_NAME=evgt-create-search-metrics-$ENV
 #Match Metric Event grid
 CREATE_MATCH_METRICS_TOPIC_NAME=evgt-publish-match-metrics-$ENV
 
+#Search Metric Event grid
+CREATE_NOTIFICATIONS_TOPIC_NAME=evgt-create-notifications-$ENV
 ### END Constants
 
 ### Functions

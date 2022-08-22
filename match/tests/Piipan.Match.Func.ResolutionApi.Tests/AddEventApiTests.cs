@@ -16,6 +16,10 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Metrics.Api;
+using Piipan.Notifications.Models;
+using Piipan.Notifications.Services;
+using Piipan.States.Core.DataAccessObjects;
+using Piipan.States.Core.Models;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.Tests
@@ -53,6 +57,38 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
 
             return mock;
         }
+        private Mock<INotificationService> NotificationServiceMock()
+        {
+            var emailTemplateInput = new EmailTemplateInput()
+            {
+                Topic = It.IsAny<string>(),
+                TemplateData = new
+                {
+                    MatchId = It.IsAny<string>(),
+                    InitState = It.IsAny<string>(),
+                    MatchingState = It.IsAny<string>(),
+                    MatchingUrl = It.IsAny<string>(),
+
+                },
+                EmailTo = It.IsAny<string>()
+            };
+            var mock = new Mock<INotificationService>();
+            mock.Setup(m => m.CreateMessageFromTemplate(
+                emailTemplateInput)).Returns(Task.FromResult(true));
+            return mock;
+        }
+        private Mock<IStateInfoDao> StateInfoDaoMock()
+        {
+            var matchRecordDao = new Mock<IStateInfoDao>();
+            matchRecordDao
+                .Setup(r => r.GetStates())
+                    .ReturnsAsync(new List<StateInfoDbo>()
+                    {
+                    new StateInfoDbo() { Id = "1", State = "Echo Alpha", StateAbbreviation = "ea" },
+                    new StateInfoDbo() { Id = "2", State = "Echo Bravo", StateAbbreviation = "eb" },
+                    });
+            return matchRecordDao;
+        }
         [Fact]
         public async void AddEvent_LogsRequest()
         {
@@ -62,12 +98,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResAggregator = new Mock<IMatchResAggregator>();
             var requestParser = new Mock<IStreamParser<AddEventRequest>>();
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object,
                 requestParser.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                stateRecordDao.Object,
+                notificationService.Object
             );
             var mockRequest = MockRequest();
             mockRequest
@@ -105,12 +145,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResAggregator = new Mock<IMatchResAggregator>();
             var requestParser = new Mock<IStreamParser<AddEventRequest>>();
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object,
                 requestParser.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                stateRecordDao.Object,
+                notificationService.Object
             );
             var mockRequest = MockRequest();
             var logger = new Mock<ILogger>();
@@ -140,12 +184,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                     Status = "closed"
                 });
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object,
                 requestParser.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                stateRecordDao.Object,
+                notificationService.Object
             );
             var mockRequest = MockRequest();
             var logger = new Mock<ILogger>();
@@ -169,12 +217,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var matchResAggregator = new Mock<IMatchResAggregator>();
             var requestParser = new Mock<IStreamParser<AddEventRequest>>();
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object,
                 requestParser.Object,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                stateRecordDao.Object,
+                notificationService.Object
             );
             var mockRequest = MockRequest();
             var logger = new Mock<ILogger>();
@@ -185,6 +237,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             // Assert
             Assert.Equal(401, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Never());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
         }
 
         [Fact]
@@ -220,12 +274,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 Mock.Of<ILogger<AddEventRequestParser>>()
             );
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
                 matchRecordDao.Object,
                 matchResEventDao.Object,
                 matchResAggregator.Object,
                 requestParser,
-                publishMatchMetrics.Object
+                publishMatchMetrics.Object,
+                stateRecordDao.Object,
+                notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"invalid_match\": true } }"); // same action as delta
             var logger = new Mock<ILogger>();
@@ -236,6 +294,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             // Assert
             Assert.Equal(422, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Never());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
         }
 
         [Fact]
@@ -250,12 +310,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 Mock.Of<ILogger<AddEventRequestParser>>()
             );
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"invalid_match\": \"foo\" } }");
             var logger = new Mock<ILogger>();
@@ -266,6 +330,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             // Assert
             Assert.Equal(400, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Never());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
         }
 
         [Fact]
@@ -280,12 +346,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 Mock.Of<ILogger<AddEventRequestParser>>()
             );
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("foobar");
             var logger = new Mock<ILogger>();
@@ -340,12 +410,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             publishMatchMetrics.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
                 .Returns(Task.CompletedTask);
 
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"vulnerable_individual\": true } }");
             var logger = new Mock<ILogger>();
@@ -357,6 +431,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             matchResEventDao.Verify(mock => mock.AddEvent(It.IsAny<MatchResEventDbo>()), Times.Once());
             matchResEventDao.Verify(mock => mock.AddEvent(It.Is<MatchResEventDbo>(m => m.ActorState == "ea")), Times.Once());
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo")), Times.Once());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
             Assert.Equal(200, response.StatusCode);
         }
 
@@ -425,12 +501,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             publishMatchMetrics.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
                   .Returns(Task.CompletedTask);
 
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"bar\", \"final_disposition_date\": \"2022-07-20T00:00:01\" } }"); // coming form state ea
             var logger = new Mock<ILogger>();
@@ -443,6 +523,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 It.Is<MatchResEventDbo>(m => m.Actor == "system" && m.Delta == api.ClosedDelta)
             ), Times.Once());
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo" && m.Status == "closed")), Times.Once());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
             Assert.Equal(200, response.StatusCode);
         }
 
@@ -496,12 +578,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
             publishMatchMetrics.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
                  .Returns(Task.CompletedTask);
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"invalid_match\": true } }"); // coming form state ea
             var logger = new Mock<ILogger>();
@@ -515,6 +601,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             ), Times.Once());
             Assert.Equal(200, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo" && m.Status == "closed")), Times.Once());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
         }
 
         [Fact]
@@ -563,12 +651,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             publishMatchMetrics.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
                 .Returns(Task.CompletedTask);
 
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"invalid_match\": true } }"); // coming form state ea
             var logger = new Mock<ILogger>();
@@ -581,6 +673,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 It.Is<MatchResEventDbo>(m => m.Actor == "system" && m.Delta == api.ClosedDelta)
             ), Times.Once());
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo")), Times.Once());
+            var topic = "UPDATE_MATCH_RES";
+            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
             Assert.Equal(200, response.StatusCode);
         }
 
@@ -625,12 +719,16 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 Mock.Of<ILogger<AddEventRequestParser>>()
             );
             var publishMatchMetrics = new Mock<IParticipantPublishMatchMetric>();
+            var stateRecordDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
             var api = new AddEventApi(
-                matchRecordDao.Object,
-                matchResEventDao.Object,
-                matchResAggregator.Object,
-                requestParser,
-                publishMatchMetrics.Object
+                  matchRecordDao.Object,
+                  matchResEventDao.Object,
+                  matchResAggregator.Object,
+                  requestParser,
+                  publishMatchMetrics.Object,
+                  stateRecordDao.Object,
+                  notificationService.Object
             );
             var mockRequest = MockRequest("{ \"data\": { \"initial_action_taken\": \"Notice Sent\", \"initial_action_at\": \"2022-07-20T00:00:02\", \"final_disposition\": \"bar\", \"final_disposition_date\": \"2022-07-20T00:00:01\" } }"); // coming form state ea
             var logger = new Mock<ILogger>();

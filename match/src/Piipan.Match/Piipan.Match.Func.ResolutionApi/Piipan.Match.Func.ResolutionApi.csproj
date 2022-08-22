@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.Notifications\Piipan.Shared.Notifications.csproj" />
     <ProjectReference Include="..\..\..\..\states\src\Piipan.States\Piipan.States.Core\Piipan.States.Core.csproj" />
     <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\Piipan.Match.Core\Piipan.Match.Core.csproj" />

@@ -12,6 +12,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
+using Piipan.Notifications.Services;
 using Piipan.Shared.Database;
 using Piipan.States.Core.DataAccessObjects;
 
@@ -31,6 +32,8 @@ namespace Piipan.Match.Func.ResolutionApi
             builder.Services.AddTransient<IMatchResEventDao, MatchResEventDao>();
             builder.Services.AddTransient<IParticipantPublishMatchMetric, ParticipantPublishMatchMetric>();
             builder.Services.AddTransient<IStateInfoDao, StateInfoDao>();
+            builder.Services.AddTransient<INotificationService, NotificationService>();
+            builder.Services.AddTransient<INotificationPublish, NotificationPublish>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
             builder.Services.AddTransient<IMatchResAggregator, MatchResAggregator>();
             builder.Services.AddTransient<IValidator<AddEventRequest>, AddEventRequestValidator>();

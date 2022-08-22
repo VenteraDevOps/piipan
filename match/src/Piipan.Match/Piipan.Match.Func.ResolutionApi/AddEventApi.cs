@@ -19,7 +19,10 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Metrics.Api;
+using Piipan.Notifications.Models;
+using Piipan.Notifications.Services;
 using Piipan.Shared.Http;
+using Piipan.States.Core.DataAccessObjects;
 
 #nullable enable
 
@@ -35,6 +38,8 @@ namespace Piipan.Match.Func.ResolutionApi
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly IStreamParser<AddEventRequest> _requestParser;
         private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
+        private readonly IStateInfoDao _stateInfoDao;
+        private readonly INotificationService _notificationService;
         public readonly string UserActor = "user";
         public readonly string SystemActor = "system";
         public readonly string ClosedDelta = "{\"status\": \"closed\"}";
@@ -44,13 +49,17 @@ namespace Piipan.Match.Func.ResolutionApi
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
             IStreamParser<AddEventRequest> requestParser,
-            IParticipantPublishMatchMetric participantPublishMatchMetric)
+            IParticipantPublishMatchMetric participantPublishMatchMetric,
+            IStateInfoDao stateInfoDao,
+            INotificationService notificationService)
         {
             _matchRecordDao = matchRecordDao;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
             _requestParser = requestParser;
             _participantPublishMatchMetric = participantPublishMatchMetric;
+            _stateInfoDao = stateInfoDao;
+            _notificationService = notificationService;
         }
 
         [FunctionName("AddEvent")]
@@ -157,6 +166,31 @@ namespace Piipan.Match.Func.ResolutionApi
                     MatchingStateVulnerableIndividual = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.VulnerableIndividual).FirstOrDefault(),
                 };
                 await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
+
+                //Send Notification to both initiating state and Matching State.
+                var states = await _stateInfoDao.GetStates();
+                var initState = states?.Where(n => string.Compare(n.StateAbbreviation, matchResRecordAfterUpdate.Initiator, true) == 0).FirstOrDefault();
+                var matchingState = states?.Where(n => string.Compare(n.StateAbbreviation, matchResRecordAfterUpdate.States[1], true) == 0).FirstOrDefault();
+                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
+
+                var emailTemplateInput = new EmailTemplateInput()
+                {
+                    Topic = "UPDATE_MATCH_RES",
+                    TemplateData = new
+                    {
+                        MatchId = matchResRecordAfterUpdate.MatchId,
+                        InitState = initState?.State,
+                        MatchingState = matchingState?.State,
+                        MatchingUrl = $"{queryToolUrl}/match/{matchResRecordAfterUpdate.MatchId}",
+
+                    },
+                    EmailTo = initState?.Email
+                };
+
+                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
+                emailTemplateInput.EmailTo = matchingState?.Email;
+                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
+
                 return new OkResult();
             }
             catch (StreamParserException ex)

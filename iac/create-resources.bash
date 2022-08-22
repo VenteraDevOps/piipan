@@ -344,6 +344,87 @@ main () {
     state_enabled_matches=${state_enabled_matches:1}
   fi
   echo "Enabled States: ${state_enabled_matches}"
+# Create Notifications API Function App
+  echo "Create Notifications API Function App"
+  collab_db_conn_str=$(pg_connection_string "$CORE_DB_SERVER_NAME" "$COLLAB_DB_NAME" "$NOTIFICATIONS_FUNC_APP_NAME")
+  az deployment group create \
+    --name notifications-api \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file  ./arm-templates/function-notifications.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      functionAppName="$NOTIFICATIONS_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+      storageAccountName="$NOTIFICATIONS_FUNC_APP_STORAGE_NAME" \
+      collabDatabaseConnectionString="$collab_db_conn_str" \
+      cloudName="$CLOUD_NAME" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      eventHubName="$EVENT_HUB_NAME"
+
+  echo "Integrating ${NOTIFICATIONS_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$NOTIFICATIONS_FUNC_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$VNET_ID"
+
+  echo "Update ${NOTIFICATIONS_FUNC_APP_NAME} settings"
+  az functionapp config appsettings set \
+    --name "${NOTIFICATIONS_FUNC_APP_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --settings \
+      WEBSITE_CONTENTOVERVNET=1 \
+      WEBSITE_VNET_ROUTE_ALL=1
+
+  event_grid_notification_system_topic_id=$(\
+  az eventgrid system-topic create \
+	--location "${LOCATION}" \
+	--name "${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+	--topic-type Microsoft.Storage.storageAccounts \
+	--resource-group "$RESOURCE_GROUP" \
+	--source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" \
+	-o tsv \
+	--query id)
+
+  echo "Publish Notifications API Function App"
+  try_run "func azure functionapp publish ${NOTIFICATIONS_FUNC_APP_NAME} --dotnet" 7 "../Notifications/src/Piipan.Notifications.Func.Api"
+  # Subscription to upload events that get routed to Function
+    subn_name=evgs-notifications-$ENV
+
+    storageid=$(az storage account show --name "${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
+    queueid="$storageid/queueservices/default/queues/emailbucket"
+
+  # Create a Subscription to upload events that get routed to Function
+   az eventgrid system-topic event-subscription create \
+      --name "$subn_name" \
+      --resource-group "$RESOURCE_GROUP" \
+      --system-topic-name "${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+      --endpoint-type storagequeue \
+      --endpoint "$queueid" \
+      --included-event-types Microsoft.Storage.BlobCreated \
+    
+  eventgrid_notification_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
+  eventgrid_notification_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
+
+  # Stream event topic logs to Event Hub
+  az monitor diagnostic-settings create \
+    --name "stream-logs-to-event-hub" \
+    --resource "$event_grid_notification_system_topic_id" \
+    --event-hub "logs" \
+    --event-hub-rule "${EH_RULE_ID}" \
+    --logs '[
+      {
+        "category": "DeliveryFailures",
+        "enabled": true
+      }
+    ]'
+
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$NOTIFICATIONS_FUNC_APP_NAME" \
+    --sign-in-audience "AzureADMyOrg"
 
  echo "Create Event grid for Search Metrics" 
 
@@ -442,6 +523,8 @@ main () {
       $EVENTGRID_CONN_METRICS_SEARCH_STR_KEY="$eventgrid_search_key_string" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT="$eventgrid_match_metrics_endpoint" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_KEY="$eventgrid_match_metrics_key_string" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_ENDPOINT="${eventgrid_notification_endpoint}" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_KEY="${eventgrid_notification_key_string}" \
 
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
@@ -508,6 +591,8 @@ main () {
       WEBSITE_VNET_ROUTE_ALL=1 \
       $EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT="$eventgrid_match_metrics_endpoint" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_KEY="$eventgrid_match_metrics_key_string" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_ENDPOINT="${eventgrid_notification_endpoint}" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_KEY="${eventgrid_notification_key_string}" \
 
   echo "Publish Match Resolution API Function App"
   try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
@@ -561,7 +646,7 @@ main () {
   az ad app create \
     --display-name "$STATES_FUNC_APP_NAME" \
     --sign-in-audience "AzureADMyOrg"
-
+    
   if [ "$exists" = "true" ]; then
     echo "Leaving $CURRENT_USER_OBJID as a member of $PG_AAD_ADMIN"
   else
