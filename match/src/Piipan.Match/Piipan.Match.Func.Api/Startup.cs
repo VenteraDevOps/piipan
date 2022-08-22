@@ -15,6 +15,7 @@ using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
+using Piipan.States.Core.DataAccessObjects;
 
 [assembly: FunctionsStartup(typeof(Piipan.Match.Func.Api.Startup))]
 
@@ -54,7 +55,14 @@ namespace Piipan.Match.Func.Api
                     Environment.GetEnvironmentVariable(CollaborationDatabaseConnectionString)
                 );
             });
-
+            builder.Services.AddTransient<IDbConnectionFactory<StateInfoDb>>(s =>
+            {
+                return new AzurePgConnectionFactory<StateInfoDb>(
+                    new AzureServiceTokenProvider(),
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(CollaborationDatabaseConnectionString)
+                );
+            });
             builder.Services.RegisterMatchServices();
             builder.Services.RegisterParticipantsServices();
             builder.Services.RegisterKeyVaultClientServices();
