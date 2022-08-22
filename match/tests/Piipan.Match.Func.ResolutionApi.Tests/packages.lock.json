@@ -2122,7 +2122,6 @@
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
           "Piipan.Shared.Cryptography": "1.0.0",
-          "Piipan.Shared.Notifications": "1.0.0",
           "Piipan.States.Core": "1.0.0"
         }
       },
@@ -2135,7 +2134,6 @@
           "Microsoft.NET.Sdk.Functions": "4.1.1",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Match.Core": "1.0.0",
-          "Piipan.Shared.Notifications": "1.0.0",
           "Piipan.States.Core": "1.0.0"
         }
       },
@@ -2191,14 +2189,6 @@
           "Azure.Security.KeyVault.Keys": "4.3.0",
           "Microsoft.Extensions.Hosting.Abstractions": "6.0.0",
           "Piipan.Shared": "1.0.0"
-        }
-      },
-      "piipan.shared.notifications": {
-        "type": "Project",
-        "dependencies": {
-          "Antlr4.Runtime": "4.6.6",
-          "Microsoft.Extensions.Logging": "6.0.0",
-          "StringTemplate4": "4.0.8"
         }
       },
       "piipan.states.api": {

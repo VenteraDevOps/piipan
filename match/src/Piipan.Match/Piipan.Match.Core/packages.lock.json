@@ -1611,14 +1611,6 @@
           "Piipan.Shared": "1.0.0"
         }
       },
-      "piipan.shared.notifications": {
-        "type": "Project",
-        "dependencies": {
-          "Antlr4.Runtime": "4.6.6",
-          "Microsoft.Extensions.Logging": "6.0.0",
-          "StringTemplate4": "4.0.8"
-        }
-      },
       "piipan.states.api": {
         "type": "Project",
         "dependencies": {
