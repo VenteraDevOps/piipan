@@ -148,10 +148,10 @@ namespace Piipan.Match.Func.Api
 
             if (String.IsNullOrEmpty(state))
             {
-                throw new HttpRequestException("Request is missing required header: X-Inititating-State");
+                throw new HttpRequestException("Request is missing required header: X-Initiating-State");
             }
 
-            return state;
+            return state.ToLower();
         }
 
         private ActionResult ValidationErrorResponse(ValidationException exception)
