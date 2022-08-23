@@ -161,7 +161,7 @@ main () {
     # Wait bit to avoid "InvalidPrincipalId" on app registration use below
     sleep 120
   fi
-
+   
   # Create event hub and assign role to app registration
   az deployment group create \
    --name monitoring \
@@ -185,7 +185,7 @@ main () {
       objectId="$CURRENT_USER_OBJID" \
       resourceTags="$RESOURCE_TAGS" \
       eventHubName="$EVENT_HUB_NAME"
-
+   
   # Send Policy events from subscription's activity log to event hub
   az deployment sub create \
     --name activity-log-diagnostics-$LOCATION \
@@ -377,40 +377,40 @@ main () {
       WEBSITE_CONTENTOVERVNET=1 \
       WEBSITE_VNET_ROUTE_ALL=1
 
-  event_grid_notification_system_topic_id=$(\
-  az eventgrid system-topic create \
-	--location "${LOCATION}" \
-	--name "${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
-	--topic-type Microsoft.Storage.storageAccounts \
-	--resource-group "$RESOURCE_GROUP" \
-	--source "${DEFAULT_PROVIDERS}/Microsoft.Storage/storageAccounts/${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" \
-	-o tsv \
-	--query id)
+ az eventgrid topic create \
+    --location "$LOCATION" \
+    --name "${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+    --resource-group "$RESOURCE_GROUP"
+  eventgrid_notification_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
+  eventgrid_notification_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
 
   echo "Publish Notifications API Function App"
   try_run "func azure functionapp publish ${NOTIFICATIONS_FUNC_APP_NAME} --dotnet" 7 "../Notifications/src/Piipan.Notifications.Func.Api"
   # Subscription to upload events that get routed to Function
     subn_name=evgs-notifications-$ENV
-
+    GRID_TOPIC_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+  
     storageid=$(az storage account show --name "${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
     queueid="$storageid/queueservices/default/queues/emailbucket"
-
-  # Create a Subscription to upload events that get routed to Function
-   az eventgrid system-topic event-subscription create \
-      --name "$subn_name" \
-      --resource-group "$RESOURCE_GROUP" \
-      --system-topic-name "${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
-      --endpoint-type storagequeue \
-      --endpoint "$queueid" \
-      --included-event-types Microsoft.Storage.BlobCreated \
-    
-  eventgrid_notification_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
-  eventgrid_notification_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
-
+  
+ # Create a Subscription to the queue
+  az eventgrid event-subscription create \
+    --source-resource-id "${GRID_TOPIC_PROVIDERS}/Microsoft.EventGrid/topics/${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+    --name "$subn_name" \
+    --endpoint-type storagequeue \
+    --endpoint "$queueid" \
+  
+   # Configure log streaming for function app
+  event_grid_notification_system_topic_id=$(\
+    az eventgrid topic show \
+      -n "$CREATE_NOTIFICATIONS_TOPIC_NAME" \
+      -g "$RESOURCE_GROUP" \
+      -o tsv \
+      --query id)
   # Stream event topic logs to Event Hub
   az monitor diagnostic-settings create \
     --name "stream-logs-to-event-hub" \
-    --resource "$event_grid_notification_system_topic_id" \
+    --resource "${event_grid_notification_system_topic_id}" \
     --event-hub "logs" \
     --event-hub-rule "${EH_RULE_ID}" \
     --logs '[
