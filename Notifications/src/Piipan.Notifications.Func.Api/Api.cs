@@ -11,7 +11,7 @@ namespace Piipan.Notifications.Func.Api
         {
         }
 
-        [FunctionName("PublishEmail")]
+        [FunctionName("NotificationRequestProcessor")]
         public async Task Run([QueueTrigger("emailbucket", Connection = "")] string emailQueue, ILogger log)
         {
             log.LogInformation($"Email Queue trigger function processed: {emailQueue}");

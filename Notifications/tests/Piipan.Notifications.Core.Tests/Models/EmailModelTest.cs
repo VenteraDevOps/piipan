@@ -54,27 +54,5 @@ namespace Piipan.Notifications.Core.Tests.Models
             Assert.False(emailone.Equals(emailTwo));
         }
 
-
-
-        [Fact]
-        public void Equals_OverrideTests()
-        {
-            // Arrange
-            string emails = "test@test.com,test1@test.com";
-            var emailone = new EmailModel
-            {
-
-                ToList = emails.Split(',').ToList(),
-                ToCCList = emails.Split(',').ToList(),
-                ToBCCList = emails.Split(',').ToList(),
-                Body = "Body of the Email",
-                Subject = "Subject of the Email",
-                From = "noreply@test.com",
-            };
-
-            // Act / Assert
-            Assert.False(emailone.Equals(null));
-            Assert.False(emailone.Equals("test"));
-        }
     }
 }

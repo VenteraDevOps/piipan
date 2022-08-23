@@ -73,21 +73,21 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 EmailTo = It.IsAny<string>()
             };
             var mock = new Mock<INotificationService>();
-            mock.Setup(m => m.CreateMessageFromTemplate(
+            mock.Setup(m => m.PublishMessageFromTemplate(
                 emailTemplateInput)).Returns(Task.FromResult(true));
             return mock;
         }
         private Mock<IStateInfoDao> StateInfoDaoMock()
         {
-            var matchRecordDao = new Mock<IStateInfoDao>();
-            matchRecordDao
+            var stateInfoDao = new Mock<IStateInfoDao>();
+            stateInfoDao
                 .Setup(r => r.GetStates())
                     .ReturnsAsync(new List<StateInfoDbo>()
                     {
-                    new StateInfoDbo() { Id = "1", State = "Echo Alpha", StateAbbreviation = "ea" },
-                    new StateInfoDbo() { Id = "2", State = "Echo Bravo", StateAbbreviation = "eb" },
+                    new StateInfoDbo() { Id = "1", State = "Echo Alpha", StateAbbreviation = "ea" , Email = "Ea@Nac.gov" },
+                    new StateInfoDbo() { Id = "2", State = "Echo Bravo", StateAbbreviation = "eb" , Email = "Eb@Nac.gov" },
                     });
-            return matchRecordDao;
+            return stateInfoDao;
         }
         [Fact]
         public async void AddEvent_LogsRequest()
@@ -238,7 +238,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             Assert.Equal(401, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Never());
             var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
         }
 
         [Fact]
@@ -295,7 +295,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             Assert.Equal(422, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Never());
             var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
         }
 
         [Fact]
@@ -331,7 +331,7 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             Assert.Equal(400, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == It.IsAny<string>())), Times.Never());
             var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never());
         }
 
         [Fact]
@@ -431,8 +431,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             matchResEventDao.Verify(mock => mock.AddEvent(It.IsAny<MatchResEventDbo>()), Times.Once());
             matchResEventDao.Verify(mock => mock.AddEvent(It.Is<MatchResEventDbo>(m => m.ActorState == "ea")), Times.Once());
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo")), Times.Once());
-            var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_IS" && p.EmailTo == "Ea@Nac.gov")), Times.Once);
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_MS" && p.EmailTo == "Eb@Nac.gov")), Times.Once);
             Assert.Equal(200, response.StatusCode);
         }
 
@@ -524,7 +524,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             ), Times.Once());
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo" && m.Status == "closed")), Times.Once());
             var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_IS" && p.EmailTo == "Ea@Nac.gov")), Times.Once);
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_MS" && p.EmailTo == "Eb@Nac.gov")), Times.Once);
             Assert.Equal(200, response.StatusCode);
         }
 
@@ -601,8 +602,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
             ), Times.Once());
             Assert.Equal(200, response.StatusCode);
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo" && m.Status == "closed")), Times.Once());
-            var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_IS" && p.EmailTo == "Ea@Nac.gov")), Times.Once);
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_MS" && p.EmailTo == "Eb@Nac.gov")), Times.Once);
         }
 
         [Fact]
@@ -673,8 +674,8 @@ namespace Piipan.Match.Func.ResolutionApi.Tests
                 It.Is<MatchResEventDbo>(m => m.Actor == "system" && m.Delta == api.ClosedDelta)
             ), Times.Once());
             publishMatchMetrics.Verify(mock => mock.PublishMatchMetric(It.Is<ParticipantMatchMetrics>(m => m.MatchId == "foo")), Times.Once());
-            var topic = "UPDATE_MATCH_RES";
-            notificationService.Verify(r => r.CreateMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Exactly(2));
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_IS" && p.EmailTo == "Ea@Nac.gov")), Times.Once);
+            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "UPDATE_MATCH_RES_MS" && p.EmailTo == "Eb@Nac.gov")), Times.Once);
             Assert.Equal(200, response.StatusCode);
         }
 

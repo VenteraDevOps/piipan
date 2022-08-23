@@ -2,44 +2,34 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Notifications.Func.Api;
-using Piipan.Notifications.Services;
 using Xunit;
 
 namespace Piipan.Notifications.Core.IntegrationTests
 {
-    public class NotificationPublishTest
+    public class NotificationApiTes
     {
-
         private EventGridEvent MockEvent()
         {
-
             var gridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(new
             {
-
                 ToList = It.IsAny<string>().Split(',').ToList(),
                 ToCCList = It.IsAny<string>()?.Split(',').ToList(),
                 ToBCCList = It.IsAny<string>()?.Split(',').ToList(),
                 Body = It.IsAny<string>(),
                 Subject = It.IsAny<string>(),
                 From = It.IsAny<string>()
-
             }));
             return gridEvent.Object;
-
         }
 
         private EventGridEvent MockBadEvent(DateTime eventTime, string State)
         {
-
             var gridEvent = new Mock<EventGridEvent>("", "", "", new BinaryData(new
             {
-
             }));
 
             return gridEvent.Object;
-
         }
-
 
         [Fact]
         public async Task Run_Log_Success()
@@ -48,15 +38,13 @@ namespace Piipan.Notifications.Core.IntegrationTests
             var now = DateTime.Now;
             var logger = new Mock<ILogger>();
 
-            var notificationService = new Mock<INotificationService>();
-
             var function = new NotificationApi();
 
             // Act
             await function.Run("Event Grid Event String", logger.Object);
 
             // Assert
-            //  notificationService.Verify(m => m.CreateMessageFromTemplate(It.IsAny<EmailTemplateInput>()), Times.Once);
+
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Information),
                 It.IsAny<EventId>(),
@@ -68,12 +56,9 @@ namespace Piipan.Notifications.Core.IntegrationTests
         [Fact]
         public async Task Run_Log_BadRequest()
         {
-
             // Arrange
             var now = DateTime.Now;
             var logger = new Mock<ILogger>();
-
-            var notificationService = new Mock<INotificationService>();
 
             var function = new NotificationApi();
 
@@ -81,7 +66,7 @@ namespace Piipan.Notifications.Core.IntegrationTests
             await function.Run("", logger.Object);
 
             // Assert
-            //  notificationService.Verify(m => m.CreateMessageFromTemplate(It.IsAny<EmailTemplateInput>()), Times.Once);
+
             logger.Verify(x => x.Log(
                 It.Is<LogLevel>(l => l == LogLevel.Error),
                 It.IsAny<EventId>(),
@@ -89,12 +74,6 @@ namespace Piipan.Notifications.Core.IntegrationTests
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
             ));
-
         }
-
-
-
-
-
     }
 }

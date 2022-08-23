@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Piipan.Notifications.Func.Api;
-using Piipan.Notifications.Services;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests
@@ -51,31 +50,25 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             // Arrange
             var logger = new Mock<ILogger>();
             var function = new NotificationApi();
-            // Act 
+            // Act
             await function.Run("", logger.Object);
 
             // Assert
             VerifyLogError(logger, "No input was provided");
         }
 
-
         [Fact]
         public async void Run_ParsedInputPassedToApi()
         {
-
             // Arrange
 
             var now = DateTime.Now;
             var logger = new Mock<ILogger>();
 
-            var notificationService = new Mock<INotificationService>();
-
             var function = new NotificationApi();
 
             // Act
             await function.Run("Event Grid Event String", logger.Object);
-
-
 
             // Assert
             logger.Verify(x => x.Log(

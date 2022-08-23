@@ -103,9 +103,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_ReturnsErrorIfNotRelatedState()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
+
             // insert a match into the database
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()
@@ -135,7 +136,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_ReturnsErrorIfClosed()
         {
             // Arrange
-            // clear databases
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
             ClearMatchRecords();
 
@@ -177,7 +178,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_SuccessInsertsEvent()
         {
             // Arrange
-            // clear databases
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
             ClearMatchRecords();
 
@@ -217,7 +218,7 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_SuccessInsertsClosedEventIfClosed()
         {
             // Arrange
-            // clear databases
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
             ClearMatchRecords();
             // insert a match into db

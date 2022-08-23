@@ -66,9 +66,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void GetMatches_ReturnsEmptyListIfNotFound()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
 
             var api = Construct();
             var mockRequest = MockGetRequest();
@@ -85,9 +85,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void GetMatches_ReturnsCorrectSchemaIfFound()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
 
             var api = Construct();
             var mockRequest = MockGetRequest();
@@ -142,9 +142,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void GetMatches_ShowsUpdatedData()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
 
             var matchId = "ABC";
             var api = Construct();

@@ -145,35 +145,22 @@ namespace Piipan.Match.Core.Services
                 await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
 
                 //Send Notification to both initiating state and Matching State.
+                // Send template data for any email template which is created based on the requirements.
+                // The below logic might change based on the template data for requirements.
+                //In future we might end up consolidating the logic based on requirements.
                 var states = await _stateInfoDao.GetStates();
                 var initState = states?.Where(n => string.Compare(n.StateAbbreviation, record.Initiator, true) == 0).FirstOrDefault();
                 var matchingState = states?.Where(n => string.Compare(n.StateAbbreviation, match.State, true) == 0).FirstOrDefault();
                 var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
 
-                var templateData = new
-                {
-                    MatchId = participantMatchRecord.MatchId,
-                    InitState = initState?.State,
-                    MatchingState = matchingState?.State,
-                    MatchingUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}",
+                EmailTemplateInput emailTemplateInputIs = GetEmailTemplate(participantMatchRecord.MatchId, initState?.State, matchingState?.State, queryToolUrl, initState?.Email);
+                emailTemplateInputIs.Topic = "CREATE_MATCH_IS";
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInputIs); //Publishing Email for Initiating State:  Based on the requirement
 
-                };
-                var emailTemplateInput = new EmailTemplateInput()
-                {
-                    Topic = "CREATE_MATCH_RES",
-                    TemplateData = new
-                    {
-                        MatchId = participantMatchRecord.MatchId,
-                        InitState = initState?.State,
-                        MatchingState = matchingState?.State,
-                        MatchingUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}",
+                EmailTemplateInput emailTemplateInputMs = GetEmailTemplate(participantMatchRecord.MatchId, initState?.State, matchingState?.State, queryToolUrl, matchingState?.Email);
+                emailTemplateInputMs.Topic = "CREATE_MATCH_MS";
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInputMs); //Publishing Email for Matching State : Based on the requirement
 
-                    },
-                    EmailTo = initState?.Email
-                };
-                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
-                emailTemplateInput.EmailTo = matchingState?.Email;
-                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
             }
             if (participantMatchRecord != null)
             {
@@ -181,6 +168,22 @@ namespace Piipan.Match.Core.Services
                 participantMatchRecord.MatchUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}";
             }
             return participantMatchRecord;
+        }
+
+        private static EmailTemplateInput GetEmailTemplate(string MatchId, string initState, string matchingState, string queryToolUrl, string email)
+        {
+            return new EmailTemplateInput()
+            {
+                TemplateData = new
+                {
+                    MatchId = MatchId,
+                    InitState = initState,
+                    MatchingState = matchingState,
+                    MatchingUrl = $"{queryToolUrl}/match/{MatchId}",
+
+                },
+                EmailTo = email
+            };
         }
 
         private async Task<ParticipantMatch> Reconcile(IParticipant match, IMatchRecord pendingRecord, IEnumerable<IMatchRecord> existingRecords)

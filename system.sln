@@ -172,8 +172,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5194A8E2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Core.Tests", "Notifications\tests\Piipan.Notifications.Core.Tests\Piipan.Notifications.Core.Tests.csproj", "{1809AD0B-8640-4EC6-AE87-08BB5D7D0B52}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Func.Api.Tests", "Notifications\tests\Piipan.Notifications.Func.Api.Tests\Piipan.Notifications.Func.Api.Tests.csproj", "{313B5772-A763-4B1B-84CA-392B5AE6257F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Func.Api.Integration.Tests", "Notifications\tests\Piipan.Notifications.Func.Api.Integration.Tests\Piipan.Notifications.Func.Api.Integration.Tests.csproj", "{993859BF-3B5D-422E-9193-B7299FDCAD6C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Core.IntegrationTests", "Notifications\tests\Piipan.Notifications.Core.Integration.Tests\Piipan.Notifications.Core.IntegrationTests.csproj", "{036FEA98-46FE-4F91-AA56-AF761BB71E7B}"
@@ -420,10 +418,6 @@ Global
 		{1809AD0B-8640-4EC6-AE87-08BB5D7D0B52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1809AD0B-8640-4EC6-AE87-08BB5D7D0B52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1809AD0B-8640-4EC6-AE87-08BB5D7D0B52}.Release|Any CPU.Build.0 = Release|Any CPU
-		{313B5772-A763-4B1B-84CA-392B5AE6257F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{313B5772-A763-4B1B-84CA-392B5AE6257F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{313B5772-A763-4B1B-84CA-392B5AE6257F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{313B5772-A763-4B1B-84CA-392B5AE6257F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{993859BF-3B5D-422E-9193-B7299FDCAD6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{993859BF-3B5D-422E-9193-B7299FDCAD6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{993859BF-3B5D-422E-9193-B7299FDCAD6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -508,7 +502,6 @@ Global
 		{1B61BD20-3D11-414B-A4FF-7120BBE16CB6} = {63B79AA4-F901-49C0-A6E3-8265AAD583C6}
 		{5194A8E2-1F34-4D15-A6C9-69CCA099AABA} = {63B79AA4-F901-49C0-A6E3-8265AAD583C6}
 		{1809AD0B-8640-4EC6-AE87-08BB5D7D0B52} = {5194A8E2-1F34-4D15-A6C9-69CCA099AABA}
-		{313B5772-A763-4B1B-84CA-392B5AE6257F} = {5194A8E2-1F34-4D15-A6C9-69CCA099AABA}
 		{993859BF-3B5D-422E-9193-B7299FDCAD6C} = {5194A8E2-1F34-4D15-A6C9-69CCA099AABA}
 		{036FEA98-46FE-4F91-AA56-AF761BB71E7B} = {5194A8E2-1F34-4D15-A6C9-69CCA099AABA}
 	EndGlobalSection

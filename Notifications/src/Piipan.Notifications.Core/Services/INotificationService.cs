@@ -4,7 +4,7 @@ namespace Piipan.Notifications.Services
 {
     public interface INotificationService
     {
-        Task<bool> CreateMessageFromTemplate(EmailTemplateInput emailTemplateInput);
+        Task<bool> PublishMessageFromTemplate(EmailTemplateInput emailTemplateInput);
 
     }
 }

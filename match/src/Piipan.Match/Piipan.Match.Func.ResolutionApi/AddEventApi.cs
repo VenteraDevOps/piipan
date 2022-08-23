@@ -187,9 +187,9 @@ namespace Piipan.Match.Func.ResolutionApi
                     EmailTo = initState?.Email
                 };
 
-                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInput);
                 emailTemplateInput.EmailTo = matchingState?.Email;
-                await _notificationService.CreateMessageFromTemplate(emailTemplateInput);
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInput);
 
                 return new OkResult();
             }

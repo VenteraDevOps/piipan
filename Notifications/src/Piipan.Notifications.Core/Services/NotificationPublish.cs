@@ -49,16 +49,16 @@ namespace Piipan.Match.Core.Services
         }
 
         /// <summary>
-        /// Publishes an event to EventGrid containing ParticipantUpload metrics
+        /// Publishes an event to EventGrid containing Email queue
         /// </summary>
-        /// <param name="metrics">Bulk Upload Metadata And Metrics</param>
+        /// <param name="emailModel">Bulk Upload Metadata And Metrics</param>
         /// <returns></returns>
-        public Task PublishEmail(EmailModel metrics)
+        public Task PublishEmail(EmailModel emailModel)
         {
             try
             {
-                var result = JsonConvert.SerializeObject(metrics);
-                //We want to use pre-serialized verion of the ParticipantMatch.
+                var result = JsonConvert.SerializeObject(emailModel);
+                //We want to use pre-serialized verion of the EmailModel.
                 //Otherwise, EventGridEvent serializes it according to class property names rather than JsonProperty attributes
                 var binaryData = BinaryData.FromString(result);
                 // Add EventGridEvents to a list to publish to the topic
