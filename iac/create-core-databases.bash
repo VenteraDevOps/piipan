@@ -13,6 +13,8 @@ set_constants () {
   PG_AAD_ADMIN=piipan-admins-${ENV}
 
   PRIVATE_DNS_ZONE=$(private_dns_zone)
+
+  set_defaults
 }
 
 main () {
@@ -39,7 +41,8 @@ main () {
      --name "$PG_SECRET_NAME" \
      --file /dev/stdin \
      --query id
-     #--value "$PG_SECRET" \
+     #--value "$PG_SECRET"
+
 
   echo "Creating core database server"
   az deployment group create \
@@ -56,7 +59,10 @@ main () {
       privateEndpointName="$CORE_DB_PRIVATE_ENDPOINT_NAME" \
       privateDnsZoneName="$PRIVATE_DNS_ZONE" \
       resourceTags="$RESOURCE_TAGS" \
-      eventHubName="$EVENT_HUB_NAME"
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   db_set_env "$RESOURCE_GROUP" "$CORE_DB_SERVER_NAME" "$DB_ADMIN_NAME" "$PG_SECRET"
 
@@ -85,26 +91,21 @@ main () {
   db_config_managed_role "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
   db_grant_readwrite "$METRICS_DB_NAME" "$METRICS_COLLECT_APP_NAME"
 
-  local orchestrator
-  orchestrator=$(get_resources "$ORCHESTRATOR_API_TAG" "$MATCH_RESOURCE_GROUP")
-  echo "Configuring $COLLAB_DB_NAME access for $orchestrator"
-  db_create_managed_role "$COLLAB_DB_NAME" "$orchestrator" "$MATCH_RESOURCE_GROUP"
-  db_config_managed_role "$COLLAB_DB_NAME" "$orchestrator"
-  db_grant_readwrite "$COLLAB_DB_NAME" "$orchestrator"
 
-  local matchRes
-  matchRes=$(get_resources "$MATCH_RES_API_TAG" "$MATCH_RESOURCE_GROUP")
-  echo "Configuring $COLLAB_DB_NAME access for $matchRes"
-  db_create_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME" "$MATCH_RESOURCE_GROUP"
-  db_config_managed_role "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
-  db_grant_readwrite "$COLLAB_DB_NAME" "$MATCH_RES_FUNC_APP_NAME"
+  echo "Configuring $COLLAB_DB_NAME access for ${ORCHESTRATOR_FUNC_APP_NAME}"
+  db_create_managed_role "$COLLAB_DB_NAME" "${ORCHESTRATOR_FUNC_APP_NAME}" "$MATCH_RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "${ORCHESTRATOR_FUNC_APP_NAME}"
+  db_grant_readwrite "$COLLAB_DB_NAME" "${ORCHESTRATOR_FUNC_APP_NAME}"
 
-  local states
-  states=$(get_resources "$STATES_API_TAG" "$RESOURCE_GROUP")
-  echo "Configuring $COLLAB_DB_NAME access for $states"
-  db_create_managed_role "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME" "$RESOURCE_GROUP"
-  db_config_managed_role "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME"
-  db_grant_readwrite "$COLLAB_DB_NAME" "$STATES_FUNC_APP_NAME"
+  echo "Configuring $COLLAB_DB_NAME access for ${MATCH_RES_FUNC_APP_NAME}"
+  db_create_managed_role "$COLLAB_DB_NAME" "${MATCH_RES_FUNC_APP_NAME}" "$MATCH_RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "${MATCH_RES_FUNC_APP_NAME}"
+  db_grant_readwrite "$COLLAB_DB_NAME" "${MATCH_RES_FUNC_APP_NAME}"
+
+  echo "Configuring $COLLAB_DB_NAME access for ${STATES_FUNC_APP_NAME}"
+  db_create_managed_role "$COLLAB_DB_NAME" "${STATES_FUNC_APP_NAME}" "$RESOURCE_GROUP"
+  db_config_managed_role "$COLLAB_DB_NAME" "${STATES_FUNC_APP_NAME}"
+  db_grant_readwrite "$COLLAB_DB_NAME" "${STATES_FUNC_APP_NAME}"
 
   db_leave_aad "$PG_AAD_ADMIN"
 

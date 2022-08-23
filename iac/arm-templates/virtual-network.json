@@ -10,7 +10,10 @@
             }
         },
         "resourceTags": {
-            "type": "object"
+            "type": "object",
+            "metadata": {
+                "description": "Specify the resource tags."
+            }
         },
         "vnetName": {
             "type": "string"
@@ -55,6 +58,30 @@
             "type": "string",
             "metadata": {
                 "description": "Comma-separated list of IP addresses / CIDR ranges to be allowed for OIDC egress traffic."
+            }
+        },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
             }
         }
     },
@@ -137,6 +164,18 @@
                             "type": "string"
                         },
                         "idpOidcIpRanges": {
+                            "type": "string"
+                        },
+                        "diagnosticSettingName": {
+                            "type": "string"
+                        },
+                        "eventHubAuthorizationRuleId": {
+                            "type": "string"
+                        },
+                        "eventHubName": {
+                            "type": "string"
+                        },
+                        "workspaceId": {
                             "type": "string"
                         }
                     },
@@ -296,6 +335,23 @@
                                         }
                                     },
                                     {
+                                        "name": "AllowAzureMonitor",
+                                        "properties": {
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "AzureMonitor",
+                                            "access": "Allow",
+                                            "priority": 140,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
                                         "name": "DenyInternet",
                                         "properties": {
                                             "protocol": "*",
@@ -304,7 +360,7 @@
                                             "sourceAddressPrefix": "*",
                                             "destinationAddressPrefix": "Internet",
                                             "access": "Deny",
-                                            "priority": 140,
+                                            "priority": 150,
                                             "direction": "Outbound",
                                             "sourcePortRanges": [],
                                             "destinationPortRanges": [],
@@ -358,6 +414,23 @@
                                         }
                                     },
                                     {
+                                        "name": "AllowAzureMonitor",
+                                        "properties": {
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "AzureMonitor",
+                                            "access": "Allow",
+                                            "priority": 130,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
                                         "name": "DenyInternet",
                                         "properties": {
                                             "protocol": "*",
@@ -366,7 +439,7 @@
                                             "sourceAddressPrefix": "*",
                                             "destinationAddressPrefix": "Internet",
                                             "access": "Deny",
-                                            "priority": 130,
+                                            "priority": 140,
                                             "direction": "Outbound",
                                             "sourcePortRanges": [],
                                             "destinationPortRanges": [],
@@ -401,6 +474,52 @@
                                 "sourceAddressPrefixes": [],
                                 "destinationAddressPrefixes": "[split(parameters('idpOidcIpRanges'), ',')]"
                             }
+                        },
+                        {
+                            "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
+                            "name": "[concat(parameters('funcAppServicePlanNsgName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+                            "apiVersion": "2021-05-01-preview",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('funcAppServicePlanNsgName'))]"
+                            ],
+                            "properties": {
+                                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                                "eventHubName": "[parameters('eventHubName')]",
+                                "workspaceId": "[parameters('workspaceId')]",
+                                "logs": [
+                                    {
+                                        "category": "NetworkSecurityGroupEvent",
+                                        "enabled": true
+                                    },
+                                    {
+                                        "category": "NetworkSecurityGroupRuleCounter",
+                                        "enabled": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
+                            "name": "[concat(parameters('webAppServicePlanNsgName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+                            "apiVersion": "2021-05-01-preview",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('webAppServicePlanNsgName'))]"
+                            ],
+                            "properties": {
+                                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                                "eventHubName": "[parameters('eventHubName')]",
+                                "workspaceId": "[parameters('workspaceId')]",
+                                "logs": [
+                                    {
+                                        "category": "NetworkSecurityGroupEvent",
+                                        "enabled": true
+                                    },
+                                    {
+                                        "category": "NetworkSecurityGroupRuleCounter",
+                                        "enabled": true
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },
@@ -434,6 +553,18 @@
                     },
                     "idpOidcIpRanges": {
                         "value": "[trim(parameters('idpOidcIpRanges'))]"
+                    },
+                    "diagnosticSettingName": {
+                        "value": "[trim(parameters('diagnosticSettingName'))]"
+                    },
+                    "eventHubAuthorizationRuleId": {
+                        "value": "[trim(parameters('eventHubAuthorizationRuleId'))]"
+                    },
+                    "eventHubName": {
+                        "value": "[trim(parameters('eventHubName'))]"
+                    },
+                    "workspaceId": {
+                        "value": "[trim(parameters('workspaceId'))]"
                     }
                 }
             }

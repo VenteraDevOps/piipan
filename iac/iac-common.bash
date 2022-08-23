@@ -117,8 +117,20 @@ METRICS_API_FUNCTION_NAME_LASTUPLOAD=GetLastUpload
 CORE_DB_SERVER_NAME=$PREFIX-psql-core-$ENV
 COLLAB_DB_NAME=collaboration
 
+# Log Analytics Workspace
+LOG_ANALYTICS_WORKSPACE_NAME=${PREFIX}-log-analytics-workspace-${ENV}
+
+# Diagnostic Settings
+DIAGNOSTIC_SETTINGS_NAME="stream-diagnostic-logs"
+DIAGNOSTIC_SETTINGS_EVGT_DATA_PLANE="DataPlaneRequests"
+DIAGNOSTIC_SETTINGS_EVGT_DELIVERY_FAIL="DeliveryFailures"
+DIAGNOSTIC_SETTINGS_EVGT_PUBLISH_FAIL="PublishFailures"
+DIAGNOSTIC_SETTINGS_FUNC="FunctionAppLogs"
+DIAGNOSTIC_SETTINGS_WORKSPACE="Audit"
+
 # Event Hub
-EVENT_HUB_NAME=$PREFIX-evh-monitoring-$ENV
+EVENT_HUB_NAMESPACE=$PREFIX-evh-monitoring-$ENV
+EVENT_HUB_NAME=logs
 
 # Name of Key Vault
 VAULT_NAME=$PREFIX-kv-core-$ENV
@@ -132,6 +144,10 @@ QUERY_TOOL_WAF_NAME=wafquerytool${ENV}
 DASHBOARD_APP_NAME=$PREFIX-app-dashboard-$ENV
 DASHBOARD_FRONTDOOR_NAME=$PREFIX-fd-dashboard-$ENV
 DASHBOARD_WAF_NAME=wafdashboard${ENV}
+
+# Orchestrator Function app and its blob storage
+ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
+ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
 
 # Match Resolution Function App Info
 MATCH_RES_FUNC_APP_NAME=$PREFIX-func-matchres-$ENV
@@ -148,11 +164,21 @@ NOTIFICATIONS_FUNC_APP_STORAGE_NAME=${PREFIX}stnotifications${ENV}
 # Names of apps authenticated by OIDC
 OIDC_APPS=("$QUERY_TOOL_APP_NAME" "$DASHBOARD_APP_NAME")
 
-#Search Metric Event grid
-CREATE_SEARCH_METRICS_TOPIC_NAME=evgt-create-search-metrics-$ENV
+# Search Metrics Event Grid
+CREATE_SEARCH_METRICS_TOPIC_NAME=evgt-create-search-metrics-${ENV}
 
-#Match Metric Event grid
+# Update Metrics Event Grid
+UPDATE_BU_METRICS_TOPIC_NAME=evgt-update-bu-metrics-${ENV}
+UPDATE_BU_METRICS_CUSTOM_TOPIC=evgs-update-bu-metrics-${ENV}
+
+# Match Metric Event grid
 CREATE_MATCH_METRICS_TOPIC_NAME=evgt-publish-match-metrics-$ENV
+
+# Application Insights
+APPINSIGHTS_CONNECTION_STRING="connectionString"
+APPINSIGHTS_KIND="web"
+APPINSIGHTS_INSTRUMENTATIONKEY="APPINSIGHTS_INSTRUMENTATIONKEY"
+APPLICATIONINSIGHTS_CONNECTION_STRING="APPLICATIONINSIGHTS_CONNECTION_STRING"
 
 #Search Metric Event grid
 CREATE_NOTIFICATIONS_TOPIC_NAME=evgt-create-notifications-$ENV
@@ -216,7 +242,7 @@ verify_cloud () {
   fi
 }
 
-# Verify that the FILE exist 
+# Verify that the FILE exist
 verify_file () {
 
   local FILEPATH
@@ -226,10 +252,10 @@ verify_file () {
   FILEPATH=$1
   FILENAME=$2
   FILE=$FILEPATH$FILENAME
-  
+
   if [ -f "$FILE" ]; then
       echo "$FILENAME exists."
-  else 
+  else
       echo "$FILENAME does not exist. A $FILENAME file is required to be present at $FILEPATH"
       exit 64
   fi
@@ -245,12 +271,12 @@ setup_enviroment () {
   ENV_CONFIG=$1
   # FILENAME=$2
   FILE=$ENV_CONFIG/config.bash
-  
+
   if [ -f "$FILE" ]; then
       echo "Setting up environment configuration $FILE."
       # shellcheck source=./iac/env/tts/dev/config.bash
       source "$FILE" "$ENV_CONFIG"
-  else 
+  else
       echo "No environment configuration found at $FILE."
   fi
 }
@@ -464,6 +490,7 @@ set_oidc_secret () {
     --file /dev/stdin \
     --query id > /dev/null
     #--value "$value"
+
 }
 
 # Given an App Service instance name, output the secret established for OIDC,
@@ -507,5 +534,89 @@ eventgrid_key_string () {
     --resource-group "$group" \
     --query "key2" \
     -o tsv
+}
+
+# Many CLI commands use a URI to identify nested resources; pre-compute the URIs
+set_defaults () {
+    # Default Providers
+    DEFAULT_PROVIDERS="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers"
+
+    # Log Analytics Workspace Id
+    LOG_ANALYTICS_WORKSPACE_ID="${DEFAULT_PROVIDERS}/microsoft.operationalinsights/workspaces/${LOG_ANALYTICS_WORKSPACE_NAME}"
+
+    # Function apps need an Event Hub authorization rule Id for log streaming
+    EH_RULE_ID="${DEFAULT_PROVIDERS}/Microsoft.EventHub/namespaces/${EVENT_HUB_NAMESPACE}/authorizationRules/RootManageSharedAccessKey"
+}
+
+# Update Diagnostic Settings for a resource and type
+# This is a temporary method to handle diagnostic updates, until all
+# Azure resource creation is coverted to ARM and the AZ CLI bug is fixed.
+# AZ CLI has a bug, so this must be done through REST API
+# https://github.com/Azure/azure-cli/issues/22572
+update_diagnostic_settings () {
+  local resource=$1
+  local type=$2
+
+  local logs='"category": "'"${type}"'"'
+  local json='{
+    "properties": {
+      "eventHubAuthorizationRuleId": "'"${EH_RULE_ID}"'",
+      "eventHubName": "'"${EVENT_HUB_NAME}"'",
+      "workspaceId": "'"${LOG_ANALYTICS_WORKSPACE_ID}"'",
+      "logs": [
+        {
+          '"${logs}"',
+          "enabled": true
+        }
+      ]
+    }
+  }'
+  submit_diagnostic_settings "${resource}" "${json}"
+}
+
+# Add Diagnostic Settings for an Event Grid Topic (not System Topic)
+# For Event Grid System Topic, use update_diagnostic_settings()
+# This is a temporary method to handle diagnostic updates, until all
+# Azure resource creation is coverted to ARM and the AZ CLI bug is fixed.
+# AZ CLI has a bug, so this must be done through REST API
+# https://github.com/Azure/azure-cli/issues/22572
+update_event_grid_topic_diagnostic_settings () {
+  local resource=$1
+
+  local json='{
+    "properties": {
+      "eventHubAuthorizationRuleId": "'"${EH_RULE_ID}"'",
+      "eventHubName": "'"${EVENT_HUB_NAME}"'",
+      "workspaceId": "'"${LOG_ANALYTICS_WORKSPACE_ID}"'",
+      "logs": [
+        {
+          "category": "'"${DIAGNOSTIC_SETTINGS_EVGT_DATA_PLANE}"'",
+          "enabled": true
+        },
+        {
+          "category": "'"${DIAGNOSTIC_SETTINGS_EVGT_DELIVERY_FAIL}"'",
+          "enabled": true
+        },
+        {
+          "category": "'"${DIAGNOSTIC_SETTINGS_EVGT_PUBLISH_FAIL}"'",
+          "enabled": true
+        }
+      ]
+    }
+  }'
+  submit_diagnostic_settings "${resource}" "${json}"
+}
+
+# Submit the Diagnostic Setting request
+submit_diagnostic_settings () {
+  local resource=$1
+  local content=$2
+
+  mgmt_domain=$(resource_manager_host_suffix)
+  az rest \
+    --method PUT \
+    --uri "https://management${mgmt_domain}/${resource}/providers/Microsoft.Insights/diagnosticSettings/${DIAGNOSTIC_SETTINGS_NAME}?api-version=2021-05-01-preview" \
+    --headers 'Content-Type=application/json' \
+    --body "${content}"
 }
 ### END Functions

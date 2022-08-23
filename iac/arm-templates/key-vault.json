@@ -9,22 +9,47 @@
             "type": "string"
         },
         "location": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location where the resources will be deployed."
+            }
         },
         "resourceTags": {
-            "type": "object"
+          "type": "object",
+          "metadata": {
+            "description": "Specify the resource tags."
+          }
+        },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
         },
         "eventHubName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         }
-    },
-    "variables": {
-        "name": "[parameters('name')]"
     },
     "resources": [
         {
             "apiVersion": "2018-02-14",
-            "name": "[variables('name')]",
+            "name": "[parameters('name')]",
             "location": "[parameters('location')]",
             "tags": "[parameters('resourceTags')]",
             "type": "Microsoft.KeyVault/vaults",
@@ -97,21 +122,26 @@
         },
         {
             "type": "Microsoft.KeyVault/vaults/providers/diagnosticSettings",
-            "apiVersion": "2017-05-01-preview",
-            "name": "[concat(variables('name'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "name": "[concat(parameters('name'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+            "apiVersion": "2021-05-01-preview",
             "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', variables('name'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('name'))]"
             ],
             "properties": {
-                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                "eventHubName": "logs",
+                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                "eventHubName": "[parameters('eventHubName')]",
+                "workspaceId": "[parameters('workspaceId')]",
                 "logs": [
-                {
-                    "category": "AuditEvent",
-                    "enabled": true
-                }
-            ]
-          }
+                    {
+                        "category": "AuditEvent",
+                        "enabled": true
+                    },
+                    {
+                        "category": "AzurePolicyEvaluationDetails",
+                        "enabled": true
+                    }
+                ]
+            }
         }
     ],
     "outputs": {}

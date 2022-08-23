@@ -99,6 +99,7 @@ main () {
   source "$(dirname "$0")"/env/"${azure_env}".bash
   source "$(dirname "$0")"/iac-common.bash
   verify_cloud
+  set_defaults
 
   APIM_NAME=${PREFIX}-apim-duppartapi-${ENV}
   PUBLISHER_NAME='API Administrator'
@@ -159,8 +160,11 @@ main () {
         location="$LOCATION" \
         resourceTags="$RESOURCE_TAGS" \
         coreResourceGroup="$RESOURCE_GROUP" \
-        eventHubName="$EVENT_HUB_NAME" \
         apimPolicyXml="$apim_policy_xml" \
+        diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+        eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+        eventHubName="${EVENT_HUB_NAME}" \
+        workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}" \
         sku="${APIM_SKU}")
 
   apim_id=$(\

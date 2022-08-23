@@ -28,7 +28,10 @@
             "type": "string"
         },
         "resourceTags": {
-            "type": "object"
+            "type": "object",
+            "metadata": {
+                "description": "Resource Tags for project"
+            }
         },
         "vnetName": {
             "type": "string"
@@ -46,8 +49,29 @@
             "type": "string",
             "defaultValue": "privatelink.postgres.database.azure.com"
         },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
         "eventHubName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         }
     },
     "variables": {
@@ -96,7 +120,16 @@
                         "privateDnsZoneName": {
                             "type": "string"
                         },
+                        "diagnosticSettingName": {
+                            "type": "string"
+                        },
+                        "eventHubAuthorizationRuleId": {
+                            "type": "string"
+                        },
                         "eventHubName": {
+                            "type": "string"
+                        },
+                        "workspaceId": {
                             "type": "string"
                         }
                     },
@@ -249,26 +282,113 @@
                                 ]
                             }
                         },
-                        /*"type": "Microsoft.DBforPostgreSQL/servers",
-                            "apiVersion": "2017-12-01-preview",
-                            "kind": "",
-                            "location": "[parameters('location')]",
-                            "tags": "[parameters('resourceTags')]",
-                            "name": "[parameters('serverName')]",*/
                         {
-                            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-                            "apiVersion": "2017-05-01-preview",
-                            "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticSettings",
-                            "name": "[concat(parameters('serverName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/log_statement')]",
                             "dependsOn": [
                                 "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
                             ],
                             "properties": {
-                                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                                "eventHubName": "logs",
+                                "value": "ALL",
+                                "source": "user-override"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/log_min_duration_statement')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "value": "0",
+                                "source": "user-override"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/log_min_error_statement')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "value": "error",
+                                "source": "system-default"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/log_connections')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "value": "on",
+                                "source": "system-default"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/log_disconnections')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "value": "ON",
+                                "source": "user-override"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/log_duration')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "value": "ON",
+                                "source": "user-override"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.DBforPostgreSQL/servers/configurations",
+                            "apiVersion": "2017-12-01",
+                            "name": "[concat(parameters('serverName'), '/logging_collector')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "value": "OFF",
+                                "source": "user-override"
+                            }
+                        },
+                        {
+                            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
+                            "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticSettings",
+                            "name": "[concat(parameters('serverName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+                            "apiVersion": "2021-05-01-preview",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
+                            ],
+                            "properties": {
+                                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                                "eventHubName": "[parameters('eventHubName')]",
+                                "workspaceId": "[parameters('workspaceId')]",
                                 "logs": [
                                     {
                                         "category": "PostgreSQLLogs",
+                                        "enabled": true
+                                    },
+                                    {
+                                        "category": "QueryStoreRuntimeStatistics",
+                                        "enabled": true
+                                    },
+                                    {
+                                        "category": "QueryStoreWaitStatistics",
                                         "enabled": true
                                     }
                                 ]
@@ -309,8 +429,17 @@
                     "privateDnsZoneName": {
                         "value": "[parameters('privateDnsZoneName')]"
                     },
+                    "diagnosticSettingName": {
+                        "value": "[parameters('diagnosticSettingName')]"
+                    },
+                    "eventHubAuthorizationRuleId": {
+                        "value": "[parameters('eventHubAuthorizationRuleId')]"
+                    },
                     "eventHubName": {
                         "value": "[parameters('eventHubName')]"
+                    },
+                    "workspaceId": {
+                        "value": "[parameters('workspaceId')]"
                     }
                 }
             }
