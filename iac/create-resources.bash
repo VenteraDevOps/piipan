@@ -26,20 +26,11 @@ set_constants () {
   # Name of PostgreSQL server
   PG_SERVER_NAME=$PREFIX-psql-participants-$ENV
 
-  # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
-  # for our default resource group
-  DEFAULT_PROVIDERS="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers"
-
-  # Function apps need an Event Hub authorization rule ID for log streaming
-  EH_RULE_ID="${DEFAULT_PROVIDERS}/Microsoft.EventHub/namespaces/${EVENT_HUB_NAME}/authorizationRules/RootManageSharedAccessKey"
-
-  # Orchestrator Function app and its blob storage
-  ORCHESTRATOR_FUNC_APP_NAME=$PREFIX-func-orchestrator-$ENV
-  ORCHESTRATOR_FUNC_APP_STORAGE_NAME=${PREFIX}storchestrator${ENV}
-
   PRIVATE_DNS_ZONE=$(private_dns_zone)
 
   QUERY_TOOL_URL="https://$QUERY_TOOL_FRONTDOOR_NAME"$(front_door_host_suffix)
+
+  set_defaults
 }
 
 # Generate the storage account connection string for the corresponding
@@ -107,6 +98,23 @@ main () {
   echo "Creating Resource Groups"
   ./create-resource-groups.bash "$azure_env"
 
+  # Create Log Analytics workspace
+  echo "Creating Log Analytics workspace"
+  az deployment group create \
+   --name "${LOG_ANALYTICS_WORKSPACE_NAME}" \
+   --resource-group "${RESOURCE_GROUP}" \
+   --template-file ./arm-templates/log-analytics-workspace.json \
+   --parameters \
+     diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+     eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+     eventHubName="${EVENT_HUB_NAME}" \
+     resourceTags="${RESOURCE_TAGS}" \
+     workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}" \
+     workspaceName="${LOG_ANALYTICS_WORKSPACE_NAME}"
+
+  # Create Event Hub
+  ./create-event-hub.bash "${azure_env}"
+
   # Virtual network is used to secure connections between
   # participant records database and all apps that communicate with it.
   # Apps will be integrated with VNet as they're created.
@@ -114,22 +122,22 @@ main () {
   az deployment group create \
     --name "$VNET_NAME" \
     --resource-group "$RESOURCE_GROUP" \
-      --template-file ./arm-templates/virtual-network.json \
-      --parameters \
-        location="$LOCATION" \
-        resourceTags="$RESOURCE_TAGS" \
-        vnetName="$VNET_NAME" \
-        peParticipantsSubnetName="$DB_SUBNET_NAME" \
-        peCoreSubnetName="$DB_2_SUBNET_NAME" \
-        funcAppServicePlanSubnetName="$FUNC_SUBNET_NAME" \
-        funcAppServicePlanNsgName="$FUNC_NSG_NAME" \
-        webAppServicePlanSubnetName="$WEBAPP_SUBNET_NAME" \
-        webAppServicePlanNsgName="$WEBAPP_NSG_NAME" \
-        idpOidcIpRanges="$IDP_OIDC_IP_RANGES"
-
-  # Many CLI commands use a URI to identify nested resources; pre-compute the URI's prefix
-  # for our default resource group
-  DEFAULT_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+    --template-file ./arm-templates/virtual-network.json \
+    --parameters \
+      location="$LOCATION" \
+      vnetName="$VNET_NAME" \
+      peParticipantsSubnetName="$DB_SUBNET_NAME" \
+      peCoreSubnetName="$DB_2_SUBNET_NAME" \
+      funcAppServicePlanSubnetName="$FUNC_SUBNET_NAME" \
+      funcAppServicePlanNsgName="$FUNC_NSG_NAME" \
+      webAppServicePlanSubnetName="$WEBAPP_SUBNET_NAME" \
+      webAppServicePlanNsgName="$WEBAPP_NSG_NAME" \
+      idpOidcIpRanges="$IDP_OIDC_IP_RANGES" \
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      resourceTags="${RESOURCE_TAGS}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}" \
 
   # Several CLI commands use the vnet resource ID
   # Resource ID required when vnet is in a separate resource group
@@ -140,79 +148,54 @@ main () {
       --query id \
       -o tsv)
 
-  # Create an Event Hub namespace and hub where resource logs will be streamed,
-  # as well as an application registration that can be used to read logs
-  siem_app_id=$(\
-    az ad sp list \
-      --display-name "$SIEM_RECEIVER" \
-      --filter "displayname eq '$SIEM_RECEIVER'" \
-      --query "[0].id" \
-      --output tsv)
-  # Avoid resetting password by only creating app registration if it does not exist
-  if [ -z "$siem_app_id" ]; then
-    siem_app_id=$(\
-      az ad sp create-for-rbac \
-        --name "$SIEM_RECEIVER" \
-        --role "Reader" \
-        --scopes "/subscriptions/${SUBSCRIPTION_ID}" \
-        --query "[0].id" \
-        --output tsv)
-
-    # Wait bit to avoid "InvalidPrincipalId" on app registration use below
-    sleep 120
-  fi
-
-  # Create event hub and assign role to app registration
-  az deployment group create \
-   --name monitoring \
-   --resource-group "$RESOURCE_GROUP" \
-   --template-file  ./arm-templates/event-hub-monitoring.json \
-   --parameters \
-     resourceTags="$RESOURCE_TAGS" \
-     location="$LOCATION" \
-     env="$ENV" \
-     prefix="$PREFIX" \
-     receiverId="$siem_app_id"
-
   # Create a key vault which will store credentials for use in other templates
   az deployment group create \
-    --name "$VAULT_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
+    --name "${VAULT_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
     --template-file ./arm-templates/key-vault.json \
     --parameters \
-      name="$VAULT_NAME" \
-      location="$LOCATION" \
-      objectId="$CURRENT_USER_OBJID" \
-      resourceTags="$RESOURCE_TAGS" \
-      eventHubName="$EVENT_HUB_NAME"
+      name="${VAULT_NAME}" \
+      location="${LOCATION}" \
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      objectId="${CURRENT_USER_OBJID}" \
+      resourceTags="${RESOURCE_TAGS}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
-  # Send Policy events from subscription's activity log to event hub
+  # Send Events from Subscription's Activity log to Event Hub / Log Analytisc workspace
   az deployment sub create \
-    --name activity-log-diagnostics-$LOCATION \
-    --location "$LOCATION" \
+    --name activity-log-diagnostics-"${LOCATION}" \
+    --location "${LOCATION}" \
     --template-file ./arm-templates/activity-log.json \
     --parameters \
-      eventHubName="$EVENT_HUB_NAME" \
-      coreResourceGroup="$RESOURCE_GROUP"
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
-      # For each participating state, create a separate storage account.
+  # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
-  while IFS=, read -r abbr name _; do
+  while IFS=$',\t\r\n' read -r abbr name enable_matches; do
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       func_stor_name=${PREFIX}st${abbr}upload${ENV}
       echo "Creating storage for $name ($func_stor_name)"
       az deployment group create \
-      --name "$func_stor_name" \
-      --resource-group "$RESOURCE_GROUP" \
+      --name "${func_stor_name}" \
+      --resource-group "${RESOURCE_GROUP}" \
       --template-file ./arm-templates/blob-storage.json \
       --parameters \
-        storageAccountName="$func_stor_name" \
-        resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION" \
-        vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME" \
-        sku="$STORAGE_SKU" \
-        eventHubNamespace="$EVENT_HUB_NAME"
+        storageAccountName="${func_stor_name}" \
+        resourceTags="${RESOURCE_TAGS}" \
+        location="${LOCATION}" \
+        diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+        eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+        eventHubName="${EVENT_HUB_NAME}" \
+        sku="${STORAGE_SKU}" \
+        subnet="${FUNC_SUBNET_NAME}" \
+        vnet="${VNET_ID}" \
+        workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
+
   done < env/"${azure_env}"/states.csv
 
   # Avoid echoing passwords in a manner that may show up in process listing,
@@ -244,7 +227,10 @@ main () {
       subnetName="$DB_SUBNET_NAME" \
       privateEndpointName="$PRIVATE_ENDPOINT_NAME" \
       privateDnsZoneName="$PRIVATE_DNS_ZONE" \
-      eventHubName="$EVENT_HUB_NAME"
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
 
   # The AD admin can't be specified in the PostgreSQL ARM template,
@@ -262,7 +248,7 @@ main () {
 
   # Create managed identities to admin each state's database
   configure_azure_profile
-  while IFS=, read -r abbr name _; do
+  while IFS=$',\t\r\n' read -r abbr name enable_matches; do
       echo "Creating managed identity for $name ($abbr)"
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
       identity=$(state_managed_id_name "$abbr" "$ENV")
@@ -345,21 +331,33 @@ main () {
   fi
   echo "Enabled States: ${state_enabled_matches}"
 
- echo "Create Event grid for Search Metrics" 
+  echo "Create Event Grid Topic for Search Metrics"
+  event_grid_topic_id=$(\
+    az eventgrid topic create \
+      --location "${LOCATION}" \
+      --name "${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      -o tsv \
+      --query id)
+  eventgrid_search_endpoint=$(eventgrid_endpoint "${RESOURCE_GROUP}" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+  eventgrid_search_key_string=$(eventgrid_key_string "${RESOURCE_GROUP}" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
 
-  az eventgrid topic create \
-    --location "$LOCATION" \
-    --name "${CREATE_SEARCH_METRICS_TOPIC_NAME}" \
-    --resource-group "$RESOURCE_GROUP"
-  eventgrid_search_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
-  eventgrid_search_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_SEARCH_METRICS_TOPIC_NAME}")
+  # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
+  update_event_grid_topic_diagnostic_settings "${event_grid_topic_id}"
 
-  az eventgrid topic create \
-    --location "$LOCATION" \
-    --name "${CREATE_MATCH_METRICS_TOPIC_NAME}" \
-    --resource-group "$RESOURCE_GROUP"
-  eventgrid_match_metrics_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_MATCH_METRICS_TOPIC_NAME}")
-  eventgrid_match_metrics_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_MATCH_METRICS_TOPIC_NAME}")
+  echo "Create Event Grid Topic for Match Metrics"
+  event_grid_topic_id=$(\
+    az eventgrid topic create \
+      --location "${LOCATION}" \
+      --name "${CREATE_MATCH_METRICS_TOPIC_NAME}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      -o tsv \
+      --query id)
+  eventgrid_match_metrics_endpoint=$(eventgrid_endpoint "${RESOURCE_GROUP}" "${CREATE_MATCH_METRICS_TOPIC_NAME}")
+  eventgrid_match_metrics_key_string=$(eventgrid_key_string "${RESOURCE_GROUP}" "${CREATE_MATCH_METRICS_TOPIC_NAME}")
+
+  # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
+  update_event_grid_topic_diagnostic_settings "${event_grid_topic_id}"
 
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
@@ -382,27 +380,14 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME" \
-      statesToEnableMatches="$state_enabled_matches"
-
-  echo "Allowing $VNET_NAME to access $ORCHESTRATOR_FUNC_APP_STORAGE_NAME"
-
-  # Subnet ID is needed when vnet and storage are in different resource groups
-  func_subnet_id=$(\
-    az network vnet subnet show \
-      --vnet-name "$VNET_NAME" \
-      --name "$FUNC_SUBNET_NAME" \
-      --resource-group "$RESOURCE_GROUP" \
-      --query id \
-      -o tsv)
-  az storage account network-rule add \
-    --account-name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --subnet "$func_subnet_id"
-  az storage account update \
-    --name "$ORCHESTRATOR_FUNC_APP_STORAGE_NAME" \
-    --resource-group "$MATCH_RESOURCE_GROUP" \
-    --default-action Deny
+      statesToEnableMatches="$state_enabled_matches" \
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      sku="${STORAGE_SKU}" \
+      subnet="${FUNC_SUBNET_NAME}" \
+      vnet="${VNET_ID}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   echo "Integrating ${ORCHESTRATOR_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -411,8 +396,14 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
 
+  echo "Removing public access for ${ORCHESTRATOR_FUNC_APP_NAME}"
+  az storage account update \
+    --name "${ORCHESTRATOR_FUNC_APP_STORAGE_NAME}" \
+    --resource-group "${MATCH_RESOURCE_GROUP}" \
+    --default-action "Deny"
+
   # Update Key Vault to allow function access
-  echo "Granting Key Vault access to ${ORCHESTRATOR_FUNC_APP_NAME}"
+  echo "Granting Key Vault access for ${ORCHESTRATOR_FUNC_APP_NAME}"
   funcIdentityPrincipalId=$(\
     az functionapp identity show \
     --name "${ORCHESTRATOR_FUNC_APP_NAME}" \
@@ -471,7 +462,13 @@ main () {
       cloudName="$CLOUD_NAME" \
       states="$state_abbrs" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      sku="${STORAGE_SKU}" \
+      subnet="${FUNC_SUBNET_NAME}" \
+      vnet="${VNET_ID}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   echo "Integrating ${MATCH_RES_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -480,8 +477,14 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
 
+  echo "Removing public access for ${MATCH_RES_FUNC_APP_NAME}"
+  az storage account update \
+    --name "${MATCH_RES_FUNC_APP_STORAGE_NAME}" \
+    --resource-group "${MATCH_RESOURCE_GROUP}" \
+    --default-action "Deny"
+
   # Update Key Vault to allow function access
-  echo "Granting Key Vault access to ${MATCH_RES_FUNC_APP_NAME}"
+  echo "Granting Key Vault access for ${MATCH_RES_FUNC_APP_NAME}"
   funcIdentityPrincipalId=$(\
     az functionapp identity show \
     --name "${MATCH_RES_FUNC_APP_NAME}" \
@@ -534,8 +537,13 @@ main () {
       collabDatabaseConnectionString="$collab_db_conn_str" \
       cloudName="$CLOUD_NAME" \
       coreResourceGroup="$RESOURCE_GROUP" \
-      eventHubName="$EVENT_HUB_NAME"
-
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      sku="${STORAGE_SKU}" \
+      subnet="${FUNC_SUBNET_NAME}" \
+      vnet="${VNET_ID}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   echo "Integrating ${STATES_FUNC_APP_NAME} into virtual network"
   az functionapp vnet-integration add \
@@ -544,6 +552,11 @@ main () {
     --subnet "$FUNC_SUBNET_NAME" \
     --vnet "$VNET_ID"
 
+  echo "Removing public access for ${MATCH_RES_FUNC_APP_NAME}"
+  az storage account update \
+    --name "${STATES_FUNC_APP_STORAGE_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --default-action "Deny"
 
   echo "Update ${STATES_FUNC_APP_NAME} settings"
   az functionapp config appsettings set \
@@ -574,7 +587,7 @@ main () {
   # Create per-state Function apps and assign corresponding managed identity for
   # access to the per-state blob-storage and database, set up system topics and
   # event subscription to bulk upload (blob creation) events
-  while IFS=, read -r abbr name ; do
+  while IFS=$',\t\r\n' read -r abbr name enable_matches; do
     echo "Creating function app for $name ($abbr)"
     abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
 
@@ -606,20 +619,26 @@ main () {
     # e.g., bindings state, keys, function code. Keep this separate from
     # the storage account used to upload data for better isolation.
     az deployment group create \
-      --name "$func_stor" \
-      --resource-group "$RESOURCE_GROUP" \
+      --name "${func_stor}" \
+      --resource-group "${RESOURCE_GROUP}" \
       --template-file ./arm-templates/function-storage.json \
       --parameters \
-        uniqueStorageName="$func_stor" \
-        resourceTags="$RESOURCE_TAGS" \
-        location="$LOCATION" \
-        vnet="$VNET_ID" \
-        subnet="$FUNC_SUBNET_NAME" \
-        sku="$STORAGE_SKU"
+        storageAccountName="${func_stor}" \
+        location="${LOCATION}" \
+        resourceTags="${RESOURCE_TAGS}" \
+        diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+        eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+        eventHubName="${EVENT_HUB_NAME}" \
+        sku="${STORAGE_SKU}" \
+        subnet="${FUNC_SUBNET_NAME}" \
+        vnet="${VNET_ID}" \
+        workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
     # Even though the OS *should* be abstracted away at the Function level, Azure
     # portal has oddities/limitations when using Linux -- lets just get it
     # working with Windows as underlying OS
+    #
+    # TODO: The following functionapp code should be migrated to ARM
     az functionapp create \
       --resource-group "$RESOURCE_GROUP" \
       --plan "$APP_SERVICE_PLAN_FUNC_NAME" \
@@ -628,7 +647,8 @@ main () {
       --functions-version 4 \
       --os-type Windows \
       --name "$func_app" \
-      --storage-account "$func_stor"
+      --storage-account "$func_stor" \
+      --disable-app-insights true
 
     # Integrate function app into Virtual Network
     echo "Integrating ${func_app} into virtual network"
@@ -637,29 +657,30 @@ main () {
       --resource-group "$RESOURCE_GROUP" \
       --subnet "$FUNC_SUBNET_NAME" \
       --vnet "$VNET_NAME"
-    az webapp config set \
-      --name "$func_app" \
-      --resource-group "$RESOURCE_GROUP" \
+
+    echo "Configure: ${func_app}"
+    az functionapp config set \
+      --name "${func_app}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      --always-on true \
+      --ftps-state "Disabled" \
+      --min-tls-version "1.2" \
       --vnet-route-all-enabled true
 
-    # Stream logs to Event Hub
+    echo "Removing public access for ${func_stor}"
+    az storage account update \
+      --name "${func_stor}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      --default-action "Deny"
+
+    # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
     func_id=$(\
       az functionapp show \
         -n "$func_app" \
         -g "$RESOURCE_GROUP" \
         -o tsv \
         --query id)
-    az monitor diagnostic-settings create \
-      --name "stream-logs-to-event-hub" \
-      --resource "$func_id" \
-      --event-hub "logs" \
-      --event-hub-rule "${EH_RULE_ID}" \
-      --logs '[
-        {
-          "category": "FunctionAppLogs",
-          "enabled": true
-        }
-      ]'
+    update_diagnostic_settings "${func_id}" "${DIAGNOSTIC_SETTINGS_FUNC}"
 
     # XXX Assumes if any identity is set, it is the one we are specifying below
     exists=$(az functionapp identity show \
@@ -700,17 +721,37 @@ main () {
         objectId="${stateManagedIdentityPrincipalId}" \
         permissionsSecrets="['get', 'list']"
 
+    echo "Creating Application Insight for function: ${func_app}"
+    appInsightConnectionString=$(\
+      az monitor app-insights component create \
+        --app "${func_app}" \
+        --location "${LOCATION}" \
+        --resource-group "${RESOURCE_GROUP}" \
+        --tags "${RESOURCE_TAGS}" \
+        --application-type "${APPINSIGHTS_KIND}" \
+        --kind "${APPINSIGHTS_KIND}" \
+        --workspace "${LOG_ANALYTICS_WORKSPACE_ID}" \
+        --query "${APPINSIGHTS_CONNECTION_STRING}" \
+        --output tsv)
+
+    echo "Integrating Application Insight with function: ${func_app}"
+    az monitor app-insights component connect-function \
+      --app "${func_app}" \
+      --function "${func_app}" \
+      --resource-group "${RESOURCE_GROUP}"
+
+    echo "Configure appsettings for: ${func_app}"
     az_serv_str=$(az_connection_string "${RESOURCE_GROUP}" "${identity}")
     blob_conn_str=$(blob_connection_string "${RESOURCE_GROUP}" "${stor_name}")
     # Long-running bulk upload queries require some specific connection
     # details that are not part of the default connection string
     db_conn_str=$(pg_connection_string "$PG_SERVER_NAME" "$db_name" "$identity")
     db_conn_str="${db_conn_str};Tcp Keepalive=true;Tcp Keepalive Time=30000;Command Timeout=300;"
-    echo "Update ${func_app} settings"
     az functionapp config appsettings set \
       --resource-group "$RESOURCE_GROUP" \
       --name "$func_app" \
       --settings \
+        ${APPLICATIONINSIGHTS_CONNECTION_STRING}="${appInsightConnectionString}" \
         ${AZ_SERV_STR_KEY}="${az_serv_str}" \
         ${BLOB_CONN_STR_KEY}="${blob_conn_str}" \
         ${CLOUD_NAME_STR_KEY}="${CLOUD_NAME}" \
@@ -747,18 +788,9 @@ main () {
       --included-event-types Microsoft.Storage.BlobCreated \
       --subject-begins-with /blobServices/default/containers/upload/blobs/
 
-    # Stream event topic logs to Event Hub
-    az monitor diagnostic-settings create \
-      --name "stream-logs-to-event-hub" \
-      --resource "$event_grid_system_topic_id" \
-      --event-hub "logs" \
-      --event-hub-rule "${EH_RULE_ID}" \
-      --logs '[
-        {
-          "category": "DeliveryFailures",
-          "enabled": true
-        }
-      ]'
+    # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
+    update_diagnostic_settings "${event_grid_system_topic_id}" "${DIAGNOSTIC_SETTINGS_EVGT_DELIVERY_FAIL}"
+
     # Create an Active Directory app registration associated with the app.
     # Used by subsequent resources to configure auth
     az ad app create \
@@ -767,13 +799,17 @@ main () {
       
   done < env/"${azure_env}"/states.csv
 
+  echo "Create Event Grid Topic for Update Metrics"
+  event_grid_topic_id=$(\
+    az eventgrid topic create \
+      --location "${LOCATION}" \
+      --name "${UPDATE_BU_METRICS_TOPIC_NAME}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      -o tsv \
+      --query id)
 
-  update_bu_metrics_topic_name=evgt-update-bu-metrics-$ENV
-
-  az eventgrid topic create \
-    --location "$LOCATION" \
-    --name "$update_bu_metrics_topic_name" \
-    --resource-group "$RESOURCE_GROUP"
+  # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
+  update_event_grid_topic_diagnostic_settings "${event_grid_topic_id}"
 
   # Create App Service resources for query tool app.
   # This needs to happen after the orchestrator is created in order for
@@ -856,13 +892,16 @@ main () {
       MatchResApiAppId="$match_res_api_app_id" \
       StatesApiUri="$states_api_uri" \
       StatesApiAppId="$states_api_app_id" \
-      eventHubName="$EVENT_HUB_NAME" \
       idpOidcConfigUri="$QUERY_TOOL_APP_IDP_OIDC_CONFIG_URI" \
       idpOidcScopes="$QUERY_TOOL_APP_IDP_OIDC_SCOPES" \
       idpClientId="$QUERY_TOOL_APP_IDP_CLIENT_ID" \
       aspNetCoreEnvironment="$PREFIX" \
       frontDoorId="$front_door_id" \
-      frontDoorUri="$QUERY_TOOL_URL"
+      frontDoorUri="$QUERY_TOOL_URL" \
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
   az webapp vnet-integration add \

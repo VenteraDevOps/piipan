@@ -3,10 +3,17 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "resourceTags": {
-            "type": "object"
+            "type": "object",
+            "metadata": {
+                "description": "Specify the resource tags."
+            }
         },
         "location": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location where the resources will be deployed."
+            }
         },
         "functionAppName": {
             "type": "string"
@@ -18,9 +25,6 @@
             "type": "string"
         },
         "coreResourceGroup": {
-            "type": "String"
-        },
-        "eventHubName": {
             "type": "String"
         },
         "databaseConnectionString": {
@@ -37,40 +41,117 @@
         },
         "statesToEnableMatches": {
             "type": "String"
+        },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "sku": {
+            "type": "String",
+            "metadata": {
+                "description": "Specify the SKU type."
+            }
+        },
+        "subnet": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Virtual Network - Subnet."
+            }
+        },
+        "vnet": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Virtual Network."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         }
     },
     "variables": {
-        "functionAppName": "[parameters('functionAppName')]",
-        "storageAccountName": "[parameters('storageAccountName')]",
         "functionWorkerRuntime": "dotnet",
-        "storageAccountType": "Standard_LRS",
         "systemTypeTag": {
             "SysType": "OrchestratorApi"
         },
         "applicationInsightsTag": {
-            "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('functionAppName')))]": "Resource"
+            "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('functionAppName')))]": "Resource"
         }
     },
     "resources": [
         // Orchestrator function app resources
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
-            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2021-09-01",
+            "name": "[parameters('storageAccountName')]",
             "tags": "[parameters('resourceTags')]",
             "location": "[parameters('location')]",
             "sku": {
-                "name": "[variables('storageAccountType')]"
+                "name": "[parameters('sku')]"
             },
             "kind": "StorageV2",
             "properties": {
+                "allowBlobPublicAccess": false,
+                "minimumTlsVersion": "TLS1_2",
+                "networkAcls": {
+                    "virtualNetworkRules": [
+                        {
+                            "id": "[concat(parameters('vnet'),  '/subnets/', parameters('subnet'))]",
+                            "action": "Allow"
+                        }
+                    ]
+                },
                 "supportsHttpsTrafficOnly": true
+            }
+        },
+        {
+            /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings#diagnostic-setting-for-azure-storage */
+            "apiVersion": "2021-05-01-preview",
+            "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticSettings",
+            "name": "[concat(parameters('storageAccountName'), '/default/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                "eventHubName": "[parameters('eventHubName')]",
+                "workspaceId": "[parameters('workspaceId')]",
+                "logs": [
+                    {
+                        "category": "StorageRead",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageWrite",
+                        "enabled": true
+                    },
+                    {
+                        "category": "StorageDelete",
+                        "enabled": true
+                    }
+                ]
             }
         },
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2020-06-01",
-            "name": "[variables('functionAppName')]",
+            "name": "[parameters('functionAppName')]",
             "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "location": "[parameters('location')]",
             "kind": "functionapp",
@@ -78,7 +159,8 @@
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+                "[resourceId('Microsoft.Insights/components', parameters('functionAppName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "properties": {
                 "serverFarmId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
@@ -97,7 +179,7 @@
                         */
                         {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
                         },
                         {
                             "name": "FUNCTIONS_WORKER_RUNTIME",
@@ -116,11 +198,11 @@
                         */
                         {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(variables('functionAppName'))]"
+                            "value": "[toLower(parameters('functionAppName'))]"
                         },
                         // Required when using the zip deployment method (i.e., the method
                         // used by `func azure functionapp publish`)
@@ -128,10 +210,13 @@
                             "name": "WEBSITE_RUN_FROM_PACKAGE",
                             "value": "1"
                         },
-                        // Connect app to Application Insights instance
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components', variables('functionAppName')), '2020-02-02-preview').InstrumentationKey]"
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).ConnectionString]"
                         },
                         // Bind backing services
                         {
@@ -159,27 +244,30 @@
             }
         },
         {
-            "type": "microsoft.insights/components",
-            "apiVersion": "2020-02-02-preview",
-            "name": "[variables('functionAppName')]",
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[parameters('functionAppName')]",
             "location": "[parameters('location')]",
-            "tags": "[union(parameters('resourceTags'), variables('applicationInsightsTag'))]",
+            "tags": "[variables('applicationInsightsTag')]",
+            "kind": "web",
             "properties": {
-                "ApplicationId": "[variables('functionAppName')]",
-                "Request_Source": "IbizaWebAppExtensionCreate"
+                "Application_Type": "web",
+                "Request_Source": "rest",
+                "WorkspaceResourceId": "[parameters('workspaceId')]"
             }
         },
         {
             /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-            "apiVersion": "2017-05-01-preview",
             "type": "Microsoft.Web/sites/providers/diagnosticSettings",
-            "name": "[concat(variables('functionAppName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "name": "[concat(parameters('functionAppName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+            "apiVersion": "2021-05-01-preview",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
             ],
             "properties": {
-                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', parameters('coreResourceGroup'), '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                "eventHubName": "logs",
+                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                "eventHubName": "[parameters('eventHubName')]",
+                "workspaceId": "[parameters('workspaceId')]",
                 "logs": [
                     /* Category names from `az monitor diagnostic-settings categories list` */
                     {
@@ -193,7 +281,7 @@
     "outputs": {
         "functionAppName": {
             "type": "string",
-            "value": "[variables('functionAppName')]"
+            "value": "[parameters('functionAppName')]"
         }
     }
 }

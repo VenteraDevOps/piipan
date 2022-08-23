@@ -6,10 +6,17 @@
             "type": "string"
         },
         "location": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location where the resources will be deployed."
+            }
         },
         "resourceTags": {
-            "type": "object"
+            "type": "object",
+            "metadata": {
+                "description": "Resource Tags for project"
+            }
         },
         "servicePlan": {
             "type": "string"
@@ -32,9 +39,6 @@
         "StatesApiAppId": {
             "type": "string"
         },
-        "eventHubName": {
-            "type": "String"
-        },
         "idpOidcConfigUri": {
             "type": "string"
         },
@@ -52,17 +56,38 @@
         },
         "frontDoorUri": {
             "type": "string"
+        },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         }
     },
     "variables": {
-        "appName": "[concat(parameters('appName'))]",
         "sku": "S1",
         "baseSiteConfig": {
-            // .NET 3.1 Core uses "v4.0", .NET 6 uses "v6.0"
             "netFrameworkVersion": "v6.0",
             "metadata": [
                 {
-                    // .NET 3.1 Core uses "dotnetcore", .NET 5 uses "dotnet"
                     "name": "CURRENT_STACK",
                     "value": "dotnet"
                 }
@@ -141,7 +166,7 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2020-06-01",
-            "name": "[variables('appName')]",
+            "name": "[parameters('appName')]",
             "location": "[parameters('location')]",
             "tags": "[union(parameters('resourceTags'), variables('systemTypeTag'))]",
             "identity": {
@@ -168,15 +193,17 @@
         },
         {
             /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-            "apiVersion": "2017-05-01-preview",
             "type": "Microsoft.Web/sites/providers/diagnosticSettings",
-            "name": "[concat(variables('appName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "name": "[concat(parameters('appName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+            "apiVersion": "2021-05-01-preview",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
             ],
             "properties": {
-                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                "eventHubName": "logs",
+                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                "eventHubName": "[parameters('eventHubName')]",
+                "workspaceId": "[parameters('workspaceId')]",
+                /* TODO: Configure categories supported by Azure Gov, but not Azure Commerical */
                 "logs": [
                     {
                         "category": "AppServiceHTTPLogs",
@@ -211,7 +238,7 @@
             "apiVersion": "2020-12-01",
             "name": "[concat(parameters('appName'), '/authsettingsV2')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
             ],
             "properties": {
                 "platform": {
@@ -281,7 +308,7 @@
     "outputs": {
         "appName": {
             "type": "string",
-            "value": "[variables('appName')]"
+            "value": "[parameters('appName')]"
         }
     }
 }

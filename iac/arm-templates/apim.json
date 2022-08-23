@@ -15,10 +15,17 @@
             "type": "String"
         },
         "resourceTags": {
-            "type": "object"
+            "type": "object",
+            "metadata": {
+                "description": "Specify the resource tags."
+            }
         },
         "location": {
-            "type": "String"
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location where the resources will be deployed."
+            }
         },
         "publisherEmail": {
             "type": "String"
@@ -35,14 +42,35 @@
         "uploadStates": {
             "type": "String"
         },
+        "apimPolicyXml": {
+            "type": "String"
+        },
         "coreResourceGroup": {
             "type": "String"
         },
-        "eventHubName": {
-            "type": "String"
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
         },
-        "apimPolicyXml": {
-            "type": "String"
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         },
         "sku": {
             "type": "string",
@@ -204,15 +232,16 @@
         },
         {
             /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-            "apiVersion": "2017-05-01-preview",
             "type": "Microsoft.ApiManagement/service/providers/diagnosticSettings",
-            "name": "[concat(parameters('apiName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "name": "[concat(parameters('apiName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+            "apiVersion": "2021-05-01-preview",
             "dependsOn": [
                 "[resourceId('Microsoft.ApiManagement/service', parameters('apiName'))]"
             ],
             "properties": {
-                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', parameters('coreResourceGroup'), '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                "eventHubName": "logs",
+                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                "eventHubName": "[parameters('eventHubName')]",
+                "workspaceId": "[parameters('workspaceId')]",
                 "logs": [
                     /* Category names from `az monitor diagnostic settings categories list` */
                     {

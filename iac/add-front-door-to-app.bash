@@ -20,6 +20,7 @@ main () {
   source "$(dirname "$0")"/env/"${azure_env}".bash
   source "$(dirname "$0")"/iac-common.bash
   verify_cloud
+  set_defaults
 
   resource_group=$2
   front_door_name=$3
@@ -41,7 +42,11 @@ main () {
       wafPolicyName="$waf_name" \
       prefix="$PREFIX" \
       env="$ENV" \
-      rulesEngineName="$rules_engine_name"
+      rulesEngineName="$rules_engine_name" \
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   echo 'Associate Routing Rule to Front Door Rule Engine'
   az network front-door routing-rule update --front-door-name "$front_door_name" --name routingRule1 --resource-group "$resource_group" --rules-engine "$rules_engine_name"

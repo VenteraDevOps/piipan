@@ -76,8 +76,29 @@
             "type": "string",
             "defaultValue": "privatelink.postgres.database.azure.com"
         },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
         "eventHubName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         }
     },
     "resources": [
@@ -127,7 +148,16 @@
                         "privateDnsZoneName": {
                             "type": "string"
                         },
+                        "diagnosticSettingName": {
+                            "type": "string"
+                        },
+                        "eventHubAuthorizationRuleId": {
+                            "type": "string"
+                        },
                         "eventHubName": {
+                            "type": "string"
+                        },
+                        "workspaceId": {
                             "type": "string"
                         }
                     },
@@ -365,18 +395,27 @@
                         },
                         {
                             /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-                            "apiVersion": "2017-05-01-preview",
                             "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticSettings",
-                            "name": "[concat(parameters('serverName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+                            "name": "[concat(parameters('serverName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+                            "apiVersion": "2021-05-01-preview",
                             "dependsOn": [
                                 "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('serverName'))]"
                             ],
                             "properties": {
-                                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', parameters('eventHubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                                "eventHubName": "logs",
+                                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                                "eventHubName": "[parameters('eventHubName')]",
+                                "workspaceId": "[parameters('workspaceId')]",
                                 "logs": [
                                     {
                                         "category": "PostgreSQLLogs",
+                                        "enabled": true
+                                    },
+                                    {
+                                        "category": "QueryStoreRuntimeStatistics",
+                                        "enabled": true
+                                    },
+                                    {
+                                        "category": "QueryStoreWaitStatistics",
                                         "enabled": true
                                     }
                                 ]
@@ -417,8 +456,17 @@
                     "privateDnsZoneName": {
                         "value": "[parameters('privateDnsZoneName')]"
                     },
+                    "diagnosticSettingName": {
+                        "value": "[parameters('diagnosticSettingName')]"
+                    },
+                    "eventHubAuthorizationRuleId": {
+                        "value": "[parameters('eventHubAuthorizationRuleId')]"
+                    },
                     "eventHubName": {
                         "value": "[parameters('eventHubName')]"
+                    },
+                    "workspaceId": {
+                        "value": "[parameters('workspaceId')]"
                     }
                 }
             }
