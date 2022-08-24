@@ -53,14 +53,14 @@ main () {
 
     echo "Generate Column Encryption Key"
     columnKey=$(openssl enc -aes-256-cbc -k secret -P -md sha512 -pbkdf2 | sed -n 's/^key=\(.*\)/\1/p')
-    BASE64COLUMNKEY=$(echo "${columnKey}" | xxd -r -p | base64)
+    BASE64COLUMNKEY=$(../tools/hexToBase64Converter.py "${columnKey}")
     create_kv_secret "${COLUMN_ENCRYPT_KEY_KV}" "${BASE64COLUMNKEY}"
 
     echo "Generate Payload Encryption Keys"
     payloadKey=$(openssl enc -aes-256-cbc -k secret -P -md sha512 -pbkdf2 | sed -n 's/^key=\(.*\)/\1/p')
-    BASE64UPLOADKEY=$(echo "${payloadKey}" | xxd -r -p | base64)
-    shaOfPayloadKey=$(echo -n "${payloadKey}" | xxd -r -p | sha256sum)
-    BASE64UPLOADSHAKEY=$(echo "${shaOfPayloadKey}" | xxd -r -p | base64)
+    BASE64UPLOADKEY=$(../tools/hexToBase64Converter.py "${payloadKey}")
+    shaOfPayloadKey=$(../tools/sha256Calculator.py "${payloadKey}")
+    BASE64UPLOADSHAKEY=$(../tools/hexToBase64Converter.py "${shaOfPayloadKey}")
     create_kv_secret "${UPLOAD_ENCRYPT_KEY_KV}" "${BASE64UPLOADKEY}"
     create_kv_secret "${UPLOAD_ENCRYPT_KEY_SHA_KV}" "${BASE64UPLOADSHAKEY}"
 }
