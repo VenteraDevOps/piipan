@@ -1,4 +1,4 @@
-# Log streaming
+# Log Streaming
 
 In keeping with [NIST SP 800-53 control AU-6](https://csrc.nist.gov/Projects/risk-management/sp800-53-controls/release-search#!/control?version=4.0&number=AU-6), resource logs are streamed to a central location where they can be [accessed by an external Security Information and Event Management (SIEM) tool](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/stream-monitoring-data-event-hubs#partner-tools-with-azure-monitor-integration). This is accomplished in Azure using a combination of [Event Hub](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-about), resource [diagnostic settings](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD), and an [application registration](https://docs.microsoft.com/en-us/azure/event-hubs/authenticate-application) for accessing and reading logs.
 
@@ -13,13 +13,15 @@ All resource logs are streamed to a central Event Hub. The IaC establishes the f
 
 ## Diagnostic Settings configuration
 
-Each resource (Function App, database cluster, etc) is configured with a diagnostic setting that sends all logs to Event Hub and a Log Analytics workspace.
-For each resource, the IaC establishes a single diagnostic setting named `stream-diagnostic-logs` that is configured to:
+Each Azure resource (Function App, Database, etc.) is configured with a diagnostic setting that sends all logs to Event Hub and a Log Analytics workspace. To ensure consistency, a single diagnostic setting is used for both Event Hub and Log Analytics workspace.
 
-- Stream all desired logging category groups and categories
+For each resource, the IaC establishes a single diagnostic setting named `stream-logs-to-event-hub` that is configured to:
+
+- Stream all desired logging categories
 - Stream logs to the `logs` event hub within the `evh-monitoring` namespace
 - Stream logs to the environment specific Log Analytics workspace
 - Use the default `RootManageSharedAccessKey` as the event hub policy
+- *Note: Changing the diagnostic setting name for existing Azure resource can cause IaC - ARM errors unless the previous diagnostic setting is removed. This results from the `RootManageSharedAccessKey` used across multiple diagnostic settings (old name and new name). Thus, the diagnostic setting will remain with the name `stream-logs-to-event-hub` rather than a more generic name like `stream-diagnostic-logs`.*
 
 Resources have two categories of logging: "logs" and "metrics". Our default practice is to stream all logs categories and no metrics categories. Categories can be enabled/disabled as required — i.e., if the team analyzing audit logs determines a certain log category to produce too much noise and be unnecessary.
 

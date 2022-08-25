@@ -116,7 +116,7 @@ COLLAB_DB_NAME=collaboration
 LOG_ANALYTICS_WORKSPACE_NAME=${PREFIX}-log-analytics-workspace-${ENV}
 
 # Diagnostic Settings
-DIAGNOSTIC_SETTINGS_NAME="stream-diagnostic-logs"
+DIAGNOSTIC_SETTINGS_NAME="stream-logs-to-event-hub"
 DIAGNOSTIC_SETTINGS_EVGT_DATA_PLANE="DataPlaneRequests"
 DIAGNOSTIC_SETTINGS_EVGT_DELIVERY_FAIL="DeliveryFailures"
 DIAGNOSTIC_SETTINGS_EVGT_PUBLISH_FAIL="PublishFailures"
