@@ -11,10 +11,10 @@ namespace Piipan.Shared.API.Enums
     {
         [Display(Name = "New Application")]
         application,
+        [Display(Name = "New Household Member")]
+        new_household_member,
         [Display(Name = "Recertification")] 
         recertification,
-        [Display(Name = "New Household Member")] 
-        new_household_member,
         [Display(Name = "Other")] 
         other
     }
