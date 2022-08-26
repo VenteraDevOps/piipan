@@ -173,8 +173,8 @@ main () {
       eventHubAuthorizationRuleId="${EH_RULE_ID}" \
       eventHubName="${EVENT_HUB_NAME}" \
       workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
-
-  # For each participating state, create a separate storage account.
+ 
+   # For each participating state, create a separate storage account.
   # Each account has a blob storage container named `upload`.
   while IFS=$',\t\r\n' read -r abbr name enable_matches; do
       abbr=$(echo "$abbr" | tr '[:upper:]' '[:lower:]')
@@ -211,7 +211,7 @@ main () {
     --file /dev/stdin \
     --query id
     #--value "$PG_SECRET"
-
+    
   echo "Creating PostgreSQL server"
   az deployment group create \
     --name participant-records \
@@ -359,6 +359,92 @@ main () {
   # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
   update_event_grid_topic_diagnostic_settings "${event_grid_topic_id}"
 
+  # Create Notifications API Function App
+  echo "Create Notifications API Function App"
+  az deployment group create \
+    --name notifications-api \
+    --resource-group "$RESOURCE_GROUP" \
+    --template-file  ./arm-templates/function.json \
+    --parameters \
+      resourceTags="$RESOURCE_TAGS" \
+      location="$LOCATION" \
+      functionAppName="$NOTIFICATIONS_FUNC_APP_NAME" \
+      appServicePlanName="$APP_SERVICE_PLAN_FUNC_NAME" \
+      storageAccountName="$NOTIFICATIONS_FUNC_APP_STORAGE_NAME" \
+      collabDatabaseConnectionString="" \
+      cloudName="$CLOUD_NAME" \
+      coreResourceGroup="$RESOURCE_GROUP" \
+      diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+      eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+      eventHubName="${EVENT_HUB_NAME}" \
+      sku="${STORAGE_SKU}" \
+      states="" \
+      subnet="${FUNC_SUBNET_NAME}" \
+      systemTypeTag="${NOTIFICATIONS_API_SYSTEM_TAG}" \
+      vnet="${VNET_ID}" \
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
+ 
+  echo "Integrating ${NOTIFICATIONS_FUNC_APP_NAME} into virtual network"
+  az functionapp vnet-integration add \
+    --name "$NOTIFICATIONS_FUNC_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --subnet "$FUNC_SUBNET_NAME" \
+    --vnet "$VNET_ID"
+
+ echo "Removing public access for ${NOTIFICATIONS_FUNC_APP_NAME}"
+  az storage account update \
+    --name "${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --default-action "Deny"
+
+  echo "Update ${NOTIFICATIONS_FUNC_APP_NAME} settings"
+  az functionapp config appsettings set \
+    --name "${NOTIFICATIONS_FUNC_APP_NAME}" \
+    --resource-group "${RESOURCE_GROUP}" \
+    --settings \
+      WEBSITE_CONTENTOVERVNET=1 \
+      WEBSITE_VNET_ROUTE_ALL=1
+
+  az eventgrid topic create \
+    --location "$LOCATION" \
+    --name "${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+    --resource-group "$RESOURCE_GROUP"
+
+  eventgrid_notification_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
+  eventgrid_notification_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
+
+  echo "Publish Notifications API Function App"
+  try_run "func azure functionapp publish ${NOTIFICATIONS_FUNC_APP_NAME} --dotnet" 7 "../notifications/src/Piipan.Notifications.Func.Api"
+  # Subscription to upload events that get routed to Function
+    subn_name=evgs-notifications-$ENV
+    GRID_TOPIC_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+  
+    storageid=$(az storage account show --name "${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
+    queueid="$storageid/queueservices/default/queues/emailbucket"
+  
+  # Create a Subscription to the queue
+  az eventgrid event-subscription create \
+    --source-resource-id "${GRID_TOPIC_PROVIDERS}/Microsoft.EventGrid/topics/${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+    --name "$subn_name" \
+    --endpoint-type storagequeue \
+    --endpoint "$queueid" \
+  
+  # Configure log streaming for function app
+  event_grid_notification_topic_id=$(\
+    az eventgrid topic show \
+      -n "$CREATE_NOTIFICATIONS_TOPIC_NAME" \
+      -g "$RESOURCE_GROUP" \
+      -o tsv \
+      --query id)
+
+  # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
+  update_event_grid_topic_diagnostic_settings "${event_grid_notification_topic_id}"
+
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$NOTIFICATIONS_FUNC_APP_NAME" \
+    --sign-in-audience "AzureADMyOrg"
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
   # restrictions for the function app and storage account are added
@@ -433,6 +519,8 @@ main () {
       $EVENTGRID_CONN_METRICS_SEARCH_STR_KEY="$eventgrid_search_key_string" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT="$eventgrid_match_metrics_endpoint" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_KEY="$eventgrid_match_metrics_key_string" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_ENDPOINT="${eventgrid_notification_endpoint}" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_KEY="${eventgrid_notification_key_string}" \
 
   # Publish function app
   try_run "func azure functionapp publish ${ORCHESTRATOR_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.Api"
@@ -451,7 +539,7 @@ main () {
   az deployment group create \
     --name match-res-api \
     --resource-group "$MATCH_RESOURCE_GROUP" \
-    --template-file  ./arm-templates/function-match-res.json \
+    --template-file  ./arm-templates/function.json \
     --parameters \
       resourceTags="$RESOURCE_TAGS" \
       location="$LOCATION" \
@@ -467,6 +555,7 @@ main () {
       eventHubName="${EVENT_HUB_NAME}" \
       sku="${STORAGE_SKU}" \
       subnet="${FUNC_SUBNET_NAME}" \
+      systemTypeTag="${MATCH_RES_API_SYSTEM_TAG}" \
       vnet="${VNET_ID}" \
       workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
@@ -511,6 +600,8 @@ main () {
       WEBSITE_VNET_ROUTE_ALL=1 \
       $EVENTGRID_CONN_METRICS_MATCH_STR_ENDPOINT="$eventgrid_match_metrics_endpoint" \
       $EVENTGRID_CONN_METRICS_MATCH_STR_KEY="$eventgrid_match_metrics_key_string" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_ENDPOINT="${eventgrid_notification_endpoint}" \
+      $EVENTGRID_CONN_NOTIFICATION_STR_KEY="${eventgrid_notification_key_string}" \
 
   echo "Publish Match Resolution API Function App"
   try_run "func azure functionapp publish ${MATCH_RES_FUNC_APP_NAME} --dotnet" 7 "../match/src/Piipan.Match/Piipan.Match.Func.ResolutionApi"
@@ -527,7 +618,7 @@ main () {
   az deployment group create \
     --name state-api \
     --resource-group "$RESOURCE_GROUP" \
-    --template-file  ./arm-templates/function-states.json \
+    --template-file  ./arm-templates/function.json \
     --parameters \
       resourceTags="$RESOURCE_TAGS" \
       location="$LOCATION" \
@@ -541,7 +632,9 @@ main () {
       eventHubAuthorizationRuleId="${EH_RULE_ID}" \
       eventHubName="${EVENT_HUB_NAME}" \
       sku="${STORAGE_SKU}" \
+      states="" \
       subnet="${FUNC_SUBNET_NAME}" \
+      systemTypeTag="${STATES_API_SYSTEM_TAG}" \
       vnet="${VNET_ID}" \
       workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
@@ -942,3 +1035,4 @@ main () {
 }
 
 main "$@"
+

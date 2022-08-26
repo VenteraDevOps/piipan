@@ -7,9 +7,12 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
+using Piipan.Notifications.Models;
+using Piipan.Notifications.Services;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.API.Enums;
 using Piipan.Shared.Cryptography;
+using Piipan.States.Core.DataAccessObjects;
 
 namespace Piipan.Match.Core.Services
 {
@@ -25,6 +28,8 @@ namespace Piipan.Match.Core.Services
         private readonly ICryptographyClient _cryptographyClient;
         private readonly IParticipantPublishSearchMetric _participantPublishSearchMetric;
         private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
+        private readonly IStateInfoDao _stateInfoDao;
+        private readonly INotificationService _notificationService;
 
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
@@ -33,7 +38,9 @@ namespace Piipan.Match.Core.Services
             IMatchResAggregator matchResAggregator,
             ICryptographyClient cryptographyClientt,
             IParticipantPublishSearchMetric ParticipantPublishSearchMetric,
-            IParticipantPublishMatchMetric participantPublishMatchMetric)
+            IParticipantPublishMatchMetric participantPublishMatchMetric,
+            IStateInfoDao stateInfoDao,
+            INotificationService notificationService)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
@@ -42,6 +49,8 @@ namespace Piipan.Match.Core.Services
             _cryptographyClient = cryptographyClientt;
             _participantPublishSearchMetric = ParticipantPublishSearchMetric;
             _participantPublishMatchMetric = participantPublishMatchMetric;
+            _stateInfoDao = stateInfoDao;
+            _notificationService = notificationService;
 
         }
 
@@ -134,6 +143,24 @@ namespace Piipan.Match.Core.Services
 
                 };
                 await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
+
+                //Send Notification to both initiating state and Matching State.
+                // Send template data for any email template which is created based on the requirements.
+                // The below logic might change based on the template data for requirements.
+                //In future we might end up consolidating the logic based on requirements.
+                var states = await _stateInfoDao.GetStates();
+                var initState = states?.Where(n => string.Compare(n.StateAbbreviation, record.Initiator, true) == 0).FirstOrDefault();
+                var matchingState = states?.Where(n => string.Compare(n.StateAbbreviation, match.State, true) == 0).FirstOrDefault();
+                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
+
+                EmailTemplateInput emailTemplateInputIs = GetEmailTemplate(participantMatchRecord.MatchId, initState?.State, matchingState?.State, queryToolUrl, initState?.Email);
+                emailTemplateInputIs.Topic = "CREATE_MATCH_IS";
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInputIs); //Publishing Email for Initiating State:  Based on the requirement
+
+                EmailTemplateInput emailTemplateInputMs = GetEmailTemplate(participantMatchRecord.MatchId, initState?.State, matchingState?.State, queryToolUrl, matchingState?.Email);
+                emailTemplateInputMs.Topic = "CREATE_MATCH_MS";
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInputMs); //Publishing Email for Matching State : Based on the requirement
+
             }
             if (participantMatchRecord != null)
             {
@@ -141,6 +168,22 @@ namespace Piipan.Match.Core.Services
                 participantMatchRecord.MatchUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}";
             }
             return participantMatchRecord;
+        }
+
+        private static EmailTemplateInput GetEmailTemplate(string MatchId, string initState, string matchingState, string queryToolUrl, string email)
+        {
+            return new EmailTemplateInput()
+            {
+                TemplateData = new
+                {
+                    MatchId = MatchId,
+                    InitState = initState,
+                    MatchingState = matchingState,
+                    MatchingUrl = $"{queryToolUrl}/match/{MatchId}",
+
+                },
+                EmailTo = email
+            };
         }
 
         private async Task<ParticipantMatch> Reconcile(IParticipant match, IMatchRecord pendingRecord, IEnumerable<IMatchRecord> existingRecords)

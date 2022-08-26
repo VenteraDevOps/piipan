@@ -19,7 +19,10 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Metrics.Api;
+using Piipan.Notifications.Models;
+using Piipan.Notifications.Services;
 using Piipan.Shared.Http;
+using Piipan.States.Core.DataAccessObjects;
 
 #nullable enable
 
@@ -35,6 +38,8 @@ namespace Piipan.Match.Func.ResolutionApi
         private readonly IMatchResAggregator _matchResAggregator;
         private readonly IStreamParser<AddEventRequest> _requestParser;
         private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
+        private readonly IStateInfoDao _stateInfoDao;
+        private readonly INotificationService _notificationService;
         public readonly string UserActor = "user";
         public readonly string SystemActor = "system";
         public readonly string ClosedDelta = "{\"status\": \"closed\"}";
@@ -44,13 +49,17 @@ namespace Piipan.Match.Func.ResolutionApi
             IMatchResEventDao matchResEventDao,
             IMatchResAggregator matchResAggregator,
             IStreamParser<AddEventRequest> requestParser,
-            IParticipantPublishMatchMetric participantPublishMatchMetric)
+            IParticipantPublishMatchMetric participantPublishMatchMetric,
+            IStateInfoDao stateInfoDao,
+            INotificationService notificationService)
         {
             _matchRecordDao = matchRecordDao;
             _matchResEventDao = matchResEventDao;
             _matchResAggregator = matchResAggregator;
             _requestParser = requestParser;
             _participantPublishMatchMetric = participantPublishMatchMetric;
+            _stateInfoDao = stateInfoDao;
+            _notificationService = notificationService;
         }
 
         [FunctionName("AddEvent")]
@@ -157,6 +166,24 @@ namespace Piipan.Match.Func.ResolutionApi
                     MatchingStateVulnerableIndividual = matchResRecordAfterUpdate.Dispositions.Where(r => r.State != matchResRecordAfterUpdate.Initiator).Select(r => r.VulnerableIndividual).FirstOrDefault(),
                 };
                 await _participantPublishMatchMetric.PublishMatchMetric(participantMatchMetrics);
+
+                //Send Notification to both initiating state and Matching State.
+                // Send template data for any email template which is created based on the requirements.
+                // The below logic might change based on the template data for requirements.
+                //In future we might end up consolidating the logic based on requirements.
+                var states = await _stateInfoDao.GetStates();
+                var initState = states?.Where(n => string.Compare(n.StateAbbreviation, matchResRecordAfterUpdate.States[0], true) == 0).FirstOrDefault();
+                var matchingState = states?.Where(n => string.Compare(n.StateAbbreviation, matchResRecordAfterUpdate.States[1], true) == 0).FirstOrDefault();
+                var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
+
+                EmailTemplateInput emailTemplateInputIs = GetEmailTemplate(matchResRecordAfterUpdate.MatchId, initState?.State, matchingState?.State, queryToolUrl, initState?.Email);
+                emailTemplateInputIs.Topic = "UPDATE_MATCH_RES_IS";
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInputIs); //Publishing Email for Initiating State:  Based on the requirement
+
+                EmailTemplateInput emailTemplateInputMs = GetEmailTemplate(matchResRecordAfterUpdate.MatchId, initState?.State, matchingState?.State, queryToolUrl, matchingState?.Email);
+                emailTemplateInputMs.Topic = "UPDATE_MATCH_RES_MS";
+                await _notificationService.PublishMessageFromTemplate(emailTemplateInputMs); //Publishing Email for Matching State : Based on the requirement
+
                 return new OkResult();
             }
             catch (StreamParserException ex)
@@ -180,7 +207,21 @@ namespace Piipan.Match.Func.ResolutionApi
                 return InternalServerErrorResponse(ex);
             }
         }
+        private static EmailTemplateInput GetEmailTemplate(string MatchId, string initState, string matchingState, string queryToolUrl, string email)
+        {
+            return new EmailTemplateInput()
+            {
+                TemplateData = new
+                {
+                    MatchId = MatchId,
+                    InitState = initState,
+                    MatchingState = matchingState,
+                    MatchingUrl = $"{queryToolUrl}/match/{MatchId}",
 
+                },
+                EmailTo = email
+            };
+        }
         private async Task DetermineClosure(
             AddEventRequest reqObj,
             IMatchRecord match,

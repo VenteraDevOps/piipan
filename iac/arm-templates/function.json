@@ -27,13 +27,10 @@
         "coreResourceGroup": {
             "type": "String"
         },
-        "collabDatabaseConnectionString": {
-            "type": "String"
-        },
         "cloudName": {
             "type": "String"
         },
-        "states": {
+        "collabDatabaseConnectionString": {
             "type": "String"
         },
         "diagnosticSettingName": {
@@ -60,10 +57,19 @@
                 "description": "Specify the SKU type."
             }
         },
+        "states": {
+            "type": "String"
+        },
         "subnet": {
             "type": "string",
             "metadata": {
                 "description": "Specify the Virtual Network - Subnet."
+            }
+        },
+		"systemTypeTag": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the System Type Tag."
             }
         },
         "vnet": {
@@ -82,14 +88,14 @@
     "variables": {
         "functionWorkerRuntime": "dotnet",
         "systemTypeTag": {
-            "SysType": "MatchResApi"
+            "SysType": "[parameters('systemTypeTag')]"
         },
         "applicationInsightsTag": {
             "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('functionAppName')))]": "Resource"
         }
     },
     "resources": [
-        // Match Resolution function app resources
+        // States function app resources
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2021-09-01",
@@ -150,84 +156,85 @@
             "location": "[parameters('location')]",
             "kind": "functionapp",
             "identity": {
-                "type": "SystemAssigned"
+            "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "properties": {
-                "serverFarmId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
-                "httpsOnly": true,
-                "siteConfig": {
-                    "ftpsState": "Disabled",
-                    "alwaysOn": true,
-                    "minTlsVersion": "1.2",
-                    "appSettings": [
-                        /*
-                            The following settings are required for Function apps per the MS documentation:
-                            - AzureWebJobsStorage
-                            - FUNCTIONS_WORKER_RUNTIME
-                            - FUNCTIONS_EXTENSION_VERSION
+            "serverFarmId": "[resourceId(parameters('coreResourceGroup'), 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+            "httpsOnly": true,
+            "siteConfig": {
+                "ftpsState": "Disabled",
+                "alwaysOn": true,
+                "minTlsVersion": "1.2",
+                "appSettings": [
+                /*
+                                The following settings are required for Function apps per the MS documentation:
+                                - AzureWebJobsStorage
+                                - FUNCTIONS_WORKER_RUNTIME
+                                - FUNCTIONS_EXTENSION_VERSION
 
-                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#function-app)
-                        */
-                        {
-                            "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
-                        },
-                        {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "[variables('functionWorkerRuntime')]"
-                        },
-                        {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~4"
-                        },
-                        /*
-                            The `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` and `WEBSITE_CONTENTSHARE`
-                            settings are required for Windows function apps using a consumption plan,
-                            per the MS documentation.
+                                See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#function-app)
+                            */
+                {
+                    "name": "AzureWebJobsStorage",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
+                },
+                {
+                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                    "value": "[variables('functionWorkerRuntime')]"
+                },
+                {
+                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                    "value": "~4"
+                },
+                /*
+                                The `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` and `WEBSITE_CONTENTSHARE`
+                                settings are required for Windows function apps using a consumption plan,
+                                per the MS documentation.
 
-                            See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#windows)
-                        */
-                        {
-                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
-                        },
-                        {
-                            "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(parameters('functionAppName'))]"
-                        },
-                        // Required when using the zip deployment method (i.e., the method
-                        // used by `func azure functionapp publish`)
-                        {
-                            "name": "WEBSITE_RUN_FROM_PACKAGE",
-                            "value": "1"
-                        },
-                        // Connect app to Application Insights instance
-                        {
-                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).InstrumentationKey]"
-                        },
-                        {
-                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).ConnectionString]"
-                        },
-                        // Bind backing services
-                        {
-                            "name": "CollaborationDatabaseConnectionString",
-                            "value": "[parameters('collabDatabaseConnectionString')]"
-                        },
-                        {
-                            "name": "CloudName",
-                            "value": "[parameters('cloudName')]"
-                        },
-                        {
-                            "name": "States",
-                            "value": "[parameters('states')]"
-                        }
-                    ]
+                                See: https://docs.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code#windows)
+                            */
+                {
+                    "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value)]"
+                },
+                {
+                    "name": "WEBSITE_CONTENTSHARE",
+                    "value": "[toLower(parameters('functionAppName'))]"
+                },
+                // Required when using the zip deployment method (i.e., the method
+                // used by `func azure functionapp publish`)
+                {
+                    "name": "WEBSITE_RUN_FROM_PACKAGE",
+                    "value": "1"
+                },
+                // Connect app to Application Insights instance
+                {
+                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                    "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).InstrumentationKey]"
+                },
+                {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).ConnectionString]"
+                },
+                // Bind backing services
+                {
+                    "name": "CollaborationDatabaseConnectionString",
+                    "value": "[parameters('collabDatabaseConnectionString')]"
+                },
+                {
+                    "name": "CloudName",
+                    "value": "[parameters('cloudName')]"
                 }
+                ,
+                {
+                    "name": "States",
+                    "value": "[parameters('states')]"
+                }
+                ]
+            }
             }
         },
         {

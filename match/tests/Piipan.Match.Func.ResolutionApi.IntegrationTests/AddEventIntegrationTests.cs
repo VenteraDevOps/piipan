@@ -17,7 +17,9 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
+using Piipan.Notifications.Services;
 using Piipan.Shared.Database;
+using Piipan.States.Core.DataAccessObjects;
 using Xunit;
 
 namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
@@ -30,6 +32,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             Environment.SetEnvironmentVariable("States", "ea");
             Environment.SetEnvironmentVariable("EventGridMetricMatchEndPoint", "http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
+            Environment.SetEnvironmentVariable("EventGridNotificationEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridNotificationKeyString", "example");
+            Environment.SetEnvironmentVariable("QueryToolUrl", "http://someendpoint.gov");
             var services = new ServiceCollection();
             services.AddLogging();
 
@@ -45,15 +50,27 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                     NpgsqlFactory.Instance,
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
             });
-
+            services.AddTransient<IDbConnectionFactory<StateInfoDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<StateInfoDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
+                );
+            });
+            services.AddTransient<IStateInfoDao, StateInfoDao>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<INotificationPublish, NotificationPublish>();
             var provider = services.BuildServiceProvider();
 
             var api = new AddEventApi(
                 provider.GetService<IMatchRecordDao>(),
                 provider.GetService<IMatchResEventDao>(),
                 provider.GetService<IMatchResAggregator>(),
-               provider.GetService<IStreamParser<AddEventRequest>>(),
-                provider.GetService<IParticipantPublishMatchMetric>()
+                provider.GetService<IStreamParser<AddEventRequest>>(),
+                provider.GetService<IParticipantPublishMatchMetric>(),
+                provider.GetService<IStateInfoDao>(),
+                provider.GetService<INotificationService>()
+
             );
 
             return api;
@@ -86,9 +103,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_ReturnsErrorIfNotRelatedState()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
+
             // insert a match into the database
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()
@@ -118,9 +136,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_ReturnsErrorIfClosed()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
+
             // insert a match into the database
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()
@@ -159,9 +178,10 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_SuccessInsertsEvent()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
+
             // insert a match into the database
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()
@@ -198,9 +218,9 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
         public async void AddEvent_SuccessInsertsClosedEventIfClosed()
         {
             // Arrange
-            // clear databases
-            ClearMatchRecords();
+            // clear databases Changing the order for any referential integrity issues.
             ClearMatchResEvents();
+            ClearMatchRecords();
             // insert a match into db
             var matchId = "ABCDEFG";
             var match = new MatchRecordDbo()

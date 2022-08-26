@@ -44,6 +44,22 @@
         "resolved": "2.4.5",
         "contentHash": "OwHamvBdUKgqsXfBzWiCW/O98BTx81UKzx2bieIOQI7CZFE5NEQZGi8PBQGIKawDW96xeRffiNf20SjfC0x9hw=="
       },
+      "Antlr3.Runtime": {
+        "type": "Transitive",
+        "resolved": "3.5.1",
+        "contentHash": "ZwCEpLCLZXkjzf1lYEixp9hgVlYYk33ACHn6xjFyVhGRi2BpoYQez0qtatbetdylASWYTG+cGz0CGR4z66JM4w==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        }
+      },
+      "Antlr4.Runtime": {
+        "type": "Transitive",
+        "resolved": "4.6.6",
+        "contentHash": "NlbRjkTCidRh1QeWvGfFPKq0sqpPZrAwGaSTV0X2jL8buZxTf9/aQ7PehFAmc7erXLUQ3YMZEVZU86aQwma2+w==",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        }
+      },
       "Azure.Core": {
         "type": "Transitive",
         "resolved": "1.25.0",
@@ -969,6 +985,15 @@
         "type": "Transitive",
         "resolved": "4.3.2",
         "contentHash": "leXiwfiIkW7Gmn7cgnNcdtNAU70SjmKW3jxGj1iKHOvdn0zRWsgv/l2OJUO5zdGdiv2VRFnAsxxhDgMzofPdWg=="
+      },
+      "StringTemplate4": {
+        "type": "Transitive",
+        "resolved": "4.0.8",
+        "contentHash": "Rx3C673O+nvM1ZvOXDslzmIbpgCR8QHd0FD1iKP/srNZPi5Zhr5Ln4gHzRGLvofMkpVf/aJPBRkcD6VzqgV4rQ==",
+        "dependencies": {
+          "Antlr3.Runtime": "3.5.1",
+          "NETStandard.Library": "1.6.0"
+        }
       },
       "System.AppContext": {
         "type": "Transitive",
@@ -2093,9 +2118,11 @@
           "Npgsql": "6.0.6",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Metrics.Api": "1.0.0",
+          "Piipan.Notifications.Core": "1.0.0",
           "Piipan.Participants.Api": "1.0.0",
           "Piipan.Shared": "1.0.0",
-          "Piipan.Shared.Cryptography": "1.0.0"
+          "Piipan.Shared.Cryptography": "1.0.0",
+          "Piipan.States.Core": "1.0.0"
         }
       },
       "piipan.match.func.resolutionapi": {
@@ -2107,6 +2134,7 @@
           "Microsoft.NET.Sdk.Functions": "4.1.1",
           "Piipan.Match.Api": "1.0.0",
           "Piipan.Match.Core": "1.0.0",
+          "Piipan.Notifications.Core": "1.0.0",
           "Piipan.States.Core": "1.0.0"
         }
       },
@@ -2114,6 +2142,16 @@
         "type": "Project",
         "dependencies": {
           "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "piipan.notifications.core": {
+        "type": "Project",
+        "dependencies": {
+          "Antlr4.Runtime": "4.6.6",
+          "Azure.Messaging.EventGrid": "4.11.0",
+          "Microsoft.Extensions.Logging": "6.0.0",
+          "Newtonsoft.Json": "13.0.1",
+          "StringTemplate4": "4.0.8"
         }
       },
       "piipan.participants.api": {

@@ -29,6 +29,7 @@ using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Cryptography;
 using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
+using Piipan.States.Core.DataAccessObjects;
 using Xunit;
 
 
@@ -117,6 +118,8 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Environment.SetEnvironmentVariable("EventGridMetricSearchKeyString", "example");
             Environment.SetEnvironmentVariable("EventGridMetricMatchEndPoint", "http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
+            Environment.SetEnvironmentVariable("EventGridNotificationEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridNotificationKeyString", "example");
             Environment.SetEnvironmentVariable("QueryToolUrl", "http://someendpoint.gov");
 
             // Mixing cases to verify the enabled states can be used no matter their casing.
@@ -162,9 +165,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
                 return factory.Object;
             });
-            services.RegisterParticipantsServices();
-            services.RegisterMatchServices();
-            services.RegisterKeyVaultClientServices();
+
 
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
@@ -173,6 +174,16 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
             });
 
+            services.AddTransient<IDbConnectionFactory<StateInfoDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<StateInfoDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
+                );
+            });
+            services.RegisterParticipantsServices();
+            services.RegisterMatchServices();
+            services.RegisterKeyVaultClientServices();
             var provider = services.BuildServiceProvider();
 
             var api = new MatchApi(
