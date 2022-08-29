@@ -22,7 +22,7 @@ We will also keep "Environment" tags. Each environment will have a moving tag po
 
 We will deploy from the "Dev" branch to the development environment with every commit. We will also deploy from the "Dev" branch to test and preprod environments based on the desired "Release" tag. 
 
-If fixes or changes are necessary for a release, we will generate a release branch from the "Release" tag, apply fixes/changes, deploy the updates, and merge the changes back to the "Dev" branch. It's important to note, that once a release branch has been generated and used to apply a fix/change, this branch should stay in existence until a new version is deployed to production. It can be deleted once the version no longer exists in any environment.
+If fixes or changes are necessary for a release, we will generate a release branch from the "Release" tag, apply fixes/changes, deploy the updates, and merge the changes back to the "Dev" branch. It's important to note, that once a release branch has been generated and used to apply a fix/change, this branch should stay in existence until a new version is deployed to production from the "Dev" branch. It can be deleted once the version no longer exists in any environment.
 
 ## Consequences
 
