@@ -16,7 +16,7 @@ Until metrics reporting requirements can be better fleshed out, we will continue
 
 ## Consequences
 
-We will continue generating custom events that better support simple, user-facing summaries or reports, rather than system events that may require code for aggregating, custom query/filter support, data manipulation, or data visualization prior to user presentation. We will store summarized metrics instead of a running log of events. This means will be issuing update queries for summary records rather than a series of insert queries.
+We will continue generating custom events that better support simple, user-facing summaries or reports, rather than system events that may require code for aggregating, custom query/filter support, data manipulation, or data visualization prior to user presentation. We will store summarized metrics instead of a running log of events. This means we will be issuing a combination of insert & update queries to maintain summary records rather than ONLY issuing a series of insert queries.
 
 We will continue with a 1-1 relationship between a specific metric needing to be captured and a function within the Metrics Collect Function App. The logic for this work will consist of constructing the custom event, publishing the event, collecting it, and persisting it.
 
