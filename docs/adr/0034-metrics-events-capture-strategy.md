@@ -1,4 +1,4 @@
-# 33. Branching and Release Strategy
+# 34. Metrics Events Capture Strategy
 
 Date: 2022-08-23
 
