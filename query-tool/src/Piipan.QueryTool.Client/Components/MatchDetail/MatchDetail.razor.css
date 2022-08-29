@@ -97,6 +97,9 @@ dd {
 .back-button {
     margin-top: 1rem;
     line-height: 1.5rem;
+}
+
+.back-button:visited {
     color: #005ea2;
 }
 

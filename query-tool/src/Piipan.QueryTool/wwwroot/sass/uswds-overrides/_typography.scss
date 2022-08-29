@@ -13,3 +13,21 @@ h1, h2 {
 .usa-hint {
     color: #6E6E6E;
 }
+a {
+    text-decoration: underline;
+}
+a:link {
+    @include u-text('primary');
+}
+
+a:visited, .usa-alert__text a:visited {
+    color: #551A8B;
+}
+
+a:hover {
+    @include u-text('primary-dark');
+}
+
+a:active {
+    @include u-text('primary-darker');
+}
