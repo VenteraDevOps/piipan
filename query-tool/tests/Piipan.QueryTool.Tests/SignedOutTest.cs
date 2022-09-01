@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Pages;
 using Xunit;
 
@@ -31,15 +30,6 @@ namespace Piipan.QueryTool.Tests
             var renderer = SetupRenderingApi();
 
             // act
-
-            OrchMatchRequest orchMatchRequest = new OrchMatchRequest
-            {
-                Data = new System.Collections.Generic.List<RequestPerson>
-                {
-                    new RequestPerson { CaseId = "123" }
-                }
-            };
-            await renderer.RenderView("/Views/Test.cshtml", orchMatchRequest);
             var (page, output) = await renderer.RenderPage(PageName, pageModel);
 
             // assert
