@@ -18,6 +18,13 @@
     private IElement? inputElement = null;
     private TestModel model = new TestModel();
     private RenderFragment? renderFragment = null;
+    private const string JSFileRelativePath = "/Forms/UsaInputSSN.razor.js";
+    BunitJSModuleInterop moduleInterop;
+
+    public UsaInputSSNTests() : base()
+    {
+        moduleInterop = this.JSInterop.SetupModule($"./_content/Piipan.Components{JSFileRelativePath}");
+    }
 
     #region Tests
 
@@ -51,7 +58,7 @@
     public void Input_Should_Bind_Value_On_Change()
     {
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
         inputElement!.Input("123-12-1234");
 
         // Assert
@@ -169,7 +176,7 @@
         // Arrange
         renderFragment = RequiredFieldRenderFragment();
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Act
         inputElement!.Input("123-12-1234");
@@ -187,7 +194,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(4);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(4);
 
         // Act
         inputElement!.Input("tes-t");
@@ -206,7 +213,7 @@
         // Arrange
         renderFragment = RequiredFieldRenderFragment();
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Act
         inputElement!.Input("123-12-1234");
@@ -216,7 +223,7 @@
         AssertHasNoErrors();
 
         // Act
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(0);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(0);
         inputElement!.Input("");
         inputElement!.Blur();
 
@@ -232,7 +239,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(9);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(9);
 
         // Act
         inputElement!.Input("123121234");
@@ -255,7 +262,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(3);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(3);
 
         // Act
         inputElement!.Input("123");
@@ -278,7 +285,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(6);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(6);
 
         // Act
         inputElement!.Input("123-12");
@@ -301,7 +308,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(6);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(6);
 
         // Act
         inputElement!.Input("123-12-");
@@ -325,7 +332,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Act
         inputElement!.Input("123-12-1234");
@@ -344,13 +351,13 @@
         CreateTestComponent();
 
         // Act
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(1);
         inputElement!.Input("1");
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(2);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(2);
         inputElement!.Input("12");
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(3);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(3);
         inputElement!.Input("*23");
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(4);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(4);
         inputElement!.Input("**34");
         form!.Find($".usa-button").Click(); // Click the view/hide button to view
 
@@ -369,10 +376,10 @@
         CreateTestComponent();
 
         // Act
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(1);
         inputElement!.Input("1");
 
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(2);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(2);
         inputElement!.Input("12");
 
         // Assert
@@ -389,10 +396,10 @@
         CreateTestComponent();
 
         // Act
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(1);
         inputElement!.Input("2");
 
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(1);
         inputElement!.Input("12");
 
         // Assert
@@ -410,10 +417,10 @@
         CreateTestComponent();
 
         // Act
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(1);
         inputElement!.Input("1");
 
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(2);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(2);
         inputElement!.Input("12");
         await Task.Delay(1100); // Wait a little longer than the timer and then verify
 
@@ -429,7 +436,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Act
         form!.Find($".usa-button").Click(); // Click the view/hide button to view
@@ -447,7 +454,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Act
         form!.Find($".usa-button").Click(); // Click the view/hide button to view
@@ -466,7 +473,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Act
         form!.Find($".usa-button").Click(); // Click the view the SSN
@@ -475,7 +482,7 @@
 
         // Assert
         Assert.Equal("123-12-1234", inputElement!.GetAttribute("value"));
-        JSInterop.VerifyInvoke("piipan.utilities.setValue", 1);
+        moduleInterop.VerifyInvoke("SetValue", 1);
     }
 
     /// <summary>
@@ -486,7 +493,7 @@
     {
         // Arrange
         CreateTestComponent();
-        JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(11);
+        moduleInterop.Setup<int>("GetCursorPosition", _ => true).SetResult(11);
 
         // Assert
         Assert.Equal("11", inputElement!.GetAttribute("maxlength"));
@@ -529,7 +536,7 @@
         Component = componentFragment.FindComponent<UsaInputSSN>();
         inputElement = componentFragment.Find($".{InputClass}");
         JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true);
-        JSInterop.SetupVoid("piipan.utilities.setValue", _ => true).SetVoidResult();
+        moduleInterop.SetupVoid("SetValue", _ => true).SetVoidResult();
     }
 
     private void AssertHasNoErrors()

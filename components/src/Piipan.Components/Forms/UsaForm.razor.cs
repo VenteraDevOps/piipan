@@ -17,6 +17,7 @@ namespace Piipan.Components.Forms
         private EditContext editContext;
         private bool showAlertBox = false;
         private bool refreshAlertBox = false;
+        IJSObjectReference formJavascriptReference;
         [Parameter] public string Id { get; set; } = "f" + Guid.NewGuid();
         public List<UsaFormGroup> FormGroups { get; set; } = new List<UsaFormGroup>();
         private List<(UsaFormGroup FormGroup, IEnumerable<string> Errors)> currentErrors =
@@ -45,6 +46,12 @@ namespace Piipan.Components.Forms
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
+
+            if (formJavascriptReference == null)
+            {
+                formJavascriptReference = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Piipan.Components/Forms/UsaForm.razor.js");
+            }
+
             if (firstRender)
             {
                 if (InitialErrors?.Count() > 0)
@@ -66,7 +73,7 @@ namespace Piipan.Components.Forms
                     IsDirty = true;
                     StateHasChanged();
                 }
-                await JSRuntime.InvokeVoidAsync("piipan.utilities.registerFormValidation", Id, DotNetObjectReference.Create(this));
+                await formJavascriptReference.InvokeVoidAsync("RegisterFormValidation", Id, DotNetObjectReference.Create(this));
             }
         }
 

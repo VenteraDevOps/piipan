@@ -1,0 +1,19 @@
+﻿@using Piipan.Components.Tables
+@using Piipan.Dashboard.Client.Models
+@using Piipan.Metrics.Api
+@code {
+    [Parameter] public ParticipantUploadModel Upload { get; set; } = new();
+    [Parameter] public string Token { get; set; }
+}
+
+<div class="grid-container margin-bottom-6">
+    <h1>SNAP Participant Data Uploads by State</h1>
+
+    
+    <section id="historical-upload-info">
+        <h2>Historical Upload Information</h2>
+        <ParticipantUploadsFilter Token="@Token" UploadRequest="Upload.ParticipantUploadFilter" />
+
+        <ParticipantUploadsResults Upload="Upload" />
+    </section>
+</div>

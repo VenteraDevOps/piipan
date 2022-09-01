@@ -1,21 +1,20 @@
-using Xunit;
-using Piipan.Dashboard.Pages;
-using Microsoft.Extensions.Logging.Abstractions;
-using Piipan.Shared.Claims;
-using Moq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using Piipan.Dashboard.Pages;
+using Piipan.Shared.Claims;
+using Xunit;
 
 namespace Piipan.Dashboard.Tests
 {
-    public class IndexPageTests
+    public class IndexPageTests : BasePageTest
     {
         [Fact]
         public void BeforeOnGet_EmailIsCorrect()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider);
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), serviceProviderMock());
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -29,8 +28,7 @@ namespace Piipan.Dashboard.Tests
         public void AfterOnGet_EmailIsCorrect()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider);
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), serviceProviderMock());
             pageModel.PageContext.HttpContext = contextMock();
 
             // act

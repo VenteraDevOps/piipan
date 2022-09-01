@@ -33,7 +33,7 @@ namespace Piipan.QueryTool.Tests
             _activator = activator;
         }
 
-        public async Task<(IView, string)> RenderView<TModel>(string name, TModel model) where TModel : PageModel
+        public async Task<(IView, string)> RenderView<TModel>(string name, TModel model)
         {
             var actionContext = GetActionContext();
 

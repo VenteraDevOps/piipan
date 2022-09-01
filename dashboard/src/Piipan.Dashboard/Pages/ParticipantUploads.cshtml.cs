@@ -5,8 +5,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Piipan.Metrics.Api;
-using Piipan.Shared.Claims;
 
 #nullable enable
 
@@ -19,18 +19,17 @@ namespace Piipan.Dashboard.Pages
 
         public ParticipantUploadsModel(IParticipantUploadReaderApi participantUploadApi,
             ILogger<ParticipantUploadsModel> logger,
-            IClaimsProvider claimsProvider)
-            : base(claimsProvider)
+            IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             _participantUploadApi = participantUploadApi;
             _logger = logger;
         }
         public string Title = "Most recent upload from each state";
         public List<ParticipantUpload> ParticipantUploadResults { get; private set; } = new List<ParticipantUpload>();
-        public string? NextPageParams { get; private set; }
-        public string? PrevPageParams { get; private set; }
+        public string? PageParams { get; private set; }
         public string? StateQuery { get; private set; }
-        public static int PerPageDefault = 10;
+        public long TotalPages { get; set; }
         public string? RequestError { get; private set; }
 
         public async Task OnGetAsync()
@@ -41,7 +40,14 @@ namespace Piipan.Dashboard.Pages
 
                 RequestError = null;
 
-                var response = await _participantUploadApi.GetLatestUploadsByState();
+                var query = HttpContext?.Request?.Query;
+                if (query?.Count > 0)
+                {
+                    var json = JsonConvert.SerializeObject(query.ToDictionary(q => q.Key, q => q.Value.ToString()));
+                    UploadRequest = JsonConvert.DeserializeObject<ParticipantUploadRequestFilter>(json);
+                }
+
+                var response = await _participantUploadApi.GetUploads(UploadRequest);
                 ParticipantUploadResults = response.Data.ToList();
                 SetPageLinks(response.Meta);
             }
@@ -57,6 +63,9 @@ namespace Piipan.Dashboard.Pages
             }
         }
 
+        [BindProperty]
+        public ParticipantUploadRequestFilter UploadRequest { get; set; } = new ParticipantUploadRequestFilter();
+
         public async Task<IActionResult> OnPostAsync()
         {
             try
@@ -65,7 +74,7 @@ namespace Piipan.Dashboard.Pages
                 RequestError = null;
 
                 StateQuery = Request.Form["state"];
-                var response = await _participantUploadApi.GetUploads(StateQuery, PerPageDefault, 1);
+                var response = await _participantUploadApi.GetUploads(UploadRequest);
                 ParticipantUploadResults = response.Data.ToList();
                 SetPageLinks(response.Meta);
             }
@@ -84,8 +93,8 @@ namespace Piipan.Dashboard.Pages
 
         private void SetPageLinks(Meta meta)
         {
-            NextPageParams = meta.NextPage;
-            PrevPageParams = meta.PrevPage;
+            PageParams = meta.PageQueryParams;
+            TotalPages = meta.Total;
         }
     }
 }

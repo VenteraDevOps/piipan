@@ -7,7 +7,7 @@
 ========================================
 ========================================
 ----------------------------------------
-USWDS 2.10.1
+USWDS 2.10.0
 ----------------------------------------
 COLOR SETTINGS
 ----------------------------------------
@@ -87,7 +87,7 @@ $theme-color-error-family: "red-warm";
 $theme-color-error-lighter: "red-warm-10";
 $theme-color-error-light: "red-warm-30v";
 $theme-color-error: "red-warm-50v";
-$theme-color-error-dark: "red-60v";
+$theme-color-error-dark: "red-warm-50v";
 $theme-color-error-darker: "red-70";
 
 // Warning colors
@@ -129,13 +129,6 @@ $theme-color-emergency-dark: "red-warm-80";
 General colors
 ----------------------------------------
 */
-
-// Body
-$theme-body-background-color: "white";
-
-// Text
-$theme-text-color: "ink";
-$theme-text-reverse-color: "white";
 
 // Links
 $theme-link-color: "primary";

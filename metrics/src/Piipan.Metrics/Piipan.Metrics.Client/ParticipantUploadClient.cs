@@ -20,9 +20,9 @@ namespace Piipan.Metrics.Client
             return await _apiClient.GetAsync<GetParticipantUploadsResponse>("GetLastUpload");
         }
 
-        public async Task<GetParticipantUploadsResponse> GetUploads(string? state, int perPage, int page)
+        public async Task<GetParticipantUploadsResponse> GetUploads(ParticipantUploadRequestFilter filter)
         {
-            return await _apiClient.GetAsync<GetParticipantUploadsResponse>("GetParticipantUploads");
+            return await _apiClient.GetAsync<GetParticipantUploadsResponse, ParticipantUploadRequestFilter>("GetParticipantUploads", filter);
         }
     }
 }

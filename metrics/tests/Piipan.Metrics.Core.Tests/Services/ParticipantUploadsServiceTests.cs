@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Piipan.Metrics.Api;
-using Piipan.Metrics.Core.DataAccessObjects;
-using Piipan.Metrics.Core.Services;
-using Moq;
-using Xunit;
-using Piipan.Metrics.Core.Builders;
 using System.Threading.Tasks;
+using Moq;
+using Piipan.Metrics.Api;
+using Piipan.Metrics.Core.Builders;
+using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Core.Models;
+using Piipan.Metrics.Core.Services;
+using Xunit;
 
 namespace Piipan.Metrics.Core.Tests.Services
 {
@@ -20,7 +20,7 @@ namespace Piipan.Metrics.Core.Tests.Services
             var uploadedAt = DateTime.Now;
             var uploadDao = new Mock<IParticipantUploadDao>();
             uploadDao
-                .Setup(m => m.GetUploads(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
                 .ReturnsAsync(new List<ParticipantUpload>()
                 {
                     new ParticipantUpload
@@ -30,15 +30,14 @@ namespace Piipan.Metrics.Core.Tests.Services
                     }
                 });
             var metaBuilder = new Mock<IMetaBuilder>();
-            metaBuilder.Setup(m => m.SetPage(It.IsAny<int>())).Returns(metaBuilder.Object);
-            metaBuilder.Setup(m => m.SetPerPage(It.IsAny<int>())).Returns(metaBuilder.Object);
-            metaBuilder.Setup(m => m.SetState(It.IsAny<string>())).Returns(metaBuilder.Object);
+            metaBuilder.Setup(m => m.SetFilter(It.IsAny<ParticipantUploadRequestFilter>())).Returns(metaBuilder.Object);
             metaBuilder.Setup(m => m.SetTotal(It.IsAny<long>())).Returns(metaBuilder.Object);
 
             var service = new ParticipantUploadService(uploadDao.Object, metaBuilder.Object);
 
             // Act
-            var response = await service.GetUploads("somestate", 1, 1);
+            var response = await service.GetUploads(
+                new ParticipantUploadRequestFilter { State = "somestate" });
 
             // Assert
             Assert.Single(response.Data);

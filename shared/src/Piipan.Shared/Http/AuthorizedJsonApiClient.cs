@@ -102,8 +102,17 @@ namespace Piipan.Shared.Http
             return (JsonConvert.DeserializeObject<TResponse>(responseContentJson), default);
         }
 
-        public async Task<TResponse> GetAsync<TResponse>(string path)
+        public async Task<TResponse> GetAsync<TResponse, TRequest>(string path, TRequest requestObject) where TRequest : class, new()
         {
+            return await GetAsync<TResponse>(path, QueryStringBuilder.ToQueryString(requestObject));
+        }
+
+        public async Task<TResponse> GetAsync<TResponse>(string path, string query = null)
+        {
+            if (!string.IsNullOrEmpty(query))
+            {
+                path += query;
+            }
             var requestMessage = await PrepareRequest(path, HttpMethod.Get);
             var response = await Client().SendAsync(requestMessage);
 
@@ -114,8 +123,12 @@ namespace Piipan.Shared.Http
             return JsonConvert.DeserializeObject<TResponse>(responseContentJson);
         }
 
-        public async Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, IEnumerable<(string, string)> headerFactory = null)
+        public async Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, IEnumerable<(string, string)> headerFactory = null, string query = null)
         {
+            if (!string.IsNullOrEmpty(query))
+            {
+                path = $"{path}?{query}";
+            }
             var requestMessage = await PrepareRequest(path, HttpMethod.Get);
 
             // add any additional headers using the supplied callback

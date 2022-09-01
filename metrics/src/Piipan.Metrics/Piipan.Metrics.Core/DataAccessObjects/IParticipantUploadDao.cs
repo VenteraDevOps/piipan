@@ -10,8 +10,8 @@ namespace Piipan.Metrics.Core.DataAccessObjects
 {
     public interface IParticipantUploadDao
     {
-        Task<Int64> GetUploadCount(string? state);
-        Task<IEnumerable<ParticipantUpload>> GetUploads(string? state, int limit, int offset = 0);
+        Task<Int64> GetUploadCount(ParticipantUploadRequestFilter filter);
+        Task<IEnumerable<ParticipantUpload>> GetUploads(ParticipantUploadRequestFilter filter);
         Task<IEnumerable<ParticipantUpload>> GetLatestSuccessfulUploadsByState();
 
         Task<int> AddUpload(ParticipantUploadDbo newUploadDbo);

@@ -1,4 +1,3 @@
-using System;
 using Microsoft.AspNetCore.WebUtilities;
 using Piipan.Metrics.Api;
 
@@ -9,7 +8,7 @@ namespace Piipan.Metrics.Core.Builders
     public class MetaBuilder : IMetaBuilder
     {
         private Meta _meta = new Meta();
-        private string? _state;
+        private ParticipantUploadRequestFilter _filter;
 
         public MetaBuilder()
         {
@@ -17,26 +16,14 @@ namespace Piipan.Metrics.Core.Builders
 
         public Meta Build()
         {
-            SetPrevPage(_state);
-            SetNextPage(_state);
+            SetPageParams();
             return _meta;
         }
 
-        public IMetaBuilder SetPage(int page)
+        public IMetaBuilder SetFilter(ParticipantUploadRequestFilter filter)
         {
-            _meta.Page = page;
-            return this;
-        }
-
-        public IMetaBuilder SetPerPage(int perPage)
-        {
-            _meta.PerPage = perPage;
-            return this;
-        }
-
-        public IMetaBuilder SetState(string? state)
-        {
-            _state = state;
+            _meta.PerPage = filter.PerPage;
+            _filter = filter;
             return this;
         }
 
@@ -46,32 +33,25 @@ namespace Piipan.Metrics.Core.Builders
             return this;
         }
 
-        private void SetPrevPage(string? state)
+        private void SetPageParams()
         {
-            var newPage = _meta.Page - 1;
-            if (newPage <= 0) return;
-
             string result = "";
-            if (!String.IsNullOrEmpty(state))
-                result = QueryHelpers.AddQueryString(result, "state", state);
-            result = QueryHelpers.AddQueryString(result, "page", newPage.ToString());
-            result = QueryHelpers.AddQueryString(result, "perPage", _meta.PerPage.ToString());
-            _meta.PrevPage = result;
+            result = SetFilterStrings(result);
+            result = QueryHelpers.AddQueryString(result, "PerPage", _meta.PerPage.ToString());
+            _meta.PageQueryParams = result;
         }
 
-        private void SetNextPage(string? state)
+        private string SetFilterStrings(string result)
         {
-            string result = "";
-            int nextPage = _meta.Page + 1;
-            // if there are next pages to be had
-            if (_meta.Total > (_meta.Page * _meta.PerPage))
-            {
-                if (!String.IsNullOrEmpty(state))
-                    result = QueryHelpers.AddQueryString(result, "state", state);
-                result = QueryHelpers.AddQueryString(result, "page", nextPage.ToString());
-                result = QueryHelpers.AddQueryString(result, "perPage", _meta.PerPage.ToString());
-            }
-            _meta.NextPage = result;
+            if (!string.IsNullOrEmpty(_filter.State))
+                result = QueryHelpers.AddQueryString(result, nameof(_filter.State), _filter.State);
+            if (_filter.StartDate != null)
+                result = QueryHelpers.AddQueryString(result, nameof(_filter.StartDate), _filter.StartDate.Value.ToString("yyyy-MM-dd"));
+            if (_filter.EndDate != null)
+                result = QueryHelpers.AddQueryString(result, nameof(_filter.EndDate), _filter.EndDate.Value.ToString("yyyy-MM-dd"));
+            if (!string.IsNullOrEmpty(_filter.Status))
+                result = QueryHelpers.AddQueryString(result, nameof(_filter.Status), _filter.Status);
+            return result;
         }
     }
 }
