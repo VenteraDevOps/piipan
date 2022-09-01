@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -25,16 +26,18 @@ namespace Piipan.Dashboard.Tests
         }
 
         [Fact]
-        public void AfterOnGet_EmailIsCorrect()
+        public async Task AfterOnGet_EmailAndStatesAreCorrect()
         {
             // arrange
             var pageModel = new IndexModel(new NullLogger<IndexModel>(), serviceProviderMock());
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
+            await OnPageHandlerExecutionAsync(pageModel, "OnGet");
             pageModel.OnGet();
 
             // assert
+            Assert.NotEmpty(pageModel.AppData.StateInfo.Results);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }

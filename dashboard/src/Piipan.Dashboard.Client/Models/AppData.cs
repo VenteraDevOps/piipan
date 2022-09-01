@@ -2,7 +2,7 @@
 
 namespace Piipan.Dashboard.Client.Models
 {
-    public class AppData
+    public record AppData
     {
         public StatesInfoResponse StateInfo { get; set; }
     }

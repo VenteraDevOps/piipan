@@ -4,7 +4,7 @@
 
 @code {
     [Parameter] public string Name { get; set; }
-    [Parameter] public Expression<Func<T, string>> Field { get; set; }
+    [Parameter] public Expression<Func<T, object>> Field { get; set; }
 
     [Parameter] public RenderFragment<T> Template { get; set; }
     [CascadingParameter] protected UsaTable<T> DataTable { get; set; }
