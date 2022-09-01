@@ -58,17 +58,28 @@ namespace Piipan.Match.Func.ResolutionApi
 
                 string requestLocation = req.Headers["X-Request-Location"];
 
-                // National Office, ignore state checks
-                if (requestLocation != "*")
+                // We ignore state checks when the requestLocation is  the National Office. They are allowed to retrieve any matches.
+                // For requests where the requestLocation is NOT the National Office, we have to check that the one of the following
+                // conditions is true- Either
+                // a) the requestLocation matches either the initiating or matching state.
+                //  OR
+                // b) the requestLocation is a Region that contains either the initiating or matching state
+                if (requestLocation != "*") //check if the requestLocation is not the National Office
                 {
+                    //Since the requestLocation is NOT National Office... 
+
+                    //Retrieve all state metadata from the database.
                     var states = await _memoryCache.GetOrCreateAsync(StateInfoCacheName, async (e) =>
                     {
                         return await _stateInfoDao.GetStates();
                     });
 
+                    //Identify all states whose abbreviation matches the requestLocation or whose region matches the requestLocation
                     states = states.Where(n => string.Compare(n.StateAbbreviation, requestLocation, true) == 0
                         || string.Compare(n.Region, requestLocation, true) == 0);
 
+                    // If the identified states associated with the requested location don't exist in the Match 
+                    // record's states (i.e. the initiating or matching state), log an error and return a Not Found response
                     if (!match.Result.States.Any(s => states.Any(n => string.Compare(n.StateAbbreviation, s, true) == 0)))
                     {
                         logger.LogInformation("(NOTAUTHORIZEDMATCH) user {User} did not have access to match id {MatchId}", req.HttpContext?.User.Identity.Name, matchId);
