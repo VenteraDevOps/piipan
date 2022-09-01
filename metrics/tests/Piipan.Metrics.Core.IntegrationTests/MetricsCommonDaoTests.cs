@@ -52,7 +52,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
 
             // Act
-            var count = await dao.GetUploadCount(null);
+            var count = await dao.GetUploadCount(new ParticipantUploadRequestFilter());
 
             // Assert
             Assert.Equal(expectedCount, count);
