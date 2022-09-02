@@ -295,7 +295,7 @@ main () {
       --query principalId \
       --output tsv)
 
-  dp_api_identity=$(\
+  apim_identity=$(\
     az apim show \
       --name "$dp_api_name" \
       --resource-group "$MATCH_RESOURCE_GROUP" \
@@ -315,11 +315,11 @@ main () {
     "$ORCH_API_APP_ROLE" \
     "$query_tool_identity"
 
-  echo "Configure Easy Auth for OrchestratorApi and DupPartApi"
+  echo "Configure Easy Auth for OrchestratorApi and APIM DupPartApi"
   configure_easy_auth_pair \
     "$orch_name" "$MATCH_RESOURCE_GROUP" \
     "$ORCH_API_APP_ROLE" \
-    "$dp_api_identity"
+    "$apim_identity"
 
   echo "Configure Easy Auth for Dashboard and MetricsApi"
   configure_easy_auth_pair \
@@ -339,9 +339,15 @@ main () {
     "$STATES_API_APP_ROLE" \
     "$query_tool_identity"
 
-  echo "Configure Easy Auth for all States: ETLStatus and QueryApp"
+  echo "Loop through every State ETL Function and enable Easy Auth between the function and (1) Dashboard AND (2) APIM"
   for etl_app_name in "${etl_function_names[@]}"
     do
+      etl_app_name="${etl_app_name/$'\r'/}"
+      configure_easy_auth_pair \
+        "${etl_app_name}" "${RESOURCE_GROUP}" \
+        "${ETL_API_APP_ROLE}" \
+        "${apim_identity}"
+
       etl_app_name="${etl_app_name/$'\r'/}"
       configure_easy_auth_pair \
         "${etl_app_name}" "${RESOURCE_GROUP}" \
