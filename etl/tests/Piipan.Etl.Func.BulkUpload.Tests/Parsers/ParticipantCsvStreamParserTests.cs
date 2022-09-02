@@ -1,14 +1,13 @@
-using CsvHelper;
-using CsvHelper.Configuration;
-using Piipan.Etl.Func.BulkUpload.Models;
-using Piipan.Etl.Func.BulkUpload.Parsers;
-using Piipan.Shared.API.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Piipan.Etl.Func.BulkUpload.Models;
+using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
@@ -86,7 +85,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             csvwriter.Context.RegisterClassMap<ParticipantMap>();
 
             var state = "EA";
-                       
+
             var p = new Participant();
 
             var recId = 31;
@@ -153,6 +152,34 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
                     ;
                 }
             });
+        }
+
+        [Fact]
+        public void BadCSVError()
+        {
+            // Arrange
+            var stream = CsvFixture(new string[]
+                {
+                    $"{LDS_HASH},CaseId1,ParticipantId1,,,",
+                    $"{LDS_HASH.Replace('0', '1')},CaseId2\",ParticipantId2,,,", // This line has a stray ", causing it to have bad data
+                });
+            var parser = new ParticipantCsvStreamParser();
+
+            // Act
+            var records = parser.Parse(stream);
+
+            // Assert
+            var ex = Assert.Throws<InvalidDataException>(() =>
+            {
+                foreach (var record in records)
+                {
+                    ;
+                }
+            });
+
+            // Error on row 3 (header row + 2nd data row)
+            Assert.Equal("Error parsing the CSV. Bad data found on row 3", ex.Message);
+
         }
 
         [Theory]
@@ -271,7 +298,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         public void EmptyInputStream()
         {
             // Arrange
-            var stream = CsvFixture(new string[] {}, false, false);
+            var stream = CsvFixture(new string[] { }, false, false);
             var parser = new ParticipantCsvStreamParser();
 
             // Act
@@ -300,7 +327,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             Assert.Null(records.First().VulnerableIndividual);
             Assert.Empty(records.First().RecentBenefitIssuanceDates);
         }
-        
+
 
     }
 }
