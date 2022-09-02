@@ -184,7 +184,12 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
-                TrimOptions = TrimOptions.Trim
+                TrimOptions = TrimOptions.Trim,
+                BadDataFound = (args) =>
+                {
+                    throw new InvalidDataException($"Error parsing the CSV. Bad data found on row {args.Context.Parser.Row}");
+                },
+                ExceptionMessagesContainRawData = false
             };
 
             var csv = new CsvReader(reader, config);
