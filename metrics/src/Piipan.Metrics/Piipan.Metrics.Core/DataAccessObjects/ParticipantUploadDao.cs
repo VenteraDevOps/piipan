@@ -60,6 +60,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             {
                 state = filter.State,
                 dateFrom = filter.StartDate?.AddHours(-1 * filter.HoursOffset),
+                // We add a day here to make sure to grab all entries in the database for the day that they asked for
                 dateTo = filter.EndDate?.AddDays(1).AddHours(-1 * filter.HoursOffset),
                 status = filter.Status,
                 limit = filter.PerPage,
@@ -108,6 +109,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             return new
             {
                 dateFrom = request.StartDate?.AddHours(-1 * request.HoursOffset),
+                // We add a day here to make sure to grab all entries in the database for the day that they asked for
                 dateTo = request.EndDate?.AddDays(1).AddHours(-1 * request.HoursOffset),
             };
         }
