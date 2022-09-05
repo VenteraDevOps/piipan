@@ -8,118 +8,30 @@
 @if (Upload.ParticipantUploadResults.Count > 0)
 {
     <div id="participant-upload-results">
-    <UsaTable Data="Upload.ParticipantUploadResults" Striped="true">
-        <UsaTableColumn T="ParticipantUpload" Name="State">
-            <Template Context="record">
-                @{
-                    var state = AppData.StateInfo.Results.FirstOrDefault(n => n.StateAbbreviation.Equals(record.State, StringComparison.OrdinalIgnoreCase));
-                }
-                @state?.State @(record?.State != null ? $"({record.State.ToUpper()})" : "")
-            </Template>
-        </UsaTableColumn>
-        <UsaTableColumn T="ParticipantUpload" Name="Upload Status">
-            <Template Context="record">
-                @if (record.Status?.Length > 1)
-                {
-                    <text>@(record.Status[0..1].ToUpper() + record.Status[1..].ToLower())</text>
-                }
-                else
-                {
-                    <text>@record.Status</text>
-                }
-                
-            </Template>
-        </UsaTableColumn>
-        <UsaTableColumn T="ParticipantUpload" Name="Timestamp at Processing Start">
-            <Template Context="record">
-                @{
-                    DateTime localDateTime = record.UploadedAt.ToLocalTime();
-                    string timeZoneAbbreviation = TimeZoneInfo.Local.IsDaylightSavingTime(localDateTime) ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName;
-                 }
-                 @localDateTime.ToString("M/d/yyyy h:mm:ss tt").ToUpper() @timeZoneAbbreviation
-            
-            </Template>
-        </UsaTableColumn>
-    </UsaTable>
-    @{
-        var numberOfPages = Upload.Total / Upload.ParticipantUploadFilter.PerPage + (Upload.Total % Upload.ParticipantUploadFilter.PerPage != 0 ? 1 : 0);
-
-        List<long> pagesNeeded = new();
-        var currentPage = Upload.ParticipantUploadFilter.Page;
-        // Add the first page
-        pagesNeeded.Add(1);
-
-        if (numberOfPages < 7)
-        {
-            for (int i = 2; i <= numberOfPages; i++)
-            {
-                pagesNeeded.Add(i);
-            }
-        }
-        else
-        {
-            if (currentPage > 1)
-            {
-                pagesNeeded.Add(currentPage - 1);
-            }
-            pagesNeeded.Add(currentPage);
-            if (currentPage < numberOfPages)
-            {
-                pagesNeeded.Add(currentPage + 1);
-            }
-            pagesNeeded.Add(numberOfPages);
-            pagesNeeded = pagesNeeded.Distinct().OrderBy(n => n).ToList();
-            for (int i = 0; i < pagesNeeded.Count - 1; i++)
-            {
-                if (pagesNeeded[i] + 2 == pagesNeeded[i + 1])
-                {
-                    pagesNeeded.Insert(i + 1, pagesNeeded[i] + 1);
-                }
-            }
-        }
-        <nav aria-label="Pagination" class="usa-pagination">
-            <ul class="usa-pagination__list">
-                @if (currentPage > 1)
-                {
-                    <li class="usa-pagination__item usa-pagination__arrow">
-                        <a href="/ParticipantUploads@(Upload.PageParams)&page=@(currentPage - 1)" class="usa-pagination__link usa-pagination__previous-page" aria-label="Previous page">
-                            <svg class="usa-icon" aria-hidden="true" role="img">
-                                <use xlink:href="/images/sprite.svg#navigate_before"></use>
-                            </svg>
-                            <span class="usa-pagination__link-text">Previous</span>
-                        </a>
-                    </li>
-                    
-                }
-                @{
-                    long previousPage = 0;
-                }
-                @foreach (var page in pagesNeeded)
-                {
-                    if (page - 1 != previousPage)
-                    {
-                        <li class="usa-pagination__item usa-pagination__overflow" role="presentation"><span>...</span></li>
+        <UsaTable Data="Upload.ParticipantUploadResults" Striped="true">
+            <UsaTableColumn T="ParticipantUpload" Name="State">
+                <Template Context="record">
+                    @{
+                        var state = AppData.StateInfo.Results.FirstOrDefault(n => n.StateAbbreviation.Equals(record.State, StringComparison.OrdinalIgnoreCase));
                     }
-                    previousPage = page;
-                    <li class="usa-pagination__item usa-pagination__page-no">
-                        <a href="/ParticipantUploads@(Upload.PageParams)&page=@(page)" class="usa-pagination__button @(page == currentPage ? "usa-current" : "")" aria-label="Page @(page)">@(page)</a>
-                    </li>
-                    
-                }
-                @if (currentPage < numberOfPages)
-                {
-                    <li class="usa-pagination__item usa-pagination__arrow">
-                        <a href="/ParticipantUploads@(Upload.PageParams)&page=@(currentPage + 1)" class="usa-pagination__link usa-pagination__next-page" aria-label="Next page">
-                            <span class="usa-pagination__link-text">Next</span>
-                            <svg class="usa-icon" aria-hidden="true" role="img">
-                                <use xlink:href="/images/sprite.svg#navigate_next"></use>
-                            </svg>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    }
+                    @state?.State @(record?.State != null ? $"({record.State.ToUpper()})" : "")
+                </Template>
+            </UsaTableColumn>
+            <UsaTableColumn T="ParticipantUpload" Name="Upload Status">
+                <Template Context="record">
+                    @record.Status?.ToLowerExceptFirstLetter()
+                </Template>
+            </UsaTableColumn>
+            <UsaTableColumn T="ParticipantUpload" Name="Timestamp at Processing Start">
+                <Template Context="record">
+                    @record.UploadedAt.ToFullTimeWithTimezone()
+                </Template>
+            </UsaTableColumn>
+        </UsaTable>
+        <UsaPagination 
+            CurrentPage="Upload.ParticipantUploadFilter.Page" 
+            NumberOfPages="(int)(Upload.Total / Upload.ParticipantUploadFilter.PerPage + (Upload.Total % Upload.ParticipantUploadFilter.PerPage != 0 ? 1 : 0))"
+            LinkWithParams="@($"/ParticipantUploads{Upload.PageParams}")" />
     </div>
 }
 else {

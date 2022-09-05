@@ -73,6 +73,8 @@ namespace Piipan.Components.Forms
                     IsDirty = true;
                     StateHasChanged();
                 }
+                // Register the form for validation. That hooks up a "submit" event, which Javascript will then fire off when the form is attempted to be submitted.
+                // When that occurs, we'll perform error checks (it eventually calls ValidateForm and, if there are no errors, PresubmitForm below).
                 await formJavascriptReference.InvokeVoidAsync("RegisterFormValidation", Id, DotNetObjectReference.Create(this));
             }
         }

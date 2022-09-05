@@ -149,6 +149,64 @@
     }
 
     /// <summary>
+    /// Verify the Quick Status buttons update the status and visually change when the same button is clicked twice in a row
+    /// </summary>
+    [Fact]
+    public void QuickStatusButtons_ShouldChangeStatusFailed_WhenToggledOff()
+    {
+        // Arrange
+        CreateTestComponent();
+        var failedBtn = Component.Find("#quick-filters-status-failed");
+        var completeBtn = Component.Find("#quick-filters-status-complete");
+
+        // Act
+        failedBtn.Click();
+
+        // Assert
+        Assert.Equal("Failed", Component.Instance.UploadRequest.Status);
+        Assert.False(failedBtn.ClassList.Contains("usa-button--outline")); // outline should be removed when selected
+        Assert.True(completeBtn.ClassList.Contains("usa-button--outline"));
+
+
+        // Act
+        failedBtn.Click();
+
+        // Assert
+        Assert.Null(Component.Instance.UploadRequest.Status);
+        Assert.True(failedBtn.ClassList.Contains("usa-button--outline"));
+        Assert.True(completeBtn.ClassList.Contains("usa-button--outline"));
+    }
+
+    /// <summary>
+    /// Verify the Quick Status buttons update the status and visually change when the same button is clicked twice in a row
+    /// </summary>
+    [Fact]
+    public void QuickStatusButtons_ShouldChangeStatusComplete_WhenToggledOff()
+    {
+        // Arrange
+        CreateTestComponent();
+        var failedBtn = Component.Find("#quick-filters-status-failed");
+        var completeBtn = Component.Find("#quick-filters-status-complete");
+
+        // Act
+        completeBtn.Click();
+
+        // Assert
+        Assert.Equal("Complete", Component.Instance.UploadRequest.Status);
+        Assert.True(failedBtn.ClassList.Contains("usa-button--outline"));
+        Assert.False(completeBtn.ClassList.Contains("usa-button--outline"));  // outline should be removed when selected
+
+
+        // Act
+        completeBtn.Click();
+
+        // Assert
+        Assert.Null(Component.Instance.UploadRequest.Status);
+        Assert.True(failedBtn.ClassList.Contains("usa-button--outline"));
+        Assert.True(completeBtn.ClassList.Contains("usa-button--outline"));
+    }
+
+    /// <summary>
     /// Verify the fields are bound to the form
     /// </summary>
     [Fact]

@@ -37,6 +37,15 @@
           "Castle.Core": "5.1.0"
         }
       },
+      "ReflectionMagic": {
+        "type": "Direct",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "5gsbb2VLQVS//2DjyOWztkd1JaT5B4M3qFXs1n40I8E7SEVSP19CEGLT8Gf++d2YB4UkZf4gE+FZ8QWBbG3Dng==",
+        "dependencies": {
+          "Microsoft.CSharp": "4.4.1"
+        }
+      },
       "xunit": {
         "type": "Direct",
         "requested": "[2.4.2, )",
@@ -295,26 +304,8 @@
       },
       "Microsoft.CSharp": {
         "type": "Transitive",
-        "resolved": "4.3.0",
-        "contentHash": "P+MBhIM0YX+JqROuf7i306ZLJEjQYA9uUyRDE+OqwUI5sh41e2ZbPQV3LfAPh+29cmceE1pUffXsGfR4eMY3KA==",
-        "dependencies": {
-          "System.Collections": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Dynamic.Runtime": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.Linq": "4.3.0",
-          "System.Linq.Expressions": "4.3.0",
-          "System.ObjectModel": "4.3.0",
-          "System.Reflection": "4.3.0",
-          "System.Reflection.Extensions": "4.3.0",
-          "System.Reflection.Primitives": "4.3.0",
-          "System.Reflection.TypeExtensions": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Runtime.InteropServices": "4.3.0",
-          "System.Threading": "4.3.0"
-        }
+        "resolved": "4.4.1",
+        "contentHash": "A5hI3gk6WpcBI0QGZY6/d5CCaYUxJgi7iENn1uYEng+Olo8RfI5ReGVkjXjeu3VR3srLvVYREATXa2M0X7FYJA=="
       },
       "Microsoft.Extensions.Configuration": {
         "type": "Transitive",
@@ -2003,81 +1994,81 @@
       "piipan.components": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.Web": "6.0.8"
+          "Microsoft.AspNetCore.Components.Web": "[6.0.8, )"
         }
       },
       "piipan.dashboard": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.WebAssembly.Server": "6.0.8",
-          "Microsoft.Extensions.Logging.AzureAppServices": "6.0.8",
-          "NEasyAuthMiddleware": "2.0.0",
-          "Newtonsoft.Json": "13.0.1",
-          "Piipan.Dashboard.Client": "1.0.0",
-          "Piipan.Metrics.Api": "1.0.0",
-          "Piipan.Metrics.Client": "1.0.0",
-          "Piipan.Shared": "1.0.0",
-          "Piipan.States.Client": "1.0.0",
-          "TimeZoneConverter": "5.0.0"
+          "Microsoft.AspNetCore.Components.WebAssembly.Server": "[6.0.8, )",
+          "Microsoft.Extensions.Logging.AzureAppServices": "[6.0.8, )",
+          "NEasyAuthMiddleware": "[2.0.0, )",
+          "Newtonsoft.Json": "[13.0.1, )",
+          "Piipan.Dashboard.Client": "[1.0.0, )",
+          "Piipan.Metrics.Api": "[1.0.0, )",
+          "Piipan.Metrics.Client": "[1.0.0, )",
+          "Piipan.Shared": "[1.0.0, )",
+          "Piipan.States.Client": "[1.0.0, )",
+          "TimeZoneConverter": "[5.0.0, )"
         }
       },
       "piipan.dashboard.client": {
         "type": "Project",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.WebAssembly": "6.0.8",
-          "Piipan.Components": "1.0.0",
-          "Piipan.Metrics.Api": "1.0.0",
-          "Piipan.States.Api": "1.0.0"
+          "Microsoft.AspNetCore.Components.WebAssembly": "[6.0.8, )",
+          "Piipan.Components": "[1.0.0, )",
+          "Piipan.Metrics.Api": "[1.0.0, )",
+          "Piipan.States.Api": "[1.0.0, )"
         }
       },
       "piipan.metrics.api": {
         "type": "Project",
         "dependencies": {
-          "Newtonsoft.Json": "13.0.1"
+          "Newtonsoft.Json": "[13.0.1, )"
         }
       },
       "piipan.metrics.client": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.25.0",
-          "Azure.Identity": "1.6.1",
-          "Microsoft.Extensions.Hosting": "6.0.1",
-          "Microsoft.Extensions.Http": "6.0.0",
-          "Piipan.Metrics.Api": "1.0.0",
-          "Piipan.Shared": "1.0.0"
+          "Azure.Core": "[1.25.0, )",
+          "Azure.Identity": "[1.6.1, )",
+          "Microsoft.Extensions.Hosting": "[6.0.1, )",
+          "Microsoft.Extensions.Http": "[6.0.0, )",
+          "Piipan.Metrics.Api": "[1.0.0, )",
+          "Piipan.Shared": "[1.0.0, )"
         }
       },
       "piipan.shared": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.25.0",
-          "Azure.Identity": "1.6.1",
-          "Microsoft.AspNetCore.Authorization": "6.0.8",
-          "Microsoft.AspNetCore.Http": "2.2.2",
-          "Microsoft.AspNetCore.Http.Extensions": "2.2.0",
-          "Microsoft.Azure.Services.AppAuthentication": "1.6.2",
-          "Microsoft.Extensions.Http": "6.0.0",
-          "Microsoft.Extensions.Logging": "6.0.0",
-          "Microsoft.Extensions.Options": "6.0.0",
-          "Newtonsoft.Json.Schema": "3.0.14",
-          "Npgsql": "6.0.6"
+          "Azure.Core": "[1.25.0, )",
+          "Azure.Identity": "[1.6.1, )",
+          "Microsoft.AspNetCore.Authorization": "[6.0.8, )",
+          "Microsoft.AspNetCore.Http": "[2.2.2, )",
+          "Microsoft.AspNetCore.Http.Extensions": "[2.2.0, )",
+          "Microsoft.Azure.Services.AppAuthentication": "[1.6.2, )",
+          "Microsoft.Extensions.Http": "[6.0.0, )",
+          "Microsoft.Extensions.Logging": "[6.0.0, )",
+          "Microsoft.Extensions.Options": "[6.0.0, )",
+          "Newtonsoft.Json.Schema": "[3.0.14, )",
+          "Npgsql": "[6.0.6, )"
         }
       },
       "piipan.states.api": {
         "type": "Project",
         "dependencies": {
-          "Newtonsoft.Json": "13.0.1"
+          "Newtonsoft.Json": "[13.0.1, )"
         }
       },
       "piipan.states.client": {
         "type": "Project",
         "dependencies": {
-          "Azure.Core": "1.25.0",
-          "Azure.Identity": "1.6.1",
-          "Microsoft.Extensions.Hosting": "6.0.1",
-          "Microsoft.Extensions.Http": "6.0.0",
-          "Piipan.Shared": "1.0.0",
-          "Piipan.States.Api": "1.0.0"
+          "Azure.Core": "[1.25.0, )",
+          "Azure.Identity": "[1.6.1, )",
+          "Microsoft.Extensions.Hosting": "[6.0.1, )",
+          "Microsoft.Extensions.Http": "[6.0.0, )",
+          "Piipan.Shared": "[1.0.0, )",
+          "Piipan.States.Api": "[1.0.0, )"
         }
       }
     }

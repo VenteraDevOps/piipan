@@ -247,11 +247,12 @@
         // Assert
         Assert.Equal("123-12-1234", model.NotRequiredField);
         // Verify cursor position
-        foreach (var invocation in JSInterop.Invocations.Where(n => n.Identifier == "piipan.utilities.setCursorPosition"))
+        foreach (var invocation in moduleInterop.Invocations.Where(n => n.Identifier == "SetCursorPosition"))
         {
             // the second argument in this call is the new cursor position. After adding in the hyphens, it should be 11
             Assert.Equal(11, invocation.Arguments[1]);
         }
+        Assert.NotEqual(0, moduleInterop.Invocations.Count(n => n.Identifier == "SetCursorPosition"));
     }
 
     /// <summary>
@@ -270,11 +271,12 @@
         // Assert
         Assert.Equal("123-", model.NotRequiredField);
         // Verify cursor position
-        foreach (var invocation in JSInterop.Invocations.Where(n => n.Identifier == "piipan.utilities.setCursorPosition"))
+        foreach (var invocation in moduleInterop.Invocations.Where(n => n.Identifier == "SetCursorPosition"))
         {
-            // the second argument in this call is the new cursor position. After adding in the hyphen, it should be 4
+            // the second argument in this call is the new cursor position. After adding in the hyphens, it should be 11
             Assert.Equal(4, invocation.Arguments[1]);
         }
+        Assert.NotEqual(0, moduleInterop.Invocations.Count(n => n.Identifier == "SetCursorPosition"));
     }
 
     /// <summary>
@@ -293,11 +295,12 @@
         // Assert
         Assert.Equal("123-12-", model.NotRequiredField);
         // Verify cursor position
-        foreach (var invocation in JSInterop.Invocations.Where(n => n.Identifier == "piipan.utilities.setCursorPosition"))
+        foreach (var invocation in moduleInterop.Invocations.Where(n => n.Identifier == "SetCursorPosition"))
         {
-            // the second argument in this call is the new cursor position. After adding in the hyphen, it should be 7
+            // the second argument in this call is the new cursor position. After adding in the hyphens, it should be 11
             Assert.Equal(7, invocation.Arguments[1]);
         }
+        Assert.NotEqual(0, moduleInterop.Invocations.Count(n => n.Identifier == "SetCursorPosition"));
     }
 
     /// <summary>
@@ -535,7 +538,7 @@
         form = componentFragment;
         Component = componentFragment.FindComponent<UsaInputSSN>();
         inputElement = componentFragment.Find($".{InputClass}");
-        JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true);
+        moduleInterop.SetupVoid("SetCursorPosition", _ => true).SetVoidResult();
         moduleInterop.SetupVoid("SetValue", _ => true).SetVoidResult();
     }
 
