@@ -10,7 +10,7 @@ Proposed
 
 We already employ a testing strategy that incorporates test-driven development (TDD) for developers for all .Net code, javascript, and recently for cshtml as well. These tests include both unit and integration tests. We enforce TDD by requiring that dvelopers write unit tests before writing code to satisfy JIRA tickets. All code changes are required to be reviewed via a Pull Request (PR) in GitHub and are automatically tested by our continuous integration pipelines. A PR will be blocked from merging if any tests fail. We additionally enforce automatic checks within GitHub that all PRs must have greater than 90% code coverage. By following these guidelines, we enforce loosely couple code that's easier to maintain, reduce the probability of bugs in our code prior to release, and reduce expensive rework by fixing issues earlier in the software development lifecycle.
 
-Our currently level of code coverage is actually 95%. While this is higher than the industry standard, we still have plenty of room for improvement to our testing strategy. We additionally want to establish a framework for incorporating types of tests into our continuous integration pipelines
+Our currently level of code coverage is actually 95%. While this is higher than the industry standard, we still have plenty of room for improvement to our testing strategy. We want to establish a framework for incorporating a variety of other types of functional & non-functional tests (see test categories below) into our continuous integration pipelines
 
 <ins>Functional Tests</ins>
 * Smoke Tests (general quick sanity tests. Check core functionalities of code)
