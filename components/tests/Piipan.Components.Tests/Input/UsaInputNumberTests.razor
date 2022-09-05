@@ -27,7 +27,7 @@
 
         // Assert
         Component!.MarkupMatches(
-            @<input type="number" step="any" class="@InputClass valid" id="model_NotRequiredField" name="model.NotRequiredField" style="" />
+            @<input type="number" step="any" value="0" class="@InputClass valid" id="model_NotRequiredField" name="model.NotRequiredField" style="" />
         );
     }
 
@@ -122,7 +122,7 @@
     /// Verify that if the value isn't set that we get errors if field is required
     /// </summary>
     [Fact]
-    public void Input_Should_Have_Errors_When_Empty_And_Required()
+    public void Input_Should_Have_NoErrors_When_Zero_And_Required()
     {
         // Arrange
         renderFragment = RequiredFieldRenderFragment();
@@ -132,7 +132,7 @@
         inputElement!.Blur();
 
         // Assert
-        AssertHasRequiredErrors();
+        AssertHasNoErrors();
     }
 
     /// <summary>
@@ -157,7 +157,7 @@
     /// Verify that we get errors when the value is set and then cleared if field is required
     /// </summary>
     [Fact]
-    public void Input_Should_Have_Errors_When_Changed_Back_To_Empty_And_Required()
+    public void Input_Should_Have_NoErrors_When_Changed_Back_To_Empty_And_Required()
     {
         // Arrange
         renderFragment = RequiredFieldRenderFragment();
@@ -171,11 +171,11 @@
         AssertHasNoErrors();
 
         // Act
-        inputElement!.Change("");
+        inputElement!.Change(0);
         inputElement!.Blur();
 
         // Assert
-        AssertHasRequiredErrors();
+        AssertHasNoErrors(); // Input cannot be empty, so there are no errors
     }
 
     #endregion Tests
