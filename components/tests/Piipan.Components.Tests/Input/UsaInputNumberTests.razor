@@ -3,11 +3,11 @@
 @inherits BaseTest<UsaInputNumber>
 @code {
     public class TestModel {
-        public int? NotRequiredField { get; set; }
+        public int NotRequiredField { get; set; }
 
         [UsaRequired]
         [Display(Name = "Required Field")]
-        public int? RequiredField { get; set; }
+        public int RequiredField { get; set; }
     }
     private IRenderedComponent<UsaForm>? form = null;
     private IElement? inputElement = null;

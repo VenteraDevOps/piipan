@@ -1,5 +1,5 @@
 ﻿@using static FormConstants
-@inherits UsaInputBase<int?>
+@inherits UsaInputBase<int>
 
 <InputNumber
     class="@($"{InputClass} {(FormGroup.Status != InputStatus.None ? $"{InputClass}--{FormGroup.Status.ToString().ToLower()}" : "")}")"
