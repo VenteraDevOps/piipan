@@ -59,5 +59,10 @@ namespace Piipan.Metrics.Core.Services
                 Meta = meta
             };
         }
+
+        public async Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest request)
+        {
+            return await _participantUploadDao.GetUploadStatistics(request);
+        }
     }
 }

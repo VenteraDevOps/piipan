@@ -94,5 +94,31 @@ namespace Piipan.Metrics.Core.Tests.Services
             Assert.Equal(1, nRows);
             uploadDao.Verify(m => m.AddUpload(It.IsAny<ParticipantUploadDbo>()), Times.Once);
         }
+
+        [Fact]
+        public async Task GetUploadStatistics()
+        {
+            // Arrange
+            var uploadedAt = DateTime.Now;
+            var uploadDao = new Mock<IParticipantUploadDao>();
+            uploadDao
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()))
+                .ReturnsAsync(new ParticipantUploadStatistics
+                {
+                    TotalFailure = 1,
+                    TotalComplete = 2
+                });
+            var metaBuilder = new Mock<IMetaBuilder>();
+
+            var service = new ParticipantUploadService(uploadDao.Object, metaBuilder.Object);
+
+            // Act
+            var response = await service.GetUploadStatistics(
+                new ParticipantUploadStatisticsRequest { StartDate = DateTime.Now.Date, EndDate = DateTime.Now.Date, HoursOffset = -5 });
+
+            // Assert
+            Assert.Equal(1, response.TotalFailure);
+            Assert.Equal(2, response.TotalComplete);
+        }
     }
 }

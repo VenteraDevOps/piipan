@@ -1,0 +1,20 @@
+﻿@using Piipan.Metrics.Api
+@code {
+    [Parameter] public ParticipantUploadStatistics Statistics { get; set; } = new();
+}
+
+<h2>Daily Upload Information</h2>
+@{
+    string timeZoneAbbreviation = TimeZoneInfo.Local.IsDaylightSavingTime(DateTime.Now) ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName;
+}
+<span>Last synced on @DateTime.Now.ToString("M/d/yyyy h:mm:ss tt").ToUpper() @timeZoneAbbreviation</span>
+<div id="statistic-wrapper">
+    <div class="statistic-card">
+        <h3>Daily Failed Uploads</h3>
+        <span class="statistic-number">@Statistics.TotalFailure</span>
+    </div>
+    <div class="statistic-card">
+        <h3>Daily Uploads Completed (out of @(AppData.StateInfo.Results.Count()))</h3>
+        <span class="statistic-number">@Statistics.TotalComplete</span>
+    </div>
+</div>

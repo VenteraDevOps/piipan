@@ -293,5 +293,37 @@ namespace Piipan.Metrics.Core.IntegrationTests
 
             Assert.Equal(1, numberOfRowsUPdated);
         }
+
+        [Theory]
+        [InlineData(0, 0, 0, 0)]
+        [InlineData(1, 2, 1, 2)]
+        [InlineData(50, 100, 10, 10)]
+        public async Task GetUploadStatistics_ReturnsExpected(int failed, int complete, int expectedFailedStates, int expectedCompleteStates)
+        {
+            // Arrange
+            for (var i = 0; i < failed; i++)
+            {
+                Insert($"E{i % 10}", DateTime.Now, DateTime.Now, "failed", "upload_identifier");
+            }
+            for (var i = 0; i < complete; i++)
+            {
+                Insert($"E{i % 10}", DateTime.Now, DateTime.Now, "complete", "upload_identifier");
+            }
+
+            var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
+
+            // Act
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            var statistics = await dao.GetUploadStatistics(new ParticipantUploadStatisticsRequest
+            {
+                StartDate = DateTime.Now.Date,
+                EndDate = DateTime.Now.Date,
+                HoursOffset = (int)offset.TotalHours
+            });
+
+            // Assert
+            Assert.Equal(expectedFailedStates, statistics.TotalFailure);
+            Assert.Equal(expectedCompleteStates, statistics.TotalComplete);
+        }
     }
 }

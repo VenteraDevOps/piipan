@@ -12,6 +12,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
     {
         Task<Int64> GetUploadCount(ParticipantUploadRequestFilter filter);
         Task<IEnumerable<ParticipantUpload>> GetUploads(ParticipantUploadRequestFilter filter);
+        Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest filter);
         Task<IEnumerable<ParticipantUpload>> GetLatestSuccessfulUploadsByState();
 
         Task<int> AddUpload(ParticipantUploadDbo newUploadDbo);
