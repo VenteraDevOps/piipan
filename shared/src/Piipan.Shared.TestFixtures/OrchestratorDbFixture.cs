@@ -113,8 +113,8 @@ namespace Piipan.Shared.TestFixtures
                 conn.Execute("DROP TABLE IF EXISTS matches");
                 conn.Execute("DROP TABLE IF EXISTS state_info");
                 conn.Execute(matchesSql);
-                conn.Execute(createStateInfo);   
-                conn.Execute(insertStateInfo);   
+                conn.Execute(createStateInfo);
+                conn.Execute(insertStateInfo);
                 conn.Close();
             }
         }
@@ -150,6 +150,7 @@ namespace Piipan.Shared.TestFixtures
                 conn.ConnectionString = CollabConnectionString;
                 conn.Open();
 
+                conn.Execute("DELETE FROM match_res_events");
                 conn.Execute("DELETE FROM matches");
 
                 conn.Close();

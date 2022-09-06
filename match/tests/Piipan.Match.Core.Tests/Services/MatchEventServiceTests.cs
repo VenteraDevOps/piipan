@@ -11,8 +11,10 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Metrics.Api;
+using Piipan.Notification.Common.Models;
+using Piipan.Notifications.Core.Builders;
+using Piipan.Notifications.Core.Services;
 using Piipan.Notifications.Models;
-using Piipan.Notifications.Services;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.Cryptography;
 using Piipan.States.Core.DataAccessObjects;
@@ -49,6 +51,25 @@ namespace Piipan.Match.Core.Tests.Services
             return recordBuilder;
         }
 
+        private NotificationRecord NotificationRecord = new NotificationRecord()
+        {
+            MatchRecord = new MatchModel()
+            {
+                MatchId = "foo",
+                InitState = "ea",
+                MatchingState = "eb",
+                MatchingUrl = It.IsAny<string>(),
+            },
+            EmailToRecord = new EmailToModel()
+            {
+                EmailTo = "Ea@Nac.gov"
+            },
+            EmailToRecordMS = new EmailToModel()
+            {
+                EmailTo = "Eb@Nac.gov"
+            }
+        };
+
         private Mock<IMatchRecordApi> ApiMock(string matchId = "foo")
         {
             var api = new Mock<IMatchRecordApi>();
@@ -71,6 +92,7 @@ namespace Piipan.Match.Core.Tests.Services
 
             return mock;
         }
+
         private Mock<IParticipantPublishSearchMetric> ParticipantPublishSearchMetricMock()
         {
             var mock = new Mock<IParticipantPublishSearchMetric>();
@@ -79,6 +101,7 @@ namespace Piipan.Match.Core.Tests.Services
 
             return mock;
         }
+
         private Mock<IParticipantPublishMatchMetric> ParticipantPublishMatchMetricMock()
         {
             var mock = new Mock<IParticipantPublishMatchMetric>();
@@ -87,26 +110,55 @@ namespace Piipan.Match.Core.Tests.Services
 
             return mock;
         }
+
         private Mock<INotificationService> NotificationServiceMock()
         {
-            var emailTemplateInput = new EmailTemplateInput()
+            var notificationRecord = new NotificationRecord()
             {
-                Topic = It.IsAny<string>(),
-                TemplateData = new
+                MatchRecord = new MatchModel()
                 {
                     MatchId = It.IsAny<string>(),
                     InitState = It.IsAny<string>(),
                     MatchingState = It.IsAny<string>(),
                     MatchingUrl = It.IsAny<string>(),
-
                 },
-                EmailTo = It.IsAny<string>()
+                EmailToRecordMS = new EmailToModel()
+                {
+                    EmailTo = It.IsAny<string>()
+                },
+                EmailToRecord = new EmailToModel()
+                {
+                    EmailTo = It.IsAny<string>()
+                }
             };
             var mock = new Mock<INotificationService>();
-            mock.Setup(m => m.PublishMessageFromTemplate(
-                emailTemplateInput)).Returns(Task.FromResult(true));
+            mock.Setup(m => m.PublishNotificationOnMatchCreation(
+                notificationRecord)).Returns(Task.FromResult(true));
             return mock;
         }
+
+        private Mock<INotificationRecordBuilder> BuilderNotificationMock(NotificationRecord record)
+        {
+            var recordBuilder = new Mock<INotificationRecordBuilder>();
+            recordBuilder
+                .Setup(r => r.SetMatchModel(It.IsAny<MatchModel>()))
+                .Returns(recordBuilder.Object);
+            recordBuilder
+                .Setup(r => r.SetEmailToModel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(recordBuilder.Object);
+            recordBuilder
+              .Setup(r => r.SetEmailMatchingStateModel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+              .Returns(recordBuilder.Object);
+            recordBuilder
+               .Setup(r => r.SetDispositionModel(It.IsAny<DispositionModel>()))
+               .Returns(recordBuilder.Object);
+            recordBuilder
+                .Setup(r => r.GetRecord())
+                .Returns(record);
+
+            return recordBuilder;
+        }
+
         private Mock<IStateInfoDao> StateInfoDaoMock()
         {
             var stateInfoDao = new Mock<IStateInfoDao>();
@@ -180,6 +232,8 @@ namespace Piipan.Match.Core.Tests.Services
             var stateInfoDao = StateInfoDaoMock();
             var notificationService = NotificationServiceMock();
 
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -189,7 +243,8 @@ namespace Piipan.Match.Core.Tests.Services
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
                 stateInfoDao.Object,
-                notificationService.Object
+                notificationService.Object,
+                recordNotificationBuilder.Object
 
             );
 
@@ -216,9 +271,8 @@ namespace Piipan.Match.Core.Tests.Services
                                                   r.InitState == record.Initiator
                                                  )),
                                                   Times.Once);
-
-            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "CREATE_MATCH_IS" && p.EmailTo == "Ea@Nac.gov")), Times.Once);
-            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == "CREATE_MATCH_MS" && p.EmailTo == "Eb@Nac.gov")), Times.Once);
+            // Need to be called only when creating new Match Record
+            notificationService.Verify(r => r.PublishNotificationOnMatchCreation(It.Is<NotificationRecord>(p => p.MatchRecord.InitState == "Echo Alpha" && p.EmailToRecord.EmailTo == "Ea@Nac.gov" && p.EmailToRecordMS.EmailTo == "Eb@Nac.gov")), Times.Once);
         }
 
         [Fact]
@@ -258,6 +312,7 @@ namespace Piipan.Match.Core.Tests.Services
             var stateInfoDao = StateInfoDaoMock();
             var notificationService = NotificationServiceMock();
 
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -267,7 +322,8 @@ namespace Piipan.Match.Core.Tests.Services
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
                 stateInfoDao.Object,
-                notificationService.Object
+                notificationService.Object,
+                recordNotificationBuilder.Object
 
             );
 
@@ -318,9 +374,10 @@ namespace Piipan.Match.Core.Tests.Services
             var publishSearchMetrics = ParticipantPublishSearchMetricMock();
             var publishMatchMetrics = ParticipantPublishMatchMetricMock();
 
-
             var stateInfoDao = StateInfoDaoMock();
             var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
 
             var service = new MatchEventService(
                 recordBuilder.Object,
@@ -331,7 +388,8 @@ namespace Piipan.Match.Core.Tests.Services
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
                 stateInfoDao.Object,
-                notificationService.Object
+                notificationService.Object,
+                recordNotificationBuilder.Object
 
             );
 
@@ -392,6 +450,7 @@ namespace Piipan.Match.Core.Tests.Services
             var stateInfoDao = StateInfoDaoMock();
             var notificationService = NotificationServiceMock();
 
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -401,7 +460,8 @@ namespace Piipan.Match.Core.Tests.Services
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
                 stateInfoDao.Object,
-                notificationService.Object
+                notificationService.Object,
+                recordNotificationBuilder.Object
 
             );
 
@@ -457,6 +517,8 @@ namespace Piipan.Match.Core.Tests.Services
             var stateInfoDao = StateInfoDaoMock();
             var notificationService = NotificationServiceMock();
 
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -466,7 +528,8 @@ namespace Piipan.Match.Core.Tests.Services
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
                 stateInfoDao.Object,
-                notificationService.Object
+                notificationService.Object,
+                recordNotificationBuilder.Object
 
             );
 
@@ -537,6 +600,8 @@ namespace Piipan.Match.Core.Tests.Services
             var stateInfoDao = StateInfoDaoMock();
             var notificationService = NotificationServiceMock();
 
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
@@ -546,7 +611,8 @@ namespace Piipan.Match.Core.Tests.Services
                 publishSearchMetrics.Object,
                 publishMatchMetrics.Object,
                 stateInfoDao.Object,
-                notificationService.Object
+                notificationService.Object,
+                recordNotificationBuilder.Object
 
             );
 
@@ -563,8 +629,9 @@ namespace Piipan.Match.Core.Tests.Services
                                                   r.Data.First().MatchCreation == search.MatchCreation &&
                                                   r.Data.First().SearchReason == search.SearchReason)),
              Times.Once);
-            var topic = "CREATE_MATCH";
-            notificationService.Verify(r => r.PublishMessageFromTemplate(It.Is<EmailTemplateInput>(p => p.Topic == topic)), Times.Never);
+
+            notificationService.Verify(r => r.PublishNotificationOnMatchCreation(It.Is<NotificationRecord>(p => p.EmailToRecord.EmailTo == "Ea@Nac.gov")), Times.Never);
         }
+
     }
 }

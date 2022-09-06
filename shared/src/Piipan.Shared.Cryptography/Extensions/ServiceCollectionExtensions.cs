@@ -19,9 +19,9 @@ namespace Piipan.Shared.Cryptography.Extensions
                 var columnEncryptionKey = Environment.GetEnvironmentVariable("ColumnEncryptionKey");
                 return new AzureAesCryptographyClient(columnEncryptionKey);
             });
-           
+
 
         }
-    
+
     }
 }

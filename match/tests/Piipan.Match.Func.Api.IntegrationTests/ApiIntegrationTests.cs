@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,6 +25,9 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Metrics.Api;
+using Piipan.Notification.Common;
+using Piipan.Notification.Core.Extensions;
+using Piipan.Notifications.Core.Services;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
@@ -125,7 +131,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             // Mixing cases to verify the enabled states can be used no matter their casing.
             Environment.SetEnvironmentVariable("EnabledStates", "ea,EB");
 
-            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
             Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
 
             var services = new ServiceCollection();
@@ -139,6 +144,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             services.AddTransient<IMatchResEventDao, MatchResEventDao>();
             services.AddTransient<IMatchResAggregator, MatchResAggregator>();
             services.AddSingleton<IMemoryCache, MemoryCache>();
+
             services.AddTransient<IParticipantPublishSearchMetric>(b =>
             {
                 var factory = new Mock<IParticipantPublishSearchMetric>();
@@ -181,6 +187,22 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
                 );
             });
+            services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            var listener = new DiagnosticListener("Microsoft.AspNetCore");
+            services.AddSingleton<DiagnosticListener>(listener);
+            services.AddSingleton<DiagnosticSource>(listener);
+
+            services.AddMvc()
+                   .AddApplicationPart(typeof(Piipan.Notification.Common.ViewRenderService).GetTypeInfo().Assembly)
+                   .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                   .AddDataAnnotationsLocalization();
+
+            services.Configure<RazorViewEngineOptions>(o =>
+            {
+                o.ViewLocationFormats.Add("/Templates/{0}" + RazorViewEngine.ViewExtension);
+            });
+            services.RegisterNotificationServices();
             services.RegisterParticipantsServices();
             services.RegisterMatchServices();
             services.RegisterKeyVaultClientServices();

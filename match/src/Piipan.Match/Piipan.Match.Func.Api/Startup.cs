@@ -1,6 +1,9 @@
 using System;
 using System.Data.Common;
+using System.Diagnostics;
+using System.Reflection;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +14,7 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Extensions;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Validators;
+using Piipan.Notification.Core.Extensions;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Shared.Cryptography.Extensions;
@@ -63,9 +67,24 @@ namespace Piipan.Match.Func.Api
                     Environment.GetEnvironmentVariable(CollaborationDatabaseConnectionString)
                 );
             });
+            var listener = new DiagnosticListener("Microsoft.AspNetCore");
+            builder.Services.AddSingleton<DiagnosticListener>(listener);
+            builder.Services.AddSingleton<DiagnosticSource>(listener);
+            builder.Services.AddMvc()
+                    .AddApplicationPart(typeof(Piipan.Notification.Common.ViewRenderService).GetTypeInfo().Assembly)
+                    .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                    .AddDataAnnotationsLocalization();
+
+            builder.Services.Configure<RazorViewEngineOptions>(o =>
+            {
+                o.ViewLocationFormats.Add("/Templates/{0}" + RazorViewEngine.ViewExtension);
+            });
+
+            builder.Services.RegisterNotificationServices();
             builder.Services.RegisterMatchServices();
             builder.Services.RegisterParticipantsServices();
             builder.Services.RegisterKeyVaultClientServices();
+
 
         }
     }
