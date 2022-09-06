@@ -203,6 +203,57 @@ Microsoft provides comprehensive [documentation on ARM templates](https://docs.m
 
 Once the IaC process has been run, individual applications are deployed to the resources using a [standardized build.bash script](../README.md#development) that can be run manually by a developer or as part of a CI/CD pipeline.
 
+## How to Run and Debug in Visual Studio
+
+Either create a json file called "launchSettings.json" in the properties folder of the function you're running, or an "appsettings.json" file in the main folder of the function you're running. Launchsettings can be used for local settings when running it through visual studio and appsettings can be used when the information is going to be deployed and needs to stay with the other project files.
+
+Variables will be pulled from the launchSettings.Json file if the developer uses **Environment.GetEnvironmentVariable** and the appsettings.json file if the developer uses **config[VARIABLE_NAME_HERE]**. When using from the appsettings.json the IConfiguration interface should be used.
+
+An example of the environment variables are below. The following environment variables can be found:
+
+| Variables     | Where to find them                   | 
+| :------------ |:-------------------------------------:| 
+| OrchApiAppId,  MatchResApiAppId, StatesApiAppId      | Azure Active Directory -> Enterprise Applications -> Remove Enterpirse Applications filter, add 'Assignment Required' = required filter -> App Id's should be with every application |
+| OrchApiUri, MatchResApiUri, StatesApiUri     | 1) Go to function on portal -> overview and copy the URL  2)  Go to function on portal -> app files -> append the route prefix to the URL copied in step 1    |
+| CollaborationDatabaseConnectionString, DatabaseConnectionString | Go to your __-psql-core-__ or __-psql-participants-__ -> connection strings -> copy the .NET connection string -> Remove 'Ssl Mode=Require' and replace with the endings in the examples below      |
+| BlobStorageConnectionString, UploadPayloadKey, UploadPayloadKeySHA | Go to the function you are running in the Azure Portal -> Configuration -> Copy the appropriate values from the table |
+| ColumnEncryptionKey | Key Vault -> secrets -> column-encryption-key -> current version -> secret value |
+| PSQL DB Passwords | Key Vault -> secrets -> appropriate PSQL DB -> current version -> secret value |
+
+```
+{
+  "profiles": {
+    "Piipan.Match.Func.ResolutionApi": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OrchApiUri": "https://cc-func-orchestrator-cjc.azurewebsites.net/api/v1/",
+        "OrchApiAppId": "ead134cc-606a-4a8b-a4bd-aeb727195dc6",
+        "MatchResApiUri": "https://cc-func-matchres-cjc.azurewebsites.net/api/v1/",
+        "MatchResApiAppId": "861b330f-bc66-44cc-8d24-0f1a6889f863",
+        "StatesApiAppId": "8dd6d72f-1aa6-4d1c-bb4f-980fa76c9ddb",
+        "StatesApiUri": "https://cc-func-states-cjc.azurewebsites.net/api/v1/",
+        "CollaborationDatabaseConnectionString": "Server=cc-psql-core-cjc.postgres.database.azure.com;Database=collaboration;Port=5432;User Id=USER_ID;Password=CORE_DB_PASSWORD;Ssl Mode=VerifyFull;",
+        "DatabaseConnectionString": "Server=cc-psql-participants-cjc.postgres.database.azure.com;Database=ea;Port=5432;User Id=USER_ID;Password=PARTCIPANT_DB_PASSWORD;Ssl Mode=VerifyFull;SearchPath=piipan;",
+        "ColumnEncryptionKey": "ENCRYPTION_KEY_HERE",
+        "EnabledStates": "ea,eb",
+        "States": "ea,eb",
+        "BlobStorageConnectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=ccsteauploadcjc;AccountKey=ACCOUNT_KEY;BlobEndpoint=https://ccsteauploadcjc.blob.core.windows.net/;FileEndpoint=https://ccsteauploadcjc.file.core.windows.net/;QueueEndpoint=https://ccsteauploadcjc.queue.core.windows.net/;TableEndpoint=https://ccsteauploadcjc.table.core.windows.net/",
+        "UploadPayloadKey": "UPLOAD_KEY",
+        "UploadPayloadKeySHA": "UPLOAD_SHA_KEY"
+      }
+    }
+  }
+}
+```
+
+**Remote Debugging**
+
+Go to your function on Azure Portal -> Configuration -> General Settings -> Ensure Remote Debugging is set to on and your version of Visual Studio -> Deploy a NON RELEASE version of the function to Azure -> Click the 3 dots menu under hosting and attach Remote Debugger
+
+
 ## Review
 
 Congrats on making it through all of the steps! By now, you should:
