@@ -33,7 +33,7 @@ namespace Piipan.Match.Core.Services
         private readonly IStateInfoDao _stateInfoDao;
         private readonly INotificationService _notificationService;
         private readonly INotificationRecordBuilder _notificationRecordBuilder;
-
+        private readonly object notificationLock = new object();
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
             IMatchRecordApi recordApi,
@@ -167,15 +167,14 @@ namespace Piipan.Match.Core.Services
                     MatchingUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}",
                     InitialActionBy = DateTime.Now.AddDays(10)
                 };
-
-                NotificationRecord notificationRecord = new NotificationRecord();
-                notificationRecord.MatchRecord = new MatchModel();
-                notificationRecord.MatchRecord = MatchRecord;
-                notificationRecord.EmailToRecord = new EmailToModel();
-                notificationRecord.EmailToRecord.EmailTo = initState?.Email;
-
-                notificationRecord.EmailToRecordMS = new EmailToModel();
-                notificationRecord.EmailToRecordMS.EmailTo = matchingState?.Email;
+                NotificationRecord notificationRecord;
+                lock (notificationLock)
+                {
+                    _notificationRecordBuilder.SetMatchModel(MatchRecord);
+                    _notificationRecordBuilder.SetEmailToModel(initState?.Email);
+                    _notificationRecordBuilder.SetEmailMatchingStateModel(matchingState?.Email);
+                    notificationRecord = _notificationRecordBuilder.GetRecord();
+                }
 
                 await _notificationService.PublishNotificationOnMatchCreation(notificationRecord); //Publishing Email for Initiating & Matching State:  Based on the requirement
 
