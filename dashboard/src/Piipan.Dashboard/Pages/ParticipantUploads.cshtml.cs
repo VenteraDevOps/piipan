@@ -27,6 +27,7 @@ namespace Piipan.Dashboard.Pages
         }
         public string Title = "Most recent upload from each state";
         public List<ParticipantUpload> ParticipantUploadResults { get; private set; } = new List<ParticipantUpload>();
+        public ParticipantUploadStatistics UploadStatistics { get; set; } = new();
         public string? PageParams { get; private set; }
         public string? StateQuery { get; private set; }
         public long TotalPages { get; set; }
@@ -48,6 +49,7 @@ namespace Piipan.Dashboard.Pages
                 }
 
                 var response = await _participantUploadApi.GetUploads(UploadRequest);
+                await GetUploadStatistics();
                 ParticipantUploadResults = response.Data.ToList();
                 SetPageLinks(response.Meta);
             }
@@ -63,6 +65,18 @@ namespace Piipan.Dashboard.Pages
             }
         }
 
+        private async Task GetUploadStatistics()
+        {
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            ParticipantUploadStatisticsRequest statisticsRequest = new ParticipantUploadStatisticsRequest
+            {
+                StartDate = DateTime.Now.Date,
+                EndDate = DateTime.Now.Date,
+                HoursOffset = (int)offset.TotalHours
+            };
+            UploadStatistics = await _participantUploadApi.GetUploadStatistics(statisticsRequest);
+        }
+
         [BindProperty]
         public ParticipantUploadRequestFilter UploadRequest { get; set; } = new ParticipantUploadRequestFilter();
 
@@ -75,6 +89,7 @@ namespace Piipan.Dashboard.Pages
 
                 StateQuery = Request.Form["state"];
                 var response = await _participantUploadApi.GetUploads(UploadRequest);
+                await GetUploadStatistics();
                 ParticipantUploadResults = response.Data.ToList();
                 SetPageLinks(response.Meta);
             }

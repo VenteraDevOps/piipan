@@ -15,6 +15,11 @@ namespace Piipan.Metrics.Client
             _apiClient = apiClient;
         }
 
+        public async Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest request)
+        {
+            return await _apiClient.GetAsync<ParticipantUploadStatistics, ParticipantUploadStatisticsRequest>("GetUploadStatistics", request);
+        }
+
         public async Task<GetParticipantUploadsResponse> GetLatestUploadsByState()
         {
             return await _apiClient.GetAsync<GetParticipantUploadsResponse>("GetLastUpload");

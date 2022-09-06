@@ -60,6 +60,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             {
                 state = filter.State,
                 dateFrom = filter.StartDate?.AddHours(-1 * filter.HoursOffset),
+                // We add a day here to make sure to grab all entries in the database for the day that they asked for
                 dateTo = filter.EndDate?.AddDays(1).AddHours(-1 * filter.HoursOffset),
                 status = filter.Status,
                 limit = filter.PerPage,
@@ -81,6 +82,65 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             using (var connection = await _dbConnectionFactory.Build())
             {
                 return await connection.ExecuteScalarAsync<Int64>(sql, GenerateQueryObject(filter));
+            }
+        }
+
+        private string GenerateStatisticsWhereClause(ParticipantUploadStatisticsRequest request)
+        {
+            string whereClause = "";
+            if (request.StartDate != null)
+            {
+                whereClause += $"uploaded_at >= @dateFrom AND ";
+            }
+            if (request.EndDate != null)
+            {
+                whereClause += $"uploaded_at < @dateTo AND ";
+            }
+            if (whereClause.EndsWith(" AND "))
+            {
+                // " AND " takes up 5 characters. Remove the last " AND "
+                whereClause = $" WHERE {whereClause[..^5]}";
+            }
+            return whereClause;
+        }
+
+        private object GenerateStatisticsQueryObject(ParticipantUploadStatisticsRequest request)
+        {
+            return new
+            {
+                dateFrom = request.StartDate?.AddHours(-1 * request.HoursOffset),
+                // We add a day here to make sure to grab all entries in the database for the day that they asked for
+                dateTo = request.EndDate?.AddDays(1).AddHours(-1 * request.HoursOffset),
+            };
+        }
+
+        private record ParticipantUploadStatisticsRow
+        {
+            public int Count { get; init; }
+            public string Status { get; init; }
+        }
+
+        public async Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest request)
+        {
+            var sql = @"
+                SELECT
+                    count(distinct State) Count,
+                    status Status
+                FROM participant_uploads";
+
+            sql += GenerateStatisticsWhereClause(request);
+
+            sql += " GROUP BY Status";
+
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                var rows = await connection.QueryAsync<ParticipantUploadStatisticsRow>(sql, GenerateStatisticsQueryObject(request));
+                ParticipantUploadStatistics statistics = new ParticipantUploadStatistics
+                {
+                    TotalComplete = rows.FirstOrDefault(n => n.Status.Equals("Complete", StringComparison.OrdinalIgnoreCase))?.Count ?? 0,
+                    TotalFailure = rows.FirstOrDefault(n => n.Status.Equals("Failed", StringComparison.OrdinalIgnoreCase))?.Count ?? 0
+                };
+                return statistics;
             }
         }
 
