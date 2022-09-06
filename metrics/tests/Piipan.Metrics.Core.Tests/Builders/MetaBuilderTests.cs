@@ -29,7 +29,8 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
                 StartDate = startDate,
                 EndDate = endDate,
                 PerPage = 20,
-                Page = 1
+                Page = 1,
+                HoursOffset = -5
             });
             builder.SetTotal(5);
 
@@ -71,6 +72,7 @@ namespace Piipan.Metrics.Func.Api.Tests.Builders
             {
                 Assert.DoesNotContain("EndDate=", meta.PageQueryParams);
             }
+            Assert.Contains($"HoursOffset=-5", meta.PageQueryParams);
         }
     }
 }
