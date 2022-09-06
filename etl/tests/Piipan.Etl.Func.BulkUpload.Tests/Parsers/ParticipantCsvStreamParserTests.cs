@@ -1,14 +1,13 @@
-using CsvHelper;
-using CsvHelper.Configuration;
-using Piipan.Etl.Func.BulkUpload.Models;
-using Piipan.Etl.Func.BulkUpload.Parsers;
-using Piipan.Shared.API.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Piipan.Etl.Func.BulkUpload.Models;
+using Piipan.Etl.Func.BulkUpload.Parsers;
+using Piipan.Shared.API.Utilities;
 using Xunit;
 
 namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
@@ -86,7 +85,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
             csvwriter.Context.RegisterClassMap<ParticipantMap>();
 
             var state = "EA";
-                       
+
             var p = new Participant();
 
             var recId = 31;
@@ -233,7 +232,7 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
         public void EmptyInputStream()
         {
             // Arrange
-            var stream = CsvFixture(new string[] {}, false, false);
+            var stream = CsvFixture(new string[] { }, false, false);
             var parser = new ParticipantCsvStreamParser();
 
             // Act
@@ -304,6 +303,26 @@ namespace Piipan.Etl.Func.BulkUpload.Tests.Parsers
                     ;
                 }
             });
+        }
+        [Theory]
+        [InlineData("04d1117b976e9c894294ab6198bee5fdaac1f657615f6ee01f96bcfc7045872c60ea68aa205c04dd2d6c5c9a350904385c8d6c9adf8f3cf8da8730d767251eef,CaseId-44,ParticipantId_1,,,")] //  CaseId is not alphanumeric
+        public void ExpectAlphanumericValidationWithHypenAndDash(String inline)
+        {
+            // Arrange
+            var stream = CsvFixture(new string[] { inline });
+            var parser = new ParticipantCsvStreamParser();
+
+            // Act
+            var records = parser.Parse(stream).ToList(); ;
+
+            // Assert
+            Assert.Single(records);
+            Assert.Equal(LDS_HASH, records.First().LdsHash);
+            Assert.Equal("CaseId-44", records.First().CaseId);
+            Assert.Equal("ParticipantId_1", records.First().ParticipantId);
+            Assert.Null(records.First().ParticipantClosingDate);
+            Assert.Null(records.First().VulnerableIndividual);
+            Assert.Empty(records.First().RecentBenefitIssuanceDates);
         }
     }
 }

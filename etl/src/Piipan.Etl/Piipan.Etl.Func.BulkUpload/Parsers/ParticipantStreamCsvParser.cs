@@ -94,7 +94,7 @@ namespace Piipan.Etl.Func.BulkUpload.Parsers
 
             static bool ValidateAlphaNumericWithLength(ValidateArgs field)
             {
-                Match match = Regex.Match(field.Field, "^[A-Za-z0-9]+$");
+                Match match = Regex.Match(field.Field, "^[A-Za-z0-9-_]+$");
                 if (!match.Success) return false;
                 if (field.Field.Length > 20) return false;
                 return true;

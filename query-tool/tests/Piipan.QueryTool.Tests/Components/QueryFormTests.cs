@@ -410,7 +410,158 @@ namespace Piipan.QueryTool.Tests.Components
                 Assert.Contains(errors[i], error);
             }
         }
+        /// <summary>
+        /// Verify that when there are special chars in Participant ID
+        /// and above the field
+        /// </summary>
+        [Fact]
+        public async Task Form_Should_Show_Errors_Special_chars()
+        {
+            // Arrange
+            CreateTestComponent();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
 
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.False(searchButton.HasAttribute("disabled"));
+
+            // Act
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123-_@abc");
+            Component.Find("#QueryFormData_Query_CaseId").Change("Case123-_#abc");
+            inputElement.Change("other");
+            bool isFormValid = false;
+            await form.InvokeAsync(async () =>
+            {
+                isFormValid = await form.Instance.ValidateForm();
+            });
+            await form.InvokeAsync(async () =>
+            {
+                await form.Instance.OnBeforeSubmit(isFormValid);
+            });
+
+
+            var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
+
+            // Assert
+            Assert.False(isFormValid);
+
+            Assert.Equal(2, inputErrorMessages.Count);
+
+            List<string> errors = new List<string>
+            {
+                "Participant ID must contain uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), underscore (_), dash (-).",
+                "Case Number must contain uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), underscore (_), dash (-)."
+            };
+
+
+            for (int i = 0; i < inputErrorMessages.Count; i++)
+            {
+                string error = inputErrorMessages[i].TextContent.Replace("\n", "");
+                error = Regex.Replace(error, @"\s+", " ");
+                Assert.Contains(errors[i], error);
+            }
+        }
+        /// <summary>
+        /// Verify that when there are special chars in Participant ID
+        /// and above the field
+        /// </summary>
+        [Fact]
+        public async Task Form_Should_Validation_Passed_With_Accepted_Char()
+        {
+            // Arrange
+            CreateTestComponent();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
+
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.False(searchButton.HasAttribute("disabled"));
+
+            // Act
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123-_abc");
+            Component.Find("#QueryFormData_Query_CaseId").Change("Case123-_abc");
+            inputElement.Change("other");
+            bool isFormValid = false;
+            await form.InvokeAsync(async () =>
+            {
+                isFormValid = await form.Instance.ValidateForm();
+            });
+            await form.InvokeAsync(async () =>
+            {
+                await form.Instance.OnBeforeSubmit(isFormValid);
+            });
+
+
+            var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
+
+            // Assert
+            Assert.True(isFormValid);
+
+            Assert.Equal(0, inputErrorMessages.Count);
+
+        }
+        /// <summary>
+        /// Verify that when there are special chars in Participant ID
+        /// and above the field
+        /// </summary>
+        [Fact]
+        public async Task Form_Should_Show_Errors_Max_Length()
+        {
+            // Arrange
+            CreateTestComponent();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
+
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.False(searchButton.HasAttribute("disabled"));
+
+            // Act
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("This a Test for large string which more than 20 chars.");
+            Component.Find("#QueryFormData_Query_CaseId").Change("This a Test for large string which more than 20 chars.");
+            inputElement.Change("other");
+            bool isFormValid = false;
+            await form.InvokeAsync(async () =>
+            {
+                isFormValid = await form.Instance.ValidateForm();
+            });
+            await form.InvokeAsync(async () =>
+            {
+                await form.Instance.OnBeforeSubmit(isFormValid);
+            });
+
+
+            var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
+
+            // Assert
+            Assert.False(isFormValid);
+
+            Assert.Equal(2, inputErrorMessages.Count);
+
+            List<string> errors = new List<string>
+            {
+                "Participant ID can be maximum 20 characters.",
+                "Case Number can be maximum 20 characters."
+            };
+
+
+            for (int i = 0; i < inputErrorMessages.Count; i++)
+            {
+                string error = inputErrorMessages[i].TextContent.Replace("\n", "");
+                error = Regex.Replace(error, @"\s+", " ");
+                Assert.Contains(errors[i], error);
+            }
+        }
         #endregion Tests
 
         #region Helper Function
