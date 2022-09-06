@@ -21,14 +21,18 @@
     <Touch Files="node_modules/.install-stamp" AlwaysCreate="true" />
   </Target>
 
-  <!--
+	<PropertyGroup>
+		<JSDir>C:\Users\William.Foshay\AppData\Roaming\npm\node_modules\gulp-cli\bin\gulp.js</JSDir>
+	</PropertyGroup>
+	<!--
       2. Compiles assets to wwwroot
       MSBuild runs NpmInstall before this task because of the DependsOnTargets attribute.
+
       Because our static analysis tool, CodeQL, autobuilds C# with the UseSharedCompilation flag, we check this flag to avoid running npm tasks for these types of builds.
    -->
-  <Target Name="NpxGulpBuild" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild" Condition="'$(UseSharedCompilation)' != 'false'">
-    <Exec Command="npx gulp build" />
-  </Target>
+	<Target Name="NpxGulpBuild" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild" Condition="'$(UseSharedCompilation)' != 'false'">
+		<Exec Command="node &quot;$(JSDIR)&quot; build" />
+	</Target>
   <ItemGroup>
     <None Include="wwwroot\customjs\utilities.js" />
   </ItemGroup>
