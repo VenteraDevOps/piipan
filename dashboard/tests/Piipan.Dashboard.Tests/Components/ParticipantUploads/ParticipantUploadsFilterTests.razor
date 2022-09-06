@@ -18,7 +18,7 @@
     {
         InitialValues = new ParticipantUploadsFilter()
         {
-            Token = "token"
+            
         };
     }
     /// <summary>
@@ -28,7 +28,7 @@
     {
         base.CreateTestComponent();
         Component = Render<ParticipantUploadsFilter>(
-            @<ParticipantUploadsFilter UploadRequest="InitialValues.UploadRequest" Token="@InitialValues.Token">
+            @<ParticipantUploadsFilter UploadRequest="InitialValues.UploadRequest">
             </ParticipantUploadsFilter>
         );
     }
@@ -48,28 +48,27 @@
         Component!.MarkupMatches(
             @<section id="participant-uploads-filter" >
                 <div class="usa-form ">
-                    <form id="upload-filter-form" method="post" novalidate="" >
+                    <form id="upload-filter-form" method="get" novalidate="" >
                         <fieldset class="usa-fieldset">
-                        <input type="hidden" name="__RequestVerificationToken" value="token" >
-                        <input type="hidden" name="UploadRequest.HoursOffset" value:ignore >
-                        <input type="hidden" name="UploadRequest.Status" >
+                        <input type="hidden" name="HoursOffset" value:ignore >
+                        <input type="hidden" name="Status" >
                         <div class="top-filters" >
                             <h2 >Filters</h2>
                             <div class="top-filter-grid" >
                             <div class="usa-form-group " >
                                 <label class="usa-label" for="UploadRequest_StartDate">Start Date</label>
-                                <input  id="UploadRequest_StartDate" name="UploadRequest.StartDate" style="width: 140px;" type="date" class="usa-input  valid" value=""  >
+                                <input  id="UploadRequest_StartDate" name="StartDate" style="width: 140px;" type="date" class="usa-input  valid" value=""  >
                             </div>
                             <span class="date-separator" >to</span>
                             <div class="end-date" >
                                 <div class="usa-form-group " >
                                 <label class="usa-label" for="UploadRequest_EndDate">End Date</label>
-                                <input  id="UploadRequest_EndDate" name="UploadRequest.EndDate" style="width: 140px;" type="date" class="usa-input  valid" value=""  >
+                                <input  id="UploadRequest_EndDate" name="EndDate" style="width: 140px;" type="date" class="usa-input  valid" value=""  >
                                 </div>
                             </div>
                             <div class="usa-form-group " >
                                 <label class="usa-label" for="UploadRequest_State">State</label>
-                                <select class="usa-select usa-input "  id="UploadRequest_State" name="UploadRequest.State" style=""  >
+                                <select class="usa-select usa-input "  id="UploadRequest_State" name="State" style=""  >
                                 <option value="">- Select -</option>
                                 <option value="EA">Echo Alpha (EA)</option>
                                 </select>

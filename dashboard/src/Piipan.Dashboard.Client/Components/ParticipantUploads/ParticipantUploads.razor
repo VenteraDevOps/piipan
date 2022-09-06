@@ -4,7 +4,6 @@
 @using static Piipan.Components.Shared.CommonConstants
 @code {
     [Parameter] public ParticipantUploadModel Upload { get; set; } = new();
-    [Parameter] public string Token { get; set; }
 }
 
 <div class="grid-container margin-bottom-6">
@@ -21,7 +20,7 @@
     
     <section id="historical-upload-info">
         <h2>Historical Upload Information</h2>
-        <ParticipantUploadsFilter Token="@Token" UploadRequest="Upload.ParticipantUploadFilter" />
+        <ParticipantUploadsFilter UploadRequest="Upload.ParticipantUploadFilter" />
 
         <ParticipantUploadsResults Upload="Upload" />
     </section>
