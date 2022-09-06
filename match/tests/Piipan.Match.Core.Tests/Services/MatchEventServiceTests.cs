@@ -272,7 +272,7 @@ namespace Piipan.Match.Core.Tests.Services
                                                  )),
                                                   Times.Once);
             // Need to be called only when creating new Match Record
-            notificationService.Verify(r => r.PublishNotificationOnMatchCreation(It.Is<NotificationRecord>(p => p.MatchRecord.InitState == "Echo Alpha" && p.EmailToRecord.EmailTo == "Ea@Nac.gov" && p.EmailToRecordMS.EmailTo == "Eb@Nac.gov")), Times.Once);
+            notificationService.Verify(r => r.PublishNotificationOnMatchCreation(It.Is<NotificationRecord>(p => p.MatchRecord.InitState == "ea" && p.EmailToRecord.EmailTo == "Ea@Nac.gov" && p.EmailToRecordMS.EmailTo == "Eb@Nac.gov")), Times.Once);
         }
 
         [Fact]
