@@ -51,6 +51,7 @@ namespace Piipan.Metrics.Core.Builders
                 result = QueryHelpers.AddQueryString(result, nameof(_filter.EndDate), _filter.EndDate.Value.ToString("yyyy-MM-dd"));
             if (!string.IsNullOrEmpty(_filter.Status))
                 result = QueryHelpers.AddQueryString(result, nameof(_filter.Status), _filter.Status);
+            result = QueryHelpers.AddQueryString(result, nameof(_filter.HoursOffset), _filter.HoursOffset.ToString());
             return result;
         }
     }
