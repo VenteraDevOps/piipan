@@ -2,16 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Primitives;
 using Moq;
 using Piipan.Dashboard.Pages;
 using Piipan.Metrics.Api;
-using Piipan.Shared.Claims;
 using Xunit;
 
 namespace Piipan.Dashboard.Tests
@@ -210,192 +207,6 @@ namespace Piipan.Dashboard.Tests
             ));
         }
 
-        // sets participant uploads after Post request
-        [Fact]
-        public async void AfterOnPostAsync_setsParticipantUploadResults()
-        {
-            // Arrange
-            var response = DefaultGetUploadsResponse;
-            var participantApi = new Mock<IParticipantUploadReaderApi>();
-            participantApi
-                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
-                .ReturnsAsync(response);
-
-            participantApi
-                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()))
-                .ReturnsAsync(DefaultStatisticsResponse);
-
-            var pageModel = new ParticipantUploadsModel(
-                participantApi.Object,
-                new NullLogger<ParticipantUploadsModel>(),
-                serviceProviderMock()
-            );
-
-            var request = requestMock();
-            request
-                .Setup(m => m.Form)
-                .Returns(new FormCollection(new Dictionary<string, StringValues>
-                {
-                    { "state", "eb" }
-                }));
-
-            var httpContext = contextMock();
-            httpContext
-                .Setup(m => m.Request)
-                .Returns(request.Object);
-            pageModel.PageContext.HttpContext = httpContext.Object;
-
-            // Act
-            await pageModel.OnPostAsync();
-
-            // Assert
-            Assert.Equal(response.Data.First(), pageModel.ParticipantUploadResults[0]);
-            Assert.Equal(1, pageModel.UploadStatistics.TotalFailure);
-            Assert.Equal(2, pageModel.UploadStatistics.TotalComplete);
-            Assert.Equal("noreply@tts.test", pageModel.Email);
-            Assert.Equal("https://tts.test", pageModel.BaseUrl);
-        }
-
-        [Theory]
-        [InlineData(true, false)]
-        [InlineData(false, true)]
-        public async Task AfterOnPostAsync_ApiThrows(bool getUploadsFailed, bool getStatisticsFailed)
-        {
-            // Arrange
-            var participantApi = new Mock<IParticipantUploadReaderApi>();
-            var getUploadsSetup = participantApi
-                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()));
-            if (getUploadsFailed)
-            {
-                getUploadsSetup.ThrowsAsync(new Exception("api broke"));
-            }
-            else
-            {
-                getUploadsSetup.ReturnsAsync(DefaultGetUploadsResponse);
-            }
-
-            var getUploadsStatisticsSetup = participantApi
-                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()));
-            if (getStatisticsFailed)
-            {
-                getUploadsStatisticsSetup.ThrowsAsync(new Exception("api broke"));
-            }
-            else
-            {
-                getUploadsStatisticsSetup.ReturnsAsync(DefaultStatisticsResponse);
-            }
-
-
-            var logger = new Mock<ILogger<ParticipantUploadsModel>>();
-
-            var pageModel = new ParticipantUploadsModel(
-                participantApi.Object,
-                logger.Object,
-                serviceProviderMock()
-            );
-
-            var request = requestMock();
-            request
-                .Setup(m => m.Form)
-                .Returns(new FormCollection(new Dictionary<string, StringValues>
-                {
-                    { "state", "eb" }
-                }));
-
-            var httpContext = contextMock();
-            httpContext
-                .Setup(m => m.Request)
-                .Returns(request.Object);
-            pageModel.PageContext.HttpContext = httpContext.Object;
-
-            // Act
-            await pageModel.OnPostAsync();
-
-            // Assert
-            logger.Verify(x => x.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Error),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("api broke")),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
-            ));
-        }
-
-        [Theory]
-        [InlineData(true, false)]
-        [InlineData(false, true)]
-
-        public async Task AfterOnPostAsync_ApiThrowsHttpRequestException(bool getUploadsFailed, bool getStatisticsFailed)
-        {
-            // Arrange
-            var participantApi = new Mock<IParticipantUploadReaderApi>();
-
-            var getUploadsSetup = participantApi
-                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()));
-            if (getUploadsFailed)
-            {
-                getUploadsSetup.ThrowsAsync(new HttpRequestException("api broke"));
-            }
-            else
-            {
-                getUploadsSetup.ReturnsAsync(DefaultGetUploadsResponse);
-            }
-
-            var getUploadsStatisticsSetup = participantApi
-                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()));
-            if (getStatisticsFailed)
-            {
-                getUploadsStatisticsSetup.ThrowsAsync(new HttpRequestException("api broke"));
-            }
-            else
-            {
-                getUploadsStatisticsSetup.ReturnsAsync(DefaultStatisticsResponse);
-            }
-
-            var logger = new Mock<ILogger<ParticipantUploadsModel>>();
-
-            var pageModel = new ParticipantUploadsModel(
-                participantApi.Object,
-                logger.Object,
-                serviceProviderMock()
-            );
-
-            var request = requestMock();
-            request
-                .Setup(m => m.Form)
-                .Returns(new FormCollection(new Dictionary<string, StringValues>
-                {
-                    { "state", "eb" }
-                }));
-
-            var httpContext = contextMock();
-            httpContext
-                .Setup(m => m.Request)
-                .Returns(request.Object);
-            pageModel.PageContext.HttpContext = httpContext.Object;
-
-            // Act
-            await pageModel.OnPostAsync();
-
-            // Assert
-            Assert.Contains("You may be able to try again", pageModel.RequestError);
-            logger.Verify(x => x.Log(
-                It.Is<LogLevel>(l => l == LogLevel.Error),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("api broke")),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)
-            ));
-        }
-
-        private IClaimsProvider claimsProviderMock(string email)
-        {
-            var claimsProviderMock = new Mock<IClaimsProvider>();
-            claimsProviderMock
-                .Setup(c => c.GetEmail(It.IsAny<ClaimsPrincipal>()))
-                .Returns(email);
-            return claimsProviderMock.Object;
-        }
 
         public static Mock<HttpRequest> requestMock()
         {

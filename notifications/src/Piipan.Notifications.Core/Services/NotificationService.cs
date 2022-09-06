@@ -1,80 +1,57 @@
-﻿using Antlr4.StringTemplate;
-using Microsoft.Extensions.Logging;
-using Piipan.Match.Core.Services;
+﻿using Microsoft.Extensions.Logging;
+
+using Piipan.Notification.Common;
+using Piipan.Notification.Common.Models;
 using Piipan.Notifications.Models;
 
-namespace Piipan.Notifications.Services
+namespace Piipan.Notifications.Core.Services
 {
     public class NotificationService : INotificationService
     {
         private readonly INotificationPublish _notificationPublish;
         public ILogger<NotificationService> _logger;
+        private readonly IViewRenderService _viewRenderService;
 
-        public NotificationService(INotificationPublish notificationPublish, ILogger<NotificationService> logger)
+        public NotificationService(INotificationPublish notificationPublish, IViewRenderService viewRenderService, ILogger<NotificationService> logger)
         {
             _notificationPublish = notificationPublish;
+            _viewRenderService = viewRenderService;
             _logger = logger;
         }
 
-        public async Task<bool> PublishMessageFromTemplate(EmailTemplateInput emailTemplateInput)
+        public async Task<bool> PublishNotificationOnMatchCreation(NotificationRecord notificationRecord)
         {
-            return await TransformMessageAndPublishEmail(emailTemplateInput.Topic, emailTemplateInput.TemplateData, emailTemplateInput.EmailTo, emailTemplateInput.EmailCcTo, emailTemplateInput.EmailCcTo, emailTemplateInput.EmailBccTo, '$', '$');
+            //Send Notofication to Iniatiating State and Matching State.  Passing Iniatiating state and Matching state templete respectively.
+            var emailbodyIS = _viewRenderService.GenerateMessageContent("MatchEmailIS.cshtml", notificationRecord.MatchRecord)?.Result.ToString();
+            var emailsubjectIS = _viewRenderService.GenerateMessageContent("MatchEmailIS_Sub.cshtml", notificationRecord.MatchRecord)?.Result.ToString();
+
+            var emailbodyMS = _viewRenderService.GenerateMessageContent("MatchEmailMS.cshtml", notificationRecord.MatchRecord)?.Result.ToString();
+            var emailsubjectMS = _viewRenderService.GenerateMessageContent("MatchEmailMS_Sub.cshtml", notificationRecord.MatchRecord)?.Result.ToString();
+
+            var resultIS = await PublishNotifications(notificationRecord.EmailToRecord, emailbodyIS, emailsubjectIS);
+            var resultMS = await PublishNotifications(notificationRecord.EmailToRecordMS, emailbodyMS, emailsubjectMS);
+            return resultMS || resultIS;
         }
-
-        public async Task<bool> TransformMessageAndPublishEmail(string topic, object templateData,
-         string EmailTo, string emailFrom, string emailCcTo = null, string emailBccTo = null,
-         char templateDelimiterStartChar = '$', char templateDelimiterStopChar = '$')
+        public async Task<bool> PublishNotificationOnMatchResEventsUpdate(NotificationRecord notificationRecord)
         {
-            TemplateGroup g = new TemplateGroup(templateDelimiterStartChar, templateDelimiterStopChar);
-            g.RegisterRenderer(typeof(string), new StringRenderer());
-            g.RegisterRenderer(typeof(double), new NumberRenderer());
-            g.RegisterRenderer(typeof(decimal), new NumberRenderer());
-            g.RegisterRenderer(typeof(float), new NumberRenderer());
-            g.RegisterRenderer(typeof(double), new NumberRenderer());
-            g.RegisterRenderer(typeof(long), new NumberRenderer());
-            g.RegisterRenderer(typeof(int), new NumberRenderer());
-            g.RegisterRenderer(typeof(DateTime), new DateRenderer());
-            g.RegisterRenderer(typeof(DateTimeOffset), new DateRenderer());
+            //Send Notofication to the other State. Todo  Refactor after getting the finialized template file .
 
-            //Below code needs to be refactored based on where the templates are stored.
-            string emailBody = " Test Email for #$data.MatchId$  IS is $data.InitState$ <br>   MS is $data.MatchingState$ <br>   MS is $data.MatchingUrl$";
-            string emailSubject = "Duplicate Match $data.MatchId$ Found in $data.InitState$ (Initiating State)";
-            if (topic == "UPDATE_MATCH_RES_IS")
-            {
-                emailBody = " Test Email for #$data.MatchId$  IS is $data.InitState$ <br>   MS is $data.MatchingState$ <br>   MS is $data.MatchingUrl$";
-                emailSubject = "Duplicate Match $data.MatchId$ is updated in $data.InitState$ (Initiating State)";
-            }
-            else if (topic == "UPDATE_MATCH_RES_MS")
-            {
-                emailBody = " Test Email for #$data.MatchId$  IS is $data.InitState$ <br>   MS is $data.MatchingState$ <br>   MS is $data.MatchingUrl$";
-                emailSubject = "Duplicate Match $data.MatchId$ is updated in $data.MatchingState$ (Matching State)";
-            }
-            else if (topic == "CREATE_MATCH_MS")
-            {
-                emailBody = " Test Email for #$data.MatchId$  IS is $data.InitState$ <br>   MS is $data.MatchingState$ <br>   MS is $data.MatchingUrl$";
-                emailSubject = "Duplicate Match $data.MatchId$ Found in $data.MatchingState$ (Matching State)";
-            }
-            else if (topic == "CREATE_MATCH_IS")
-            {
-                emailBody = " Test Email for #$data.MatchId$  IS is $data.InitState$ <br>   MS is $data.MatchingState$ <br>   MS is $data.MatchingUrl$";
-                emailSubject = "Duplicate Match $data.MatchId$ Found in $data.InitState$ (Initiating State)";
-            }
+            var emailbodyIS = _viewRenderService.GenerateMessageContent("DispositionEmail.cshtml", notificationRecord.MatchResEvent)?.Result.ToString();
+            var emailsubjectIS = _viewRenderService.GenerateMessageContent("DispositionEmail_Sub.cshtml", notificationRecord.MatchResEvent)?.Result.ToString();
+            return await PublishNotifications(notificationRecord.EmailToRecord, emailbodyIS, emailsubjectIS);
 
-            Template bodyTemplate = new Template(g, emailBody);
-            bodyTemplate.Add("data", templateData);
-
-            Template subjectTemplate = new Template(g, emailSubject);
-            subjectTemplate.Add("data", templateData);
-
+        }
+        public async Task<bool> PublishNotifications(EmailToModel emailToRecord, string emailbody, string emailsubject)
+        {
             try
             {
                 var emailModel = new EmailModel
                 {
-                    ToList = EmailTo.Split(',').ToList(),
-                    ToCCList = emailCcTo?.Split(',').ToList(),
-                    ToBCCList = emailBccTo?.Split(',').ToList(),
-                    Body = bodyTemplate.Render(),
-                    Subject = subjectTemplate.Render(),
+                    ToList = emailToRecord?.EmailTo.Split(',').ToList(),
+                    ToCCList = emailToRecord?.EmailCcTo?.Split(',').ToList(),
+                    ToBCCList = emailToRecord?.EmailBccTo?.Split(',').ToList(),
+                    Body = emailbody,
+                    Subject = emailsubject,
                     From = string.Empty,
                 };
                 // Publish to the queue.
@@ -83,9 +60,10 @@ namespace Piipan.Notifications.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to publish Participant Search metrics event to EventGrid.");
-                throw;
+                _logger.LogError(ex, String.Format("Failed to publish Notification for the state {0} and email subject {1}", emailToRecord?.EmailTo, emailsubject));
+                return false;
             }
         }
+
     }
 }

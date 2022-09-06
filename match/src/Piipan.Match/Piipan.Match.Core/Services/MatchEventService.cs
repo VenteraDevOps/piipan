@@ -7,8 +7,10 @@ using Piipan.Match.Api.Models;
 using Piipan.Match.Core.Builders;
 using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Metrics.Api;
+using Piipan.Notification.Common.Models;
+using Piipan.Notifications.Core.Builders;
+using Piipan.Notifications.Core.Services;
 using Piipan.Notifications.Models;
-using Piipan.Notifications.Services;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.API.Enums;
 using Piipan.Shared.Cryptography;
@@ -30,6 +32,7 @@ namespace Piipan.Match.Core.Services
         private readonly IParticipantPublishMatchMetric _participantPublishMatchMetric;
         private readonly IStateInfoDao _stateInfoDao;
         private readonly INotificationService _notificationService;
+        private readonly INotificationRecordBuilder _notificationRecordBuilder;
 
         public MatchEventService(
             IActiveMatchRecordBuilder recordBuilder,
@@ -40,7 +43,8 @@ namespace Piipan.Match.Core.Services
             IParticipantPublishSearchMetric ParticipantPublishSearchMetric,
             IParticipantPublishMatchMetric participantPublishMatchMetric,
             IStateInfoDao stateInfoDao,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            INotificationRecordBuilder notificationRecordBuilder)
         {
             _recordBuilder = recordBuilder;
             _recordApi = recordApi;
@@ -51,6 +55,7 @@ namespace Piipan.Match.Core.Services
             _participantPublishMatchMetric = participantPublishMatchMetric;
             _stateInfoDao = stateInfoDao;
             _notificationService = notificationService;
+            _notificationRecordBuilder = notificationRecordBuilder;
 
         }
 
@@ -153,13 +158,26 @@ namespace Piipan.Match.Core.Services
                 var matchingState = states?.Where(n => string.Compare(n.StateAbbreviation, match.State, true) == 0).FirstOrDefault();
                 var queryToolUrl = Environment.GetEnvironmentVariable("QueryToolUrl");
 
-                EmailTemplateInput emailTemplateInputIs = GetEmailTemplate(participantMatchRecord.MatchId, initState?.State, matchingState?.State, queryToolUrl, initState?.Email);
-                emailTemplateInputIs.Topic = "CREATE_MATCH_IS";
-                await _notificationService.PublishMessageFromTemplate(emailTemplateInputIs); //Publishing Email for Initiating State:  Based on the requirement
 
-                EmailTemplateInput emailTemplateInputMs = GetEmailTemplate(participantMatchRecord.MatchId, initState?.State, matchingState?.State, queryToolUrl, matchingState?.Email);
-                emailTemplateInputMs.Topic = "CREATE_MATCH_MS";
-                await _notificationService.PublishMessageFromTemplate(emailTemplateInputMs); //Publishing Email for Matching State : Based on the requirement
+                var MatchRecord = new MatchModel()
+                {
+                    MatchId = participantMatchRecord.MatchId,
+                    InitState = initState?.State,
+                    MatchingState = matchingState?.State,
+                    MatchingUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}",
+                    InitialActionBy = DateTime.Now.AddDays(10)
+                };
+
+                NotificationRecord notificationRecord = new NotificationRecord();
+                notificationRecord.MatchRecord = new MatchModel();
+                notificationRecord.MatchRecord = MatchRecord;
+                notificationRecord.EmailToRecord = new EmailToModel();
+                notificationRecord.EmailToRecord.EmailTo = initState?.Email;
+
+                notificationRecord.EmailToRecordMS = new EmailToModel();
+                notificationRecord.EmailToRecordMS.EmailTo = matchingState?.Email;
+
+                await _notificationService.PublishNotificationOnMatchCreation(notificationRecord); //Publishing Email for Initiating & Matching State:  Based on the requirement
 
             }
             if (participantMatchRecord != null)
@@ -168,22 +186,6 @@ namespace Piipan.Match.Core.Services
                 participantMatchRecord.MatchUrl = $"{queryToolUrl}/match/{participantMatchRecord.MatchId}";
             }
             return participantMatchRecord;
-        }
-
-        private static EmailTemplateInput GetEmailTemplate(string MatchId, string initState, string matchingState, string queryToolUrl, string email)
-        {
-            return new EmailTemplateInput()
-            {
-                TemplateData = new
-                {
-                    MatchId = MatchId,
-                    InitState = initState,
-                    MatchingState = matchingState,
-                    MatchingUrl = $"{queryToolUrl}/match/{MatchId}",
-
-                },
-                EmailTo = email
-            };
         }
 
         private async Task<ParticipantMatch> Reconcile(IParticipant match, IMatchRecord pendingRecord, IEnumerable<IMatchRecord> existingRecords)

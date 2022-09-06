@@ -32,11 +32,15 @@ namespace Piipan.QueryTool.Client.Models
 
         [UsaRequired]
         [Display(Name = "Participant ID")]
+        [RegularExpression("^[A-Za-z0-9-_]+$", ErrorMessage = $"{ValidationFieldPlaceholder} must contain uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), underscore (_), dash (-).")]
+        [MaxLength(20, ErrorMessage = $"{ValidationFieldPlaceholder} can be maximum 20 characters.")]
         [JsonPropertyName("participant_id")]
         public string ParticipantId { get; set; }
 
         [Display(Name = "Case Number")]
         [JsonPropertyName("case_id")]
+        [RegularExpression("^[A-Za-z0-9-_]+$", ErrorMessage = $"{ValidationFieldPlaceholder} must contain uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), underscore (_), dash (-).")]
+        [MaxLength(20, ErrorMessage = $"{ValidationFieldPlaceholder} can be maximum 20 characters.")]
         public string CaseId { get; set; }
 
         [UsaRequired]

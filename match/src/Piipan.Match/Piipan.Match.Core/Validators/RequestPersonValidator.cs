@@ -1,5 +1,5 @@
-using Piipan.Match.Api.Models;
 using FluentValidation;
+using Piipan.Match.Api.Models;
 using Piipan.Shared.API.Enums;
 
 namespace Piipan.Match.Core.Validators
@@ -12,7 +12,7 @@ namespace Piipan.Match.Core.Validators
         public RequestPersonValidator()
         {
             const string HashRegex = "^[a-z0-9]{128}$";
-            const string AlphanumericRegex = "^[A-Za-z0-9]+$";
+            const string AlphanumericRegex = "^[A-Za-z0-9-_]+$";
 
             RuleFor(q => q.LdsHash).Matches(HashRegex);
             RuleFor(q => q.ParticipantId).Matches(AlphanumericRegex);

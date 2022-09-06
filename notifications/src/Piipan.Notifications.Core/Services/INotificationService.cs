@@ -1,10 +1,11 @@
 ﻿using Piipan.Notifications.Models;
 
-namespace Piipan.Notifications.Services
+namespace Piipan.Notifications.Core.Services
 {
     public interface INotificationService
     {
-        Task<bool> PublishMessageFromTemplate(EmailTemplateInput emailTemplateInput);
+        Task<bool> PublishNotificationOnMatchCreation(NotificationRecord notificationRecord);
+        Task<bool> PublishNotificationOnMatchResEventsUpdate(NotificationRecord notificationRecord);
 
     }
 }

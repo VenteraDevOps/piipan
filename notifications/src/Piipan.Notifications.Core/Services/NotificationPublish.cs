@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Piipan.Notifications.Models;
 
-namespace Piipan.Match.Core.Services
+namespace Piipan.Notifications.Core.Services
 {
     public class NotificationPublish : INotificationPublish
     {

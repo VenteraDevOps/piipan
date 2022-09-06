@@ -1,7 +1,5 @@
 ﻿@page
 @model Piipan.Dashboard.Pages.ParticipantUploadsModel
-@inject IAntiforgery antiforgery
-@using Microsoft.AspNetCore.Antiforgery
 @using Piipan.Dashboard.Client.Models
 @using Piipan.Dashboard.Extensions
 
@@ -17,4 +15,4 @@
     };
 }
 <component type="typeof(Dashboard.Client.Components.ParticipantUploads.ParticipantUploads)" render-mode="WebAssembly"
-param-Upload="model" param-Token="antiforgery.GetAndStoreTokens(HttpContext).RequestToken" />
+param-Upload="model" />

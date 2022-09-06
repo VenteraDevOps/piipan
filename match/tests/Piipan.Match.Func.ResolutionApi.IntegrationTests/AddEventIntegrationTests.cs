@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -17,7 +20,9 @@ using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
-using Piipan.Notifications.Services;
+using Piipan.Notification.Core.Extensions;
+using Piipan.Notifications.Core.Builders;
+using Piipan.Notifications.Core.Services;
 using Piipan.Shared.Database;
 using Piipan.States.Core.DataAccessObjects;
 using Xunit;
@@ -60,6 +65,21 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
             services.AddTransient<IStateInfoDao, StateInfoDao>();
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<INotificationPublish, NotificationPublish>();
+            var listener = new DiagnosticListener("Microsoft.AspNetCore");
+            services.AddSingleton<DiagnosticListener>(listener);
+            services.AddSingleton<DiagnosticSource>(listener);
+
+            services.AddMvc()
+                   .AddApplicationPart(typeof(Piipan.Notification.Common.ViewRenderService).GetTypeInfo().Assembly)
+                   .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                   .AddDataAnnotationsLocalization();
+
+            services.Configure<RazorViewEngineOptions>(o =>
+            {
+                o.ViewLocationFormats.Add("/Templates/{0}" + RazorViewEngine.ViewExtension);
+            });
+
+            services.RegisterNotificationServices();
             var provider = services.BuildServiceProvider();
 
             var api = new AddEventApi(
@@ -69,7 +89,8 @@ namespace Piipan.Match.Func.ResolutionApi.IntegrationTests
                 provider.GetService<IStreamParser<AddEventRequest>>(),
                 provider.GetService<IParticipantPublishMatchMetric>(),
                 provider.GetService<IStateInfoDao>(),
-                provider.GetService<INotificationService>()
+                provider.GetService<INotificationService>(),
+                provider.GetService<INotificationRecordBuilder>()
 
             );
 

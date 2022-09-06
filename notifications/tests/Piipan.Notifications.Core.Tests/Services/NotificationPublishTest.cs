@@ -1,9 +1,10 @@
 ﻿using Azure.Messaging.EventGrid;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Piipan.Match.Core.Services;
+using Piipan.Notification.Common;
+using Piipan.Notification.Common.Models;
+using Piipan.Notifications.Core.Services;
 using Piipan.Notifications.Models;
-using Piipan.Notifications.Services;
 using Xunit;
 
 namespace Piipan.Notifications.Core.Tests.Services
@@ -13,36 +14,83 @@ namespace Piipan.Notifications.Core.Tests.Services
         [Fact]
         public async void NotificationPublish_Sucess()
         {
-            //Environment.SetEnvironmentVariable("EventGridEndPoint", "http://someendpoint.gov");
-            //Environment.SetEnvironmentVariable("EventGridKeyString", "example");
-            //var logger = Mock.Of<ILogger<EmailModel>>();
-            //var notificationPublish = new NotificationPublish(logger);
-            //Mock<EventGridPublisherClient> publisherClientMock = new Mock<EventGridPublisherClient>();
-            //notificationPublish._client = publisherClientMock.Object;
-            //string emails = "test@test.com,test1@test.com";
-            //var emailModel = new EmailModel
-            //{
+            var notificationRecord = new NotificationRecord()
+            {
+                MatchRecord = new MatchModel()
+                {
+                    MatchId = "foo",
+                    InitState = "ea",
+                    MatchingState = "eb",
+                    MatchingUrl = "http://test.com",
+                },
+                EmailToRecordMS = new EmailToModel()
+                {
+                    EmailTo = "eb@nac.com"
+                },
+                EmailToRecord = new EmailToModel()
+                {
+                    EmailTo = "ea@nac.com"
+                }
+            };
+            string subIS = "IS: Test Subject";
+            string bodyIS = "IS: Test Body";
+            string subMS = "MS: Test Subject";
+            string bodyMS = "MS: Test Subject";
 
-            //    ToList = emails.Split(',').ToList(),
-            //    ToCCList = emails.Split(',').ToList(),
-            //    ToBCCList = emails.Split(',').ToList(),
-            //    Body = "Body of the Email",
-            //    Subject = "Subject of the Email",
-            //    From = "noreply@test.com",
-            //};
-            //await notificationPublish.PublishEmail(emailModel);
-            //publisherClientMock.Verify(x => x.SendEventAsync(It.Is<EventGridEvent>(s => s.EventType == "Publish to the queue"), default));
+            var emailModelIS = new EmailModel
+            {
 
-            var emailTemplateInput = new EmailTemplateInput { EmailTo = "Test@test.com", Topic = "UPDATE_MATCH_RES" };
+                ToList = "ea@nac.com".Split(',').ToList(),
+                ToCCList = null,
+                ToBCCList = null,
+                Body = bodyIS,
+                Subject = subIS,
+                From = "",
+            };
+            var emailModelMS = new EmailModel
+            {
+
+                ToList = "eb@nac.com".Split(',').ToList(),
+                ToCCList = null,
+                ToBCCList = null,
+                Body = bodyMS,
+                Subject = subMS,
+                From = "",
+            };
+
+
             var notificatioPublish = new Mock<INotificationPublish>();
+            var viewRenderService = new Mock<IViewRenderService>();
+
+            viewRenderService
+                .Setup(m => m.GenerateMessageContent("MatchEmailIS.cshtml", notificationRecord.MatchRecord))
+                .Returns(Task.FromResult(bodyIS));
+            viewRenderService
+               .Setup(m => m.GenerateMessageContent("MatchEmailIS_Sub.cshtml", notificationRecord.MatchRecord))
+               .Returns(Task.FromResult(subIS));
+
+            viewRenderService
+                .Setup(m => m.GenerateMessageContent("MatchEmailMS_Sub.cshtml", notificationRecord.MatchRecord))
+                .Returns(Task.FromResult(subMS));
+
+            viewRenderService
+                .Setup(m => m.GenerateMessageContent("MatchEmailMS.cshtml", notificationRecord.MatchRecord))
+                .Returns(Task.FromResult(bodyMS));
+
             notificatioPublish
                 .Setup(m => m.PublishEmail(It.IsAny<EmailModel>()));
+
             var logger = new Mock<ILogger<NotificationService>>();
-            var service = new NotificationService(notificatioPublish.Object, logger.Object);
-            var ret = await service.PublishMessageFromTemplate(emailTemplateInput);
+
+            var service = new NotificationService(notificatioPublish.Object, viewRenderService.Object, logger.Object);
+            var ret = await service.PublishNotificationOnMatchCreation(notificationRecord);
             // Assert
             Assert.True(ret);
-            notificatioPublish.Verify(m => m.PublishEmail(It.IsAny<EmailModel>()), Times.Once);
+
+            notificatioPublish.Verify(m => m.PublishEmail(It.Is<EmailModel>(p => p.Body == emailModelIS.Body && p.Subject == emailModelIS.Subject && p.ToList[0] == "ea@nac.com")), Times.Once);
+            notificatioPublish.Verify(m => m.PublishEmail(It.Is<EmailModel>(p => p.Body == emailModelMS.Body && p.Subject == emailModelMS.Subject && p.ToList[0] == "eb@nac.com")), Times.Once);
+
+
 
 
         }
