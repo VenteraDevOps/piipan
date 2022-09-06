@@ -413,6 +413,38 @@ main () {
   eventgrid_notification_endpoint=$(eventgrid_endpoint "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
   eventgrid_notification_key_string=$(eventgrid_key_string "$RESOURCE_GROUP" "${CREATE_NOTIFICATIONS_TOPIC_NAME}")
 
+  echo "Publish Notifications API Function App"
+  try_run "func azure functionapp publish ${NOTIFICATIONS_FUNC_APP_NAME} --dotnet" 7 "../notifications/src/Piipan.Notifications.Func.Api"
+  # Subscription to upload events that get routed to Function
+    subn_name=evgs-notifications-$ENV
+    GRID_TOPIC_PROVIDERS=/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers
+
+    storageid=$(az storage account show --name "${NOTIFICATIONS_FUNC_APP_STORAGE_NAME}" --resource-group "${RESOURCE_GROUP}" --query id --output tsv)
+    queueid="$storageid/queueservices/default/queues/emailbucket"
+
+  # Create a Subscription to the queue
+  az eventgrid event-subscription create \
+    --source-resource-id "${GRID_TOPIC_PROVIDERS}/Microsoft.EventGrid/topics/${CREATE_NOTIFICATIONS_TOPIC_NAME}" \
+    --name "$subn_name" \
+    --endpoint-type storagequeue \
+    --endpoint "$queueid" \
+
+  # Configure log streaming for function app
+  event_grid_notification_topic_id=$(\
+    az eventgrid topic show \
+      -n "$CREATE_NOTIFICATIONS_TOPIC_NAME" \
+      -g "$RESOURCE_GROUP" \
+      -o tsv \
+      --query id)
+
+  # Stream Event Grid topic diagnostic logs to Event Hub / Log Analytisc workspace
+  update_event_grid_topic_diagnostic_settings "${event_grid_notification_topic_id}"
+
+  # Create an Active Directory app registration associated with the app.
+  # Used by subsequent resources to configure auth
+  az ad app create \
+    --display-name "$NOTIFICATIONS_FUNC_APP_NAME" \
+    --sign-in-audience "AzureADMyOrg"
   
   # Create orchestrator-level Function app using ARM template and
   # deploy project code using functions core tools. Networking
