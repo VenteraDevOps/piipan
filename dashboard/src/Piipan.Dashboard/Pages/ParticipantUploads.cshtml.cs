@@ -80,32 +80,6 @@ namespace Piipan.Dashboard.Pages
         [BindProperty]
         public ParticipantUploadRequestFilter UploadRequest { get; set; } = new ParticipantUploadRequestFilter();
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Querying uploads via search form");
-                RequestError = null;
-
-                StateQuery = Request.Form["state"];
-                var response = await _participantUploadApi.GetUploads(UploadRequest);
-                await GetUploadStatistics();
-                ParticipantUploadResults = response.Data.ToList();
-                SetPageLinks(response.Meta);
-            }
-            catch (HttpRequestException exception)
-            {
-                _logger.LogError(exception, exception.Message);
-                RequestError = "There was an error running your search. You may be able to try again. If the problem persists, please contact system maintainers.";
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, exception.Message);
-                RequestError = "Internal Server Error. Please contact system maintainers.";
-            }
-            return Page();
-        }
-
         private void SetPageLinks(Meta meta)
         {
             PageParams = meta.PageQueryParams;

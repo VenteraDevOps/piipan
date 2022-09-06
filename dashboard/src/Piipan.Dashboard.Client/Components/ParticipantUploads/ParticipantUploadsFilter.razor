@@ -4,7 +4,6 @@
 
 @code {
     [Parameter] public ParticipantUploadRequestFilter UploadRequest { get; set; } = new();
-    [Parameter] public string Token { get; set; }
 
     private (string, string)[] dropdownOptions = null;
     int hoursOffset = 0;
@@ -40,25 +39,24 @@
 }
 
 <section id="participant-uploads-filter">
-    <UsaForm @ref="FilterForm" Id="upload-filter-form" Model="UploadRequest" method="post">
-        <input type="hidden" name="__RequestVerificationToken" value="@Token" />
-        <input type="hidden" name="UploadRequest.HoursOffset" value="@hoursOffset" />
-        <input type="hidden" name="UploadRequest.Status" value="@UploadRequest.Status" />
+    <UsaForm @ref="FilterForm" Id="upload-filter-form" Model="UploadRequest" method="get">
+        <input type="hidden" name="HoursOffset" value="@hoursOffset" />
+        <input type="hidden" name="Status" value="@UploadRequest.Status" />
         <div class="top-filters">
             <h2>Filters</h2>
             <div class="top-filter-grid">
         <UsaFormGroup>
-            <UsaInputDate Width="140" @bind-Value="UploadRequest.StartDate"  />
+            <UsaInputDate Width="140" @bind-Value="UploadRequest.StartDate" name="StartDate" />
         </UsaFormGroup>
         <span class="date-separator">to</span>
         <div class="end-date">
             <UsaFormGroup>
-                <UsaInputDate Width="140" @bind-Value="UploadRequest.EndDate"  />
+                <UsaInputDate Width="140" @bind-Value="UploadRequest.EndDate" name="EndDate" />
             </UsaFormGroup>
         </div>
         <UsaFormGroup>
             <ChildContent>
-                <UsaSelect @bind-Value="UploadRequest.State" DropdownOptions="dropdownOptions"  />
+                <UsaSelect @bind-Value="UploadRequest.State" DropdownOptions="dropdownOptions" name="State" />
             </ChildContent>
         </UsaFormGroup>
         </div>
