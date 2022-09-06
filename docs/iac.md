@@ -139,6 +139,7 @@ The following environment variables are pre-configured by the Infrastructure-as-
 | `UploadPayloadKeySHA` | Payload Encryption Key SHA. | Piipan.Etl |
 | `StatesApiUri` | URI for the States API endpoint. | Piipan.QueryTool |
 | `StatesApiAppId` | [Application ID](./securing-internal-apis.md#application-id-uri) for State API's Azure Active Directory application object | Piipan.QueryTool |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING` | Connection string to the associated App Insights resource. | Piipan.Dashboard, Piipan.QueryTool |
 
 ## `SysType` resource tag
 

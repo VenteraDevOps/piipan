@@ -368,6 +368,19 @@ main () {
       --query "[0].appId" \
       --output tsv)
 
+  echo "Creating Application Insight for function: ${DASHBOARD_APP_NAME}"
+  appInsightConnectionString=$(\
+    az monitor app-insights component create \
+      --app "${DASHBOARD_APP_NAME}" \
+      --location "${LOCATION}" \
+      --resource-group "${RESOURCE_GROUP}" \
+      --tags "Project=${PROJECT_TAG}" \
+      --application-type "${APPINSIGHTS_KIND}" \
+      --kind "${APPINSIGHTS_KIND}" \
+      --workspace "${LOG_ANALYTICS_WORKSPACE_ID}" \
+      --query "${APPINSIGHTS_CONNECTION_STRING}" \
+      --output tsv)
+
   # Create App Service resources for dashboard app
   echo "Creating App Service resources for dashboard app"
   az deployment group create \
@@ -390,7 +403,14 @@ main () {
       diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
       eventHubAuthorizationRuleId="${EH_RULE_ID}" \
       eventHubName="${EVENT_HUB_NAME}" \
-      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}" \
+      ${APPLICATIONINSIGHTS_CONNECTION_STRING}="${appInsightConnectionString}"
+  
+    echo "Integrating Application Insight with app: ${DASHBOARD_APP_NAME}"
+    az monitor app-insights component connect-function \
+      --app "${DASHBOARD_APP_NAME}" \
+      --function "${DASHBOARD_APP_NAME}" \
+      --resource-group "${RESOURCE_GROUP}"
 
   echo "Integrating ${DASHBOARD_APP_NAME} into virtual network"
   az webapp vnet-integration add \

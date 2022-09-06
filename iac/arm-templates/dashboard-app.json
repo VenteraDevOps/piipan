@@ -68,6 +68,12 @@
             "metadata": {
                 "description": "Specify the Log Analytics Workspace Id."
             }
+        },
+        "APPLICATIONINSIGHTS_CONNECTION_STRING": {
+            "type": "string",
+            "metadata": {
+                "description": "The connection string to log Application Insights."
+            }
         }
     },
     "variables": {
@@ -111,12 +117,19 @@
                 {
                     "name": "ASPNETCORE_ENVIRONMENT",
                     "value": "[parameters('aspNetCoreEnvironment')]"
+                },
+                {
+                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    "value": "[parameters('APPLICATIONINSIGHTS_CONNECTION_STRING')]"
                 }
             ],
             "vnetRouteAllEnabled": true
         },
         "systemTypeTag": {
             "SysType": "DashboardApp"
+        },
+        "applicationInsightsTag": {
+            "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('appName')))]": "Resource"
         }
     },
     "resources": [
@@ -161,6 +174,19 @@
                         ]
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[parameters('appName')]",
+            "location": "[parameters('location')]",
+            "tags": "[variables('applicationInsightsTag')]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Request_Source": "rest",
+                "WorkspaceResourceId": "[parameters('workspaceId')]"
             }
         },
         {

@@ -107,6 +107,11 @@ namespace Piipan.QueryTool
             {
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
+
+            services.AddApplicationInsightsTelemetry((options) =>
+            {
+                options.ConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
