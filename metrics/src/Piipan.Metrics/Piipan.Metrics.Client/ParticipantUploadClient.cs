@@ -15,14 +15,19 @@ namespace Piipan.Metrics.Client
             _apiClient = apiClient;
         }
 
+        public async Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest request)
+        {
+            return await _apiClient.GetAsync<ParticipantUploadStatistics, ParticipantUploadStatisticsRequest>("GetUploadStatistics", request);
+        }
+
         public async Task<GetParticipantUploadsResponse> GetLatestUploadsByState()
         {
             return await _apiClient.GetAsync<GetParticipantUploadsResponse>("GetLastUpload");
         }
 
-        public async Task<GetParticipantUploadsResponse> GetUploads(string? state, int perPage, int page)
+        public async Task<GetParticipantUploadsResponse> GetUploads(ParticipantUploadRequestFilter filter)
         {
-            return await _apiClient.GetAsync<GetParticipantUploadsResponse>("GetParticipantUploads");
+            return await _apiClient.GetAsync<GetParticipantUploadsResponse, ParticipantUploadRequestFilter>("GetParticipantUploads", filter);
         }
     }
 }

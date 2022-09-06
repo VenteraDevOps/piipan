@@ -67,7 +67,6 @@
 
 // -------------------------------------
 // ...or import the complete USWDS kit
-
 @import "uswds";
 
 // -------------------------------------
@@ -76,12 +75,16 @@
 @import "uswds-theme-custom-styles";
 
 // -------------------------------------
-// USWDS Overrides
-
+// uswds component overrides
 @import "uswds-overrides/logo";
+@import "uswds-overrides/table";
 @import "uswds-overrides/nav";
+@import "uswds-overrides/alert";
+@import "uswds-overrides/forms";
+@import "uswds-overrides/grid";
+@import "uswds-overrides/typography";
 
 // -------------------------------------
-// Custom SASS
-
+// custom styles
 @import "custom/agency";
+@import "custom/_component_styles";

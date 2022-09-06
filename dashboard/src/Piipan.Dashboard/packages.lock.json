@@ -1785,11 +1785,19 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "piipan.components": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.Web": "6.0.8"
+        }
+      },
       "piipan.dashboard.client": {
         "type": "Project",
         "dependencies": {
           "Microsoft.AspNetCore.Components.WebAssembly": "6.0.8",
-          "Piipan.Metrics.Api": "1.0.0"
+          "Piipan.Components": "1.0.0",
+          "Piipan.Metrics.Api": "1.0.0",
+          "Piipan.States.Api": "1.0.0"
         }
       },
       "piipan.metrics.api": {
@@ -1823,6 +1831,23 @@
           "Microsoft.Extensions.Options": "6.0.0",
           "Newtonsoft.Json.Schema": "3.0.14",
           "Npgsql": "6.0.6"
+        }
+      },
+      "piipan.states.api": {
+        "type": "Project",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "piipan.states.client": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Core": "1.25.0",
+          "Azure.Identity": "1.6.1",
+          "Microsoft.Extensions.Hosting": "6.0.1",
+          "Microsoft.Extensions.Http": "6.0.0",
+          "Piipan.Shared": "1.0.0",
+          "Piipan.States.Api": "1.0.0"
         }
       }
     }

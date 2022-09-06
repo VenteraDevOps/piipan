@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Piipan.Metrics.Api;
 using Xunit;
-using Moq;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Piipan.Metrics.Func.Api.Tests
 {
@@ -29,7 +29,7 @@ namespace Piipan.Metrics.Func.Api.Tests
             {
                 Data = new List<ParticipantUpload>
                 {
-                    new ParticipantUpload 
+                    new ParticipantUpload
                     {
                         State = "ea",
                         UploadedAt = uploadedAt
@@ -37,11 +37,8 @@ namespace Piipan.Metrics.Func.Api.Tests
                 },
                 Meta = new Meta
                 {
-                    Page = 1,
                     PerPage = 1,
-                    Total = 1,
-                    NextPage = null,
-                    PrevPage = null
+                    Total = 1
                 }
             };
 
@@ -54,7 +51,7 @@ namespace Piipan.Metrics.Func.Api.Tests
             // Act
             var result = await function.Run(request, logger.Object) as JsonResult;
             var response = result.Value as GetParticipantUploadsResponse;
-            
+
             // Assert
             Assert.NotNull(response);
             Assert.Equal(response.Meta, expectedResponse.Meta);

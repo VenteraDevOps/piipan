@@ -38,7 +38,7 @@ namespace Piipan.States.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<StatesClient>>();
             apiClient
-                .Setup(m => m.GetAsync<StatesInfoResponse>("states"))
+                .Setup(m => m.GetAsync<StatesInfoResponse>("states", null))
                 .ReturnsAsync(expectedResponse);
 
             var client = new StatesClient(apiClient.Object);

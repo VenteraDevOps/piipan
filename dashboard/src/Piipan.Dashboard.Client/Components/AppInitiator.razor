@@ -1,0 +1,8 @@
+﻿@code {
+    [Parameter] public AppData InitialValues { get; set; }
+
+    protected override void OnInitialized()
+    {
+        PropertyCopier.CopyPropertiesTo(InitialValues, AppData);
+    }
+}

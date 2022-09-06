@@ -29,6 +29,9 @@
   <Target Name="NpxGulpBuild" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild" Condition="'$(UseSharedCompilation)' != 'false'">
     <Exec Command="npx gulp build" />
   </Target>
+  <ItemGroup>
+    <None Include="wwwroot\customjs\utilities.js" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.8" />
@@ -42,6 +45,7 @@
     <ProjectReference Include="..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
     <ProjectReference Include="..\..\..\metrics\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
     <ProjectReference Include="..\..\..\metrics\src\Piipan.Metrics\Piipan.Metrics.Client\Piipan.Metrics.Client.csproj" />
+    <ProjectReference Include="..\..\..\states\src\Piipan.States.Client\Piipan.States.Client.csproj" />
     <ProjectReference Include="..\Piipan.Dashboard.Client\Piipan.Dashboard.Client.csproj" />
   </ItemGroup>
 

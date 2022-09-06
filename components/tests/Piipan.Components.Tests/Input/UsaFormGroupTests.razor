@@ -114,7 +114,6 @@
     }
     protected override void CreateTestComponent()
     {
-        JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true);
         form = Render<UsaForm>(
             @<UsaForm Model="model">
                 <UsaFormGroup LabelOverride="@InitialValues.LabelOverride" 
@@ -125,7 +124,6 @@
         );
         Component = form.FindComponent<UsaFormGroup>();
         inputElement = Component.Find($".{InputClass}");
-        JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true);
     }
 
     #endregion Helper Functions

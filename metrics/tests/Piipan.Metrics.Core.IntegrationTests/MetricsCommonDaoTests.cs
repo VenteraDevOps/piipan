@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Piipan.Metrics.Api;
 using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Core.Models;
 using Piipan.Participants.Core.Enums;
@@ -51,7 +52,7 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
 
             // Act
-            var count = await dao.GetUploadCount(null);
+            var count = await dao.GetUploadCount(new ParticipantUploadRequestFilter());
 
             // Assert
             Assert.Equal(expectedCount, count);
@@ -74,9 +75,9 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
 
             // Act
-            var eaCount = await dao.GetUploadCount("ea");
-            var ebCount = await dao.GetUploadCount("eb");
-            var ecCount = await dao.GetUploadCount("ec");
+            var eaCount = await dao.GetUploadCount(new Api.ParticipantUploadRequestFilter { State = "ea" });
+            var ebCount = await dao.GetUploadCount(new Api.ParticipantUploadRequestFilter { State = "eb" });
+            var ecCount = await dao.GetUploadCount(new Api.ParticipantUploadRequestFilter { State = "ec" });
 
             // Assert
             Assert.Equal(expectedCount, eaCount);
@@ -101,9 +102,9 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
 
             // Act
-            var eaUploads = await dao.GetUploads("ea", 100);
-            var ebUploads = await dao.GetUploads("eb", 100);
-            var ecUploads = await dao.GetUploads("ec", 100);
+            var eaUploads = await dao.GetUploads(new Api.ParticipantUploadRequestFilter { State = "ea", PerPage = 100 });
+            var ebUploads = await dao.GetUploads(new Api.ParticipantUploadRequestFilter { State = "eb", PerPage = 100 });
+            var ecUploads = await dao.GetUploads(new Api.ParticipantUploadRequestFilter { State = "ec", PerPage = 100 });
 
             // Assert
             Assert.Equal(count, eaUploads.Count());
@@ -126,17 +127,18 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
 
             // Act
-            var eaUploads = await dao.GetUploads("ea", limit);
+            var eaUploads = await dao.GetUploads(new Api.ParticipantUploadRequestFilter { State = "ea", PerPage = limit });
 
             // Assert
             Assert.Equal(limit, eaUploads.Count());
         }
 
         [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(50)]
-        public async Task GetUploads_OffsettingWorks(int offset)
+        [InlineData(1, 30)]
+        [InlineData(3, 30)]
+        [InlineData(4, 10)]
+        [InlineData(5, 0)]
+        public async Task GetUploads_OffsettingWorks(int pageNumber, int expectedReturned)
         {
             // Arrange
             for (var i = 0; i < 100; i++)
@@ -146,10 +148,10 @@ namespace Piipan.Metrics.Core.IntegrationTests
 
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
             // Act
-            var eaUploads = await dao.GetUploads("ea", 100, offset);
+            var eaUploads = await dao.GetUploads(new Api.ParticipantUploadRequestFilter { State = "ea", PerPage = 30, Page = pageNumber });
 
             // Assert
-            Assert.Equal(100 - offset, eaUploads.Count());
+            Assert.Equal(expectedReturned, eaUploads.Count());
         }
 
         [Fact]
@@ -189,16 +191,17 @@ namespace Piipan.Metrics.Core.IntegrationTests
             // Arrange
             var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
             var uploadedAt = new DateTime(2021, 1, 1, 5, 10, 0);
+            var filter = new ParticipantUploadRequestFilter { State = "ea" };
 
-            var uploadCount = await dao.GetUploadCount("ea");
+            var uploadCount = await dao.GetUploadCount(filter);
             Assert.Equal(0, uploadCount);
 
             // Act
             await dao.AddUpload(new ParticipantUploadDbo() { State = "ea", UploadedAt = uploadedAt, Status = UploadStatuses.UPLOADING.ToString() });
-            var results = await dao.GetUploads("ea", 10);
+            var results = await dao.GetUploads(filter);
 
             // Assert
-            uploadCount = await dao.GetUploadCount("ea");
+            uploadCount = await dao.GetUploadCount(filter);
             Assert.Equal(1, uploadCount);
 
             Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
@@ -213,9 +216,10 @@ namespace Piipan.Metrics.Core.IntegrationTests
             var completedAt = new DateTime(2021, 1, 1, 5, 15, 0);
             var upload_id = "abcd123";
             Insert("ea", uploadedAt, null, UploadStatuses.UPLOADING.ToString(), upload_id);
+            var filter = new ParticipantUploadRequestFilter { State = "ea" };
 
-            var results = await dao.GetUploads("ea", 10);
-            var uploadCount = await dao.GetUploadCount("ea");
+            var results = await dao.GetUploads(filter);
+            var uploadCount = await dao.GetUploadCount(filter);
             Assert.Equal(1, uploadCount);
             Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
             Assert.Null(results.ToList()[0].CompletedAt);
@@ -224,9 +228,9 @@ namespace Piipan.Metrics.Core.IntegrationTests
             await dao.UpdateUpload(new ParticipantUploadDbo() { State = "ea", UploadedAt = uploadedAt, CompletedAt = completedAt, Status = UploadStatuses.COMPLETE.ToString(), UploadIdentifier = upload_id });
 
             // Assert
-            uploadCount = await dao.GetUploadCount("ea");
+            uploadCount = await dao.GetUploadCount(filter);
             Assert.Equal(1, uploadCount);
-            results = await dao.GetUploads("ea", 10);
+            results = await dao.GetUploads(filter);
             Assert.Equal(uploadedAt, results.ToList()[0].UploadedAt);
             Assert.Equal(completedAt, results.ToList()[0].CompletedAt);
         }
@@ -288,6 +292,38 @@ namespace Piipan.Metrics.Core.IntegrationTests
             Assert.Equal(participantMatchDbo.InitStateFinalDisposition, results.ToList()[0].InitStateFinalDisposition);
 
             Assert.Equal(1, numberOfRowsUPdated);
+        }
+
+        [Theory]
+        [InlineData(0, 0, 0, 0)]
+        [InlineData(1, 2, 1, 2)]
+        [InlineData(50, 100, 10, 10)]
+        public async Task GetUploadStatistics_ReturnsExpected(int failed, int complete, int expectedFailedStates, int expectedCompleteStates)
+        {
+            // Arrange
+            for (var i = 0; i < failed; i++)
+            {
+                Insert($"E{i % 10}", DateTime.Now, DateTime.Now, "failed", "upload_identifier");
+            }
+            for (var i = 0; i < complete; i++)
+            {
+                Insert($"E{i % 10}", DateTime.Now, DateTime.Now, "complete", "upload_identifier");
+            }
+
+            var dao = new ParticipantUploadDao(DbConnFactory(), new NullLogger<ParticipantUploadDao>());
+
+            // Act
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            var statistics = await dao.GetUploadStatistics(new ParticipantUploadStatisticsRequest
+            {
+                StartDate = DateTime.Now.Date,
+                EndDate = DateTime.Now.Date,
+                HoursOffset = (int)offset.TotalHours
+            });
+
+            // Assert
+            Assert.Equal(expectedFailedStates, statistics.TotalFailure);
+            Assert.Equal(expectedCompleteStates, statistics.TotalComplete);
         }
     }
 }

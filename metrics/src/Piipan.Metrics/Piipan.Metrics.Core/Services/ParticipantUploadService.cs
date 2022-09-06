@@ -1,8 +1,7 @@
-using System;
-using Piipan.Metrics.Core.DataAccessObjects;
-using Piipan.Metrics.Api;
 using System.Threading.Tasks;
+using Piipan.Metrics.Api;
 using Piipan.Metrics.Core.Builders;
+using Piipan.Metrics.Core.DataAccessObjects;
 using Piipan.Metrics.Core.Models;
 
 #nullable enable
@@ -44,17 +43,13 @@ namespace Piipan.Metrics.Core.Services
             return await _participantUploadDao.UpdateUpload(new ParticipantUploadDbo(participantUpload));
         }
 
-        public async Task<GetParticipantUploadsResponse> GetUploads(string? state, int perPage, int page = 0)
+        public async Task<GetParticipantUploadsResponse> GetUploads(ParticipantUploadRequestFilter filter)
         {
-            var limit = perPage;
-            var offset = perPage * (page - 1);
-            var uploads = await _participantUploadDao.GetUploads(state, limit, offset);
-            var total = await _participantUploadDao.GetUploadCount(state);
+            var uploads = await _participantUploadDao.GetUploads(filter);
+            var total = await _participantUploadDao.GetUploadCount(filter);
 
             var meta = _metaBuilder
-                .SetPage(page)
-                .SetPerPage(perPage)
-                .SetState(state)
+                .SetFilter(filter)
                 .SetTotal(total)
                 .Build();
 
@@ -63,6 +58,11 @@ namespace Piipan.Metrics.Core.Services
                 Data = uploads,
                 Meta = meta
             };
+        }
+
+        public async Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest request)
+        {
+            return await _participantUploadDao.GetUploadStatistics(request);
         }
     }
 }

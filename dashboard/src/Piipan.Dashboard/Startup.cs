@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,12 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NEasyAuthMiddleware;
+using Piipan.Components.Modals;
+using Piipan.Components.Routing;
 using Piipan.Metrics.Client.Extensions;
 using Piipan.Shared.Authorization;
 using Piipan.Shared.Claims;
 using Piipan.Shared.Logging;
-using System;
-using System.Diagnostics.CodeAnalysis;
+using Piipan.States.Client.Extensions;
 
 namespace Piipan.Dashboard
 {
@@ -67,6 +70,9 @@ namespace Piipan.Dashboard
             services.AddTransient<IClaimsProvider, ClaimsProvider>();
 
             services.RegisterMetricsClientServices(_env);
+            services.AddModalManager();
+            services.AddPiipanNavigationManager();
+            services.RegisterStatesClientServices(_env);
 
             if (_env.IsDevelopment())
             {

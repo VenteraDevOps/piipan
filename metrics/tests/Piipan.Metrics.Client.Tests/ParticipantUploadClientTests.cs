@@ -1,10 +1,10 @@
 using System;
-using System.Threading.Tasks;
-using Xunit;
-using Piipan.Metrics.Api;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Moq;
+using Piipan.Metrics.Api;
 using Piipan.Shared.Http;
+using Xunit;
 
 namespace Piipan.Metrics.Client.Tests
 {
@@ -14,6 +14,12 @@ namespace Piipan.Metrics.Client.Tests
         public async Task GetUploads_ReturnsApiClientResponse()
         {
             // Arrange
+            ParticipantUploadRequestFilter filter = new ParticipantUploadRequestFilter()
+            {
+                State = "ea",
+                Page = 1,
+                PerPage = 20
+            };
             var expectedResponse = new GetParticipantUploadsResponse
             {
                 Data = new List<ParticipantUpload>
@@ -22,20 +28,20 @@ namespace Piipan.Metrics.Client.Tests
                 },
                 Meta = new Meta
                 {
-                    Page = 1,
-                    Total = 1
+                    Total = 1,
+                    PageQueryParams = "?PerPage=20&State=ea"
                 }
             };
 
             var apiClient = new Mock<IAuthorizedApiClient<ParticipantUploadClient>>();
             apiClient
-                .Setup(m => m.GetAsync<GetParticipantUploadsResponse>("GetParticipantUploads"))
+                .Setup(m => m.GetAsync<GetParticipantUploadsResponse, ParticipantUploadRequestFilter>("GetParticipantUploads", filter))
                 .ReturnsAsync(expectedResponse);
 
             var client = new ParticipantUploadClient(apiClient.Object);
 
             // Act
-            var response = await client.GetUploads("ea", 1, 1);
+            var response = await client.GetUploads(filter);
 
             // Assert
             Assert.Equal(expectedResponse, response);
@@ -53,14 +59,13 @@ namespace Piipan.Metrics.Client.Tests
                 },
                 Meta = new Meta
                 {
-                    Page = 1,
                     Total = 1
                 }
             };
 
             var apiClient = new Mock<IAuthorizedApiClient<ParticipantUploadClient>>();
             apiClient
-                .Setup(m => m.GetAsync<GetParticipantUploadsResponse>("GetLastUpload"))
+                .Setup(m => m.GetAsync<GetParticipantUploadsResponse>("GetLastUpload", null))
                 .ReturnsAsync(expectedResponse);
 
             var client = new ParticipantUploadClient(apiClient.Object);

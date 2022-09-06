@@ -13,6 +13,9 @@
         [Display(Name = "Input Text")]
         public string InputTextField { get; set; }
 
+        [Display(Name = "Input Number")]
+        public int InputNumberField { get; set; }
+
         [Display(Name = "Input Text Area")]
         public string InputTextAreaField { get; set; }
 
@@ -59,6 +62,15 @@
                 </UsaFormGroup>
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-date"))" class="@ButtonClass">View Input Date</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Input Number">
+            <BodyContent>
+                <p>A number input allows a user to pick only an integer</p>
+                <UsaFormGroup>
+                    <UsaInputNumber @bind-Value="indexModel.InputNumberField" />
+                </UsaFormGroup>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/input-number"))" class="@ButtonClass">View Input Number</button></FooterContent>
         </UsaCard>
         <UsaCard Header="Input Radio">
             <BodyContent>
@@ -107,6 +119,18 @@
                 <ModalComponent />
             </BodyContent>
             <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/modal"))" class="@ButtonClass">View Modal</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Pagination">
+            <BodyContent>
+                <p>Pagination display for when you want to be able to go to different pages in a table</p>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/pagination"))" class="@ButtonClass">View Pagination</button></FooterContent>
+        </UsaCard>
+        <UsaCard Header="Table">
+            <BodyContent>
+                <p>Tables help logically organize information and group like things together, and they make it easier to understand complex content</p>
+            </BodyContent>
+            <FooterContent><button type="button" @onclick="@(() => navManager.NavigateTo("/table"))" class="@ButtonClass">View Table</button></FooterContent>
         </UsaCard>
         <UsaCard Header="Tag">
             <BodyContent>

@@ -16,16 +16,31 @@ using Xunit;
 
 namespace Piipan.Dashboard.Tests
 {
-    public class ParticipantUploadsModelTests
+    public class ParticipantUploadsModelTests : BasePageTest
     {
+        private GetParticipantUploadsResponse DefaultGetUploadsResponse => new GetParticipantUploadsResponse
+        {
+            Data = new List<ParticipantUpload>
+                {
+                    new ParticipantUpload { State = "ea", UploadedAt = DateTime.Now }
+                },
+            Meta = new Meta()
+        };
+
+        private ParticipantUploadStatistics DefaultStatisticsResponse =>
+            new ParticipantUploadStatistics
+            {
+                TotalComplete = 2,
+                TotalFailure = 1
+            };
+
         [Fact]
         public void BeforeOnGetAsync_TitleIsCorrect()
         {
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
                 Mock.Of<IParticipantUploadReaderApi>(),
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                serviceProviderMock()
             );
             pageModel.PageContext.HttpContext = contextMock().Object;
 
@@ -35,19 +50,20 @@ namespace Piipan.Dashboard.Tests
         }
 
         [Fact]
-        public void BeforeOnGetAsync_PerPageDefaultIsCorrect()
+        public void BeforeOnGetAsync_DefaultsAreCorrect()
         {
-            Assert.True(ParticipantUploadsModel.PerPageDefault > 0, "page default is greater than 0");
+            ParticipantUploadRequestFilter filter = new ParticipantUploadRequestFilter();
+            Assert.Equal(53, filter.PerPage);
+            Assert.Equal(1, filter.Page);
         }
 
         [Fact]
         public void BeforeOnGetAsync_InitializesParticipantUploadResults()
         {
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
             var pageModel = new ParticipantUploadsModel(
                 Mock.Of<IParticipantUploadReaderApi>(),
                 new NullLogger<ParticipantUploadsModel>(),
-                mockClaimsProvider
+                serviceProviderMock()
             );
             Assert.IsType<List<ParticipantUpload>>(pageModel.ParticipantUploadResults);
         }
@@ -57,23 +73,20 @@ namespace Piipan.Dashboard.Tests
         public async void AfterOnGetAsync_SetsParticipantUploadResults()
         {
             // Arrange
-            var response = new GetParticipantUploadsResponse
-            {
-                Data = new List<ParticipantUpload>
-                {
-                    new ParticipantUpload { State = "ea", UploadedAt = DateTime.Now }
-                },
-                Meta = new Meta()
-            };
+            var response = DefaultGetUploadsResponse;
+
             var participantApi = new Mock<IParticipantUploadReaderApi>();
             participantApi
-                .Setup(m => m.GetLatestUploadsByState())
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
                 .ReturnsAsync(response);
+            participantApi
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()))
+                .ReturnsAsync(DefaultStatisticsResponse);
 
             var pageModel = new ParticipantUploadsModel(
                 participantApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                claimsProviderMock("noreply@tts.test")
+                serviceProviderMock()
             );
 
             var httpContext = contextMock().Object;
@@ -84,25 +97,52 @@ namespace Piipan.Dashboard.Tests
 
             // assert
             Assert.Equal(response.Data.First(), pageModel.ParticipantUploadResults[0]);
+            Assert.Equal(1, pageModel.UploadStatistics.TotalFailure);
+            Assert.Equal(2, pageModel.UploadStatistics.TotalComplete);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
 
-        [Fact]
-        public async Task AfterOnGetAsync_ApiThrows()
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public async Task AfterOnGetAsync_ApiThrows(bool getUploadsFailed, bool getStatisticsFailed)
         {
             // Arrange
             var participantApi = new Mock<IParticipantUploadReaderApi>();
             participantApi
-                .Setup(m => m.GetLatestUploadsByState())
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
                 .ThrowsAsync(new Exception("api broke"));
+
+            var getUploadsSetup = participantApi
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()));
+            if (getUploadsFailed)
+            {
+                getUploadsSetup.ThrowsAsync(new Exception("api broke"));
+            }
+            else
+            {
+                getUploadsSetup.ReturnsAsync(DefaultGetUploadsResponse);
+            }
+
+            var getUploadsStatisticsSetup = participantApi
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()));
+            if (getStatisticsFailed)
+            {
+                getUploadsStatisticsSetup.ThrowsAsync(new Exception("api broke"));
+            }
+            else
+            {
+                getUploadsStatisticsSetup.ReturnsAsync(DefaultStatisticsResponse);
+            }
+
 
             var logger = new Mock<ILogger<ParticipantUploadsModel>>();
 
             var pageModel = new ParticipantUploadsModel(
                 participantApi.Object,
                 logger.Object,
-                claimsProviderMock("noreply@tts.test")
+                serviceProviderMock()
             );
 
             // Act
@@ -118,21 +158,42 @@ namespace Piipan.Dashboard.Tests
             ));
         }
 
-        [Fact]
-        public async Task AfterOnGetAsync_ApiThrowsHttpRequestExecption()
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public async Task AfterOnGetAsync_ApiThrowsHttpRequestExecption(bool getUploadsFailed, bool getStatisticsFailed)
         {
             // Arrange
             var participantApi = new Mock<IParticipantUploadReaderApi>();
-            participantApi
-                .Setup(m => m.GetLatestUploadsByState())
-                .ThrowsAsync(new HttpRequestException("api broke"));
+
+            var getUploadsSetup = participantApi
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()));
+            if (getUploadsFailed)
+            {
+                getUploadsSetup.ThrowsAsync(new HttpRequestException("api broke"));
+            }
+            else
+            {
+                getUploadsSetup.ReturnsAsync(DefaultGetUploadsResponse);
+            }
+
+            var getUploadsStatisticsSetup = participantApi
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()));
+            if (getStatisticsFailed)
+            {
+                getUploadsStatisticsSetup.ThrowsAsync(new HttpRequestException("api broke"));
+            }
+            else
+            {
+                getUploadsStatisticsSetup.ReturnsAsync(DefaultStatisticsResponse);
+            }
 
             var logger = new Mock<ILogger<ParticipantUploadsModel>>();
 
             var pageModel = new ParticipantUploadsModel(
                 participantApi.Object,
                 logger.Object,
-                claimsProviderMock("noreply@tts.test")
+                serviceProviderMock()
             );
 
             // Act
@@ -154,23 +215,20 @@ namespace Piipan.Dashboard.Tests
         public async void AfterOnPostAsync_setsParticipantUploadResults()
         {
             // Arrange
-            var response = new GetParticipantUploadsResponse
-            {
-                Data = new List<ParticipantUpload>
-                {
-                    new ParticipantUpload { State = "eb", UploadedAt = DateTime.Now }
-                },
-                Meta = new Meta()
-            };
+            var response = DefaultGetUploadsResponse;
             var participantApi = new Mock<IParticipantUploadReaderApi>();
             participantApi
-                .Setup(m => m.GetUploads("eb", ParticipantUploadsModel.PerPageDefault, 1))
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
                 .ReturnsAsync(response);
+
+            participantApi
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()))
+                .ReturnsAsync(DefaultStatisticsResponse);
 
             var pageModel = new ParticipantUploadsModel(
                 participantApi.Object,
                 new NullLogger<ParticipantUploadsModel>(),
-                claimsProviderMock("noreply@tts.test")
+                serviceProviderMock()
             );
 
             var request = requestMock();
@@ -192,25 +250,48 @@ namespace Piipan.Dashboard.Tests
 
             // Assert
             Assert.Equal(response.Data.First(), pageModel.ParticipantUploadResults[0]);
+            Assert.Equal(1, pageModel.UploadStatistics.TotalFailure);
+            Assert.Equal(2, pageModel.UploadStatistics.TotalComplete);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }
 
-        [Fact]
-        public async Task AfterOnPostAsync_ApiThrows()
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public async Task AfterOnPostAsync_ApiThrows(bool getUploadsFailed, bool getStatisticsFailed)
         {
             // Arrange
             var participantApi = new Mock<IParticipantUploadReaderApi>();
-            participantApi
-                .Setup(m => m.GetUploads("eb", ParticipantUploadsModel.PerPageDefault, 1))
-                .ThrowsAsync(new Exception("api broke"));
+            var getUploadsSetup = participantApi
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()));
+            if (getUploadsFailed)
+            {
+                getUploadsSetup.ThrowsAsync(new Exception("api broke"));
+            }
+            else
+            {
+                getUploadsSetup.ReturnsAsync(DefaultGetUploadsResponse);
+            }
+
+            var getUploadsStatisticsSetup = participantApi
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()));
+            if (getStatisticsFailed)
+            {
+                getUploadsStatisticsSetup.ThrowsAsync(new Exception("api broke"));
+            }
+            else
+            {
+                getUploadsStatisticsSetup.ReturnsAsync(DefaultStatisticsResponse);
+            }
+
 
             var logger = new Mock<ILogger<ParticipantUploadsModel>>();
 
             var pageModel = new ParticipantUploadsModel(
                 participantApi.Object,
                 logger.Object,
-                claimsProviderMock("noreply@tts.test")
+                serviceProviderMock()
             );
 
             var request = requestMock();
@@ -240,21 +321,43 @@ namespace Piipan.Dashboard.Tests
             ));
         }
 
-        [Fact]
-        public async Task AfterOnPostAsync_ApiThrowsHttpRequestException()
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+
+        public async Task AfterOnPostAsync_ApiThrowsHttpRequestException(bool getUploadsFailed, bool getStatisticsFailed)
         {
             // Arrange
             var participantApi = new Mock<IParticipantUploadReaderApi>();
-            participantApi
-                .Setup(m => m.GetUploads("eb", ParticipantUploadsModel.PerPageDefault, 1))
-                .ThrowsAsync(new HttpRequestException("api broke"));
+
+            var getUploadsSetup = participantApi
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()));
+            if (getUploadsFailed)
+            {
+                getUploadsSetup.ThrowsAsync(new HttpRequestException("api broke"));
+            }
+            else
+            {
+                getUploadsSetup.ReturnsAsync(DefaultGetUploadsResponse);
+            }
+
+            var getUploadsStatisticsSetup = participantApi
+                .Setup(m => m.GetUploadStatistics(It.IsAny<ParticipantUploadStatisticsRequest>()));
+            if (getStatisticsFailed)
+            {
+                getUploadsStatisticsSetup.ThrowsAsync(new HttpRequestException("api broke"));
+            }
+            else
+            {
+                getUploadsStatisticsSetup.ReturnsAsync(DefaultStatisticsResponse);
+            }
 
             var logger = new Mock<ILogger<ParticipantUploadsModel>>();
 
             var pageModel = new ParticipantUploadsModel(
                 participantApi.Object,
                 logger.Object,
-                claimsProviderMock("noreply@tts.test")
+                serviceProviderMock()
             );
 
             var request = requestMock();

@@ -3,11 +3,12 @@
 @inject IJSRuntime JSRuntime
 @code {
     InputDate<DateTime?> InputDateReference { get; set; }
+    IJSObjectReference inputDateJavascriptReference;
     public override int? Width { get; set; } = 180;
 
     protected override async Task<List<string>> PreverificationChecks()
     {
-        bool hasBadInput = await JSRuntime.InvokeAsync<bool>("piipan.utilities.doesElementHaveInvalidInput", Id);
+        bool hasBadInput = await inputDateJavascriptReference.InvokeAsync<bool>("DoesElementHaveInvalidInput", Id);
         if (hasBadInput)
         {
             return new List<string>() { ValidationConstants.InvalidMessage };
@@ -15,6 +16,20 @@
         else
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Grab the input date javascript reference to be used later
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (inputDateJavascriptReference == null)
+        {
+            inputDateJavascriptReference = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Piipan.Components/Forms/UsaInputDate.razor.js");
         }
     }
 }
