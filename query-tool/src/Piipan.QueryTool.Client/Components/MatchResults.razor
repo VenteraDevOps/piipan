@@ -10,6 +10,8 @@
 
 @code {
     [Parameter] public List<MatchResApiResponse> QueryResult { get; set; }
+    [Parameter] public string LoggedInUsersState { get; set; }
+    [Parameter] public bool IsNationalOffice { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -44,6 +46,64 @@
             Navigate();
         }
     }
+
+    private string MatchingStateTableResults(MatchResApiResponse result)
+    {
+        if (IsNationalOffice)
+        {
+            return string.Join(", ", result.Data.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state)));
+        }
+        else
+        {
+            foreach(string state in result.Data.States)
+            {
+                if (state != LoggedInUsersState)
+                {
+                    return state;
+                }
+            }
+        }
+        return "";
+    }
+
+    private string VulnerableIndivudualTableResults(MatchResApiResponse result)
+    {
+        string VulnerableIndividualTableResults = "";
+        if (IsNationalOffice)
+        {
+            result.Data.Dispositions.OrderBy(state => state);
+            foreach (var disposition in result.Data.Dispositions)
+            {
+                string individualStateVulnerableStatus = disposition.VulnerableIndividual switch
+                {
+
+                    true => "Yes,",
+                    false => "No,",
+                    null => "-,"
+                };
+                VulnerableIndividualTableResults = VulnerableIndividualTableResults + individualStateVulnerableStatus;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                if (result.Data.States[i] != LoggedInUsersState)
+                {
+                    VulnerableIndividualTableResults = result.Data.Dispositions[i].VulnerableIndividual switch
+                    {
+
+                        true => "Yes",
+                        false => "No",
+                        null => "-"
+                    };
+                }
+            }
+        }
+        VulnerableIndividualTableResults  = VulnerableIndividualTableResults.Remove(VulnerableIndividualTableResults.Length - 1);
+        return VulnerableIndividualTableResults;
+    }
+
 }
 
 <section class="border-top-1px border-base-light margin-top-6" id="match-results-area">
@@ -53,7 +113,8 @@
         <thead>
             <tr>
                 <th scope="col">Match ID</th>
-                <th scope="col">Matching States</th>
+                <th scope="col">Matching State</th>
+                <th scope="col">Vulnerable Individual</th>
             </tr>
         </thead>
         <tbody>
@@ -61,7 +122,8 @@
         {
             <tr>
                 <td><a href="/match/@result.Data.MatchId" @onclick="@(() => ResultClicked(result))" @onclick:preventDefault>@result.Data.MatchId</a></td>
-                <td>@(string.Join(", ", result.Data.States.OrderBy(state => state).Select(state => StateHelper.GetStateName(state))))</td>
+                <td>@MatchingStateTableResults(result)</td>
+                <td>@VulnerableIndivudualTableResults(result)</td>
             </tr>
         }
         </tbody>

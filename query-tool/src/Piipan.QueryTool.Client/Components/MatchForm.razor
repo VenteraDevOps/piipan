@@ -6,6 +6,8 @@
     [Parameter] public MatchSearchRequest Query { get; set; }
     [Parameter] public ParameterBase<List<MatchResApiResponse>> QueryResult { get; set; }
     [Parameter] public string Token { get; set; }
+    [Parameter] public string LoggedInUsersState { get; set; }
+    [Parameter] public bool IsNationalOffice { get; set; }
     [Parameter] public List<ServerError> ServerErrors { get; set; }
 
     private bool searching = false;
@@ -57,7 +59,8 @@
 }
 @if (QueryResult?.Data?.Count > 0)
 {
-    <MatchResults QueryResult="QueryResult.Data" />
+    <MatchResults LoggedInUsersState="@LoggedInUsersState"
+            IsNationalOffice="@IsNationalOffice" QueryResult="QueryResult.Data" />
 }
 else {
     <section class="border-top-1px border-base-light margin-top-6"></section>
