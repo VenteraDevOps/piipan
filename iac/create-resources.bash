@@ -970,19 +970,6 @@ main () {
       --query "[0].appId" \
       --output tsv)
 
-  echo "Creating Application Insight for app: ${QUERY_TOOL_APP_NAME}"
-  appInsightConnectionString=$(\
-    az monitor app-insights component create \
-      --app "${QUERY_TOOL_APP_NAME}" \
-      --location "${LOCATION}" \
-      --resource-group "${RESOURCE_GROUP}" \
-      --tags "Project=${PROJECT_TAG}" \
-      --application-type "${APPINSIGHTS_KIND}" \
-      --kind "${APPINSIGHTS_KIND}" \
-      --workspace "${LOG_ANALYTICS_WORKSPACE_ID}" \
-      --query "${APPINSIGHTS_CONNECTION_STRING}" \
-      --output tsv)
-
   echo "Deploying ${QUERY_TOOL_APP_NAME} resources"
   az deployment group create \
     --name "$QUERY_TOOL_APP_NAME" \
@@ -1008,14 +995,7 @@ main () {
       diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
       eventHubAuthorizationRuleId="${EH_RULE_ID}" \
       eventHubName="${EVENT_HUB_NAME}" \
-      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}" \
-      ${APPLICATIONINSIGHTS_CONNECTION_STRING}="${appInsightConnectionString}"
-
-  echo "Integrating Application Insight with app: ${QUERY_TOOL_APP_NAME}"
-  az monitor app-insights component connect-function \
-      --app "${QUERY_TOOL_APP_NAME}" \
-      --function "${QUERY_TOOL_APP_NAME}" \
-      --resource-group "${RESOURCE_GROUP}"
+      workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}"
 
   echo "Integrating ${QUERY_TOOL_APP_NAME} into virtual network"
   az webapp vnet-integration add \

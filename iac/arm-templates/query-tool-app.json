@@ -80,79 +80,10 @@
             "metadata": {
                 "description": "Specify the Log Analytics Workspace Id."
             }
-        },
-        "APPLICATIONINSIGHTS_CONNECTION_STRING": {
-            "type": "string",
-            "metadata": {
-                "description": "The connection string to log Application Insights."
-            }
         }
     },
     "variables": {
         "sku": "S1",
-        "baseSiteConfig": {
-            "netFrameworkVersion": "v6.0",
-            "metadata": [
-                {
-                    "name": "CURRENT_STACK",
-                    "value": "dotnet"
-                }
-            ],
-            // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments
-            "use32BitWorkerProcess": false,
-            "ipSecurityRestrictions": [
-                // Restricts access to Front Door
-                {
-                    "ipAddress": "AzureFrontDoor.Backend",
-                    "tag": "ServiceTag",
-                    "action": "Allow",
-                    "priority": 100,
-                    "name": "Allow Azure Front Door access",
-                    "headers": {
-                        "x-azure-fdid": [
-                            "[parameters('frontDoorId')]"
-                        ]
-                    }
-                }
-            ],
-            "ftpsState": "Disabled",
-            "appSettings": [
-                // Environment Variables
-                {
-                    "name": "OrchApiUri",
-                    "value": "[parameters('OrchApiUri')]"
-                },
-                {
-                    "name": "OrchApiAppId",
-                    "value": "[parameters('OrchApiAppId')]"
-                },
-                {
-                    "name": "StatesApiUri",
-                    "value": "[parameters('StatesApiUri')]"
-                },
-                {
-                    "name": "StatesApiAppId",
-                    "value": "[parameters('StatesApiAppId')]"
-                },
-                {
-                    "name": "MatchResApiUri",
-                    "value": "[parameters('MatchResApiUri')]"
-                },
-                {
-                    "name": "MatchResApiAppId",
-                    "value": "[parameters('MatchResApiAppId')]"
-                },
-                {
-                    "name": "ASPNETCORE_ENVIRONMENT",
-                    "value": "[parameters('aspNetCoreEnvironment')]"
-                },
-                {
-                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                    "value": "[parameters('APPLICATIONINSIGHTS_CONNECTION_STRING')]"
-                }
-            ],
-            "vnetRouteAllEnabled": true
-        },
         "systemTypeTag": {
             "SysType": "QueryApp"
         },
@@ -191,7 +122,74 @@
             "properties": {
                 "httpsOnly": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan'))]",
-                "siteConfig": "[variables('baseSiteConfig')]",
+                "siteConfig": {
+                    "netFrameworkVersion": "v6.0",
+                    "metadata": [
+                        {
+                            "name": "CURRENT_STACK",
+                            "value": "dotnet"
+                        }
+                    ],
+                    // Use 64-bit runtime on Windows for consistency with local Linux and macOS dev environments
+                    "use32BitWorkerProcess": false,
+                    "ipSecurityRestrictions": [
+                        // Restricts access to Front Door
+                        {
+                            "ipAddress": "AzureFrontDoor.Backend",
+                            "tag": "ServiceTag",
+                            "action": "Allow",
+                            "priority": 100,
+                            "name": "Allow Azure Front Door access",
+                            "headers": {
+                                "x-azure-fdid": [
+                                    "[parameters('frontDoorId')]"
+                                ]
+                            }
+                        }
+                    ],
+                    "ftpsState": "Disabled",
+                    "appSettings": [
+                        // Environment Variables
+                        {
+                            "name": "OrchApiUri",
+                            "value": "[parameters('OrchApiUri')]"
+                        },
+                        {
+                            "name": "OrchApiAppId",
+                            "value": "[parameters('OrchApiAppId')]"
+                        },
+                        {
+                            "name": "StatesApiUri",
+                            "value": "[parameters('StatesApiUri')]"
+                        },
+                        {
+                            "name": "StatesApiAppId",
+                            "value": "[parameters('StatesApiAppId')]"
+                        },
+                        {
+                            "name": "MatchResApiUri",
+                            "value": "[parameters('MatchResApiUri')]"
+                        },
+                        {
+                            "name": "MatchResApiAppId",
+                            "value": "[parameters('MatchResApiAppId')]"
+                        },
+                        {
+                            "name": "ASPNETCORE_ENVIRONMENT",
+                            "value": "[parameters('aspNetCoreEnvironment')]"
+                        },
+                        // Connect app to Application Insights instance
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('appName'))).ConnectionString]"
+                        }
+                    ],
+                    "vnetRouteAllEnabled": true
+                },
                 "resources": [
                     {
                         "apiVersion": "2020-06-01",
