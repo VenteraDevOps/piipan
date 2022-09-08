@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Moq;
 using Piipan.Match.Api;
@@ -13,8 +11,14 @@ using Piipan.Match.Core.DataAccessObjects;
 using Piipan.Match.Core.Models;
 using Piipan.Match.Core.Services;
 using Piipan.Metrics.Api;
+using Piipan.Notification.Common.Models;
+using Piipan.Notifications.Core.Builders;
+using Piipan.Notifications.Core.Services;
+using Piipan.Notifications.Models;
 using Piipan.Participants.Api.Models;
 using Piipan.Shared.Cryptography;
+using Piipan.States.Core.DataAccessObjects;
+using Piipan.States.Core.Models;
 using Xunit;
 
 namespace Piipan.Match.Core.Tests.Services
@@ -24,7 +28,7 @@ namespace Piipan.Match.Core.Tests.Services
         private const string QueryToolUrl = "https://tts.test";
         private string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
         private ICryptographyClient cryptographyClient;
-                
+
         public MatchEventServiceTests()
         {
             Environment.SetEnvironmentVariable("QueryToolUrl", QueryToolUrl);
@@ -46,6 +50,25 @@ namespace Piipan.Match.Core.Tests.Services
 
             return recordBuilder;
         }
+
+        private NotificationRecord NotificationRecord = new NotificationRecord()
+        {
+            MatchRecord = new MatchModel()
+            {
+                MatchId = "foo",
+                InitState = "ea",
+                MatchingState = "eb",
+                MatchingUrl = It.IsAny<string>(),
+            },
+            EmailToRecord = new EmailToModel()
+            {
+                EmailTo = "Ea@Nac.gov"
+            },
+            EmailToRecordMS = new EmailToModel()
+            {
+                EmailTo = "Eb@Nac.gov"
+            }
+        };
 
         private Mock<IMatchRecordApi> ApiMock(string matchId = "foo")
         {
@@ -70,9 +93,88 @@ namespace Piipan.Match.Core.Tests.Services
             return mock;
         }
 
+        private Mock<IParticipantPublishSearchMetric> ParticipantPublishSearchMetricMock()
+        {
+            var mock = new Mock<IParticipantPublishSearchMetric>();
+            mock.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
+                  .Returns(Task.CompletedTask);
+
+            return mock;
+        }
+
+        private Mock<IParticipantPublishMatchMetric> ParticipantPublishMatchMetricMock()
+        {
+            var mock = new Mock<IParticipantPublishMatchMetric>();
+            mock.Setup(m => m.PublishMatchMetric(It.IsAny<ParticipantMatchMetrics>()))
+                  .Returns(Task.CompletedTask);
+
+            return mock;
+        }
+
+        private Mock<INotificationService> NotificationServiceMock()
+        {
+            var notificationRecord = new NotificationRecord()
+            {
+                MatchRecord = new MatchModel()
+                {
+                    MatchId = It.IsAny<string>(),
+                    InitState = It.IsAny<string>(),
+                    MatchingState = It.IsAny<string>(),
+                    MatchingUrl = It.IsAny<string>(),
+                },
+                EmailToRecordMS = new EmailToModel()
+                {
+                    EmailTo = It.IsAny<string>()
+                },
+                EmailToRecord = new EmailToModel()
+                {
+                    EmailTo = It.IsAny<string>()
+                }
+            };
+            var mock = new Mock<INotificationService>();
+            mock.Setup(m => m.PublishNotificationOnMatchCreation(
+                notificationRecord)).Returns(Task.FromResult(true));
+            return mock;
+        }
+
+        private Mock<INotificationRecordBuilder> BuilderNotificationMock(NotificationRecord record)
+        {
+            var recordBuilder = new Mock<INotificationRecordBuilder>();
+            recordBuilder
+                .Setup(r => r.SetMatchModel(It.IsAny<MatchModel>()))
+                .Returns(recordBuilder.Object);
+            recordBuilder
+                .Setup(r => r.SetEmailToModel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(recordBuilder.Object);
+            recordBuilder
+              .Setup(r => r.SetEmailMatchingStateModel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+              .Returns(recordBuilder.Object);
+            recordBuilder
+               .Setup(r => r.SetDispositionModel(It.IsAny<DispositionModel>()))
+               .Returns(recordBuilder.Object);
+            recordBuilder
+                .Setup(r => r.GetRecord())
+                .Returns(record);
+
+            return recordBuilder;
+        }
+
+        private Mock<IStateInfoDao> StateInfoDaoMock()
+        {
+            var stateInfoDao = new Mock<IStateInfoDao>();
+            stateInfoDao
+                .Setup(r => r.GetStates())
+                    .ReturnsAsync(new List<StateInfoDbo>()
+                    {
+                    new StateInfoDbo() { Id = "1", State = "Echo Alpha", StateAbbreviation = "ea" , Email = "Ea@Nac.gov" },
+                    new StateInfoDbo() { Id = "2", State = "Echo Bravo", StateAbbreviation = "eb" , Email = "Eb@Nac.gov" },
+                    });
+            return stateInfoDao;
+        }
+
         private Mock<IMatchResAggregator> MatchResAggregatorMock(
-            MatchResRecord result
-        )
+                    MatchResRecord result
+                )
         {
             var mock = new Mock<IMatchResAggregator>();
             mock.Setup(r => r.Build(
@@ -123,16 +225,27 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                   .Returns(Task.CompletedTask);
+
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+            var stateInfoDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object,
+                stateInfoDao.Object,
+                notificationService.Object,
+                recordNotificationBuilder.Object
+
             );
 
             // Act
@@ -147,11 +260,19 @@ namespace Piipan.Match.Core.Tests.Services
                     r.States.SequenceEqual(record.States))),
                 Times.Once);
 
-            participantPublishSearchMetric.Verify(r => r.PublishSearchdMetric(
+            publishSearchMetrics.Verify(r => r.PublishSearchdMetric(
               It.Is<ParticipantSearchMetrics>(r => r.Data.First().MatchCount == search.MatchCount &&
                                                    r.Data.First().MatchCreation == search.MatchCreation &&
                                                    r.Data.First().SearchReason == search.SearchReason)),
                                                    Times.Once);
+
+            publishMatchMetrics.Verify(r => r.PublishMatchMetric(
+             It.Is<ParticipantMatchMetrics>(r => r.MatchId == "foo" &&
+                                                  r.InitState == record.Initiator
+                                                 )),
+                                                  Times.Once);
+            // Need to be called only when creating new Match Record
+            notificationService.Verify(r => r.PublishNotificationOnMatchCreation(It.Is<NotificationRecord>(p => p.MatchRecord.InitState == "Echo Alpha" && p.EmailToRecord.EmailTo == "Ea@Nac.gov" && p.EmailToRecordMS.EmailTo == "Eb@Nac.gov")), Times.Once);
         }
 
         [Fact]
@@ -185,16 +306,25 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                   .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+            var stateInfoDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object,
+                stateInfoDao.Object,
+                notificationService.Object,
+                recordNotificationBuilder.Object
+
             );
 
             // Act
@@ -241,16 +371,26 @@ namespace Piipan.Match.Core.Tests.Services
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
 
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+            var stateInfoDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
+
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object,
+                stateInfoDao.Object,
+                notificationService.Object,
+                recordNotificationBuilder.Object
+
             );
 
             // Act
@@ -304,22 +444,31 @@ namespace Piipan.Match.Core.Tests.Services
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+            var stateInfoDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object,
+                stateInfoDao.Object,
+                notificationService.Object,
+                recordNotificationBuilder.Object
+
             );
 
             // Act
             var resolvedResponse = await service.ResolveMatches(request, response, "ea");
             var firstMatch = resolvedResponse.Data.Results.First().Matches.First();
-            
+
             // Assert
             Assert.Equal($"{QueryToolUrl}/match/{openMatchId}", firstMatch.MatchUrl);
             Assert.Equal(openMatchId, firstMatch.MatchId);
@@ -362,17 +511,26 @@ namespace Piipan.Match.Core.Tests.Services
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
             var aggDao = MatchResAggregatorMock(new MatchResRecord());
 
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+            var stateInfoDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
 
             var service = new MatchEventService(
                 recordBuilder.Object,
                 recordApi.Object,
                 mreDao.Object,
-                aggDao.Object, 
+                aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object,
+                stateInfoDao.Object,
+                notificationService.Object,
+                recordNotificationBuilder.Object
+
             );
 
             // Act
@@ -431,13 +589,18 @@ namespace Piipan.Match.Core.Tests.Services
             response.Data.Results.Add(result);
 
             var mreDao = MatchResEventDaoMock(new List<IMatchResEvent>());
-            var aggDao = MatchResAggregatorMock(new MatchResRecord(){
+            var aggDao = MatchResAggregatorMock(new MatchResRecord()
+            {
                 Status = MatchRecordStatus.Closed
             });
 
-            var participantPublishSearchMetric = new Mock<IParticipantPublishSearchMetric>();
-            participantPublishSearchMetric.Setup(m => m.PublishSearchdMetric(It.IsAny<ParticipantSearchMetrics>()))
-                               .Returns(Task.CompletedTask);
+            var publishSearchMetrics = ParticipantPublishSearchMetricMock();
+            var publishMatchMetrics = ParticipantPublishMatchMetricMock();
+
+            var stateInfoDao = StateInfoDaoMock();
+            var notificationService = NotificationServiceMock();
+
+            var recordNotificationBuilder = BuilderNotificationMock(NotificationRecord);
 
             var service = new MatchEventService(
                 recordBuilder.Object,
@@ -445,7 +608,12 @@ namespace Piipan.Match.Core.Tests.Services
                 mreDao.Object,
                 aggDao.Object,
                 cryptographyClient,
-                participantPublishSearchMetric.Object
+                publishSearchMetrics.Object,
+                publishMatchMetrics.Object,
+                stateInfoDao.Object,
+                notificationService.Object,
+                recordNotificationBuilder.Object
+
             );
 
             // Act
@@ -456,11 +624,14 @@ namespace Piipan.Match.Core.Tests.Services
             Assert.Equal($"{QueryToolUrl}/match/{newId}", firstMatch.MatchUrl);
             Assert.Equal(newId, firstMatch.MatchId);
 
-            participantPublishSearchMetric.Verify(r => r.PublishSearchdMetric(
+            publishSearchMetrics.Verify(r => r.PublishSearchdMetric(
              It.Is<ParticipantSearchMetrics>(r => r.Data.First().MatchCount == search.MatchCount &&
                                                   r.Data.First().MatchCreation == search.MatchCreation &&
                                                   r.Data.First().SearchReason == search.SearchReason)),
              Times.Once);
+
+            notificationService.Verify(r => r.PublishNotificationOnMatchCreation(It.Is<NotificationRecord>(p => p.EmailToRecord.EmailTo == "Ea@Nac.gov")), Times.Never);
         }
+
     }
 }

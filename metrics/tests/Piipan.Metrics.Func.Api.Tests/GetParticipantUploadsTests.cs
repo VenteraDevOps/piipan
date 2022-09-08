@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Piipan.Metrics.Api;
 using Piipan.Metrics.Func.Api.Extensions;
 using Xunit;
-using Moq;
-using System.Threading.Tasks;
 
 namespace Piipan.Metrics.Func.Api.Tests
 {
@@ -31,7 +31,7 @@ namespace Piipan.Metrics.Func.Api.Tests
             {
                 Data = new List<ParticipantUpload>
                 {
-                    new ParticipantUpload 
+                    new ParticipantUpload
                     {
                         State = "ea",
                         UploadedAt = uploadedAt
@@ -39,17 +39,14 @@ namespace Piipan.Metrics.Func.Api.Tests
                 },
                 Meta = new Meta
                 {
-                    Page = 1,
                     PerPage = 1,
-                    Total = 1,
-                    NextPage = null,
-                    PrevPage = null
+                    Total = 1
                 }
             };
 
             var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
-                .Setup(m => m.GetUploads(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
                 .ReturnsAsync(expectedResponse);
 
             var function = new GetParticipantUploads(uploadApi.Object);
@@ -57,7 +54,7 @@ namespace Piipan.Metrics.Func.Api.Tests
             // Act
             var result = (await function.Run(request, logger.Object)) as JsonResult;
             var response = result.Value as GetParticipantUploadsResponse;
-            
+
             // Assert
             Assert.NotNull(response);
             Assert.Equal(response.Meta, expectedResponse.Meta);
@@ -82,7 +79,7 @@ namespace Piipan.Metrics.Func.Api.Tests
 
             var uploadApi = new Mock<IParticipantUploadReaderApi>();
             uploadApi
-                .Setup(m => m.GetUploads(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(m => m.GetUploads(It.IsAny<ParticipantUploadRequestFilter>()))
                 .ThrowsAsync(new Exception("upload api broke"));
 
             var function = new GetParticipantUploads(uploadApi.Object);

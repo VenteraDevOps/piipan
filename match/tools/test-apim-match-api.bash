@@ -19,6 +19,7 @@ MATCH_API_PATH="/match/v2/find_matches"
 JSON='{
     "data": [{
       "lds_hash": "a3cab51dd68da2ac3e5508c8b0ee514ada03b9f166f7035b4ac26d9c56aa7bf9d6271e44c0064337a01b558ff63fd282de14eead7e8d5a613898b700589bcdec",
+      "participant_id": "participant1",
       "search_reason": "application"
     }]
 }'

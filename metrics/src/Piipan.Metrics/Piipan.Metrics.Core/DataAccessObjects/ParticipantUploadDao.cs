@@ -28,22 +28,119 @@ namespace Piipan.Metrics.Core.DataAccessObjects
             _logger = logger;
         }
 
+        private string GenerateWhereClause(ParticipantUploadRequestFilter filter)
+        {
+            string whereClause = "";
+            if (!string.IsNullOrEmpty(filter.State))
+            {
+                whereClause += $"lower(state) = lower(@state) AND ";
+            }
+            if (!string.IsNullOrEmpty(filter.Status))
+            {
+                whereClause += $"lower(status) = lower(@status) AND ";
+            }
+            if (filter.StartDate != null)
+            {
+                whereClause += $"uploaded_at >= @dateFrom AND ";
+            }
+            if (filter.EndDate != null)
+            {
+                whereClause += $"uploaded_at < @dateTo AND ";
+            }
+            if (whereClause.EndsWith(" AND "))
+            {
+                // " AND " takes up 5 characters. Remove the last " AND "
+                whereClause = $" WHERE {whereClause[..^5]}";
+            }
+            return whereClause;
+        }
+        private object GenerateQueryObject(ParticipantUploadRequestFilter filter)
+        {
+            return new
+            {
+                state = filter.State,
+                dateFrom = filter.StartDate?.AddHours(-1 * filter.HoursOffset),
+                // We add a day here to make sure to grab all entries in the database for the day that they asked for
+                dateTo = filter.EndDate?.AddDays(1).AddHours(-1 * filter.HoursOffset),
+                status = filter.Status,
+                limit = filter.PerPage,
+                offset = filter.PerPage * (filter.Page - 1)
+            };
+        }
+
+
+
         /// <summary>
         /// Gets a count of uploads performed overall, or by a specific state
         /// </summary>
         /// <param name="state">The state being queried for a count of uploads performed</param>
         /// <returns>The number of uploads</returns>
-        public async Task<Int64> GetUploadCount(string? state)
+        public async Task<Int64> GetUploadCount(ParticipantUploadRequestFilter filter)
         {
-            var sql = "SELECT COUNT(*) from participant_uploads";
-            if (!String.IsNullOrEmpty(state))
-            {
-                sql += $" WHERE lower(state) LIKE @state";
-            }
+            var sql = "SELECT COUNT(*) from participant_uploads" + GenerateWhereClause(filter);
 
             using (var connection = await _dbConnectionFactory.Build())
             {
-                return await connection.ExecuteScalarAsync<Int64>(sql, new { state = state });
+                return await connection.ExecuteScalarAsync<Int64>(sql, GenerateQueryObject(filter));
+            }
+        }
+
+        private string GenerateStatisticsWhereClause(ParticipantUploadStatisticsRequest request)
+        {
+            string whereClause = "";
+            if (request.StartDate != null)
+            {
+                whereClause += $"uploaded_at >= @dateFrom AND ";
+            }
+            if (request.EndDate != null)
+            {
+                whereClause += $"uploaded_at < @dateTo AND ";
+            }
+            if (whereClause.EndsWith(" AND "))
+            {
+                // " AND " takes up 5 characters. Remove the last " AND "
+                whereClause = $" WHERE {whereClause[..^5]}";
+            }
+            return whereClause;
+        }
+
+        private object GenerateStatisticsQueryObject(ParticipantUploadStatisticsRequest request)
+        {
+            return new
+            {
+                dateFrom = request.StartDate?.AddHours(-1 * request.HoursOffset),
+                // We add a day here to make sure to grab all entries in the database for the day that they asked for
+                dateTo = request.EndDate?.AddDays(1).AddHours(-1 * request.HoursOffset),
+            };
+        }
+
+        private record ParticipantUploadStatisticsRow
+        {
+            public int Count { get; init; }
+            public string Status { get; init; }
+        }
+
+        public async Task<ParticipantUploadStatistics> GetUploadStatistics(ParticipantUploadStatisticsRequest request)
+        {
+            var sql = @"
+                SELECT
+                    count(distinct State) Count,
+                    status Status
+                FROM participant_uploads";
+
+            sql += GenerateStatisticsWhereClause(request);
+
+            sql += " GROUP BY Status";
+
+            using (var connection = await _dbConnectionFactory.Build())
+            {
+                var rows = await connection.QueryAsync<ParticipantUploadStatisticsRow>(sql, GenerateStatisticsQueryObject(request));
+                ParticipantUploadStatistics statistics = new ParticipantUploadStatistics
+                {
+                    TotalComplete = rows.FirstOrDefault(n => n.Status.Equals("Complete", StringComparison.OrdinalIgnoreCase))?.Count ?? 0,
+                    TotalFailure = rows.FirstOrDefault(n => n.Status.Equals("Failed", StringComparison.OrdinalIgnoreCase))?.Count ?? 0
+                };
+                return statistics;
             }
         }
 
@@ -54,7 +151,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
         /// <param name="limit">The number or records desired to be retrieved</param>
         /// <param name="offset">The offset in the set of matching upload records to be used as the start for the set of records to return </param>
         /// <returns>Task of IEnumerable of PartcipantUploads</returns>
-        public async Task<IEnumerable<ParticipantUpload>> GetUploads(string? state, int limit, int offset = 0)
+        public async Task<IEnumerable<ParticipantUpload>> GetUploads(ParticipantUploadRequestFilter filter)
         {
             var sql = @"
                 SELECT
@@ -67,10 +164,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
                     error_message ErrorMessage
                 FROM participant_uploads";
 
-            if (!String.IsNullOrEmpty(state))
-            {
-                sql += $" WHERE lower(state) LIKE lower(@state)";
-            }
+            sql += GenerateWhereClause(filter);
 
             sql += " ORDER BY uploaded_at DESC";
             sql += $" LIMIT @limit";
@@ -78,8 +172,7 @@ namespace Piipan.Metrics.Core.DataAccessObjects
 
             using (var connection = await _dbConnectionFactory.Build())
             {
-                return await connection
-                    .QueryAsync<ParticipantUpload>(sql, new { state = state, limit = limit, offset = offset });
+                return await connection.QueryAsync<ParticipantUpload>(sql, GenerateQueryObject(filter));
             }
         }
 

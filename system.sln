@@ -166,6 +166,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Shared.Notifications
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.States.Func.Api.IntegrationTests", "states\tests\Piipan.States.Func.Api.IntegrationTests\Piipan.States.Func.Api.IntegrationTests.csproj", "{B38CCADB-1F7E-4BC1-B286-212AA2491EC9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{041C39E8-3481-4BE1-983E-F5C3520C7C86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Core", "notifications\src\Piipan.Notifications.Core\Piipan.Notifications.Core.csproj", "{7033F765-F0A9-44FA-9F20-AC37E98DC05F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Func.Api", "notifications\src\Piipan.Notifications.Func.Api\Piipan.Notifications.Func.Api.csproj", "{F8E83E48-5BD0-4334-8C7D-3CC68BF1963F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3C37C50A-38C7-43C8-B9CC-B30B4FBB235C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Core.IntegrationTests", "notifications\tests\Piipan.Notifications.Core.Integration.Tests\Piipan.Notifications.Core.IntegrationTests.csproj", "{FA318239-A9C0-4478-AD80-DBE0CD1C849A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Core.Tests", "notifications\tests\Piipan.Notifications.Core.Tests\Piipan.Notifications.Core.Tests.csproj", "{1647DCC2-C9BB-4082-BB48-9EC74A4EC83C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notifications.Func.Api.Integration.Tests", "notifications\tests\Piipan.Notifications.Func.Api.Integration.Tests\Piipan.Notifications.Func.Api.Integration.Tests.csproj", "{00A837C9-7486-4973-9573-C47E5E0C492F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piipan.Notification.Common", "notifications\src\Piipan.Notification.Common\Piipan.Notification.Common.csproj", "{2DCC9438-E2EB-41F0-993D-A721E6E57D91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piipan.Notifications.Common.Tests", "notifications\tests\Piipan.Notifications.Common.Tests\Piipan.Notifications.Common.Tests.csproj", "{CC978639-6644-4082-B074-CDC7307EF2BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -404,6 +422,34 @@ Global
 		{B38CCADB-1F7E-4BC1-B286-212AA2491EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B38CCADB-1F7E-4BC1-B286-212AA2491EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B38CCADB-1F7E-4BC1-B286-212AA2491EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7033F765-F0A9-44FA-9F20-AC37E98DC05F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7033F765-F0A9-44FA-9F20-AC37E98DC05F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7033F765-F0A9-44FA-9F20-AC37E98DC05F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7033F765-F0A9-44FA-9F20-AC37E98DC05F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8E83E48-5BD0-4334-8C7D-3CC68BF1963F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8E83E48-5BD0-4334-8C7D-3CC68BF1963F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8E83E48-5BD0-4334-8C7D-3CC68BF1963F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8E83E48-5BD0-4334-8C7D-3CC68BF1963F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA318239-A9C0-4478-AD80-DBE0CD1C849A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA318239-A9C0-4478-AD80-DBE0CD1C849A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA318239-A9C0-4478-AD80-DBE0CD1C849A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA318239-A9C0-4478-AD80-DBE0CD1C849A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1647DCC2-C9BB-4082-BB48-9EC74A4EC83C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1647DCC2-C9BB-4082-BB48-9EC74A4EC83C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1647DCC2-C9BB-4082-BB48-9EC74A4EC83C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1647DCC2-C9BB-4082-BB48-9EC74A4EC83C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00A837C9-7486-4973-9573-C47E5E0C492F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00A837C9-7486-4973-9573-C47E5E0C492F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00A837C9-7486-4973-9573-C47E5E0C492F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00A837C9-7486-4973-9573-C47E5E0C492F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DCC9438-E2EB-41F0-993D-A721E6E57D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DCC9438-E2EB-41F0-993D-A721E6E57D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DCC9438-E2EB-41F0-993D-A721E6E57D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DCC9438-E2EB-41F0-993D-A721E6E57D91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC978639-6644-4082-B074-CDC7307EF2BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC978639-6644-4082-B074-CDC7307EF2BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC978639-6644-4082-B074-CDC7307EF2BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC978639-6644-4082-B074-CDC7307EF2BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -478,6 +524,14 @@ Global
 		{6CF03FA4-AB6A-4841-858C-A674168D01A5} = {9D76C087-50BA-499A-BC9C-9029DF0DE7F5}
 		{FD682461-E466-4A0C-A5D9-5AB551F8019D} = {692D4B76-E6E3-4BCA-B731-89943ED3C2C8}
 		{B38CCADB-1F7E-4BC1-B286-212AA2491EC9} = {FEC0F4AF-9F64-42C4-A7CC-848F37F9EAA0}
+		{7033F765-F0A9-44FA-9F20-AC37E98DC05F} = {041C39E8-3481-4BE1-983E-F5C3520C7C86}
+		{F8E83E48-5BD0-4334-8C7D-3CC68BF1963F} = {041C39E8-3481-4BE1-983E-F5C3520C7C86}
+		{3C37C50A-38C7-43C8-B9CC-B30B4FBB235C} = {041C39E8-3481-4BE1-983E-F5C3520C7C86}
+		{FA318239-A9C0-4478-AD80-DBE0CD1C849A} = {3C37C50A-38C7-43C8-B9CC-B30B4FBB235C}
+		{1647DCC2-C9BB-4082-BB48-9EC74A4EC83C} = {3C37C50A-38C7-43C8-B9CC-B30B4FBB235C}
+		{00A837C9-7486-4973-9573-C47E5E0C492F} = {3C37C50A-38C7-43C8-B9CC-B30B4FBB235C}
+		{2DCC9438-E2EB-41F0-993D-A721E6E57D91} = {041C39E8-3481-4BE1-983E-F5C3520C7C86}
+		{CC978639-6644-4082-B074-CDC7307EF2BC} = {3C37C50A-38C7-43C8-B9CC-B30B4FBB235C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B44BDF3-D32A-4F70-B573-1AD075EEF0EA}

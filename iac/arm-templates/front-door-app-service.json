@@ -66,6 +66,30 @@
             "metadata": {
                 "description": "Name of the rules engine to be created with Security Headers"
             }
+        },
+        "diagnosticSettingName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Diagnostic Setting Name."
+            }
+        },
+        "eventHubAuthorizationRuleId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Authorization Rule Id."
+            }
+        },
+        "eventHubName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Event Hub Name."
+            }
+        },
+        "workspaceId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify the Log Analytics Workspace Id."
+            }
         }
     },
     "variables": {
@@ -250,15 +274,16 @@
         },
         {
             /* https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/resource-manager-diagnostic-settings */
-            "apiVersion": "2021-05-01-preview",
             "type": "Microsoft.Network/frontdoors/providers/diagnosticSettings",
-            "name": "[concat(parameters('frontDoorName'), '/Microsoft.Insights/stream-logs-to-event-hub')]",
+            "name": "[concat(parameters('frontDoorName'), '/Microsoft.Insights/', parameters('diagnosticSettingName'))]",
+            "apiVersion": "2021-05-01-preview",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/frontdoors', parameters('frontDoorName'))]"
             ],
             "properties": {
-                "eventHubAuthorizationRuleId": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.EventHub/namespaces/', variables('eventhubName'), '/authorizationrules/RootManageSharedAccessKey')]",
-                "eventHubName": "logs",
+                "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                "eventHubName": "[parameters('eventHubName')]",
+                "workspaceId": "[parameters('workspaceId')]",
                 "logs": [
                     /* Category names from `az monitor diagnostic settings categories list` */
                     {

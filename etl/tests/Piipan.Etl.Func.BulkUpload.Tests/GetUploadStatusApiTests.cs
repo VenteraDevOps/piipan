@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json;
 using Piipan.Etl.Func.BulkUpload.Models;
 using Piipan.Participants.Api;
 using Piipan.Participants.Api.Models;
@@ -39,7 +40,51 @@ namespace Piipan.Etl.Func.BulkUpload.Tests
             Assert.Same(uploadDto, response.Data);
         }
 
-        
+        [Fact]
+        public async void GetUploadByIdReturnsCorrectVariables()
+        {
+            // Arrange
+            var participantUploadApi = new Mock<IParticipantUploadApi>();
+            var logger = new Mock<ILogger>();
+            var context = new DefaultHttpContext();
+            var request = context.Request;
+
+            UploadDto uploadDto = new UploadDto{
+                Id = 12345,
+                Publisher = "testPublisher",
+                UploadIdentifier = "0x8DA814242535F4D",
+                CreatedAt = new DateTime(),
+                ParticipantsUploaded = 40,
+                CompletedAt = new DateTime(),
+                Status =  "COMPLETE"
+            };
+
+            
+
+            participantUploadApi
+                .Setup(m => m.GetUploadById("upload1"))
+                .ReturnsAsync(uploadDto);
+
+            var function = new GetUploadStatusApi(participantUploadApi.Object);
+
+            // Act
+            var result = await function.GetUploadById(request, "upload1", logger.Object) as JsonResult;
+            var response = result.Value as UploadStatusApiResponse;
+
+            string serializedResponse = JsonConvert.SerializeObject(response);
+
+            // Assert
+            Assert.Same(uploadDto, response.Data);
+            Assert.DoesNotContain("testPublisher", serializedResponse);
+            Assert.DoesNotContain("12345", serializedResponse);
+            Assert.Contains("upload_identifier", serializedResponse);
+            Assert.Contains("created_at", serializedResponse);
+            Assert.Contains("participants_uploaded", serializedResponse);
+            Assert.Contains("completed_at", serializedResponse);
+            Assert.Contains("status", serializedResponse);
+        }
+
+
         [Fact]
         public async void GetUploadById_Returns_ApiErrorResponse_ForGeneralErrors()
         {

@@ -5,51 +5,14 @@
 
 @{
   ViewData["Title"] = "National Accuracy Clearinghouse Metrics Dashboard";
+  ParticipantUploadModel model = new ParticipantUploadModel() 
+    { 
+        ParticipantUploadResults = Model.ParticipantUploadResults,
+        ParticipantUploadFilter = Model.UploadRequest,
+        PageParams = Model.PageParams,
+        Total = Model.TotalPages,
+        Statistics = Model.UploadStatistics
+    };
 }
-<div class="grid-container margin-bottom-6">
-    <h1>@Model.Title</h1>
-
-    <section aria-label="search by state">
-        <form method="post" role="search">
-            <label class="usa-label" for="state">Search all uploads</label>
-            <div class="usa-search">
-                <input class="usa-input" id="search-field" type="search" name="state">
-                <button class="usa-button" type="submit">
-                    <span class="usa-search__submit-text">Search</span>
-                </button>
-             </div>
-        </form>
-    </section>
-
-    @if (!String.IsNullOrEmpty(Model.StateQuery))
-    {
-        <div class="margin-top-2">
-            <span>Searched for: <strong>@Model.StateQuery</strong></span>
-            <a asp-page="/ParticipantUploads" class="usa-button usa-button--unstyled margin-left-1">Clear search</a>
-        </div>
-    }
-
-    @if (Model.ParticipantUploadResults.Any())
-    {
-        ParticipantUploadModel uploadSingle = new ParticipantUploadModel() { ParticipantUploadResults = Model.ParticipantUploadResults };
-        <component type="typeof(Dashboard.Client.Components.ParticipantUploads)" render-mode="WebAssembly"
-        param-Upload="uploadSingle" />
-
-    }
-    @if (!String.IsNullOrEmpty(Model.RequestError))
-    {
-        <h3>@Model.RequestError</h3>
-    }
-    @if (String.IsNullOrEmpty(Model.RequestError) && !Model.ParticipantUploadResults.Any())
-    {
-        <h3>There were no results for your search</h3>
-    }
-    @if (!String.IsNullOrEmpty(Model.PrevPageParams))
-    {
-        <a href="@Model.PrevPageParams" class="usa-button usa-button--outline">Prev</a>
-    }
-    @if (!String.IsNullOrEmpty(Model.NextPageParams))
-    {
-        <a href="@Model.NextPageParams" class="usa-button usa-button--outline">Next</a>
-    }
-</div>
+<component type="typeof(Dashboard.Client.Components.ParticipantUploads.ParticipantUploads)" render-mode="WebAssembly"
+param-Upload="model" />

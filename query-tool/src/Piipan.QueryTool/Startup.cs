@@ -90,6 +90,7 @@ namespace Piipan.QueryTool
                 options.DefaultPolicy = AuthorizationPolicyBuilder.Build(Configuration
                     .GetSection(AuthorizationPolicyOptions.SectionName)
                     .Get<AuthorizationPolicyOptions>());
+
             });
 
             services.RegisterMatchClientServices(_env);
@@ -125,6 +126,7 @@ namespace Piipan.QueryTool
 
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
+            app.UseStatusCodePagesWithReExecute("/NotAuthorized", "?code={0}");
 
             //Perform middleware for custom 404 page
             app.Use(async (context, next) =>
@@ -133,6 +135,11 @@ namespace Piipan.QueryTool
                 {
                     context.Response.Headers.Add("X-Frame-Options", "DENY");
                     await next();
+                    if (context.Response.StatusCode == 403 &&
+                        (!context.Request.Path.Value?.TrimEnd('/').TrimEnd('\\').EndsWith("NotAuthorized", StringComparison.InvariantCultureIgnoreCase) ?? true))
+                    {
+                        context.Response.Redirect("/NotAuthorized");
+                    }
                     if (context.Response.StatusCode == 404 || context.Response.StatusCode == 500)
                     {
                         context.Request.Path = "/Error";

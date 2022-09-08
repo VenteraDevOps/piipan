@@ -9,6 +9,7 @@ namespace Piipan.Components.Modals
     public class ModalInfo
     {
         public RenderFragment RenderFragment { get; set; }
+        public string ModalId { get; set; }
         public bool ForceAction { get; set; }
     }
 }

@@ -31,7 +31,7 @@ main () {
 
   echo "This script will delete all resources hosted on $CLOUD_NAME in ${azure_env}."
   echo "CAUTION: This action is not reversible and will delete all data".
-  read -p "Proceed with bulk delete? (Yes or No) " -r
+  read -p "Proceed with bulk delete? (Yes or No) "  -r -t 10 &&
   if [[ $REPLY =~ ^[yY]es$ ]]; then
 
     purge "$MATCH_RESOURCE_GROUP"

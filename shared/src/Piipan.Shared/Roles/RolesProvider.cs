@@ -24,5 +24,14 @@ namespace Piipan.Shared.Roles
         {
             return _options?.EditMatch ?? Array.Empty<string>();
         }
+
+        /// <summary>
+        /// Returns which roles are acceptable when viewing a match.
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetMatchViewRoles()
+        {
+            return _options?.ViewMatch ?? Array.Empty<string>();
+        }
     }
 }

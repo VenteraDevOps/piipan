@@ -1,0 +1,40 @@
+﻿@using Piipan.Components.Alerts
+@using Piipan.Components.Enums
+@using System.Linq.Expressions
+@using Piipan.Dashboard.Client.Components
+@using Piipan.Dashboard.Client.Models
+@using Piipan.States.Api.Models
+@using Xunit
+@inherits BaseComponentTest<AppInitiator>
+
+@code {
+    /// <summary>
+    /// Create an AppInitiator component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        base.CreateTestComponent();
+        Component = Render<AppInitiator>(
+            @<AppInitiator InitialValues="@AppData">
+            </AppInitiator>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the app initiator copies data over to the injected AppData record
+    /// </summary>
+    [Fact]
+    public void AppInitiator_ShouldCopy_AppData()
+    {
+        // Arrange
+        CreateTestComponent();
+        var injectedAppData = Services.GetService<AppData>();
+
+        // Assert
+        Assert.Equal(AppData, injectedAppData);
+    }
+
+    #endregion
+}

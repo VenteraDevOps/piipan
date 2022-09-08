@@ -1,0 +1,54 @@
+﻿@using Piipan.Components.Alerts
+@using Piipan.Components.Enums
+@using System.Linq.Expressions
+@using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Models
+@using Piipan.QueryTool.Client.Components
+@inherits BaseComponentTest<AppInitiator>
+
+@code {
+    /// <summary>
+    /// Set the default initial values for this test component
+    /// </summary>
+    public AppInitiatorTests() : base()
+    {
+        InitialValues = new AppInitiator()
+            {
+                AppData = new AppData
+                {
+                    HelpDeskEmail = "test@usda.example",
+                    IsAuthorized = true
+                }
+            };
+    }
+
+    /// <summary>
+    /// Create a generic unauthorized banner component
+    /// </summary>
+    protected override void CreateTestComponent()
+    {
+        base.CreateTestComponent();
+        Component = Render<AppInitiator>(
+            @<AppInitiator AppData="InitialValues.AppData">
+            </AppInitiator>
+        );
+    }
+
+    #region Tests
+
+    /// <summary>
+    /// Verify the app initiator copies data over to the injected AppData record
+    /// </summary>
+    [Fact]
+    public void AppInitiator_ShouldCopy_AppData()
+    {
+        // Arrange
+        CreateTestComponent();
+        var injectedAppData = Services.GetService<AppData>();
+
+        // Assert
+        Assert.Equal(InitialValues.AppData, injectedAppData); // simply equal comparison since these are records
+    }
+
+    #endregion
+}

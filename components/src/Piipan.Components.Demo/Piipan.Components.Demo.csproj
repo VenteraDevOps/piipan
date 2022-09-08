@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
-	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.8" PrivateAssets="all" />
 	  <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
   </ItemGroup>
 	<!--
@@ -59,6 +59,16 @@
 	</Target>
   <ItemGroup>
     <ProjectReference Include="..\Piipan.Components\Piipan.Components.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\PaginationComponent.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\PaginationComponent.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Pagination.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\Pagination.razor" />
   </ItemGroup>
 
 

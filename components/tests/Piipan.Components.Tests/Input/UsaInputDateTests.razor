@@ -18,6 +18,13 @@
     private string validDate = "1990-01-01";
     private string invalidDate = "test";
     private bool badInput = false;
+    private const string JSFileRelativePath = "/Forms/UsaInputDate.razor.js";
+    BunitJSModuleInterop moduleInterop;
+
+    public UsaInputDateTests() : base()
+    {
+        moduleInterop = this.JSInterop.SetupModule($"./_content/Piipan.Components{JSFileRelativePath}");
+    }
 
     #region Tests
 
@@ -267,7 +274,7 @@
         form = componentFragment;
         Component = componentFragment.FindComponent<UsaInputDate>();
         inputElement = componentFragment.Find($".{InputClass}");
-        JSInterop.Setup<bool>("piipan.utilities.doesElementHaveInvalidInput", _ => true).SetResult(badInput);
+        moduleInterop.Setup<bool>("DoesElementHaveInvalidInput", _ => true).SetResult(badInput);
     }
 
     private void AssertHasNoErrors()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,9 +30,10 @@ namespace Piipan.QueryTool.Pages
         public MatchResApiResponse Match { get; set; } = null;
         public List<MatchResApiResponse> AvailableMatches { get; set; } = null;
         public List<ServerError> RequestErrors { get; private set; } = new();
-        public MatchDetailSaveResponseData MatchDetailSaveResponse { get; set; }
+        public MatchDetailData MatchDetailData { get; set; } = new MatchDetailData();
         public string UserState { get; set; } = "";
         public string[] RequiredRolesToEdit => _rolesProvider.GetMatchEditRoles();
+        public string[] RequiredRolesToView => _rolesProvider.GetMatchViewRoles();
 
         public MatchModel(ILogger<MatchModel> logger
                            , IMatchResolutionApi matchResolutionApi
@@ -58,15 +60,29 @@ namespace Piipan.QueryTool.Pages
             }
         }
 
-        private RedirectToPageResult RedirectToNotFoundMatch()
-        {
-            return RedirectToPage("Error", new { message = "Requested Match Not Found" });
-        }
-
         public async Task<IActionResult> OnGet([FromRoute] string id)
         {
             if (!string.IsNullOrWhiteSpace(id))
             {
+                if (!_rolesProvider.GetMatchViewRoles().Contains(Role))
+                {
+                    return UnauthorizedResult();
+                }
+                var referer = Request.GetTypedHeaders().Referer;
+                MatchDetailData.ReferralPage = MatchDetailReferralPage.Other;
+                if (referer != null)
+                {
+                    if (referer.Scheme.Equals(Request.Scheme, StringComparison.OrdinalIgnoreCase) && referer.Host.Equals(Request.Host.Host, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MatchDetailData.ReferralPage = referer.AbsolutePath.ToLower().Trim().TrimEnd('/') switch
+                        {
+                            "" => MatchDetailReferralPage.Query,
+                            "/match" => MatchDetailReferralPage.MatchSearch,
+                            var p when p == $"/match/{id}" => MatchDetailReferralPage.Self,
+                            _ => MatchDetailReferralPage.Other
+                        };
+                    }
+                }
                 //Prevents malicious user input
                 //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                 Regex r = new Regex("^[a-zA-Z0-9]*$");
@@ -76,18 +92,18 @@ namespace Piipan.QueryTool.Pages
                     //Reference: https://github.com/18F/piipan/pull/2692#issuecomment-1045071033
                     if (id.Length != 7)
                     {
-                        return RedirectToNotFoundMatch();
+                        return UnauthorizedResult();
                     }
 
                     Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                     if (Match == null)
                     {
-                        return RedirectToNotFoundMatch();
+                        return UnauthorizedResult();
                     }
                 }
                 else
                 {
-                    return RedirectToPage("Error", new { message = "MatchId not valid" });
+                    return UnauthorizedResult();
                 }
             }
             return Page();
@@ -132,7 +148,13 @@ namespace Piipan.QueryTool.Pages
             }
             else
             {
-                MatchDetailSaveResponse = new MatchDetailSaveResponseData() { SaveSuccess = false, FailedDispositionModel = DispositionData };
+                MatchDetailData.SaveSuccess = false;
+                MatchDetailData.FailedDispositionModel = DispositionData;
+                MatchDetailData.ReferralPage = DispositionData.MatchDetailReferralPage;
+                if (!_rolesProvider.GetMatchViewRoles().Contains(Role))
+                {
+                    return UnauthorizedResult();
+                }
                 if (!_rolesProvider.GetMatchEditRoles().Contains(Role))
                 {
                     _logger.LogError($"User {Email} does not have permissions to edit match details.");
@@ -170,8 +192,8 @@ namespace Piipan.QueryTool.Pages
                             var (_, failResponse) = await _matchResolutionApi.AddMatchResEvent(id, addEventRequest, Location);
                             if (string.IsNullOrEmpty(failResponse))
                             {
-                                MatchDetailSaveResponse.SaveSuccess = true;
-                                MatchDetailSaveResponse.FailedDispositionModel = null;
+                                MatchDetailData.SaveSuccess = true;
+                                MatchDetailData.FailedDispositionModel = null;
                             }
                             else
                             {
@@ -212,7 +234,7 @@ namespace Piipan.QueryTool.Pages
                 Match = await _matchResolutionApi.GetMatch(id, IsNationalOffice ? "*" : Location);
                 if (Match == null)
                 {
-                    return RedirectToNotFoundMatch();
+                    return UnauthorizedResult();
                 }
             }
             return Page();

@@ -8,7 +8,6 @@ namespace Piipan.Participants.Api.Models
         string UploadIdentifier { get; set; }
         DateTime CreatedAt { get; set; }
         string Publisher { get; set; }
-
         long? ParticipantsUploaded { get; set; }
         string ErrorMessage { get; set; }
         DateTime? CompletedAt { get; set; }

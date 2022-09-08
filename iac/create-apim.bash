@@ -99,6 +99,7 @@ main () {
   source "$(dirname "$0")"/env/"${azure_env}".bash
   source "$(dirname "$0")"/iac-common.bash
   verify_cloud
+  set_defaults
 
   APIM_NAME=${PREFIX}-apim-duppartapi-${ENV}
   PUBLISHER_NAME='API Administrator'
@@ -128,7 +129,7 @@ main () {
 
   get_upload_by_id_policy_path=$(dirname "$0")/apim-getuploadbyid-policy.xml
   get_upload_by_id_policy_xml=$(< "$get_upload_by_id_policy_path")
-  
+
   all_upload_operations_policy_path=$(dirname "$0")/apim-all-bulkupload-operations-policy.xml
   all_upload_operations_policy_xml=$(< "$all_upload_operations_policy_path")
 
@@ -159,8 +160,12 @@ main () {
         location="$LOCATION" \
         resourceTags="$RESOURCE_TAGS" \
         coreResourceGroup="$RESOURCE_GROUP" \
-        eventHubName="$EVENT_HUB_NAME" \
-        apimPolicyXml="$apim_policy_xml")
+        apimPolicyXml="$apim_policy_xml" \
+        diagnosticSettingName="${DIAGNOSTIC_SETTINGS_NAME}" \
+        eventHubAuthorizationRuleId="${EH_RULE_ID}" \
+        eventHubName="${EVENT_HUB_NAME}" \
+        workspaceId="${LOG_ANALYTICS_WORKSPACE_ID}" \
+        sku="${APIM_SKU}")
 
   apim_id=$(\
     az apim show \
@@ -218,7 +223,7 @@ main () {
       uploadStates="${state_abbrs}" \
       uploadPolicyXml="${upload_policy_xml}" \
       uploadByIdPolicyXml="${get_upload_by_id_policy_xml}" \
-      allUploadOperationsPolicyXml="${all_upload_operations_policy_xml}" 
+      allUploadOperationsPolicyXml="${all_upload_operations_policy_xml}"
 
   echo "Granting APIM identity contributor access to per-state storage accounts"
   upload_accounts=($(get_resources "$PER_STATE_STORAGE_TAG" "$RESOURCE_GROUP"))

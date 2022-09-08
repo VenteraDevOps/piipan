@@ -60,6 +60,22 @@ main () {
 
   printf "\n"
 
+    # grab url for metrics statistics api
+  function_uri_statistics=$(az functionapp function show \
+    --name "$METRICS_API_APP_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --function-name $METRICS_API_FUNCTION_NAME_STATISTICS \
+    --query invokeUrlTemplate \
+    --output tsv)
+
+  echo "Submitting request to ${function_uri_statistics}"
+  curl -X GET -i \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${token}" \
+    "${function_uri_statistics}"
+
+  printf "\n"
+
   script_completed
 }
 

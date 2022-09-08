@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Bunit;
-using Microsoft.AspNetCore.Components.Forms;
 using Piipan.Components.Alerts;
 using Piipan.Components.Forms;
+using Piipan.Components.Modals;
 using Piipan.Match.Api.Models;
 using Piipan.QueryTool.Client.Components;
+using Piipan.QueryTool.Client.Components.UnauthorizedBanners;
 using Piipan.QueryTool.Client.Models;
 using Xunit;
 using static Piipan.Components.Forms.FormConstants;
@@ -19,7 +21,6 @@ namespace Piipan.QueryTool.Tests.Components
     public class QueryFormTests : BaseComponentTest<QueryForm>
     {
         #region Tests
-        IRenderedComponent<QueryForm> queryForm = null;
         PiiQuery model = new PiiQuery();
         bool invalidDateInput = false;
         ComponentParameterCollectionBuilder<QueryForm> parameters = new ComponentParameterCollectionBuilder<QueryForm>();
@@ -44,11 +45,11 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Act
-            queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
-            queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
-            queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
-            queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
-            queryForm.Find("#QueryFormData_Query_CaseId").Change("456");
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123");
+            Component.Find("#QueryFormData_Query_CaseId").Change("456");
             inputElement.Change("recertification");
 
             // Assert
@@ -76,9 +77,9 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             Assert.Contains("This participant does not have a matching record in any other states.", alertBox.Markup);
-            Assert.False(queryForm.HasComponent<QueryResults>());
+            Assert.False(Component.HasComponent<QueryResults>());
         }
 
         /// <summary>
@@ -104,9 +105,9 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             Assert.Contains("This participant does not have a matching record in any other states.", alertBox.Markup);
-            Assert.False(queryForm.HasComponent<QueryResults>());
+            Assert.False(Component.HasComponent<QueryResults>());
         }
 
         /// <summary>
@@ -139,8 +140,85 @@ namespace Piipan.QueryTool.Tests.Components
             CreateTestComponent();
 
             // Assert
-            Assert.True(queryForm.HasComponent<QueryResults>());
-            Assert.False(queryForm.HasComponent<UsaAlertBox>());
+            Assert.True(Component.HasComponent<QueryResults>());
+            Assert.False(Component.HasComponent<UsaAlertBox>());
+        }
+
+        /// <summary>
+        /// Verify that if we have results that has a vulnerable individual, clicking it shows the vulnerable match modal
+        /// </summary>
+        [Fact]
+        public void Verify_VulnerableModal_ShownWhenClicked_VulnerableMatch()
+        {
+            // Arrange
+
+            // Add a result with no matches
+            InitialValues.QueryFormData.QueryResult = new()
+            {
+                Results = new()
+                {
+                    new()
+                    {
+                        Index = 1,
+                        Matches = new List<ParticipantMatch>()
+                        {
+                            new ()
+                            {
+                                MatchId = "1234",
+                                State = "ea",
+                                VulnerableIndividual = true
+                            }
+                        }
+                    }
+                }
+            };
+            CreateTestComponent();
+
+            var queryResults = Component.FindComponent<QueryResults>();
+            queryResults.Find("a").Click();
+
+            // Assert
+            var modalManager = Services.GetService<IModalManager>();
+            Assert.True(modalManager.OpenModals.First().ForceAction);
+            Assert.Equal(1, modalManager.OpenModals.Count);
+        }
+
+        /// <summary>
+        /// Verify that if we have results that has do not have a vulnerable individual, clicking it does NOT show the vulnerable match modal
+        /// </summary>
+        [Fact]
+        public void Verify_VulnerableModal_NotShownWhenClicked_NotVulnerableMatch()
+        {
+            // Arrange
+
+            // Add a result with no matches
+            InitialValues.QueryFormData.QueryResult = new()
+            {
+                Results = new()
+                {
+                    new()
+                    {
+                        Index = 1,
+                        Matches = new List<ParticipantMatch>()
+                        {
+                            new ()
+                            {
+                                MatchId = "1234",
+                                State = "ea",
+                                VulnerableIndividual = false
+                            }
+                        }
+                    }
+                }
+            };
+            CreateTestComponent();
+
+            var queryResults = Component.FindComponent<QueryResults>();
+            queryResults.Find("a").Click();
+
+            // Assert
+            var modalManager = Services.GetService<IModalManager>();
+            Assert.Empty(modalManager.OpenModals);
         }
 
         /// <summary>
@@ -151,18 +229,18 @@ namespace Piipan.QueryTool.Tests.Components
         {
             // Arrange
             CreateTestComponent();
-            var searchButton = queryForm.Find("#query-form-search-btn");
-            var form = queryForm.FindComponent<UsaForm>();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
 
             // Assert
             Assert.Equal("Search", searchButton.TextContent);
             Assert.False(searchButton.HasAttribute("disabled"));
 
             // Act
-            queryForm.Find("#QueryFormData_Query_LastName").Change("Name");
-            queryForm.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
-            queryForm.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
-            queryForm.Find("#QueryFormData_Query_ParticipantId").Change("123");
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123");
             inputElement.Change("other");
             bool isFormValid = false;
             await form.InvokeAsync(async () =>
@@ -187,8 +265,8 @@ namespace Piipan.QueryTool.Tests.Components
         {
             // Arrange
             CreateTestComponent();
-            var searchButton = queryForm.Find("#query-form-search-btn");
-            var form = queryForm.FindComponent<UsaForm>();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
 
             // Assert
             Assert.Equal("Search", searchButton.TextContent);
@@ -212,19 +290,39 @@ namespace Piipan.QueryTool.Tests.Components
         }
 
         /// <summary>
+        /// Verify that when you have authorization the form should not be disabled
+        /// </summary>
+        [Fact]
+        public void Form_Should_Be_Enabled_When_Authorized()
+        {
+            // Arrange
+            AppData.IsAuthorized = true;
+            CreateTestComponent();
+
+            // Assert
+            Assert.False(Component.HasComponent<GenericUnauthorizedBanner>());
+
+            var wrapper = Component.Find("#snap-participants-query-form-wrapper");
+            Assert.False(wrapper.ClassList.Contains("disabled-area"));
+            Assert.False(wrapper.HasAttribute("inert")); // Inert makes it so the fields cannot be entered
+        }
+
+        /// <summary>
         /// Verify that when you don't have a state location that the button is disabled
         /// </summary>
         [Fact]
-        public void Button_Should_Not_Be_Enabled_When_Location_Is_Not_A_State()
+        public void Form_Should_Be_Disabled_When_Not_Authorized()
         {
             // Arrange
-            InitialValues.QueryFormData.Location = "National";
+            AppData.IsAuthorized = false;
             CreateTestComponent();
-            var searchButton = queryForm.Find("#query-form-search-btn");
 
             // Assert
-            Assert.Equal("Search", searchButton.TextContent);
-            Assert.True(searchButton.HasAttribute("disabled"));
+            Assert.True(Component.HasComponent<GenericUnauthorizedBanner>());
+
+            var wrapper = Component.Find("#snap-participants-query-form-wrapper");
+            Assert.True(wrapper.ClassList.Contains("disabled-area"));
+            Assert.True(wrapper.HasAttribute("inert")); // Inert makes it so the fields cannot be entered
         }
 
         /// <summary>
@@ -240,7 +338,7 @@ namespace Piipan.QueryTool.Tests.Components
             };
             CreateTestComponent();
 
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             var alertBoxErrors = alertBox.FindAll("li");
 
             // Assert
@@ -268,7 +366,7 @@ namespace Piipan.QueryTool.Tests.Components
         {
             // Arrange
             CreateTestComponent();
-            var form = queryForm.FindComponent<UsaForm>();
+            var form = Component.FindComponent<UsaForm>();
 
             // Act
             bool isFormValid = false;
@@ -280,7 +378,7 @@ namespace Piipan.QueryTool.Tests.Components
             {
                 await form.Instance.OnBeforeSubmit(isFormValid);
             });
-            var alertBox = queryForm.FindComponent<UsaAlertBox>();
+            var alertBox = Component.FindComponent<UsaAlertBox>();
             var alertBoxErrors = alertBox.FindAll("li");
             var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
 
@@ -312,7 +410,158 @@ namespace Piipan.QueryTool.Tests.Components
                 Assert.Contains(errors[i], error);
             }
         }
+        /// <summary>
+        /// Verify that when there are special chars in Participant ID
+        /// and above the field
+        /// </summary>
+        [Fact]
+        public async Task Form_Should_Show_Errors_Special_chars()
+        {
+            // Arrange
+            CreateTestComponent();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
 
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.False(searchButton.HasAttribute("disabled"));
+
+            // Act
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123-_@abc");
+            Component.Find("#QueryFormData_Query_CaseId").Change("Case123-_#abc");
+            inputElement.Change("other");
+            bool isFormValid = false;
+            await form.InvokeAsync(async () =>
+            {
+                isFormValid = await form.Instance.ValidateForm();
+            });
+            await form.InvokeAsync(async () =>
+            {
+                await form.Instance.OnBeforeSubmit(isFormValid);
+            });
+
+
+            var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
+
+            // Assert
+            Assert.False(isFormValid);
+
+            Assert.Equal(2, inputErrorMessages.Count);
+
+            List<string> errors = new List<string>
+            {
+                "Participant ID must contain uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), underscore (_), dash (-).",
+                "Case Number must contain uppercase letters (A-Z), lowercase letters (a-z), numbers (0-9), underscore (_), dash (-)."
+            };
+
+
+            for (int i = 0; i < inputErrorMessages.Count; i++)
+            {
+                string error = inputErrorMessages[i].TextContent.Replace("\n", "");
+                error = Regex.Replace(error, @"\s+", " ");
+                Assert.Contains(errors[i], error);
+            }
+        }
+        /// <summary>
+        /// Verify that when there are special chars in Participant ID
+        /// and above the field
+        /// </summary>
+        [Fact]
+        public async Task Form_Should_Validation_Passed_With_Accepted_Char()
+        {
+            // Arrange
+            CreateTestComponent();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
+
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.False(searchButton.HasAttribute("disabled"));
+
+            // Act
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("123-_abc");
+            Component.Find("#QueryFormData_Query_CaseId").Change("Case123-_abc");
+            inputElement.Change("other");
+            bool isFormValid = false;
+            await form.InvokeAsync(async () =>
+            {
+                isFormValid = await form.Instance.ValidateForm();
+            });
+            await form.InvokeAsync(async () =>
+            {
+                await form.Instance.OnBeforeSubmit(isFormValid);
+            });
+
+
+            var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
+
+            // Assert
+            Assert.True(isFormValid);
+
+            Assert.Equal(0, inputErrorMessages.Count);
+
+        }
+        /// <summary>
+        /// Verify that when there are special chars in Participant ID
+        /// and above the field
+        /// </summary>
+        [Fact]
+        public async Task Form_Should_Show_Errors_Max_Length()
+        {
+            // Arrange
+            CreateTestComponent();
+            var searchButton = Component.Find("#query-form-search-btn");
+            var form = Component.FindComponent<UsaForm>();
+
+            // Assert
+            Assert.Equal("Search", searchButton.TextContent);
+            Assert.False(searchButton.HasAttribute("disabled"));
+
+            // Act
+            Component.Find("#QueryFormData_Query_LastName").Change("Name");
+            Component.Find("#QueryFormData_Query_DateOfBirth").Change("1997-01-01");
+            Component.Find("#QueryFormData_Query_SocialSecurityNum").Input("550-01-6981");
+            Component.Find("#QueryFormData_Query_ParticipantId").Change("This a Test for large string which more than 20 chars.");
+            Component.Find("#QueryFormData_Query_CaseId").Change("This a Test for large string which more than 20 chars.");
+            inputElement.Change("other");
+            bool isFormValid = false;
+            await form.InvokeAsync(async () =>
+            {
+                isFormValid = await form.Instance.ValidateForm();
+            });
+            await form.InvokeAsync(async () =>
+            {
+                await form.Instance.OnBeforeSubmit(isFormValid);
+            });
+
+
+            var inputErrorMessages = form.FindAll($".{InputErrorMessageClass}");
+
+            // Assert
+            Assert.False(isFormValid);
+
+            Assert.Equal(2, inputErrorMessages.Count);
+
+            List<string> errors = new List<string>
+            {
+                "Participant ID can be maximum 20 characters.",
+                "Case Number can be maximum 20 characters."
+            };
+
+
+            for (int i = 0; i < inputErrorMessages.Count; i++)
+            {
+                string error = inputErrorMessages[i].TextContent.Replace("\n", "");
+                error = Regex.Replace(error, @"\s+", " ");
+                Assert.Contains(errors[i], error);
+            }
+        }
         #endregion Tests
 
         #region Helper Function
@@ -322,17 +571,17 @@ namespace Piipan.QueryTool.Tests.Components
         /// </summary>
         protected override void CreateTestComponent()
         {
+            base.CreateTestComponent();
             JSInterop.SetupVoid("piipan.utilities.registerFormValidation", _ => true).SetVoidResult();
             JSInterop.Setup<int>("piipan.utilities.getCursorPosition", _ => true).SetResult(1);
             JSInterop.SetupVoid("piipan.utilities.setCursorPosition", _ => true).SetVoidResult();
             JSInterop.SetupVoid("piipan.utilities.scrollToElement", _ => true).SetVoidResult();
             JSInterop.Setup<bool>("piipan.utilities.doesElementHaveInvalidInput", _ => true).SetResult(invalidDateInput);
-            var componentFragment = RenderComponent<QueryForm>((builder) =>
+            Component = RenderComponent<QueryForm>((builder) =>
             {
                 builder.Add(n => n.QueryFormData, InitialValues.QueryFormData);
             });
-            queryForm = componentFragment;
-            inputElement = componentFragment.Find($".{InputRadioClass}");
+            inputElement = Component.Find($".{InputRadioClass}");
         }
 
 

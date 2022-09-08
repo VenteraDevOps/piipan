@@ -16,6 +16,7 @@ namespace Piipan.Components.Tests
     {
         public BaseTest()
         {
+            JSInterop.Mode = JSRuntimeMode.Loose;
             Services.AddModalManager();
             Services.AddPiipanNavigationManager();
         }

@@ -33,13 +33,19 @@ namespace Piipan.Shared.Http
         /// Send an asynchronous GET request to an API endpoint
         /// </summary>
         /// <param name="path">path portion of the API endpoint</param>
-        Task<TResponse> GetAsync<TResponse>(string path);
+        Task<TResponse> GetAsync<TResponse, TRequest>(string path, TRequest requestObject) where TRequest : class, new();
+
+        /// <summary>
+        /// Send an asynchronous GET request to an API endpoint
+        /// </summary>
+        /// <param name="path">path portion of the API endpoint</param>
+        Task<TResponse> GetAsync<TResponse>(string path, string query = null);
 
         /// <summary>
         /// Attempts to send an asynchronous GET request to an API endpoint. If a 404 is not found, 
         /// it will return the default TResponse. Will return the status code whether a 404 or a success.
         /// </summary>
         /// <param name="path">path portion of the API endpoint</param>
-        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, IEnumerable<(string, string)> headerFactory = null);
+        Task<(TResponse Response, int StatusCode)> TryGetAsync<TResponse>(string path, IEnumerable<(string, string)> headerFactory = null, string query = null);
     }
 }

@@ -15,6 +15,7 @@ namespace Piipan.Match.Api.Models
 
         [JsonProperty("lds_hash",
             NullValueHandling = NullValueHandling.Ignore)]
+        [JsonIgnore]
         public string LdsHash { get; set; }
 
         [JsonProperty("state")]

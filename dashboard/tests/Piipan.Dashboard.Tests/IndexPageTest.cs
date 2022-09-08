@@ -1,21 +1,21 @@
-using Xunit;
-using Piipan.Dashboard.Pages;
-using Microsoft.Extensions.Logging.Abstractions;
-using Piipan.Shared.Claims;
-using Moq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using Piipan.Dashboard.Pages;
+using Piipan.Shared.Claims;
+using Xunit;
 
 namespace Piipan.Dashboard.Tests
 {
-    public class IndexPageTests
+    public class IndexPageTests : BasePageTest
     {
         [Fact]
         public void BeforeOnGet_EmailIsCorrect()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider);
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), serviceProviderMock());
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
@@ -26,17 +26,18 @@ namespace Piipan.Dashboard.Tests
         }
 
         [Fact]
-        public void AfterOnGet_EmailIsCorrect()
+        public async Task AfterOnGet_EmailAndStatesAreCorrect()
         {
             // arrange
-            var mockClaimsProvider = claimsProviderMock("noreply@tts.test");
-            var pageModel = new IndexModel(new NullLogger<IndexModel>(), mockClaimsProvider);
+            var pageModel = new IndexModel(new NullLogger<IndexModel>(), serviceProviderMock());
             pageModel.PageContext.HttpContext = contextMock();
 
             // act
+            await OnPageHandlerExecutionAsync(pageModel, "OnGet");
             pageModel.OnGet();
 
             // assert
+            Assert.NotEmpty(pageModel.AppData.StateInfo.Results);
             Assert.Equal("noreply@tts.test", pageModel.Email);
             Assert.Equal("https://tts.test", pageModel.BaseUrl);
         }

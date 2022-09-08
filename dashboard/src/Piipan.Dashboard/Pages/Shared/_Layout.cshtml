@@ -1,12 +1,19 @@
-﻿<!DOCTYPE html>
+﻿@using Piipan.Dashboard.Client.Components
+@model BasePageModel
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
+    <base href="/" />
     <link rel="stylesheet" href="~/css/styles.css" />
+    <link href="/Piipan.Dashboard.styles.css" rel="stylesheet" asp-append-version="true" />
+    <link href="/Piipan.Dashboard.Client.styles.css" rel="stylesheet" asp-append-version="true" />
     <script src="~/js/uswds-init.min.js" asp-append-version="true"></script>
 </head>
+<component type="typeof(AppInitiator)" param-InitialValues="Model.AppData" render-mode="WebAssembly" />
 <body>
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
     <partial name="_UsaBanner" />
@@ -53,5 +60,6 @@
     </div>
     <script src="~/js/uswds.min.js" asp-append-version="true"></script>
     <script src="/_framework/blazor.webassembly.js" asp-append-version="true"></script>
+    <script src="/customjs/utilities.js" asp-append-version="true"></script>
 </body>
 </html>

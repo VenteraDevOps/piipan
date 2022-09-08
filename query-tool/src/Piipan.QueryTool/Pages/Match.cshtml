@@ -1,24 +1,30 @@
 ﻿@page "{id?}"
 @using Microsoft.AspNetCore.Antiforgery
 @using Piipan.Match.Api.Models.Resolution
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.States.Api.Models
 @using Piipan.QueryTool.Client.Models
-<link rel="stylesheet" href="app.css" type="text/css" />
 @inject IAntiforgery antiforgery
 @model Piipan.QueryTool.Pages.MatchModel
 @{
-    ViewData["Title"] = "NAC Participant Search";
+    ViewData["Title"] = Model.Match != null || !Model.AppData.IsAuthorized ? "NAC Match Detail" : "NAC Match Search";
+    ViewData["SelectedPage"] = Model.MatchDetailData?.ReferralPage switch
+    {
+        MatchDetailReferralPage.MatchSearch => "match",
+        MatchDetailReferralPage.Query => "",
+        _ => null
+    };
 }
 
-@if (Model.Match != null)
+@if (Model.Match != null || !Model.AppData.IsAuthorized)
 {
     Model.InitializeUserState(); 
     <div class="grid-container">
-        <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetail)" render-mode="WebAssembly"
+        <component type="typeof(QueryTool.Client.Components.MatchDetail.MatchDetailWrapper)" render-mode="WebAssembly"
         param-Match="ParameterBase<MatchResApiResponse>.FromObject(Model.Match)"
         param-StateInfo="ParameterBase<StatesInfoResponse>.FromObject(Model.StateInfo)"
         param-LoggedInUsersState="Model.UserState"
-        param-SaveResponse="Model.MatchDetailSaveResponse"
+        param-MatchDetailInfo="Model.MatchDetailData"
         param-ServerErrors="Model.RequestErrors"
         param-Role="Model.Role"
         param-RequiredRolesToEdit="Model.RequiredRolesToEdit"

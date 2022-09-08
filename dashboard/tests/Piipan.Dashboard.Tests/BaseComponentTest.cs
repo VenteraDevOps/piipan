@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Piipan.Components.Modals;
+using Piipan.Components.Routing;
+using Piipan.Dashboard.Client.Helpers;
+using Piipan.Dashboard.Client.Models;
+using Piipan.States.Api.Models;
 
 namespace Piipan.Dashboard.Tests
 {
@@ -17,6 +19,7 @@ namespace Piipan.Dashboard.Tests
     public abstract class BaseComponentTest<T> : TestContext where T : IComponent, new()
     {
         protected T InitialValues { get; set; } = new T();
+        protected AppData AppData { get; set; } = new AppData();
 
         protected IRenderedComponent<T> Component { get; set; }
 
@@ -26,6 +29,32 @@ namespace Piipan.Dashboard.Tests
                 parameters.Add(parameter, value));
         }
 
-        protected abstract void CreateTestComponent();
+        public BaseComponentTest()
+        {
+            JSInterop.Mode = JSRuntimeMode.Loose;
+            Services.AddModalManager();
+            Services.AddPiipanNavigationManager();
+            AppData.StateInfo = new StatesInfoResponse
+            {
+                Results = new System.Collections.Generic.List<StateInfoResponseData>
+                {
+                    new StateInfoResponseData
+                    {
+                        Email = "ea-test@usda.example",
+                        Phone = "123-123-1234",
+                        State = "Echo Alpha",
+                        StateAbbreviation = "EA"
+                    }
+                }
+            };
+        }
+
+        protected virtual void CreateTestComponent()
+        {
+            Services.TryAddSingleton<AppData>();
+            var appData = Services.GetService<AppData>();
+
+            PropertyCopier.CopyPropertiesTo(AppData, appData);
+        }
     }
 }

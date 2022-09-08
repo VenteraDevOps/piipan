@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\metrics\src\Piipan.Metrics\Piipan.Metrics.Api\Piipan.Metrics.Api.csproj" />
+    <ProjectReference Include="..\..\..\..\notifications\src\Piipan.Notifications.Core\Piipan.Notifications.Core.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared.Cryptography\Piipan.Shared.Cryptography.csproj" />
+    <ProjectReference Include="..\..\..\..\states\src\Piipan.States\Piipan.States.Core\Piipan.States.Core.csproj" />
     <ProjectReference Include="..\Piipan.Match.Api\Piipan.Match.Api.csproj" />
     <ProjectReference Include="..\..\..\..\shared\src\Piipan.Shared\Piipan.Shared.csproj" />
     <ProjectReference Include="..\..\..\..\participants\src\Piipan.Participants\Piipan.Participants.Api\Piipan.Participants.Api.csproj" />
@@ -19,9 +21,9 @@
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Nanoid" Version="2.1.0" />
-    <PackageReference Include="Npgsql" Version="6.0.5" />
+    <PackageReference Include="Npgsql" Version="6.0.6" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
-    <PackageReference Include="FluentValidation" Version="11.1.0" />
+    <PackageReference Include="FluentValidation" Version="11.2.0" />
   </ItemGroup>
 
 </Project>

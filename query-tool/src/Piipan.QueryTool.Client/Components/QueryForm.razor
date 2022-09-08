@@ -5,11 +5,12 @@
 @using System.Net.Http
 @using Piipan.Components.Alerts
 @using Piipan.Match.Api.Models
+@using Piipan.QueryTool.Client.Components.UnauthorizedBanners
 @using Piipan.QueryTool.Client.Models
 @using Piipan.Shared.API.Enums
 @using static Piipan.Components.Forms.FormConstants
 @inject NavigationManager NavigationManager
-
+@inject AppData AppData
 
 @code {
     [Parameter] public QueryFormModel QueryFormData { get; set; } = new();
@@ -18,7 +19,6 @@
         (QueryFormData.QueryResult.Results.Count == 0 || QueryFormData.QueryResult.Results[0].Matches.Count() == 0);
     private bool showNoResultsAlert = true;
     private bool searching = false;
-    private bool canPerformSearch = false;
     List<(string Property, string Error)> serverErrorList;
     protected override void OnInitialized()
     {
@@ -28,9 +28,6 @@
         {
             serverErrorList = new(QueryFormData.ServerErrors.Select(n => (n.Property, n.Error)));
         }
-
-        // Only locations with length 2, which are states, can perform a search.
-        canPerformSearch = QueryFormData.Location?.Length == 2;
     }
     private Task SubmitForm(bool valid)
     {
@@ -48,53 +45,59 @@
 }
 
 <h1>Search for SNAP Participants</h1>
-<p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
-@if (NoResults && showNoResultsAlert)
+@if (!AppData.IsAuthorized)
 {
-    <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Info">
-        <p>This participant does not have a matching record in any other states.</p>
-    </UsaAlertBox>
+    <GenericUnauthorizedBanner style="margin-bottom: 2rem;" />    
 }
-@if (QueryFormData.Query != null)
-{
-    <UsaForm Id="snap-participants-query-form" InitialErrors="serverErrorList" Model="QueryFormData.Query" method="post" OnBeforeSubmit="SubmitForm">
-        <input type="hidden" name="__RequestVerificationToken" value="@QueryFormData.Token" />
-        <legend class="usa-sr-only">participant information</legend>
-        <UsaFormGroup>
-            <UsaInputText @bind-Value="QueryFormData.Query.LastName" />
-        </UsaFormGroup>
-        <UsaFormGroup>
-            <UsaInputDate @bind-Value="QueryFormData.Query.DateOfBirth" />
-        </UsaFormGroup>
-        <UsaFormGroup>
-            <HintContent>###-##-####</HintContent>
-            <ChildContent>
-                <UsaInputSSN @bind-Value="QueryFormData.Query.SocialSecurityNum" />
-            </ChildContent>
-        </UsaFormGroup>
-        <UsaFormGroup>
-            <UsaInputText @bind-Value="QueryFormData.Query.ParticipantId" Width="118" />
-        </UsaFormGroup>
-        <UsaFormGroup>
-            <UsaInputText @bind-Value="QueryFormData.Query.CaseId" Width="143" />
-        </UsaFormGroup>
-        <UsaRadioGroup @bind-Value="QueryFormData.Query.SearchReason">
-            <ChildContent>
-                @{
-                    foreach (ValidSearchReasons val in  Enum.GetValues(typeof(ValidSearchReasons)))
-                    {
-                        <UsaRadio Value="val.ToString()">@EnumHelper.GetDisplayName(val)</UsaRadio>
-                    }
-            }
-            </ChildContent>
-        </UsaRadioGroup>
-        <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@(searching || !canPerformSearch)">@(searching ? "Searching..." : "Search")</button>
-    </UsaForm>
-}
-@if (QueryFormData.QueryResult?.Results?.Count > 0 && QueryFormData.QueryResult.Results[0].Matches?.Count() > 0)
-{
-    <QueryResults QueryResult="QueryFormData.QueryResult" />
-}
-else {
-    <section class="border-top-1px border-base-light margin-top-6"></section>
-}
+<div id="snap-participants-query-form-wrapper" class="@(AppData.IsAuthorized ? "" : "disabled-area")" inert="@(!AppData.IsAuthorized)">
+    <p style="margin-bottom: 0;"><span class="usa-required">*</span> indicates a required field</p>
+    @if (NoResults && showNoResultsAlert)
+    {
+        <UsaAlertBox Slim="true" AlertSeverity="AlertSeverity.Info">
+            <p>This participant does not have a matching record in any other states.</p>
+        </UsaAlertBox>
+    }
+    @if (QueryFormData.Query != null)
+    {
+        <UsaForm Id="snap-participants-query-form" InitialErrors="serverErrorList" Model="QueryFormData.Query" method="post" OnBeforeSubmit="SubmitForm">
+            <input type="hidden" name="__RequestVerificationToken" value="@QueryFormData.Token" />
+            <legend class="usa-sr-only">participant information</legend>
+            <UsaFormGroup>
+                <UsaInputText @bind-Value="QueryFormData.Query.LastName" />
+            </UsaFormGroup>
+            <UsaFormGroup>
+                <UsaInputDate @bind-Value="QueryFormData.Query.DateOfBirth" />
+            </UsaFormGroup>
+            <UsaFormGroup>
+                <HintContent>###-##-####</HintContent>
+                <ChildContent>
+                    <UsaInputSSN @bind-Value="QueryFormData.Query.SocialSecurityNum" />
+                </ChildContent>
+            </UsaFormGroup>
+            <UsaFormGroup>
+                <UsaInputText @bind-Value="QueryFormData.Query.ParticipantId" Width="118" maxlength="20" />
+            </UsaFormGroup>
+            <UsaFormGroup>
+                <UsaInputText @bind-Value="QueryFormData.Query.CaseId" Width="143"  maxlength="20" />
+            </UsaFormGroup>
+            <UsaRadioGroup @bind-Value="QueryFormData.Query.SearchReason">
+                <ChildContent>
+                    @{
+                        foreach (ValidSearchReasons val in  Enum.GetValues(typeof(ValidSearchReasons)))
+                        {
+                                <UsaRadio Value="val.ToString()">@EnumHelper.GetDisplayName(val)</UsaRadio>
+                        }
+                }
+                </ChildContent>
+            </UsaRadioGroup>
+            <button class="usa-button" type="submit" id="query-form-search-btn" disabled="@(searching)">@(searching ? "Searching..." : "Search")</button>
+        </UsaForm>
+    }
+    @if (QueryFormData.QueryResult?.Results?.Count > 0 && QueryFormData.QueryResult.Results[0].Matches?.Count() > 0)
+    {
+        <QueryResults QueryResult="QueryFormData.QueryResult" />
+    }
+    else {
+        <section class="border-top-1px border-base-light margin-top-6"></section>
+    }
+</div>

@@ -5,9 +5,7 @@ namespace Piipan.Metrics.Core.Builders
     public interface IMetaBuilder
     {
         Meta Build();
-        IMetaBuilder SetPage(int page);
-        IMetaBuilder SetPerPage(int perPage);
-        IMetaBuilder SetState(string state);
+        IMetaBuilder SetFilter(ParticipantUploadRequestFilter filter);
         IMetaBuilder SetTotal(long total);
     }
 }

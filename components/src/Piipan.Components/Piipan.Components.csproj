@@ -13,12 +13,14 @@
 
   <ItemGroup>
     <None Include="Alerts\UsaAlertBox.razor" />
+    <None Include="Tables\UsaTable.razor" />
     <None Include="Tag\UsaTag.razor" />
+    <None Include="Tooltips\UsaTooltip.razor" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.8" />
   </ItemGroup>
 
 

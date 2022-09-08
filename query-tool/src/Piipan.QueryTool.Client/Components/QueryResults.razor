@@ -1,7 +1,13 @@
-﻿@using Piipan.Match.Api.Models
+﻿@using Piipan.Components.Modals
+@using Piipan.Components.Routing
+@using Piipan.Components.Tables
+@using Piipan.Match.Api.Models
 @using Piipan.QueryTool.Client.Helpers
+@using Piipan.QueryTool.Client.Modals
 @using Piipan.QueryTool.Client.Models
 @inject IJSRuntime JSRuntime
+@inject IModalManager ModalManager
+@inject PiipanNavigationManager NavigationManager
 @code {
     [Parameter] public OrchMatchResponseData QueryResult { get; set; }
 
@@ -13,6 +19,30 @@
         }
         await base.OnAfterRenderAsync(firstRender);
     }
+    private void ResultClicked(ParticipantMatch record)
+    {
+        void Navigate()
+        {
+            NavigationManager.NavigateTo($"/match/{record.MatchId}", true);
+        }
+        if (record.VulnerableIndividual == true)
+        {
+            ModalManager.Show<VulnerableIndividualModal>(
+                new VulnerableIndividualModal()
+                {
+                    ContinueCallback = Navigate
+                },
+                new ModalInfo
+                {
+                    ForceAction = true
+                }
+            );
+        }
+        else
+        {
+            Navigate();
+        }
+    }
 }
 
 <section class="border-top-1px border-base-light margin-top-6" id="query-results-area">
@@ -20,22 +50,17 @@
     <p>This participant was found in another state. Select the Match ID for more information.</p>
     @foreach (var result in QueryResult.Results)
     {
-        <table class="usa-table">
-        <thead>
-            <tr>
-                <th scope="col">Match ID</th>
-                <th scope="col">Matching State</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var record in result.Matches)
-                {
-                    <tr>
-                        <td><a href="/match/@record.MatchId">@record.MatchId</a></td>
-                        <td>@(StateHelper.GetStateName(record.State))</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <UsaTable Data="result.Matches">
+            <UsaTableColumn T="ParticipantMatch" Name="Match ID">
+                <Template Context="record">
+                    <a href="/match/@record.MatchId" @onclick="@(() => ResultClicked(record))" @onclick:preventDefault>@record.MatchId</a>
+                </Template>
+            </UsaTableColumn>
+            <UsaTableColumn T="ParticipantMatch" Name="Matching State">
+                <Template Context="record">
+                    @(StateHelper.GetStateName(record.State))
+                </Template>
+            </UsaTableColumn>
+        </UsaTable>
     }
 </section>

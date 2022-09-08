@@ -20,7 +20,15 @@ i.e.
 ----------------------------------------
 */
 .cui {
-  @include u-bg('cyan-5');
+    @include u-bg('cyan-5');
+
+    .usa-alert {
+        border-left: none;
+    }
+}
+
+.usa-logo a {
+    color: #1b1b1b !important;
 }
 
 /*

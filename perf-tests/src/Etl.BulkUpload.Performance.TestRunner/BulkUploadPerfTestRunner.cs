@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Piipan.Etl.Func.BulkUpload.Models;
@@ -18,16 +19,18 @@ namespace Etl.BulkUpload.Performance.TestRunner
         private const string UPLOAD_CONTAINER_NAME = "upload";
         private string _azureStorageAccountName;
         private string _azureStorageAccountKey;
+        private string _uploadEncryptionKey;
 
-        public BulkUploadPerfTestRunner(string azureStorageAccountName, string azureStorageAccountKey)
+        public BulkUploadPerfTestRunner(string azureStorageAccountName, string azureStorageAccountKey, string uploadEncryptionKey)
         {
             _azureStorageAccountName = azureStorageAccountName;
             _azureStorageAccountKey = azureStorageAccountKey;
+            _uploadEncryptionKey = uploadEncryptionKey;
         }
 
         public async Task runTest(long desiredParticipantCount)
         {
-            string headers = "lds_hash,case_id,participant_id,benefits_end_month,recent_benefit_issuance_dates,vulnerable_individual";
+            string headers = "lds_hash,case_id,participant_id,participant_closing_date,recent_benefit_issuance_dates,vulnerable_individual";
 
             using (MemoryStream ms = new MemoryStream())
             {
@@ -37,8 +40,16 @@ namespace Etl.BulkUpload.Performance.TestRunner
                     await PopulateMemoryStreamWithMockRecords(writer, desiredParticipantCount);
                     Console.WriteLine($"Finish populating Mock Records - {DateTime.Now.ToLongTimeString()}");
 
+                    var cpk = new CustomerProvidedKey(_uploadEncryptionKey);
+
+                    // Specify the customer-provided key on the options for the client.
+                    BlobClientOptions options = new BlobClientOptions()
+                    {
+                        CustomerProvidedKey = cpk
+                    };
+
                     string connectionString = $"DefaultEndpointsProtocol=https;AccountName={_azureStorageAccountName};AccountKey={_azureStorageAccountKey};EndpointSuffix=core.windows.net";
-                    var blobClient = new BlobContainerClient(connectionString, UPLOAD_CONTAINER_NAME);
+                    var blobClient = new BlobContainerClient(connectionString, UPLOAD_CONTAINER_NAME, options);
 
                     string datePostfix = DateTime.Now.ToString("MM-dd-yy_HH:mm:ss");
 
@@ -80,8 +91,8 @@ namespace Etl.BulkUpload.Performance.TestRunner
                 var padRecId = recId.ToString("00000000");
                 p.LdsHash = createMockHash(128);
 
-                p.CaseId = $"case-{state}-{padRecId}";
-                p.ParticipantId = $"part-{state}-{padRecId}";
+                p.CaseId = $"case{state}{padRecId}";
+                p.ParticipantId = $"part{state}{padRecId}";
                 p.ParticipantClosingDate = DateTime.Now;
 
                 var dr1 = new DateRange(new DateTime(2021, 04, 01), new DateTime(2021, 04, 15));

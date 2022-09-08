@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Piipan.Components.Forms
 {
@@ -12,6 +12,7 @@ namespace Piipan.Components.Forms
     public partial class UsaInputSSN
     {
         [Inject] protected IJSRuntime JSRuntime { get; set; } = default!;
+        IJSObjectReference ssnJavascriptReference;
 
         /// <summary>
         /// This timer is used to hide the last SSN character typed after 1 second. This protects it as expected, but allows
@@ -34,11 +35,25 @@ namespace Piipan.Components.Forms
                 {
                     InvisibleValue ??= "";
                     InvisibleValue = string.Join("", InvisibleValue.Select(n => n != '-' ? '*' : n));
-                    int cursorPosition = await JSRuntime.InvokeAsync<int>("piipan.utilities.getCursorPosition", ElementReference);
+                    int cursorPosition = await ssnJavascriptReference.InvokeAsync<int>("GetCursorPosition", ElementReference);
                     await InvokeAsync(StateHasChanged);
-                    await JSRuntime.InvokeVoidAsync("piipan.utilities.setCursorPosition", ElementReference, cursorPosition);
+                    await ssnJavascriptReference.InvokeVoidAsync("SetCursorPosition", ElementReference, cursorPosition);
                 }
             };
+        }
+
+        /// <summary>
+        /// Grab the ssn javascript reference to be used later
+        /// </summary>
+        /// <param name="firstRender"></param>
+        /// <returns></returns>
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            if (ssnJavascriptReference == null)
+            {
+                ssnJavascriptReference = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/Piipan.Components/Forms/UsaInputSSN.razor.js");
+            }
         }
 
         /// <summary>
@@ -48,7 +63,7 @@ namespace Piipan.Components.Forms
         {
             CurrentValue ??= "";
             string value = e.Value as string;
-            var cursorPosition = await JSRuntime.InvokeAsync<int>("piipan.utilities.getCursorPosition", ElementReference);
+            var cursorPosition = await ssnJavascriptReference.InvokeAsync<int>("GetCursorPosition", ElementReference);
             if (cursorPosition > value.Length)
             {
                 cursorPosition = value.Length;
@@ -147,13 +162,13 @@ namespace Piipan.Components.Forms
             {
                 // Reset the value. Blazor won't rebind, but we need to refresh it anyway
                 // This happens when you try deleting a hyphen that's in the middle of the SSN and the above logic puts it back in.
-                await JSRuntime.InvokeVoidAsync("piipan.utilities.setValue", ElementReference, visible ? tempValue : invisibleValue);
+                await ssnJavascriptReference.InvokeVoidAsync("SetValue", ElementReference, visible ? tempValue : invisibleValue);
             }
             CurrentValue = tempValue;
             InvisibleValue = invisibleValue;
             StateHasChanged();
             await ValueChanged.InvokeAsync(tempValue);
-            await JSRuntime.InvokeVoidAsync("piipan.utilities.setCursorPosition", ElementReference, cursorPosition);
+            await ssnJavascriptReference.InvokeVoidAsync("SetCursorPosition", ElementReference, cursorPosition);
         }
     }
 }

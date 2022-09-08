@@ -3,6 +3,43 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). This project **does not** adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1.47] - 2022-08-09
+
+### Changed
+- Parameterized IAC to provide APIM SKU based on environment
+- Server parameters for Postgres in the Postgres ARM templates to increase logging
+
+### Added
+- Unauthorized banner to Participant Search, Match Search, Match Detail, and Match List pages. 
+- Unauthorized Page for when users don't have a location or a role claim
+- Support for tests that render & test CSHTML pages  
+- Script that generates a dependency report containing a list of .Net and JS dependencies
+- Created Log Analytics workspace for all Diagnostic Settings, updated IAC scripts to configure Settings in various resources
+
+### Fixed
+- Applied authentication to Bulk Upload & Upload Status endpoints
+- Added required participant_id to the request body in the APIM test script for Match API
+- Updated ETL Performance Testing tool to incorporate recent changes for Bulk Upload Payload encryption and new restrictions on allowed values for case_id & participant_id
+- Removed ID and Publisher from ETL Status API response
+- Reordered Search Reasons for Participant Search Page
+- Increased security of Storage Accounts
+- Fixed and upgraded Application Insights for Azure Functions to use Log Analytics workspace
+
+## [1.1.1.46] - 2022-08-09
+
+### Changed
+- HttpsOnly setting to true for Dashboard and Query Tool app services
+- Enabled all states and added MO for tts/test environment
+
+### Added
+- Ability to close a match based on either states both marking the match invalid or both providing a Final Disposition & Final Disposition Date
+- Warning modal that pops up for Vulnerable individuals when the individual is navigated to from a duplicate participation search, from the match search screen, or when directly navigating to the match detail screen
+- Match Detail back button that navigates to appropriate prior screen
+- Ability to capture all matches and resolution events in the Metrics database
+- Blazor toolip component to the Component library
+- Tooltips on the Invalid Match and Vulnerable Individual parts of the Match Detail page
+- Optional tableName parameter to functions in db_common bash script for specifying table-level access
+
 ## [1.1.1.45] - 2022-07-27
 
 ### Changed

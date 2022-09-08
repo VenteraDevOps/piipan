@@ -4,5 +4,6 @@
     {
         public const string SectionName = "Roles";
         public string[] EditMatch { get; set; }
+        public string[] ViewMatch { get; set; }
     }
 }

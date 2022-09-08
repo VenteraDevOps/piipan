@@ -40,3 +40,6 @@ SIEM_RECEIVER=$PREFIX-siem-tool-$ENV
 # Azure Storage SKU for per-state storage accounts and storage accounts backing function apps
 STORAGE_SKU="Standard_ZRS" # Standard Zone Redundant Storage
 # STORAGE_SKU="Standard_LRS" # Standard Locally Redundant Storage (Use this when ZRS is not available in the region)
+
+# Azure API Management (APIM) SKU
+APIM_SKU="Developer"

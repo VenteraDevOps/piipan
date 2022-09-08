@@ -3,6 +3,7 @@
     public enum BorderType
     {
         Round,
-        Square
+        Square,
+        RoundedSquare
     }
 }

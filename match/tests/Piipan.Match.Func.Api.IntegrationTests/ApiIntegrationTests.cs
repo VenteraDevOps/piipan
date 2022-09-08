@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,6 +25,9 @@ using Piipan.Match.Core.Parsers;
 using Piipan.Match.Core.Services;
 using Piipan.Match.Core.Validators;
 using Piipan.Metrics.Api;
+using Piipan.Notification.Common;
+using Piipan.Notification.Core.Extensions;
+using Piipan.Notifications.Core.Services;
 using Piipan.Participants.Core.DataAccessObjects;
 using Piipan.Participants.Core.Extensions;
 using Piipan.Participants.Core.Models;
@@ -29,6 +35,7 @@ using Piipan.Shared.API.Utilities;
 using Piipan.Shared.Cryptography;
 using Piipan.Shared.Cryptography.Extensions;
 using Piipan.Shared.Database;
+using Piipan.States.Core.DataAccessObjects;
 using Xunit;
 
 
@@ -111,16 +118,19 @@ namespace Piipan.Match.Func.Api.IntegrationTests
         static MatchApi Construct()
         {
             Environment.SetEnvironmentVariable("States", "ea");
-            Environment.SetEnvironmentVariable("EventGridEndPoint","http://someendpoint.gov");
-            Environment.SetEnvironmentVariable("EventGridKeyString","example");
+            Environment.SetEnvironmentVariable("EventGridEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridKeyString", "example");
             Environment.SetEnvironmentVariable("EventGridMetricSearchEndPoint", "http://someendpoint.gov");
             Environment.SetEnvironmentVariable("EventGridMetricSearchKeyString", "example");
-
+            Environment.SetEnvironmentVariable("EventGridMetricMatchEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridMetricMatchKeyString", "example");
+            Environment.SetEnvironmentVariable("EventGridNotificationEndPoint", "http://someendpoint.gov");
+            Environment.SetEnvironmentVariable("EventGridNotificationKeyString", "example");
+            Environment.SetEnvironmentVariable("QueryToolUrl", "http://someendpoint.gov");
 
             // Mixing cases to verify the enabled states can be used no matter their casing.
             Environment.SetEnvironmentVariable("EnabledStates", "ea,EB");
 
-            string base64EncodedKey = "kW6QuilIQwasK7Maa0tUniCdO+ACHDSx8+NYhwCo7jQ=";
             Environment.SetEnvironmentVariable("ColumnEncryptionKey", base64EncodedKey);
 
             var services = new ServiceCollection();
@@ -135,12 +145,6 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             services.AddTransient<IMatchResAggregator, MatchResAggregator>();
             services.AddSingleton<IMemoryCache, MemoryCache>();
 
-            services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(s =>
-            {
-                return new BasicPgConnectionFactory<ParticipantsDb>(
-                    NpgsqlFactory.Instance,
-                    Environment.GetEnvironmentVariable(Startup.DatabaseConnectionString));
-            });
             services.AddTransient<IParticipantPublishSearchMetric>(b =>
             {
                 var factory = new Mock<IParticipantPublishSearchMetric>();
@@ -151,9 +155,23 @@ namespace Piipan.Match.Func.Api.IntegrationTests
 
                 return factory.Object;
             });
-            services.RegisterParticipantsServices();
-            services.RegisterMatchServices();
-            services.RegisterKeyVaultClientServices();
+            services.AddTransient<IDbConnectionFactory<ParticipantsDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<ParticipantsDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.DatabaseConnectionString));
+            });
+            services.AddTransient<IParticipantPublishMatchMetric>(b =>
+            {
+                var factory = new Mock<IParticipantPublishMatchMetric>();
+
+                factory.Setup(m => m.PublishMatchMetric(
+                                        It.IsAny<ParticipantMatchMetrics>()))
+                       .Returns(Task.CompletedTask);
+
+                return factory.Object;
+            });
+
 
             services.AddTransient<IDbConnectionFactory<CollaborationDb>>(s =>
             {
@@ -162,6 +180,32 @@ namespace Piipan.Match.Func.Api.IntegrationTests
                     Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString));
             });
 
+            services.AddTransient<IDbConnectionFactory<StateInfoDb>>(s =>
+            {
+                return new BasicPgConnectionFactory<StateInfoDb>(
+                    NpgsqlFactory.Instance,
+                    Environment.GetEnvironmentVariable(Startup.CollaborationDatabaseConnectionString)
+                );
+            });
+            services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            var listener = new DiagnosticListener("Microsoft.AspNetCore");
+            services.AddSingleton<DiagnosticListener>(listener);
+            services.AddSingleton<DiagnosticSource>(listener);
+
+            services.AddMvc()
+                   .AddApplicationPart(typeof(Piipan.Notification.Common.ViewRenderService).GetTypeInfo().Assembly)
+                   .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                   .AddDataAnnotationsLocalization();
+
+            services.Configure<RazorViewEngineOptions>(o =>
+            {
+                o.ViewLocationFormats.Add("/Templates/{0}" + RazorViewEngine.ViewExtension);
+            });
+            services.RegisterNotificationServices();
+            services.RegisterParticipantsServices();
+            services.RegisterMatchServices();
+            services.RegisterKeyVaultClientServices();
             var provider = services.BuildServiceProvider();
 
             var api = new MatchApi(
@@ -331,7 +375,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             Assert.Equal(resultA.Matches.First().ParticipantId, recordA.ParticipantId);
             Assert.Equal(resultB.Matches.First().ParticipantId, recordB.ParticipantId);
         }
-        
+
         [Fact]
         public async void ApiCreatesMatchRecords()
         {
@@ -362,7 +406,7 @@ namespace Piipan.Match.Func.Api.IntegrationTests
             // Arrange
             var recordA = FullRecord();
             var recordEncryptedA = EncryptedFullRecord(recordA);
-            
+
             var recordB = FullRecord();
             // lynn,1940-08-01,000-12-3457
             recordB.LdsHash = "97719c32bb3c6a5e08c1241a7435d6d7047e75f40d8b3880744c07fef9d586954f77dc93279044c662d5d379e9c8a447ce03d9619ce384a7467d322e647e5d95";

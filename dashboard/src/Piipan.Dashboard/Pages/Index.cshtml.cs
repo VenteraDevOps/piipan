@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using System;
 using Microsoft.Extensions.Logging;
-using Piipan.Shared.Claims;
 
 namespace Piipan.Dashboard.Pages
 {
@@ -9,8 +8,8 @@ namespace Piipan.Dashboard.Pages
         private readonly ILogger<IndexModel> _logger;
 
         public IndexModel(ILogger<IndexModel> logger,
-            IClaimsProvider claimsProvider)
-            : base(claimsProvider)
+            IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             _logger = logger;
         }

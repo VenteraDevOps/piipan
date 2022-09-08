@@ -23,6 +23,7 @@ namespace Piipan.Participants.Api.Models
         }
 
         [JsonProperty("id")]
+        [JsonIgnore]
         public long Id { get; set; }
 
         [JsonProperty("upload_identifier")]
@@ -32,6 +33,7 @@ namespace Piipan.Participants.Api.Models
         public DateTime CreatedAt { get; set; }
 
         [JsonProperty("publisher")]
+        [JsonIgnore]
         public string Publisher { get; set; }
 
         [JsonProperty("participants_uploaded",

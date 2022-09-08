@@ -30,7 +30,7 @@ namespace Piipan.Match.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
             apiClient
-                .Setup(m => m.TryGetAsync<MatchResApiResponse>("matches/m123456", It.IsAny<IEnumerable<(string, string)>>()))
+                .Setup(m => m.TryGetAsync<MatchResApiResponse>("matches/m123456", It.IsAny<IEnumerable<(string, string)>>(), null))
                 .ReturnsAsync((expectedResponse, 200));
 
             var client = new MatchResolutionClient(apiClient.Object);
@@ -63,7 +63,7 @@ namespace Piipan.Match.Client.Tests
 
             var apiClient = new Mock<IAuthorizedApiClient<MatchResolutionClient>>();
             apiClient
-                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("matches", null))
+                .Setup(m => m.TryGetAsync<MatchResListApiResponse>("matches", null, null))
                 .ReturnsAsync((expectedResponse, 200));
 
             var client = new MatchResolutionClient(apiClient.Object);
